@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/evidence-unit.schema.json",
+  "title": "DeckCompiler Evidence Unit",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "evidence_id",
+    "source_id",
+    "source_locator",
+    "evidence_type",
+    "canonical_content",
+    "importance",
+    "confidence",
+    "visualizable_as",
+    "relations",
+    "citation_metadata",
+    "provenance"
+  ],
+  "properties": {
+    "evidence_id": {"type": "string", "pattern": "^ev_[0-9a-f]{20}$"},
+    "source_id": {"type": "string", "pattern": "^src_[0-9a-f]{20}$"},
+    "source_locator": {"$ref": "source-locator.schema.json"},
+    "evidence_type": {
+      "enum": ["intent", "claim", "definition", "process", "comparison", "statistic", "table", "figure", "recommendation", "quotation", "constraint"]
+    },
+    "canonical_content": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text"],
+      "properties": {
+        "text": {"type": "string", "minLength": 1},
+        "data": {}
+      }
+    },
+    "importance": {"enum": ["low", "medium", "high", "critical"]},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "visualizable_as": {
+      "type": "array",
+      "items": {"enum": ["text", "kpi", "table", "chart", "diagram", "process", "timeline", "comparison", "hero_visual", "citation"]},
+      "uniqueItems": true
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["relation_type", "target_evidence_id"],
+        "properties": {
+          "relation_type": {"enum": ["supports", "contradicts", "qualifies", "derives_from", "parent", "child", "compares_with"]},
+          "target_evidence_id": {"type": "string", "pattern": "^ev_[0-9a-f]{20}$"}
+        }
+      }
+    },
+    "citation_metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["citation_label", "repository_authored", "display_locator"],
+      "properties": {
+        "citation_label": {"type": "string", "minLength": 1},
+        "repository_authored": {"type": "boolean"},
+        "display_locator": {"type": "string", "minLength": 1},
+        "author": {"type": "string"},
+        "title": {"type": "string"}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["extraction_method", "normalization_version", "content_sha256"],
+      "properties": {
+        "extraction_method": {"enum": ["repository_authored_fixture", "deterministic_parser", "user_supplied"]},
+        "normalization_version": {"type": "string", "minLength": 1},
+        "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  }
+}

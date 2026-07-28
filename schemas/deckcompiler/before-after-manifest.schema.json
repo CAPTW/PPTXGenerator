@@ -1,0 +1,49 @@
+{
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/before-after-manifest.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DeckCompiler Phase 6 before faulty repaired manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "state": {
+      "type": "object",
+      "properties": {
+        "upstream_sha256": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+        "pptx_sha256": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+        "html_sha256": { "pattern": "^[0-9a-f]{64}$", "type": "string" }
+      },
+      "required": ["upstream_sha256", "pptx_sha256", "html_sha256"]
+    }
+  },
+  "properties": {
+    "schema_name": { "const": "phase6_before_after_manifest" },
+    "schema_version": { "const": "1.0.0" },
+    "manifest_id": { "pattern": "^before_after_[0-9a-f]{20}$", "type": "string" },
+    "repair_plan_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "states": {
+      "type": "object", "additionalProperties": false,
+      "properties": { "baseline": { "$ref": "#/$defs/state" }, "faulty": { "$ref": "#/$defs/state" }, "repaired": { "$ref": "#/$defs/state" } },
+      "required": ["baseline", "faulty", "repaired"]
+    },
+    "semantic_content_unchanged": { "const": true },
+    "evidence_bindings_unchanged": { "const": true },
+    "visual_targets_unchanged": { "const": true },
+    "direct_final_output_patch": { "const": false },
+    "visual_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "baseline_slide_001_sha256": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+        "faulty_slide_001_sha256": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+        "repaired_slide_001_sha256": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+        "contact_sheet_sha256": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+        "labels_outside_slide_image_regions": { "const": true }
+      },
+      "required": ["baseline_slide_001_sha256", "faulty_slide_001_sha256", "repaired_slide_001_sha256", "contact_sheet_sha256", "labels_outside_slide_image_regions"]
+    },
+    "created_at": { "format": "date-time", "type": "string" },
+    "timezone": { "const": "Asia/Seoul" },
+    "manifest_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" }
+  },
+  "required": ["schema_name", "schema_version", "manifest_id", "repair_plan_hash", "states", "semantic_content_unchanged", "evidence_bindings_unchanged", "visual_targets_unchanged", "direct_final_output_patch", "created_at", "timezone", "manifest_hash"]
+}

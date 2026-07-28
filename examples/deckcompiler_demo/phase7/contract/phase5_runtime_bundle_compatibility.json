@@ -1,0 +1,362 @@
+{
+  "authority_id": "bundleauth_39b009a998d4b5ab87e4",
+  "bundle_id": "deckcompiler-phase5-baseline-bundle",
+  "contract": "runtime_bundle_compatibility_v1",
+  "expected_file_count": 38,
+  "extra_file_count": 0,
+  "extra_paths": [],
+  "failure_codes": [],
+  "files": [
+    {
+      "classification": "text-clean-filter",
+      "clean_filter_oid_match": true,
+      "path": "README.md",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": null,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "external_skillset_pin.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "handoff/asset_manifest.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "handoff/crop_plan.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "handoff/expected_output_contract.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "handoff/invocation_plan.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "handoff/pngtopptx_handoff_manifest.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "handoff/reconstruction_constraints.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "input_provenance.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "manifests/crop_coverage_summary.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "manifests/html_element_manifest.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "manifests/native_object_manifest.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "manifests/pptx_object_inventory.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "manifests/reconstruction_manifest.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "text-clean-filter",
+      "clean_filter_oid_match": true,
+      "path": "outputs/html/index.html",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": null,
+      "status": "PASS"
+    },
+    {
+      "classification": "binary-exact",
+      "clean_filter_oid_match": true,
+      "path": "outputs/pptx_generator_demo.pptx",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": null,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "prior_failed_run_reference.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "provenance/external_skillset_pre_post_fingerprint.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "provenance/handoff_source_pre_post_fingerprint.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "provenance/orchestrator_execution_record.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "provenance/phase4_bundle_pre_post_fingerprint.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "provenance/repair_history.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "binary-exact",
+      "clean_filter_oid_match": true,
+      "path": "renders/slide-001.png",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": null,
+      "status": "PASS"
+    },
+    {
+      "classification": "binary-exact",
+      "clean_filter_oid_match": true,
+      "path": "renders/slide-002.png",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": null,
+      "status": "PASS"
+    },
+    {
+      "classification": "binary-exact",
+      "clean_filter_oid_match": true,
+      "path": "renders/slide-003.png",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": null,
+      "status": "PASS"
+    },
+    {
+      "classification": "binary-exact",
+      "clean_filter_oid_match": true,
+      "path": "renders/slide-004.png",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": null,
+      "status": "PASS"
+    },
+    {
+      "classification": "binary-exact",
+      "clean_filter_oid_match": true,
+      "path": "renders/slide-005.png",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": null,
+      "status": "PASS"
+    },
+    {
+      "classification": "binary-exact",
+      "clean_filter_oid_match": true,
+      "path": "renders/slide-006.png",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": null,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "validation/cross_output_semantic_parity_report.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "validation/external_visual_qa_summary.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "validation/html_package_validation_report.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "validation/html_semantic_fidelity_report.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "validation/independent_validation_summary.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "validation/official_pngtopptx_final_gate_report.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "validation/phase5_reconstruction_acceptance.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "validation/pptx_package_validation_report.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "validation/pptx_semantic_fidelity_report.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "validation/render_manifest.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    }
+  ],
+  "missing_file_count": 0,
+  "missing_paths": [],
+  "observed_file_count": 38,
+  "report_hash": "54edced9c97ffcd4d2a90c6dcbf4f6b94555849a41e4c2493dadafb8f9d16666",
+  "schema_name": "runtime_bundle_compatibility",
+  "schema_version": "1.0.0",
+  "source_commit": "541e4d1627951fd93ef25ef0b260eebead396229",
+  "status": "PASS",
+  "subtree_path": "examples/deckcompiler_demo/phase5"
+}

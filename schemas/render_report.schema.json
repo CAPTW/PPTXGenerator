@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/render_report.schema.json",
+  "title": "RenderReport",
+  "type": "object",
+  "required": [
+    "stage",
+    "status",
+    "inputs",
+    "outputs",
+    "source_evidence",
+    "created_at"
+  ],
+  "properties": {
+    "stage": {
+      "const": "RENDER_LOCAL_PPTX"
+    },
+    "status": {
+      "enum": [
+        "SUCCESS",
+        "FAIL"
+      ]
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "source_evidence": {
+      "$ref": "intake_manifest.schema.json#/$defs/sourceEvidenceList"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "invalidates_downstream_from": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "pptx_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "build_manifest_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "slide_build_linkage_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "render_validation": {
+      "type": "object",
+      "properties": {
+        "file_size_bytes": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "zip_readable": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "presentation_xml_present": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "slide_count": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "checksum": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "render_metadata": {
+      "type": "object"
+    },
+    "failure_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "next_stage": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

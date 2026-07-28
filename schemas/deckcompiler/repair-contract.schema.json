@@ -1,0 +1,26 @@
+{
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/repair-contract.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "contract_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "direct_final_html_patch": { "const": false },
+    "direct_final_pptx_patch": { "const": false },
+    "evidence_binding_change": { "const": false },
+    "expected_after_value": { "type": "number" },
+    "fixture_id": { "minLength": 1, "type": "string" },
+    "injection_surface": { "const": "lib/slides.js" },
+    "maximum_outer_waves": { "const": 3 },
+    "owner_artifact": { "const": "src/presentation_agent/deckcompiler/qa/reconstruction_source/slides.js" },
+    "owner_sha256": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "owner_field": { "minLength": 1, "type": "string" },
+    "repair_action_type": { "const": "rematerialize_canonical_owner" },
+    "schema_name": { "const": "phase6_repair_contract" },
+    "schema_version": { "const": "1.0.0" },
+    "semantic_content_change": { "const": false },
+    "visual_target_change": { "const": false }
+  },
+  "required": ["schema_name", "schema_version", "fixture_id", "owner_artifact", "owner_sha256", "owner_field", "injection_surface", "repair_action_type", "expected_after_value", "maximum_outer_waves", "direct_final_pptx_patch", "direct_final_html_patch", "semantic_content_change", "evidence_binding_change", "visual_target_change", "contract_hash"],
+  "title": "DeckCompiler Phase 6 fixture repair contract",
+  "type": "object"
+}

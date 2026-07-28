@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/external-visual-qa-output-contract-audit.schema.json",
+  "title": "DeckCompiler external visual QA output contract audit",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name", "schema_version", "tool_identity", "source_command", "tool_hashes",
+    "source_channel", "source_output_inventory", "detected_output_format", "detected_output_version",
+    "summary_location", "result_array_paths", "slide_level_paths", "rule_level_paths", "metric_paths",
+    "reason_message_paths", "official_rule_ids_exposed", "slide_ids_exposed", "severity_exposed",
+    "unknown_fields", "parser_verdict", "created_at", "timezone", "report_hash"
+  ],
+  "properties": {
+    "schema_name": {"const": "external_visual_qa_output_contract_audit"},
+    "schema_version": {"const": "1.0.0"},
+    "tool_identity": {"const": "slide-visual-polish-qa"},
+    "source_command": {"type": "array", "items": {"type": "string"}},
+    "tool_hashes": {"type": "object", "additionalProperties": {"$ref": "#/$defs/hash"}},
+    "source_channel": {"enum": ["json_report", "stdout_json"]},
+    "stdout": {"type": ["object", "null"]},
+    "stderr": {"type": ["object", "null"]},
+    "source_output_inventory": {"type": "array", "items": {"type": "object"}},
+    "detected_output_format": {"enum": ["rule_level_records", "slide_verdict_with_rule_records", "summary_only"]},
+    "detected_output_version": {"type": "string", "minLength": 1},
+    "summary_location": {"type": "string", "minLength": 1},
+    "result_array_paths": {"type": "array", "items": {"type": "string"}},
+    "slide_level_paths": {"type": "array", "items": {"type": "string"}},
+    "rule_level_paths": {"type": "array", "items": {"type": "string"}},
+    "metric_paths": {"type": "array", "items": {"type": "string"}},
+    "reason_message_paths": {"type": "array", "items": {"type": "string"}},
+    "official_rule_ids_exposed": {"type": "boolean"},
+    "slide_ids_exposed": {"type": "boolean"},
+    "severity_exposed": {"type": "boolean"},
+    "unknown_fields": {"type": "array", "items": {"type": "string"}},
+    "parser_verdict": {"enum": ["PASS", "BLOCKED"]},
+    "created_at": {"type": "string", "minLength": 1},
+    "timezone": {"const": "Asia/Seoul"},
+    "report_hash": {"$ref": "#/$defs/hash"}
+  },
+  "$defs": {"hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+}

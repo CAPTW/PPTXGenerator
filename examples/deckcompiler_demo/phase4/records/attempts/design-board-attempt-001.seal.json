@@ -1,0 +1,21 @@
+{
+  "schema_name": "platform_image_attempt_seal",
+  "schema_version": "1.0.0",
+  "request_id": "imagerequest_849385423afce7969c6c",
+  "attempt_id": "imageattempt_0283a64ebabc8db7511f",
+  "target_artifact_id": "designboard_61f00a55ee02666b3254",
+  "target_type": "design_board",
+  "prompt_id": "prompt_d4b67d090ed2e0128c16",
+  "prompt_hash": "3c7b0d1fc8e29a4213200a2dd39d1fd2a04004d515e8d64fcc6a52540bcfbbc9",
+  "attempt_number": 1,
+  "prior_attempt_id": null,
+  "expected_output_relative_path": "artifacts/design_board/imageattempt_0283a64ebabc8db7511f/original.png",
+  "expected_output_absent_at_seal": true,
+  "execution_mode": "platform_managed_tool",
+  "platform_tool_id": "image_gen.imagegen",
+  "external_provider_id": null,
+  "external_transport_used": false,
+  "repository_network_calls": 0,
+  "credential_lookups": 0,
+  "sealed_at": "2026-07-20T02:29:14.655+09:00"
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/fresh-locked-environment-report.schema.json",
+  "title": "DeckCompiler fresh locked Python environment report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "python_version",
+    "implementation",
+    "platform",
+    "interpreter_owner",
+    "interpreter_path_class",
+    "system_site_packages",
+    "user_site_packages",
+    "lock_sha256",
+    "distributions",
+    "locked_distribution_count",
+    "unexpected_distribution_count",
+    "pip_check_status",
+    "status",
+    "report_hash"
+  ],
+  "properties": {
+    "schema_name": {"const": "fresh_locked_environment_report"},
+    "schema_version": {"const": "1.0.0"},
+    "python_version": {"const": "3.11.9"},
+    "implementation": {"const": "CPython"},
+    "platform": {"const": "Windows_x64"},
+    "interpreter_owner": {"const": "deckcompiler_sys_executable"},
+    "interpreter_path_class": {"const": "%FRESH_VENV%/Scripts/python.exe"},
+    "system_site_packages": {"const": false},
+    "user_site_packages": {"const": false},
+    "lock_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "distributions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "version"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "version": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "locked_distribution_count": {"type": "integer", "minimum": 1},
+    "unexpected_distribution_count": {"const": 0},
+    "pip_check_status": {"const": "PASS"},
+    "status": {"const": "PASS"},
+    "report_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

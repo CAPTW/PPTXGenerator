@@ -1,0 +1,62 @@
+{
+  "actual_generation": true,
+  "attempt_id": "imageattempt_841f1a2d3f85ffe84b12",
+  "credential_lookups": 0,
+  "execution_mode": "platform_managed_tool",
+  "external_provider_id": null,
+  "external_transport_used": false,
+  "image_model": "not_exposed_by_tool",
+  "output": {
+    "completion_timestamp": "2026-07-20T02:33:30.465+09:00",
+    "normalized_dimensions": {
+      "height": 936,
+      "width": 1664
+    },
+    "normalized_file_size_bytes": 1088641,
+    "normalized_format": "PNG",
+    "normalized_relative_path": "references/design_board.png",
+    "normalized_sha256": "a0229b8e27b4a103c177682b2d742ae3d4dd6eb9bb70c675cbf9f88293dd666d",
+    "original_dimensions": {
+      "height": 941,
+      "width": 1672
+    },
+    "original_file_size_bytes": 1205577,
+    "original_format": "PNG",
+    "original_relative_path": "artifacts/design_board/imageattempt_841f1a2d3f85ffe84b12/original.png",
+    "original_sha256": "71291a4f56fa2abcaa4740a3504c8eb8138bb1e6c2ba8ed45b52b8a5eb298b2b",
+    "prior_attempt_id": "imageattempt_0283a64ebabc8db7511f",
+    "prompt_hash": "223f9a0826c02037f3c3d2a46c4c1c78d96bdd7364d6c51c84443f796cd293f0",
+    "prompt_id": "prompt_77ef39e31d92666aa704",
+    "prompt_relative_path": "prompts/design_board.prompt.json",
+    "rejection_reason": null,
+    "request_timestamp": "2026-07-20T02:32:19.306+09:00",
+    "seal_relative_path": "records/attempts/design-board-attempt-002.seal.json",
+    "selected": true,
+    "target_type": "design_board",
+    "transformation": {
+      "crop_box": [
+        4,
+        2,
+        1668,
+        938
+      ],
+      "nonuniform_resize_used": false,
+      "stretch_used": false,
+      "type": "aspect_preserving_crop",
+      "uniform_resize_to": null
+    },
+    "verification_status": "VERIFIED",
+    "visual_review_status": "ACCEPTED_FOR_PHASE4"
+  },
+  "platform_tool_channel": "commentary",
+  "platform_tool_id": "image_gen.imagegen",
+  "platform_tool_invocation_count": 1,
+  "record_hash": "3b5c9796179698517aa14c158510e420b1d4cd5e59d38749a9bed8f860b370b0",
+  "record_id": "imageexecution_1ef578c02d1b91c3c41b",
+  "repository_network_calls": 0,
+  "request_id": "imagerequest_eaa2f2fff6662540456a",
+  "schema_name": "platform_image_execution_record",
+  "schema_version": "1.0.0",
+  "target_artifact_id": "designboard_61f00a55ee02666b3254",
+  "tool_call_id": "not_exposed"
+}

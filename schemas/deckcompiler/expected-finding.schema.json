@@ -1,0 +1,27 @@
+{
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/expected-finding.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "canonical_repair_owner": { "const": "src/presentation_agent/deckcompiler/qa/reconstruction_source/slides.js" },
+    "contract_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "finding_id": { "minLength": 1, "type": "string" },
+    "fixture_id": { "minLength": 1, "type": "string" },
+    "gate": { "const": "visual" },
+    "injection_surface": { "const": "lib/slides.js" },
+    "object_id": { "const": "recommended-decision-body-text" },
+    "owning_artifact": { "minLength": 1, "type": "string" },
+    "release_blocking": { "const": true },
+    "repairable": { "const": true },
+    "rule_id": { "minLength": 1, "type": "string" },
+    "schema_name": { "const": "phase6_expected_finding" },
+    "schema_version": { "const": "1.0.0" },
+    "severity": { "const": "severe" },
+    "slide_id": { "const": "slide-001" },
+    "slot_id": { "const": "recommended-decision-body" },
+    "target_field": { "const": "#/functions/s1/recommended_decision_body/x" }
+  },
+  "required": ["schema_name", "schema_version", "fixture_id", "finding_id", "rule_id", "gate", "severity", "slide_id", "object_id", "slot_id", "target_field", "owning_artifact", "injection_surface", "canonical_repair_owner", "repairable", "release_blocking", "contract_hash"],
+  "title": "DeckCompiler Phase 6 expected finding contract",
+  "type": "object"
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/input-request.schema.json",
+  "title": "DeckCompiler Phase 3 Input Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "artifact", "run_id", "request_id", "mode", "prompt", "pdfs", "presentation", "policies", "stop_after"],
+  "properties": {
+    "schema_name": {"const": "input_request"},
+    "schema_version": {"const": "1.0.0"},
+    "artifact": {
+      "allOf": [
+        {"$ref": "artifact-envelope.schema.json"},
+        {"properties": {"artifact_type": {"const": "input_request"}}}
+      ]
+    },
+    "run_id": {"type": "string", "pattern": "^run_[0-9a-f]{20}$"},
+    "request_id": {"type": "string", "pattern": "^request_[0-9a-f]{20}$"},
+    "mode": {"enum": ["prompt_only", "prompt_plus_two_pdfs"]},
+    "prompt": {"$ref": "#/$defs/inputSource"},
+    "pdfs": {"type": "array", "maxItems": 2, "items": {"$ref": "#/$defs/inputSource"}},
+    "presentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slide_count", "audience", "purpose", "language", "tone", "workflow"],
+      "properties": {
+        "slide_count": {"type": "integer", "minimum": 5, "maximum": 6},
+        "audience": {"type": "string", "minLength": 1},
+        "purpose": {"type": "string", "minLength": 1},
+        "language": {"type": "string", "minLength": 1},
+        "tone": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "workflow": {"type": "string", "minLength": 1}
+      }
+    },
+    "policies": {"type": "object", "additionalProperties": {"type": "string", "minLength": 1}},
+    "stop_after": {"const": "creative_architecture"}
+  },
+  "$defs": {
+    "inputSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "source_type"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1, "not": {"pattern": "(^[A-Za-z]:|^/|\\.\\.|://)"}},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "source_type": {"enum": ["user_prompt", "pdf"]}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"mode": {"const": "prompt_only"}}, "required": ["mode"]},
+      "then": {"properties": {"pdfs": {"maxItems": 0}}}
+    },
+    {
+      "if": {"properties": {"mode": {"const": "prompt_plus_two_pdfs"}}, "required": ["mode"]},
+      "then": {"properties": {"pdfs": {"minItems": 2, "maxItems": 2}}}
+    }
+  ]
+}

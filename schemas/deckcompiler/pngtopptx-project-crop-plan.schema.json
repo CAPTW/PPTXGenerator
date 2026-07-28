@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/pngtopptx-project-crop-plan.schema.json",
+  "title": "PNGtoPPTX Project Crop Plan Wrapper",
+  "description": "DeckCompiler lineage envelope around observed_external_contract_v1. The slides object remains directly consumable by official make_crops.py.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "contract_classification",
+    "plan_id",
+    "handoff_id",
+    "producer",
+    "created_at",
+    "timezone",
+    "slide_count",
+    "ordered_slide_ids",
+    "ordered_source_asset_ids",
+    "source_assets",
+    "crop_count",
+    "crop_state",
+    "crop_state_reason",
+    "slides",
+    "validation_status"
+  ],
+  "properties": {
+    "schema_name": {"const": "pngtopptx_project_crop_plan"},
+    "schema_version": {"const": "1.0.0"},
+    "contract_classification": {"const": "observed_external_contract_v1"},
+    "plan_id": {"type": "string", "pattern": "^cropplan_[0-9a-f]{20}$"},
+    "handoff_id": {"type": "string", "pattern": "^pnghandoff_[0-9a-f]{20}$"},
+    "producer": {"const": "DeckCompiler thin handoff adapter"},
+    "created_at": {"type": "string", "minLength": 1},
+    "timezone": {"type": "string", "minLength": 1},
+    "slide_count": {"const": 6},
+    "ordered_slide_ids": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "ordered_source_asset_ids": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^cropsource_[0-9a-f]{20}$"}
+    },
+    "source_assets": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {"$ref": "#/$defs/sourceAsset"}
+    },
+    "crop_count": {"type": "integer", "minimum": 0},
+    "crop_state": {"enum": ["ZERO_RASTER_CROPS", "RASTER_CROPS_PRESENT"]},
+    "crop_state_reason": {"type": "string", "minLength": 1},
+    "slides": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["1", "2", "3", "4", "5", "6"],
+      "properties": {
+        "1": {"$ref": "#/$defs/cropList"},
+        "2": {"$ref": "#/$defs/cropList"},
+        "3": {"$ref": "#/$defs/cropList"},
+        "4": {"$ref": "#/$defs/cropList"},
+        "5": {"$ref": "#/$defs/cropList"},
+        "6": {"$ref": "#/$defs/cropList"}
+      }
+    },
+    "validation_status": {"const": "PASS"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "dimensions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height"],
+      "properties": {
+        "width": {"type": "integer", "minimum": 1},
+        "height": {"type": "integer", "minimum": 1}
+      }
+    },
+    "slotList": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "sourceAsset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_asset_id",
+        "sequence",
+        "slide_id",
+        "visual_target_id",
+        "sidecar_id",
+        "path",
+        "sha256",
+        "dimensions",
+        "format",
+        "role",
+        "native_required_slot_ids",
+        "raster_allowed_slot_ids",
+        "full_slide_raster_forbidden",
+        "ocr_canonical_text_forbidden",
+        "validation_status"
+      ],
+      "properties": {
+        "source_asset_id": {"type": "string", "pattern": "^cropsource_[0-9a-f]{20}$"},
+        "sequence": {"type": "integer", "minimum": 1, "maximum": 6},
+        "slide_id": {"type": "string", "minLength": 1},
+        "visual_target_id": {"type": "string", "minLength": 1},
+        "sidecar_id": {"type": "string", "minLength": 1},
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "dimensions": {"$ref": "#/$defs/dimensions"},
+        "format": {"const": "PNG"},
+        "role": {"const": "slide_visual_target_design_reference"},
+        "native_required_slot_ids": {"$ref": "#/$defs/slotList"},
+        "raster_allowed_slot_ids": {"$ref": "#/$defs/slotList"},
+        "full_slide_raster_forbidden": {"const": true},
+        "ocr_canonical_text_forbidden": {"const": true},
+        "validation_status": {"const": "PASS"}
+      }
+    },
+    "cropList": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/crop"}
+    },
+    "crop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "source_asset_id",
+        "slide",
+        "slot_id",
+        "x",
+        "y",
+        "w",
+        "h",
+        "feather_edges",
+        "content_type",
+        "reconstruction_reason",
+        "editable_replacement"
+      ],
+      "properties": {
+        "name": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"},
+        "source_asset_id": {"type": "string", "pattern": "^cropsource_[0-9a-f]{20}$"},
+        "slide": {"type": "integer", "minimum": 1, "maximum": 6},
+        "slot_id": {"type": "string", "minLength": 1},
+        "x": {"type": "integer", "minimum": 0},
+        "y": {"type": "integer", "minimum": 0},
+        "w": {"type": "integer", "minimum": 1},
+        "h": {"type": "integer", "minimum": 1},
+        "feather_edges": {"type": "string", "pattern": "^[LRTB]*$"},
+        "content_type": {"type": "string", "minLength": 1},
+        "reconstruction_reason": {"type": "string", "minLength": 1},
+        "editable_replacement": {"type": "string", "minLength": 1},
+        "allow_large_crop": {"type": "boolean"},
+        "reason": {"type": "string", "minLength": 1}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"allow_large_crop": {"const": true}}, "required": ["allow_large_crop"]},
+          "then": {"required": ["reason"]}
+        }
+      ]
+    }
+  }
+}

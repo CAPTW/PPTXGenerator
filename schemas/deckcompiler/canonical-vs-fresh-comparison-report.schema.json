@@ -1,0 +1,5 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://pptx-generator.local/schemas/deckcompiler/canonical-vs-fresh-comparison-report.schema.json", "title": "DeckCompiler canonical versus fresh comparison", "type": "object", "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "canonical_run_id", "fresh_run_id", "semantic_equivalence", "structural_equivalence", "release_gate_equivalence", "unexplained_divergence_count", "status", "report_hash"],
+  "properties": {"schema_name": {"const": "canonical_vs_fresh_comparison_report"}, "schema_version": {"const": "1.0.0"}, "canonical_run_id": {"type": "string"}, "fresh_run_id": {"type": "string"}, "semantic_equivalence": {"const": 1.0}, "structural_equivalence": {"const": "PASS"}, "release_gate_equivalence": {"const": "PASS"}, "unexplained_divergence_count": {"const": 0}, "status": {"const": "PASS"}, "report_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"}}
+}

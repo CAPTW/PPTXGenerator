@@ -1,0 +1,82 @@
+{
+  "architecture": "AMD64/x64",
+  "canonical_timezone": "Asia/Seoul",
+  "chromium": {
+    "executable_class": "%PLAYWRIGHT_BROWSERS_PATH%/chromium-1228/chrome-win64/chrome.exe",
+    "product": "Google Chrome for Testing",
+    "version": "149.0.7827.55"
+  },
+  "credential_requirement": false,
+  "environment_variables_prohibited": [
+    "OPENAI_API_KEY",
+    "API_KEY",
+    "ACCESS_TOKEN",
+    "CLIENT_SECRET"
+  ],
+  "environment_variables_required": [
+    "DECKCOMPILER_NODE_MODULES",
+    "PYTHONPATH",
+    "PYTHONNOUSERSITE"
+  ],
+  "external_python_dependency_manifest": {
+    "manifest_hash": "1f895c6e45ef7fc9e807631566de9edcb403211b9ac9aa9666e6101eef626e07",
+    "path": "examples/deckcompiler_demo/phase7/contract/external_python_runtime_dependency_manifest.json",
+    "required_distribution_count": 38
+  },
+  "external_python_interpreter": {
+    "fallback_allowed": false,
+    "owner": "deckcompiler_sys_executable",
+    "system_site_packages": false,
+    "user_site_packages": false
+  },
+  "external_skill_pin": {
+    "aggregate_sha256": "3dd4541fb0f2f4cf421d2a5c3cf2002390c0b00661a2e4d3a588d4467600022a",
+    "artifact_sha256": "61b64ca02cb1301c215d1cfa90b1f558ae127d3a19b2d49f2b82746930ef0a84",
+    "mode": "git_tree_pin",
+    "path": "docs/devpost/evidence/pngtopptx_external_skillset_pin.json"
+  },
+  "manifest_hash": "1af3d0763f47d3260f53f0a4307ad67b2d79f54298e8bee872e5ca2754738578",
+  "network_requirement_by_stage": {
+    "canonical_demo": "not_required",
+    "live_image_generation": "forbidden",
+    "lock_install": "package_index_or_preseeded_cache"
+  },
+  "node_lock": {
+    "reason": "Repo-local Node dependencies are not used by the canonical demo",
+    "status": "not_required"
+  },
+  "node_version": "24.13.1",
+  "path_sanitization_policy": "curated_artifacts_use_placeholders_and_relative_paths",
+  "playwright": {
+    "browser_revision": "1228",
+    "python_package_version": "1.61.0"
+  },
+  "powerpoint": {
+    "build": "20131",
+    "identity": "Microsoft PowerPoint",
+    "platform": "x64",
+    "product_release": "O365ProPlusRetail",
+    "required": true,
+    "version": "16.0"
+  },
+  "powershell_version": "7.5.8",
+  "python_interpreter_constraints": "CPython ==3.11.*; 64-bit Windows",
+  "python_lock_path": "requirements/devpost-release.lock.txt",
+  "python_lock_sha256": "4fde8f6fd2584f66e2c5f6c0f57f822da19809cb9d12259e35537d3d378a21dc",
+  "python_version": "3.11.9",
+  "release_profile_id": "devpost_p0_frozen_visuals",
+  "schema_name": "runtime_environment_manifest",
+  "schema_version": "1.1.0",
+  "setup_verification_status": "PASS",
+  "supported_os": {
+    "build": "26200",
+    "name": "Microsoft Windows 11 Pro",
+    "version": "10.0.26200"
+  },
+  "tesseract_cairo": {
+    "dll_path_class": "%PROGRAMFILES%/Tesseract-OCR",
+    "ocr_enabled": false,
+    "purpose": "Cairo DLL discovery only",
+    "tesseract_version": "5.4.0.20240606"
+  }
+}

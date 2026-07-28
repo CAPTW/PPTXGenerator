@@ -1,0 +1,18 @@
+{
+  "contract_hash": "8de3a1ae4488cef65d49ca3a2c3d9c0523b230038ff78f50c7d362f797637505",
+  "direct_final_html_patch": false,
+  "direct_final_pptx_patch": false,
+  "evidence_binding_change": false,
+  "expected_after_value": 210,
+  "fixture_id": "phase6-fixture-text-off-canvas-slide-001",
+  "injection_surface": "lib/slides.js",
+  "maximum_outer_waves": 3,
+  "owner_artifact": "src/presentation_agent/deckcompiler/qa/reconstruction_source/slides.js",
+  "owner_field": "#/functions/s1/recommended_decision_body/x",
+  "owner_sha256": "8130f47caa5decf4e1df5343f405fcc79ff18f6d7c6e1880d7e56733d45ae20b",
+  "repair_action_type": "rematerialize_canonical_owner",
+  "schema_name": "phase6_repair_contract",
+  "schema_version": "1.0.0",
+  "semantic_content_change": false,
+  "visual_target_change": false
+}

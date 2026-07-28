@@ -1,0 +1,230 @@
+{
+  "checks": {
+    "byte_size": 261527,
+    "failures": [],
+    "full_slide_picture_count": 0,
+    "html_absolute_machine_path_count": 0,
+    "html_external_network_dependency_count": 0,
+    "html_missing_asset_count": 0,
+    "html_native_table_count": 1,
+    "html_slide_count": 6,
+    "html_slide_order": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "macro_part_count": 0,
+    "macro_parts": [],
+    "media_part_count": 0,
+    "missing_part_count": 0,
+    "missing_parts": [],
+    "picture_shape_count": 0,
+    "pptx_sha256": "805eb4aa3d44d90ebe5b78c0247d02e412ebfc9468e57c778516b90de2d27676",
+    "python_pptx_open": true,
+    "python_pptx_version": "1.0.2",
+    "relationship_count": 43,
+    "render_count": 6,
+    "render_dimension_failures": [],
+    "renderer_identity": "Microsoft PowerPoint COM",
+    "renderer_version": "16.0",
+    "renders": [
+      {
+        "aspect_ratio": "16:9",
+        "byte_size": 95737,
+        "decode_valid": true,
+        "height": 1080,
+        "path": "renders/slide-001.png",
+        "sha256": "1d9753e704f776238d07862082540ee78dbc64630d50a8136e43151a28633684",
+        "slide": 1,
+        "width": 1920
+      },
+      {
+        "aspect_ratio": "16:9",
+        "byte_size": 100803,
+        "decode_valid": true,
+        "height": 1080,
+        "path": "renders/slide-002.png",
+        "sha256": "95da832e8af843baa86227eddd0933ee122d3238d4264a6fdd1647746c1df13e",
+        "slide": 2,
+        "width": 1920
+      },
+      {
+        "aspect_ratio": "16:9",
+        "byte_size": 94729,
+        "decode_valid": true,
+        "height": 1080,
+        "path": "renders/slide-003.png",
+        "sha256": "8da4216332f596e20de3df53e34c1592c5b31818181f06e64b21f06ca2f2901f",
+        "slide": 3,
+        "width": 1920
+      },
+      {
+        "aspect_ratio": "16:9",
+        "byte_size": 73027,
+        "decode_valid": true,
+        "height": 1080,
+        "path": "renders/slide-004.png",
+        "sha256": "855ae16e06b6e3c70aa795a7ce8feac03d699327135f2e5aff320c94e7a064a8",
+        "slide": 4,
+        "width": 1920
+      },
+      {
+        "aspect_ratio": "16:9",
+        "byte_size": 91074,
+        "decode_valid": true,
+        "height": 1080,
+        "path": "renders/slide-005.png",
+        "sha256": "1a9ecda45b6d0d475425dd84b83b441deeb8f040357c3a97fc6af43caf5659e2",
+        "slide": 5,
+        "width": 1920
+      },
+      {
+        "aspect_ratio": "16:9",
+        "byte_size": 95604,
+        "decode_valid": true,
+        "height": 1080,
+        "path": "renders/slide-006.png",
+        "sha256": "6f838b7d761103fea32ed7d90872db13d764ba088f6b0e3f7c159b5e160aa870",
+        "slide": 6,
+        "width": 1920
+      }
+    ],
+    "repair_warning_count": 0,
+    "required_parts_present": true,
+    "screenshot_slide_count": 0,
+    "semantic_raster_violation_count": 0,
+    "slide_count": 6,
+    "source_pptx_sha256": "805eb4aa3d44d90ebe5b78c0247d02e412ebfc9468e57c778516b90de2d27676",
+    "status": "PASS",
+    "zip_crc_failure": null,
+    "zip_open": true
+  },
+  "created_at": "2026-07-22T10:30:00+09:00",
+  "findings": [],
+  "implementation_provenance": {
+    "acceptance_authority": "DeckCompiler independent composite gate",
+    "component": "presentation_agent.deckcompiler.qa",
+    "deckcompiler_commit": "e2a6fabb1916680800097981fbda27abfe02b852",
+    "detector_version": "1.0.0",
+    "external_outputs_may_self_accept": false
+  },
+  "producer": "DeckCompiler package and render QA",
+  "report_hash": "137429c2d7ed971b10d4afc24d06361cd12bccffd5330553b4ea24ca172558f4",
+  "report_id": "report_35592355c0cf3ddda065",
+  "run_id": "phase6qa_9bd9b0fcf02397f92902",
+  "schema_name": "phase6_package_render_qa_report",
+  "schema_version": "1.0.0",
+  "severity_counts": {
+    "error": 0,
+    "info": 0,
+    "severe": 0,
+    "warning": 0
+  },
+  "source_artifacts": [
+    {
+      "artifact_id": "phase4-input-provenance",
+      "path": "examples/deckcompiler_demo/phase4/input_provenance.json",
+      "sha256": "d8e7659a779c7085d23a7ca049a9a9515401f943587f4d2365c11e6675a695ea"
+    },
+    {
+      "artifact_id": "phase4-geometry-fit",
+      "path": "examples/deckcompiler_demo/phase4/geometry_fit_report.json",
+      "sha256": "dcd87abdebfaffd19dfc1cddde1738329f134756df3f6481bd18f9024142f451"
+    },
+    {
+      "artifact_id": "phase4-bundle-acceptance",
+      "path": "examples/deckcompiler_demo/phase4/phase4_bundle_acceptance.json",
+      "sha256": "9e8570f96ae54e9666f54c6d2e0d0a6bc0affd54f1823a3cac7ee34a3172a2bd"
+    },
+    {
+      "artifact_id": "phase5-handoff",
+      "path": "examples/deckcompiler_demo/phase5/handoff/pngtopptx_handoff_manifest.json",
+      "sha256": "8548e4a21a0df26b4747af2273e407bd66a8d6c956a63d29d78cb5de67f35678"
+    },
+    {
+      "artifact_id": "phase5-reconstruction-constraints",
+      "path": "examples/deckcompiler_demo/phase5/handoff/reconstruction_constraints.json",
+      "sha256": "4f15ad4dcf389647d4db7bcd54b35f9db913f730d86bb1ae0f044ea89df04c46"
+    },
+    {
+      "artifact_id": "external-skillset-pin",
+      "path": "examples/deckcompiler_demo/phase5/external_skillset_pin.json",
+      "sha256": "be35c664bb3ed366d0ab558a58554f55cad2de56f790b1e0b68824ea45aee94a"
+    },
+    {
+      "artifact_id": "active-pptx",
+      "path": "active-output/pptx_generator_demo.pptx",
+      "sha256": "805eb4aa3d44d90ebe5b78c0247d02e412ebfc9468e57c778516b90de2d27676"
+    },
+    {
+      "artifact_id": "active-html",
+      "path": "active-output/html/index.html",
+      "sha256": "b1f161bed4d1dc37be576eceda0cf01d125580df4a767c4722582c8671983085"
+    },
+    {
+      "artifact_id": "artifact_db86bcbfdee3abef7294",
+      "path": "examples/deckcompiler_demo/phase4/semantic_sidecars/slide-001.semantic.json",
+      "sha256": "d64efb0fd8be9ae34be946e2649bf4462e22d9bce2b05418f9e27a9385877bc6"
+    },
+    {
+      "artifact_id": "artifact_e9de634311cff9b3cac9",
+      "path": "examples/deckcompiler_demo/phase4/semantic_sidecars/slide-002.semantic.json",
+      "sha256": "8716555d40f109bff559039a82bbc50004a663f5c0d2e10f4b35aa848214cc2c"
+    },
+    {
+      "artifact_id": "artifact_5127d8d1b1277c8f24c0",
+      "path": "examples/deckcompiler_demo/phase4/semantic_sidecars/slide-003.semantic.json",
+      "sha256": "e2268e400f51926e669e4f51bf2b474ba8f6a1eb58fbf8fb1786b239825cc6c3"
+    },
+    {
+      "artifact_id": "artifact_35f461ccdb3954692c6d",
+      "path": "examples/deckcompiler_demo/phase4/semantic_sidecars/slide-004.semantic.json",
+      "sha256": "a358fd52748cb0bb93699dea9b31c55927b8f72799e4aded4f8331065324a7b9"
+    },
+    {
+      "artifact_id": "artifact_b0fd337c0c45086f70ea",
+      "path": "examples/deckcompiler_demo/phase4/semantic_sidecars/slide-005.semantic.json",
+      "sha256": "a17b19ecb3c5453aa548a9df1e57cbc09bdb2fb19fb6b4813d7c611dd79add8a"
+    },
+    {
+      "artifact_id": "artifact_8ab300926d3f1c88b773",
+      "path": "examples/deckcompiler_demo/phase4/semantic_sidecars/slide-006.semantic.json",
+      "sha256": "fbb6d67cbccff2b063d50fdca7d20dd3290e895655066ea8d89faf73fe959587"
+    },
+    {
+      "artifact_id": "artifact_44ec7963d6feaff563f7",
+      "path": "examples/deckcompiler_demo/phase4/visual_targets/slide-001.png",
+      "sha256": "bb529c9644837050e4cf3a611e81dbaf9038fb083af13e262e79488f3966170f"
+    },
+    {
+      "artifact_id": "artifact_ecd46b993bd43411da8d",
+      "path": "examples/deckcompiler_demo/phase4/visual_targets/slide-002.png",
+      "sha256": "37f42109e03e22d0721da51ffd571e0a78452a5be1447bbcaec4f2d4008c9c72"
+    },
+    {
+      "artifact_id": "artifact_1a7b4d65e364654ef53d",
+      "path": "examples/deckcompiler_demo/phase4/visual_targets/slide-003.png",
+      "sha256": "96fc9ac2da10198a5cf2edf1f2fe44b089618dc1c72f8cd0c3c51313c19bb3d4"
+    },
+    {
+      "artifact_id": "artifact_7ff0d34d99747d7192b1",
+      "path": "examples/deckcompiler_demo/phase4/visual_targets/slide-004.png",
+      "sha256": "af9492fece0b40fc2f67ed42a1d073e2b82002eb15c58c64f955fe0cc70d9dbf"
+    },
+    {
+      "artifact_id": "artifact_e41b00231acf2abd7c05",
+      "path": "examples/deckcompiler_demo/phase4/visual_targets/slide-005.png",
+      "sha256": "8f42a53fd1fe62851082c147a280f2ac8487f450e0743d55a0c3c91d516ebb52"
+    },
+    {
+      "artifact_id": "artifact_e591dce29ea61dc74250",
+      "path": "examples/deckcompiler_demo/phase4/visual_targets/slide-006.png",
+      "sha256": "0274db749369959daac7fed17331e7f007ff5c47cc7b824698c3c298f5c0e4c2"
+    }
+  ],
+  "status": "PASS",
+  "timezone": "Asia/Seoul"
+}

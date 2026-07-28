@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/workflow-resolution.schema.json",
+  "title": "DeckCompiler Workflow Resolution",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "artifact", "resolution_id", "requested_workflow", "mapped_workflow_option", "selected_workflow_option", "contract_status", "resolution_code", "policy_id", "reason", "existing_contract_matrix_used", "planning_adapter_version"],
+  "properties": {
+    "schema_name": {"const": "workflow_resolution"},
+    "schema_version": {"const": "1.0.0"},
+    "artifact": {"allOf": [{"$ref": "artifact-envelope.schema.json"}, {"properties": {"artifact_type": {"const": "workflow_resolution"}}}]},
+    "resolution_id": {"type": "string", "pattern": "^workflow_[0-9a-f]{20}$"},
+    "requested_workflow": {"type": "string", "minLength": 1},
+    "mapped_workflow_option": {"type": "string", "minLength": 1},
+    "selected_workflow_option": {"type": "string", "minLength": 1},
+    "contract_status": {"const": "honored"},
+    "resolution_code": {"const": "request-honored"},
+    "policy_id": {"type": "string", "minLength": 1},
+    "reason": {"type": "string", "minLength": 1},
+    "existing_contract_matrix_used": {"const": true},
+    "planning_adapter_version": {"const": "deckcompiler-source-to-strict-v1"}
+  }
+}

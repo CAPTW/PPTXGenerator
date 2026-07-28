@@ -1,0 +1,15 @@
+{
+  "acceptance_hash": "5e38af2b8facda606135edac84b77528ef64f2a36433da3e9b1cfe4face970a5",
+  "acceptance_id": "phase4acceptance_82a7d497a590cc33d3ca",
+  "blocked_target_count": 0,
+  "bundle_status": "ELIGIBLE_FOR_PNGTOPPTX_HANDOFF",
+  "devpost_release_eligible": false,
+  "final_release_eligible": false,
+  "phase4_accepted": true,
+  "pngtopptx_executed": false,
+  "pptx_release_eligible": false,
+  "schema_name": "phase4_visual_bundle_acceptance",
+  "schema_version": "1.0.0",
+  "selected_image_count": 13,
+  "semantic_sidecar_count": 6
+}

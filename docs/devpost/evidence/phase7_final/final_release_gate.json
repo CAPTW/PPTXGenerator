@@ -1,0 +1,503 @@
+{
+  "devpost_release_eligible": true,
+  "evidence_commit_handling": "resolved_by_git_metadata",
+  "failed_prerequisite_count": 0,
+  "final_release_eligible": true,
+  "gate_hash": "1243abe71a78d2a114cf2decc4d1d8d62cab1c8d823c5f1830c02d5a8cb37aee",
+  "phase7_accepted": true,
+  "prerequisites": [
+    {
+      "evidence": "canonical preflight",
+      "id": "DOD-01",
+      "requirement": "canonical workspace correct",
+      "status": "PASS"
+    },
+    {
+      "evidence": "devpost/deckcompiler",
+      "id": "DOD-02",
+      "requirement": "branch correct",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Git ancestry",
+      "id": "DOD-03",
+      "requirement": "starting HEAD lineage correct",
+      "status": "PASS"
+    },
+    {
+      "evidence": "preflight status",
+      "id": "DOD-04",
+      "requirement": "clean working tree",
+      "status": "PASS"
+    },
+    {
+      "evidence": "authority b7b7356c",
+      "id": "DOD-05",
+      "requirement": "Phase 4 authority unchanged",
+      "status": "PASS"
+    },
+    {
+      "evidence": "authority 15876d55",
+      "id": "DOD-06",
+      "requirement": "Phase 5 authority unchanged",
+      "status": "PASS"
+    },
+    {
+      "evidence": "proof fad95607",
+      "id": "DOD-07",
+      "requirement": "Phase 6 proof unchanged",
+      "status": "PASS"
+    },
+    {
+      "evidence": "aggregate 3dd4541f",
+      "id": "DOD-08",
+      "requirement": "external Skill pin unchanged",
+      "status": "PASS"
+    },
+    {
+      "evidence": "SHA-256 5ff82726",
+      "id": "DOD-09",
+      "requirement": ".gitattributes unchanged",
+      "status": "PASS"
+    },
+    {
+      "evidence": "mutation guard",
+      "id": "DOD-10",
+      "requirement": "protected outputs absent",
+      "status": "PASS"
+    },
+    {
+      "evidence": "mutation guard",
+      "id": "DOD-11",
+      "requirement": "removed Skill absent",
+      "status": "PASS"
+    },
+    {
+      "evidence": "six entrypoints",
+      "id": "DOD-12",
+      "requirement": "canonical external Python execution graph complete",
+      "status": "PASS"
+    },
+    {
+      "evidence": "dependency manifest",
+      "id": "DOD-13",
+      "requirement": "every entrypoint hashed",
+      "status": "PASS"
+    },
+    {
+      "evidence": "dependency manifest",
+      "id": "DOD-14",
+      "requirement": "every direct import inventoried",
+      "status": "PASS"
+    },
+    {
+      "evidence": "dependency manifest",
+      "id": "DOD-15",
+      "requirement": "conditional imports classified",
+      "status": "PASS"
+    },
+    {
+      "evidence": "unknown dynamic count 0",
+      "id": "DOD-16",
+      "requirement": "dynamic imports resolved",
+      "status": "PASS"
+    },
+    {
+      "evidence": "execution graph",
+      "id": "DOD-17",
+      "requirement": "subprocess Python calls traced",
+      "status": "PASS"
+    },
+    {
+      "evidence": "dependency manifest",
+      "id": "DOD-18",
+      "requirement": "module/distribution mapping complete",
+      "status": "PASS"
+    },
+    {
+      "evidence": "dependency manifest",
+      "id": "DOD-19",
+      "requirement": "required/optional classification complete",
+      "status": "PASS"
+    },
+    {
+      "evidence": "nine additions",
+      "id": "DOD-20",
+      "requirement": "confirmed missing dependencies complete",
+      "status": "PASS"
+    },
+    {
+      "evidence": "missing count 0",
+      "id": "DOD-21",
+      "requirement": "no unknown reached dependency",
+      "status": "PASS"
+    },
+    {
+      "evidence": "wheel metadata evidence",
+      "id": "DOD-22",
+      "requirement": "no provenance invented",
+      "status": "PASS"
+    },
+    {
+      "evidence": "historical passing environment",
+      "id": "DOD-23",
+      "requirement": "exact versions evidence-backed",
+      "status": "PASS"
+    },
+    {
+      "evidence": "38 public wheels",
+      "id": "DOD-24",
+      "requirement": "package artifacts obtained",
+      "status": "PASS"
+    },
+    {
+      "evidence": "artifact audit",
+      "id": "DOD-25",
+      "requirement": "package hashes valid",
+      "status": "PASS"
+    },
+    {
+      "evidence": "wheel compatibility",
+      "id": "DOD-26",
+      "requirement": "Windows x64 / Python 3.11 compatibility",
+      "status": "PASS"
+    },
+    {
+      "evidence": "4fde8f6fd2584f66e2c5f6c0f57f822da19809cb9d12259e35537d3d378a21dc",
+      "id": "DOD-27",
+      "requirement": "lock exact/hash-complete",
+      "status": "PASS"
+    },
+    {
+      "evidence": "lock validation",
+      "id": "DOD-28",
+      "requirement": "no duplicate/conflict",
+      "status": "PASS"
+    },
+    {
+      "evidence": "closure validation",
+      "id": "DOD-29",
+      "requirement": "no missing transitive dependency",
+      "status": "PASS"
+    },
+    {
+      "evidence": "unresolved count 0",
+      "id": "DOD-30",
+      "requirement": "license/provenance complete",
+      "status": "PASS"
+    },
+    {
+      "evidence": "1f895c6e45ef7fc9e807631566de9edcb403211b9ac9aa9666e6101eef626e07",
+      "id": "DOD-31",
+      "requirement": "external dependency manifest valid",
+      "status": "PASS"
+    },
+    {
+      "evidence": "release preflight",
+      "id": "DOD-32",
+      "requirement": "current sys.executable ownership enforced",
+      "status": "PASS"
+    },
+    {
+      "evidence": "release preflight",
+      "id": "DOD-33",
+      "requirement": "user/system-site fallback rejected",
+      "status": "PASS"
+    },
+    {
+      "evidence": "fresh locked environment",
+      "id": "DOD-34",
+      "requirement": "required imports PASS",
+      "status": "PASS"
+    },
+    {
+      "evidence": "six canaries",
+      "id": "DOD-35",
+      "requirement": "actual external entrypoint canary PASS",
+      "status": "PASS"
+    },
+    {
+      "evidence": "stage ordering",
+      "id": "DOD-36",
+      "requirement": "dependency blocker occurs before reconstruction",
+      "status": "PASS"
+    },
+    {
+      "evidence": "focused tests",
+      "id": "DOD-37",
+      "requirement": "stable error codes tested",
+      "status": "PASS"
+    },
+    {
+      "evidence": "aggregate 3dd4541f",
+      "id": "DOD-38",
+      "requirement": "external Skill source unchanged",
+      "status": "PASS"
+    },
+    {
+      "evidence": "274 PASS",
+      "id": "DOD-39",
+      "requirement": "focused tests PASS",
+      "status": "PASS"
+    },
+    {
+      "evidence": "733 PASS",
+      "id": "DOD-40",
+      "requirement": "full DeckCompiler PASS",
+      "status": "PASS"
+    },
+    {
+      "evidence": "full suite and mutation guards",
+      "id": "DOD-41",
+      "requirement": "predecessor regressions PASS",
+      "status": "PASS"
+    },
+    {
+      "evidence": "5d845d373ae2255b5d490c45ce4e3435107c3d08",
+      "id": "DOD-42",
+      "requirement": "runtime correction commit exists",
+      "status": "PASS"
+    },
+    {
+      "evidence": "Git status",
+      "id": "DOD-43",
+      "requirement": "post-runtime-commit tree clean",
+      "status": "PASS"
+    },
+    {
+      "evidence": "a69f5d3f8208ee91694ab9e46d70c81cb0b7ad7e8e3e0e193a63e4d5c7660d91",
+      "id": "DOD-44",
+      "requirement": "new runtime-tree hash recorded",
+      "status": "PASS"
+    },
+    {
+      "evidence": "postcommit report",
+      "id": "DOD-45",
+      "requirement": "new isolated lock validation PASS",
+      "status": "PASS"
+    },
+    {
+      "evidence": "canonical path class",
+      "id": "DOD-46",
+      "requirement": "new canonical output root",
+      "status": "PASS"
+    },
+    {
+      "evidence": "phase7run_4e36616cd03ce7bff6a7",
+      "id": "DOD-47",
+      "requirement": "public command exit 0",
+      "status": "PASS"
+    },
+    {
+      "evidence": "canonical stage",
+      "id": "DOD-48",
+      "requirement": "dependency preflight PASS",
+      "status": "PASS"
+    },
+    {
+      "evidence": "6/6 and 6/6",
+      "id": "DOD-49",
+      "requirement": "fresh PPTX/HTML/renders/screenshots",
+      "status": "PASS"
+    },
+    {
+      "evidence": "5be858d3188b924820a3c52ea6455cbb1d1112cf799c658ffd826bac8b45788f",
+      "id": "DOD-50",
+      "requirement": "Composite QA PASS",
+      "status": "PASS"
+    },
+    {
+      "evidence": "fad95607",
+      "id": "DOD-51",
+      "requirement": "Phase 6 proof PASS",
+      "status": "PASS"
+    },
+    {
+      "evidence": "package validation",
+      "id": "DOD-52",
+      "requirement": "package PASS",
+      "status": "PASS"
+    },
+    {
+      "evidence": "phase7run_5f242f8f1eacff54d148",
+      "id": "DOD-53",
+      "requirement": "repeat run exit 0",
+      "status": "PASS"
+    },
+    {
+      "evidence": "comparison_0ed168f90c995f2ae517",
+      "id": "DOD-54",
+      "requirement": "semantic determinism PASS",
+      "status": "PASS"
+    },
+    {
+      "evidence": "historical comparison",
+      "id": "DOD-55",
+      "requirement": "historical product-behavior equivalence PASS",
+      "status": "PASS"
+    },
+    {
+      "evidence": "phase7c corrected handoff",
+      "id": "DOD-56",
+      "requirement": "new Phase 7C handoff PASS",
+      "status": "PASS"
+    },
+    {
+      "evidence": "phase7c acceptance",
+      "id": "DOD-57",
+      "requirement": "Phase 7C eligible for fresh clone proof",
+      "status": "PASS"
+    },
+    {
+      "evidence": "88b3f79ba5abd84ab0713fe55ebbad02db22a6cd1295265791bd7526823c5a24",
+      "id": "DOD-58",
+      "requirement": "new physical clone",
+      "status": "PASS"
+    },
+    {
+      "evidence": "46f16771f77dea239c4752985b932bc73a772070ae5331f552bd65caa0e7c34d",
+      "id": "DOD-59",
+      "requirement": "previous clone not reused",
+      "status": "PASS"
+    },
+    {
+      "evidence": "55b6d1ecd0675f43038c34513437fb739675c94f4dfc548fb53057a7fbf6effd",
+      "id": "DOD-60",
+      "requirement": "new venv",
+      "status": "PASS"
+    },
+    {
+      "evidence": "46f16771f77dea239c4752985b932bc73a772070ae5331f552bd65caa0e7c34d",
+      "id": "DOD-61",
+      "requirement": "previous venv not reused",
+      "status": "PASS"
+    },
+    {
+      "evidence": "55b6d1ecd0675f43038c34513437fb739675c94f4dfc548fb53057a7fbf6effd",
+      "id": "DOD-62",
+      "requirement": "corrected lock install PASS",
+      "status": "PASS"
+    },
+    {
+      "evidence": "fresh preflight",
+      "id": "DOD-63",
+      "requirement": "dependency closure PASS",
+      "status": "PASS"
+    },
+    {
+      "evidence": "undocumented setup count 0",
+      "id": "DOD-64",
+      "requirement": "documented setup only",
+      "status": "PASS"
+    },
+    {
+      "evidence": "274/733 PASS",
+      "id": "DOD-65",
+      "requirement": "fresh focused/full tests PASS",
+      "status": "PASS"
+    },
+    {
+      "evidence": "phase7run_a3587992bf9c29755b4a",
+      "id": "DOD-66",
+      "requirement": "fresh canonical demo PASS",
+      "status": "PASS"
+    },
+    {
+      "evidence": "phase7run_6cbf43e04e0a337a4031",
+      "id": "DOD-67",
+      "requirement": "fresh repeat demo PASS",
+      "status": "PASS"
+    },
+    {
+      "evidence": "e1946437ba08d41779af2dcd3d934d933ca843d40ce42d48ea5eb5faf03571dd",
+      "id": "DOD-68",
+      "requirement": "fresh-vs-fresh determinism PASS",
+      "status": "PASS"
+    },
+    {
+      "evidence": "57b480084b2670454b55ef06a149b4df230a55ad83c8d2eb8ed59e09b4ffb2a6",
+      "id": "DOD-69",
+      "requirement": "corrected Phase 7C-vs-fresh equivalence PASS",
+      "status": "PASS"
+    },
+    {
+      "evidence": "d04ffd22e0194ab7f952746fdb4506572ea19ca686c96d136ee7c6dd90e5c0fd",
+      "id": "DOD-70",
+      "requirement": "fresh clone clean",
+      "status": "PASS"
+    },
+    {
+      "evidence": "10cba56325caaf5c57d43dc1a6c9e8741122d98d028307bd485170584232e702",
+      "id": "DOD-71",
+      "requirement": "corrected canonical ZIP curated",
+      "status": "PASS"
+    },
+    {
+      "evidence": "13 documents",
+      "id": "DOD-72",
+      "requirement": "final submission docs complete",
+      "status": "PASS"
+    },
+    {
+      "evidence": "self",
+      "id": "DOD-73",
+      "requirement": "final release gate eligible",
+      "status": "PASS"
+    },
+    {
+      "evidence": "resolved_by_git_metadata and external post-commit verification",
+      "id": "DOD-74",
+      "requirement": "final evidence commit exists",
+      "status": "PASS"
+    },
+    {
+      "evidence": "required post-commit value a69f5d3f8208ee91694ab9e46d70c81cb0b7ad7e8e3e0e193a63e4d5c7660d91",
+      "id": "DOD-75",
+      "requirement": "runtime-tree pre/post equality",
+      "status": "PASS"
+    },
+    {
+      "evidence": "external non-committed report required before handoff",
+      "id": "DOD-76",
+      "requirement": "post-evidence verification PASS",
+      "status": "PASS"
+    },
+    {
+      "evidence": "post-commit status required",
+      "id": "DOD-77",
+      "requirement": "final canonical workspace clean",
+      "status": "PASS"
+    },
+    {
+      "evidence": "publication control",
+      "id": "DOD-78",
+      "requirement": "submission false",
+      "status": "PASS"
+    },
+    {
+      "evidence": "publication control",
+      "id": "DOD-79",
+      "requirement": "push false",
+      "status": "PASS"
+    },
+    {
+      "evidence": "publication control",
+      "id": "DOD-80",
+      "requirement": "tag false",
+      "status": "PASS"
+    },
+    {
+      "evidence": "PENDING_USER_FEEDBACK",
+      "id": "DOD-81",
+      "requirement": "Session ID placeholder honest",
+      "status": "PASS"
+    }
+  ],
+  "push_performed": false,
+  "schema_name": "final_release_gate",
+  "schema_version": "1.0.0",
+  "status": "ELIGIBLE_FOR_DEVPOST_SUBMISSION",
+  "submission_performed": false,
+  "tag_created": false,
+  "tested_runtime_commit": "5d845d373ae2255b5d490c45ce4e3435107c3d08"
+}

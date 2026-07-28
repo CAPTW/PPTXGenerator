@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/deckcompiler/phase4-editable-template-spec.schema.json",
+  "title": "DeckCompiler Phase 4 Editable Template Specification Wrapper",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "source_commit", "template_spec", "planning_contract", "content_hash"],
+  "properties": {
+    "schema_name": {"const": "phase4_editable_template_spec"},
+    "schema_version": {"const": "1.0.0"},
+    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "template_spec": {"$ref": "https://presentation-agent.local/schemas/creative_frontend/template_reference_editable_template_spec.schema.json"},
+    "planning_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["geometry_level", "slide_layout_assignments", "safe_areas", "capacity_limits", "native_raster_policy", "prohibited_uses"],
+      "properties": {
+        "geometry_level": {"const": "planning_normalized"},
+        "slide_layout_assignments": {
+          "type": "array", "minItems": 6, "maxItems": 6,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["slide_id", "module_id", "batch_id", "template_family_id", "layout_id", "required_slot_ids"],
+            "properties": {
+              "slide_id": {"type": "string"}, "module_id": {"type": "string"}, "batch_id": {"type": "string"}, "template_family_id": {"type": "string"}, "layout_id": {"type": "string"},
+              "required_slot_ids": {"type": "array", "minItems": 1, "items": {"type": "string"}, "uniqueItems": true}
+            }
+          }
+        },
+        "safe_areas": {"type": "object"},
+        "capacity_limits": {"type": "object"},
+        "native_raster_policy": {"type": "object"},
+        "prohibited_uses": {"type": "array", "minItems": 4, "items": {"type": "string"}, "uniqueItems": true}
+      }
+    },
+    "content_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

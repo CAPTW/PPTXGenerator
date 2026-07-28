@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/intake_manifest.schema.json",
+  "title": "IntakeManifest",
+  "type": "object",
+  "required": [
+    "stage",
+    "status",
+    "inputs",
+    "outputs",
+    "source_evidence",
+    "created_at"
+  ],
+  "properties": {
+    "stage": {
+      "const": "INGEST"
+    },
+    "status": {
+      "enum": [
+        "APPROVED",
+        "BLOCKED"
+      ]
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "source_evidence": {
+      "$ref": "#/$defs/sourceEvidenceList"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "invalidates_downstream_from": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "asset_id",
+          "filename",
+          "roles"
+        ],
+        "properties": {
+          "asset_id": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fingerprint": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "request_contract": {
+      "type": "object",
+      "properties": {
+        "requested_workflow_option": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "fingerprints": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/fingerprintRecord"
+      }
+    }
+  },
+  "$defs": {
+    "sourceEvidenceList": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "properties": {
+          "asset_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "artifact": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "fingerprintRecord": {
+      "type": "object",
+      "required": [
+        "key",
+        "digest",
+        "invalidates_from_stage",
+        "sources"
+      ],
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "digest": {
+          "type": "string"
+        },
+        "invalidates_from_stage": {
+          "type": "string",
+          "enum": [
+            "INGEST",
+            "DESIGN_REFERENCE_CHECK",
+            "MASTER_TEMPLATE",
+            "CONTENT_PLAN",
+            "GENERATE",
+            "QA",
+            "RENDER_LOCAL_PPTX"
+          ]
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": true
+}

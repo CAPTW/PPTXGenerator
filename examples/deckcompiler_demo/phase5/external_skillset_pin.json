@@ -1,0 +1,16 @@
+{
+  "canonical_pin_artifact": "docs/devpost/evidence/pngtopptx_external_skillset_pin.json",
+  "combined_aggregate_sha256": "3dd4541fb0f2f4cf421d2a5c3cf2002390c0b00661a2e4d3a588d4467600022a",
+  "content_sha256_without_this_field": "7717191520af425163c517ec4f69c0060b2f66d2a74603250ae5256415ecb3f5",
+  "external_skill_modified": false,
+  "installed_file_count": 99,
+  "pin_hash": "c98dee779823ec40d176f54f10363dce676bb7299d99ffb2216c9a6454dc1a27",
+  "pin_id": "pngpin_1c4af8ad011cc18786d8",
+  "post_status": "PASS",
+  "pre_status": "PASS",
+  "schema_name": "phase5_external_skillset_pin_reference",
+  "schema_version": "1.0.0",
+  "status": "PASS",
+  "unexpected_executable_extras_count": 0,
+  "validation_command": "python -B -m presentation_agent.deckcompiler validate-pngtopptx-pin --installation-root <external-skill-root> --pin docs/devpost/evidence/pngtopptx_external_skillset_pin.json"
+}

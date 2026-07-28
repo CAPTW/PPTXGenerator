@@ -1,0 +1,343 @@
+{
+  "artifact_hash": "b4ef3bac92567be6120e1ce4acebf78209c52d772d9b0b152ece75d9f79b0812",
+  "expected_visual_target_id": "visualtarget_04b7463dd0285b07a31a",
+  "phase4_metadata": {
+    "accessibility_description": "Evidence-backed risk findings. Prioritize the most consequential risks using traceable findings and numbers.",
+    "canonical_content_hashes": {
+      "citation-01": "cc34f5e43c4a3ece6698072e327b58469716055a432816bb398b77bf2d74de7e",
+      "citation-02": "0598fd24001026778bcd2b6990b62a2c9a2f07a54b8ff72be809f15abb4d2357",
+      "citation-03": "e892c83c813274b4ec01bd2240999ab85c566493b464a32f4a5b781b17f23310",
+      "citation-04": "c8c50f9ca1264c20a79e76a4de72e725e9efdb328310122b11b1d5ef8ea30adf",
+      "citation-05": "68b49972f28777b46f8de0093ee4435f692dcfcb55b934d81a9a1597208355fe",
+      "slide-03-risk-findings-evidence-01": "af3d7425df48a62aa08a3509bcb564f287e66f07f89e7f876445e8fc7311e45e",
+      "slide-03-risk-findings-evidence-02": "4e8588692f5ae7dbb10f93b191be6fc70fe0140a628f730eddbb6fd5fda4216b",
+      "slide-03-risk-findings-evidence-03": "a6cc92e789bbe44946926fc0d5c99e2d5efd117def44ecae055ebcb23a7d8e84",
+      "slide-03-risk-findings-evidence-04": "c69f036d3782421dc697a3da93cfb538edbe127221ddd569360c6435c35400aa",
+      "slide-03-risk-findings-evidence-05": "641b2c8c60036cd2f3be82b9cf7f53ae21d4bd435e44c411584e76b43be287db",
+      "speaker_notes": "7d512ac2e4583c2ab59dbe64ade6a74a560831ef745405b1714f03c7fedda2b7",
+      "subtitle": "b9b0047e90ff1fbe00da1175ea9ce6c6054b221b68243ac522f899bc2137e54d",
+      "title": "223304762d4b77e2da6c3ee80000988d146a1d15c53a40e9c540491034cdc40b"
+    },
+    "citations": [
+      {
+        "citation_id": "ev_1e9b8f0e5619ab8c65e0",
+        "label": "AI Data Center Cooling System Overview, page 2",
+        "source": "src_28f15fd546b6f681dba7"
+      },
+      {
+        "citation_id": "ev_77ff16b86a91f6aa4b0c",
+        "label": "AI Data Center Cooling System Overview, page 2",
+        "source": "src_28f15fd546b6f681dba7"
+      },
+      {
+        "citation_id": "ev_8431641a3e942e9a3fa9",
+        "label": "AI Data Center Cooling Risk Decision Report, page 1",
+        "source": "src_e35364d65cb7cc6e21dd"
+      },
+      {
+        "citation_id": "ev_8fa3cc97dbb13d32f5aa",
+        "label": "AI Data Center Cooling Risk Decision Report, page 2",
+        "source": "src_e35364d65cb7cc6e21dd"
+      },
+      {
+        "citation_id": "ev_91e413f88fab19b30183",
+        "label": "AI Data Center Cooling System Overview, page 3",
+        "source": "src_28f15fd546b6f681dba7"
+      }
+    ],
+    "diagram_edges": [],
+    "diagram_nodes": [],
+    "evidence_unit_bindings": [
+      "ev_1e9b8f0e5619ab8c65e0",
+      "ev_77ff16b86a91f6aa4b0c",
+      "ev_8431641a3e942e9a3fa9",
+      "ev_8fa3cc97dbb13d32f5aa",
+      "ev_91e413f88fab19b30183"
+    ],
+    "exact_body_blocks": [
+      {
+        "content_item_id": "slide-03-risk-findings-evidence-01",
+        "slot": "body",
+        "text": "Redundant sensing reduces single-point blind spots but does not remove calibration drift risk.",
+        "type": "source_evidence"
+      },
+      {
+        "content_item_id": "slide-03-risk-findings-evidence-02",
+        "slot": "body",
+        "text": "A loss of reliable flow telemetry can hide a developing restriction until component temperatures begin to rise.",
+        "type": "source_evidence"
+      },
+      {
+        "content_item_id": "slide-03-risk-findings-evidence-03",
+        "slot": "body",
+        "text": "Shared heat-rejection saturation can affect multiple compute rows at the same time.",
+        "type": "source_evidence"
+      },
+      {
+        "content_item_id": "slide-03-risk-findings-evidence-04",
+        "slot": "body",
+        "text": "A combined option can address both rapid flow loss and slower sensor degradation without requiring a full plant redesign.",
+        "type": "source_evidence"
+      },
+      {
+        "content_item_id": "slide-03-risk-findings-evidence-05",
+        "slot": "body",
+        "text": "Facility heat-rejection capacity remains a shared upstream constraint even when the primary loop is healthy.",
+        "type": "source_evidence"
+      }
+    ],
+    "exact_labels": [
+      "TITLE",
+      "SUBTITLE",
+      "BODY",
+      "KPI",
+      "FOOTER",
+      "SOURCE_NOTES",
+      "PAGE_NUMBER"
+    ],
+    "exact_numbers": [],
+    "exact_subtitle": "Claim origin: documentary fact",
+    "exact_title": "Evidence-backed risk findings",
+    "exact_units": [],
+    "factual_content_item_ids": [
+      "slide-03-risk-findings-evidence-01",
+      "slide-03-risk-findings-evidence-02",
+      "slide-03-risk-findings-evidence-03",
+      "slide-03-risk-findings-evidence-04",
+      "slide-03-risk-findings-evidence-05"
+    ],
+    "full_slide_raster_forbidden": true,
+    "native_required_slot_ids": [
+      "title",
+      "subtitle",
+      "body",
+      "kpi",
+      "footer",
+      "source_notes",
+      "page_number"
+    ],
+    "ocr_canonical_text_forbidden": true,
+    "primary_message": "Prioritize the most consequential risks using traceable findings and numbers.",
+    "raster_allowed_slot_ids": [
+      "bounded_illustration"
+    ],
+    "slide_role": "risk_findings",
+    "source_note_policy": "Visible native footer/source-note region; exact citation text remains Sidecar authority.",
+    "speaker_note_candidates": [
+      "Source notes: page 2, block 6 — AI Data Center Cooling System Overview; page 2, block 5 — AI Data Center Cooling System Overview; page 1, block 4 — AI Data Center Cooling Risk Decision Report; page 2, block 5 — AI Data Center Cooling Risk Decision Report; page 3, block 4 — AI Data Center Cooling System Overview"
+    ],
+    "structured_chart_data": {
+      "series": []
+    },
+    "structured_table_data": null,
+    "visual_target_is_not_semantic_source": true
+  },
+  "schema_name": "phase4_semantic_sidecar",
+  "schema_version": "1.0.0",
+  "sidecar": {
+    "batch_id": "batch-02-01",
+    "canonical_content": [
+      {
+        "kind": "text",
+        "slot_id": "title",
+        "value": "Evidence-backed risk findings"
+      },
+      {
+        "kind": "text",
+        "slot_id": "subtitle",
+        "value": "Claim origin: documentary fact"
+      },
+      {
+        "kind": "text",
+        "slot_id": "body",
+        "value": "Redundant sensing reduces single-point blind spots but does not remove calibration drift risk."
+      },
+      {
+        "kind": "text",
+        "slot_id": "body",
+        "value": "A loss of reliable flow telemetry can hide a developing restriction until component temperatures begin to rise."
+      },
+      {
+        "kind": "text",
+        "slot_id": "body",
+        "value": "Shared heat-rejection saturation can affect multiple compute rows at the same time."
+      },
+      {
+        "kind": "text",
+        "slot_id": "body",
+        "value": "A combined option can address both rapid flow loss and slower sensor degradation without requiring a full plant redesign."
+      },
+      {
+        "kind": "text",
+        "slot_id": "body",
+        "value": "Facility heat-rejection capacity remains a shared upstream constraint even when the primary loop is healthy."
+      },
+      {
+        "kind": "citation",
+        "slot_id": "footer",
+        "value": {
+          "citation_id": "ev_1e9b8f0e5619ab8c65e0",
+          "label": "AI Data Center Cooling System Overview, page 2",
+          "source": "src_28f15fd546b6f681dba7"
+        }
+      },
+      {
+        "kind": "citation",
+        "slot_id": "footer",
+        "value": {
+          "citation_id": "ev_77ff16b86a91f6aa4b0c",
+          "label": "AI Data Center Cooling System Overview, page 2",
+          "source": "src_28f15fd546b6f681dba7"
+        }
+      },
+      {
+        "kind": "citation",
+        "slot_id": "footer",
+        "value": {
+          "citation_id": "ev_8431641a3e942e9a3fa9",
+          "label": "AI Data Center Cooling Risk Decision Report, page 1",
+          "source": "src_e35364d65cb7cc6e21dd"
+        }
+      },
+      {
+        "kind": "citation",
+        "slot_id": "footer",
+        "value": {
+          "citation_id": "ev_8fa3cc97dbb13d32f5aa",
+          "label": "AI Data Center Cooling Risk Decision Report, page 2",
+          "source": "src_e35364d65cb7cc6e21dd"
+        }
+      },
+      {
+        "kind": "citation",
+        "slot_id": "footer",
+        "value": {
+          "citation_id": "ev_91e413f88fab19b30183",
+          "label": "AI Data Center Cooling System Overview, page 3",
+          "source": "src_28f15fd546b6f681dba7"
+        }
+      },
+      {
+        "kind": "speaker_notes",
+        "slot_id": "speaker_notes",
+        "value": "Source notes: page 2, block 6 — AI Data Center Cooling System Overview; page 2, block 5 — AI Data Center Cooling System Overview; page 1, block 4 — AI Data Center Cooling Risk Decision Report; page 2, block 5 — AI Data Center Cooling Risk Decision Report; page 3, block 4 — AI Data Center Cooling System Overview"
+      }
+    ],
+    "content_hash": "6ab94d71fc2abcbdb897f861469796a6e4962f7dba273302c8d1d50d5962a5db",
+    "editability_policy": {
+      "cards": "native_required",
+      "charts": "native_required",
+      "full_slide_raster": "forbidden",
+      "image_frames": "replaceable",
+      "speaker_notes": "native_required",
+      "tables": "native_required",
+      "text": "native_required"
+    },
+    "layout_id": "layout-risk-evidence-grid",
+    "module_id": "module-02-section_02_evaluate",
+    "native_required": [
+      {
+        "object_type": "text_box",
+        "slot_id": "title"
+      },
+      {
+        "object_type": "text_box",
+        "slot_id": "subtitle"
+      },
+      {
+        "object_type": "text_box",
+        "slot_id": "body"
+      },
+      {
+        "object_type": "chart",
+        "slot_id": "kpi"
+      },
+      {
+        "object_type": "footer",
+        "slot_id": "footer"
+      },
+      {
+        "object_type": "footer",
+        "slot_id": "source_notes"
+      },
+      {
+        "object_type": "footer",
+        "slot_id": "page_number"
+      }
+    ],
+    "raster_allowed": [
+      {
+        "slot_id": "bounded_illustration",
+        "usage": "replaceable_image_frame"
+      }
+    ],
+    "schema_name": "slide_semantic_sidecar",
+    "schema_version": "1.0.0",
+    "slide_id": "slide-03-risk-findings",
+    "source_bindings": [
+      {
+        "element": "slide-03-risk-findings-evidence-01",
+        "evidence_ids": [
+          "ev_1e9b8f0e5619ab8c65e0"
+        ]
+      },
+      {
+        "element": "slide-03-risk-findings-evidence-02",
+        "evidence_ids": [
+          "ev_77ff16b86a91f6aa4b0c"
+        ]
+      },
+      {
+        "element": "slide-03-risk-findings-evidence-03",
+        "evidence_ids": [
+          "ev_8431641a3e942e9a3fa9"
+        ]
+      },
+      {
+        "element": "slide-03-risk-findings-evidence-04",
+        "evidence_ids": [
+          "ev_8fa3cc97dbb13d32f5aa"
+        ]
+      },
+      {
+        "element": "slide-03-risk-findings-evidence-05",
+        "evidence_ids": [
+          "ev_91e413f88fab19b30183"
+        ]
+      },
+      {
+        "element": "citation-01",
+        "evidence_ids": [
+          "ev_1e9b8f0e5619ab8c65e0"
+        ]
+      },
+      {
+        "element": "citation-02",
+        "evidence_ids": [
+          "ev_77ff16b86a91f6aa4b0c"
+        ]
+      },
+      {
+        "element": "citation-03",
+        "evidence_ids": [
+          "ev_8431641a3e942e9a3fa9"
+        ]
+      },
+      {
+        "element": "citation-04",
+        "evidence_ids": [
+          "ev_8fa3cc97dbb13d32f5aa"
+        ]
+      },
+      {
+        "element": "citation-05",
+        "evidence_ids": [
+          "ev_91e413f88fab19b30183"
+        ]
+      }
+    ],
+    "template_family_id": "family-evidence-grid"
+  },
+  "sidecar_id": "sidecar_64ca44f39ae7dbd432e3",
+  "source_commit": "00fefe71e3b02fa897794f9e9f3d6df5be715cd8"
+}

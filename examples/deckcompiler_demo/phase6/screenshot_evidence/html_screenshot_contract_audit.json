@@ -1,0 +1,165 @@
+{
+  "actual_size_producer": "PNG IHDR from Playwright locator.screenshot or Chrome CLI viewport screenshot, independently recomputed by DeckCompiler",
+  "browser_preference_order": [
+    "playwright-python/chromium",
+    "chrome-cli --headless=new",
+    "chrome-cli --headless"
+  ],
+  "capture_mode": {
+    "device_scale_factor": 1,
+    "diagnostic_only": true,
+    "fallback": "isolated temporary HTML viewport screenshot",
+    "full_page": false,
+    "preferred": "visible slide selector screenshot",
+    "qa_static_query": "?qa=1"
+  },
+  "contract_classification": "DIMENSION_MAPPING_DEFECT",
+  "created_at": "2026-07-22T09:18:13.9596520+09:00",
+  "curated_audit_hash": "39340948789339d784fd778c155915c79a6212513dcd0ec9255ffd97e5be9fe6",
+  "expected_size_authority": {
+    "authoritative_current_dimensions": {
+      "height": 936,
+      "width": 1664
+    },
+    "current_deck_html_body": {
+      "attributes": [
+        "data-deck-pxw",
+        "data-deck-pxh"
+      ],
+      "height": 936,
+      "width": 1664
+    },
+    "current_deck_slide_css": {
+      "height": 936,
+      "width": 1664
+    },
+    "generic_external_defaults": {
+      "classification": "fallback defaults only, not deck-specific authority",
+      "height": 941,
+      "width": 1672
+    },
+    "phase4_visual_target_and_handoff": {
+      "height": 936,
+      "width": 1664
+    }
+  },
+  "external_pin": {
+    "pin_hash": "c98dee779823ec40d176f54f10363dce676bb7299d99ffb2216c9a6454dc1a27",
+    "pin_id": "pngpin_1c4af8ad011cc18786d8",
+    "skill_aggregate_sha256": "9ecbc8904a72dd4fd62fd64e0b5d430016c8193c09653fa2330baee940f71161",
+    "skill_file_count": 20,
+    "skill_md_sha256": "4c3ff087e112ad2742d276b53480b62158852a8c9fbc8ddb487c9dbeec9db50a",
+    "source_tree_oid": "1795e9b6986647051c03ff20977c67994aa18584",
+    "validation_status": "PASS"
+  },
+  "ownership_verdict": {
+    "approved_owner": "DeckCompiler capture invocation/evidence harness",
+    "deckcompiler_defect": "reachability.py omitted explicit deck-specific --width/--height and invoked all six slides in one opaque subprocess",
+    "dual_surface_required": false,
+    "external_contract": "valid and unchanged",
+    "external_skill_modification_required": false,
+    "stretch_or_resize_required": false
+  },
+  "prior_failure": {
+    "actual": {
+      "height": 936,
+      "width": 1664
+    },
+    "deepest_timeout_stage": "child_process_wait",
+    "output_exists": false,
+    "requested": {
+      "height": 941,
+      "width": 1672
+    },
+    "stderr_sha256": "e0daa183b4214398963d2f20fea09183f625407dc95e658e03022fe246e31268"
+  },
+  "ready_condition_authority": {
+    "external": "page.goto networkidle with load fallback; optional 2-second qaStatic observation",
+    "required_deckcompiler_preflight": [
+      "document.readyState complete",
+      "document.fonts.ready",
+      "all local images decoded",
+      "two animation frames layout stability",
+      "target slide visible",
+      "qa static true",
+      "remote network dependency absent"
+    ]
+  },
+  "retry_authority": {
+    "agent_level_max_attempts_per_slide": 2,
+    "automatic_hidden_retry": false,
+    "non_retryable": [
+      "dimension_mismatch",
+      "html_hash_mismatch",
+      "wrong_slide",
+      "stale_output",
+      "missing_local_asset",
+      "off_canvas_geometry",
+      "unsupported_format",
+      "scaled_output_rejection"
+    ],
+    "parallelism": 1,
+    "retryable": [
+      "browser_startup_failure",
+      "navigation_timeout",
+      "official_ready_condition_timeout",
+      "browser_process_crash",
+      "missing_output_after_success",
+      "locked_profile_or_cleanup_failure"
+    ]
+  },
+  "schema_name": "phase6_1b1_html_screenshot_contract_audit",
+  "schema_version": "1.0.0",
+  "skill_tool_identity": "slide-visual-polish-qa/scripts/capture_html_screenshot.py",
+  "source_audit_hash": "84b9256435e2ddbd6ee1738c952829fd40ff9caf019816a7738052fc583f845c",
+  "source_files_functions_inspected": [
+    {
+      "functions": [],
+      "path": "SKILL.md",
+      "sha256": "4c3ff087e112ad2742d276b53480b62158852a8c9fbc8ddb487c9dbeec9db50a"
+    },
+    {
+      "functions": [],
+      "path": "screenshot-raster-policy.md",
+      "sha256": "b6b4305d17a8db77944d9234ca148b2874585bf6ca4295f475fdeb71aeb28209"
+    },
+    {
+      "functions": [
+        "file_url",
+        "isolated_slide_html",
+        "assert_expected_png_dimensions",
+        "capture_with_playwright",
+        "find_chrome_like",
+        "capture_with_chrome_cli",
+        "write_error_reports",
+        "main"
+      ],
+      "path": "capture_html_screenshot.py",
+      "sha256": "d6b12a483bbdfec3a067afbaf8deeca3d330ed79b99932ab5535214af041229c"
+    },
+    {
+      "functions": [
+        "resolve_slide_mapping",
+        "mapping_metadata"
+      ],
+      "path": "slide_mapping.py",
+      "sha256": "94b84ebc9a095b250651d7f7765800d67fe606eb690b3dbda9252c7da5e38b5c"
+    },
+    {
+      "functions": [
+        "_run_command",
+        "run_fresh_evidence_pipeline"
+      ],
+      "path": "src/presentation_agent/deckcompiler/qa/reachability.py",
+      "sha256": "8570d97528e4bb37aad7757aa31f3f7a9a2179570bec0b4d69d886ba8f486417"
+    }
+  ],
+  "timeout_authority": {
+    "external_chrome_subprocess_seconds": 150,
+    "prior_deckcompiler_outer_seconds": 600,
+    "prior_failure_deepest_observable_stage": "child_process_wait",
+    "prior_failure_output_exists": false,
+    "required_policy": "bounded per-slide stage-aware attempt; maximum two attempts"
+  },
+  "timezone": "Asia/Seoul"
+}

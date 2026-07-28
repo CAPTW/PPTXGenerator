@@ -1,0 +1,217 @@
+{
+  "classification_counts": {
+    "adapted": 3,
+    "build_week_new": 15,
+    "existing": 2,
+    "external_existing": 2,
+    "historical_evidence": 0,
+    "platform_generated": 1,
+    "protected_not_used": 1
+  },
+  "component_count": 24,
+  "components": [
+    {
+      "classification": "external_existing",
+      "component": "CAPTW/pngtopptx SkillSet",
+      "evidence": [
+        "docs/devpost/evidence/pngtopptx_external_skillset_pin.json"
+      ],
+      "origin": "external"
+    },
+    {
+      "classification": "build_week_new",
+      "component": "Composite QA",
+      "evidence": [
+        "ea6b8bc09011418cc2ca9d9d3e44e1b1f82d05c6"
+      ],
+      "origin": "repository"
+    },
+    {
+      "classification": "adapted",
+      "component": "Creative Front-End",
+      "evidence": [
+        "956b1e87f4246903d1a319c2e26347c1faf8fbe9"
+      ],
+      "origin": "repository"
+    },
+    {
+      "classification": "build_week_new",
+      "component": "Presentation Architecture integration",
+      "evidence": [
+        "9a79d5f26e598816295be97df57c304f7ddba020"
+      ],
+      "origin": "repository"
+    },
+    {
+      "classification": "build_week_new",
+      "component": "Source Corpus and Evidence Unit layer",
+      "evidence": [
+        "c82274308eda603594d83bd7465f256e70fe9dcb"
+      ],
+      "origin": "repository"
+    },
+    {
+      "classification": "build_week_new",
+      "component": "Visual DNA and Semantic Sidecars",
+      "evidence": [
+        "00fefe71e3b02fa897794f9e9f3d6df5be715cd8"
+      ],
+      "origin": "repository"
+    },
+    {
+      "classification": "build_week_new",
+      "component": "bounded repair closure",
+      "evidence": [
+        "c3a2202078f3125b3861924ab356b31cf818b4e0"
+      ],
+      "origin": "repository"
+    },
+    {
+      "classification": "build_week_new",
+      "component": "controlled fault fixture",
+      "evidence": [
+        "21bcd35e5919dc340e01be74ced0a51f23931f08"
+      ],
+      "origin": "repository"
+    },
+    {
+      "classification": "build_week_new",
+      "component": "delivery packager",
+      "evidence": [
+        "Phase 7C implementation required before final acceptance"
+      ],
+      "origin": "repository"
+    },
+    {
+      "classification": "adapted",
+      "component": "editable PPTX and HTML reconstruction integration",
+      "evidence": [
+        "e2a6fabb1916680800097981fbda27abfe02b852"
+      ],
+      "origin": "repository_and_external"
+    },
+    {
+      "classification": "build_week_new",
+      "component": "external Python dependency manifest",
+      "evidence": [
+        "examples/deckcompiler_demo/phase7/contract/external_python_runtime_dependency_manifest.json"
+      ],
+      "origin": "repository"
+    },
+    {
+      "classification": "external_existing",
+      "component": "external Python distributions",
+      "evidence": [
+        "requirements/devpost-release.lock.txt",
+        "examples/deckcompiler_demo/phase7/contract/external_python_runtime_dependency_manifest.json"
+      ],
+      "origin": "external"
+    },
+    {
+      "classification": "build_week_new",
+      "component": "external Python fresh-environment tests",
+      "evidence": [
+        "tests/deckcompiler/test_phase7_external_python_runtime.py"
+      ],
+      "origin": "repository"
+    },
+    {
+      "classification": "build_week_new",
+      "component": "external Python interpreter preflight",
+      "evidence": [
+        "src/presentation_agent/deckcompiler/release/external_python_runtime.py"
+      ],
+      "origin": "repository"
+    },
+    {
+      "classification": "build_week_new",
+      "component": "external Python lock closure validation",
+      "evidence": [
+        "src/presentation_agent/deckcompiler/release/external_python_runtime.py"
+      ],
+      "origin": "repository"
+    },
+    {
+      "classification": "build_week_new",
+      "component": "fresh-clone verifier",
+      "evidence": [
+        "Phase 7D proof required before final acceptance"
+      ],
+      "origin": "repository"
+    },
+    {
+      "classification": "build_week_new",
+      "component": "one-command demo",
+      "evidence": [
+        "Phase 7B implementation required before final acceptance"
+      ],
+      "origin": "repository"
+    },
+    {
+      "classification": "adapted",
+      "component": "release dependency lock and preflight integration",
+      "evidence": [
+        "requirements/devpost-release.lock.txt",
+        "src/presentation_agent/deckcompiler/release/demo.py"
+      ],
+      "origin": "repository_and_external"
+    },
+    {
+      "classification": "platform_generated",
+      "component": "platform Image Generation results",
+      "evidence": [
+        "examples/deckcompiler_demo/phase4/generation_provenance.json"
+      ],
+      "origin": "platform"
+    },
+    {
+      "classification": "protected_not_used",
+      "component": "protected historical outputs",
+      "evidence": [
+        "outputs/editable_template_spec.final.json",
+        "outputs/golden_template_masters.pptx",
+        "outputs/final_deck_large_premium.pptx"
+      ],
+      "origin": "historical"
+    },
+    {
+      "classification": "existing",
+      "component": "source ingestion",
+      "evidence": [
+        "src/presentation_agent/source_ingestion.py",
+        "e0259b7551c381f8c0de4cdd329d5943680fa502"
+      ],
+      "origin": "pre_baseline"
+    },
+    {
+      "classification": "build_week_new",
+      "component": "strict planning adapter",
+      "evidence": [
+        "9a79d5f26e598816295be97df57c304f7ddba020"
+      ],
+      "origin": "repository"
+    },
+    {
+      "classification": "build_week_new",
+      "component": "thin PNGtoPPTX handoff",
+      "evidence": [
+        "6e5f7037dacdf2ac3e353bc8cebe660e79e56ebc",
+        "8c05f69ccee081f838455fced7de3b77dd1baf29"
+      ],
+      "origin": "repository"
+    },
+    {
+      "classification": "existing",
+      "component": "workflow planner",
+      "evidence": [
+        "src/presentation_agent/non_pptx_modules/workflow_planner.py",
+        "e0259b7551c381f8c0de4cdd329d5943680fa502"
+      ],
+      "origin": "pre_baseline"
+    }
+  ],
+  "no_overclaim": true,
+  "provenance_hash": "b49b52597608ee18a98972eed227329bde83589ea5a33b27d3d1ce44359efa62",
+  "schema_name": "component_provenance_manifest",
+  "schema_version": "1.0.0"
+}

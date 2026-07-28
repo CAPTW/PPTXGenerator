@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/artifact-envelope.schema.json",
+  "title": "DeckCompiler Artifact Provenance Envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["artifact_id", "artifact_type", "artifact_version", "product", "provenance", "content_sha256"],
+  "properties": {
+    "artifact_id": {"type": "string", "pattern": "^art_[0-9a-f]{20}$"},
+    "artifact_type": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+    "artifact_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "product": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["product_name", "product_slug", "system_name", "system_id", "reconstruction_engine"],
+      "properties": {
+        "product_name": {"const": "PPTX Generator"},
+        "product_slug": {"const": "pptx-generator"},
+        "system_name": {"const": "DeckCompiler"},
+        "system_id": {"const": "deckcompiler"},
+        "reconstruction_engine": {"const": "PNGtoPPTX"}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["created_at", "producer", "build_baseline", "source_commit", "input_artifact_ids"],
+      "properties": {
+        "created_at": {"type": "string", "format": "date-time"},
+        "producer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tool_name", "tool_version", "runtime"],
+          "properties": {
+            "tool_name": {"type": "string", "minLength": 1},
+            "tool_version": {"type": "string", "minLength": 1},
+            "runtime": {"type": "string", "minLength": 1}
+          }
+        },
+        "build_baseline": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "input_artifact_ids": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^art_[0-9a-f]{20}$"},
+          "uniqueItems": true
+        }
+      }
+    },
+    "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

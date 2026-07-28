@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/deckcompiler/phase4-generation-provenance.schema.json",
+  "title": "Phase 4 Generation Provenance",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "product_name", "system_name", "phase3_source_run", "phase3_source_commit", "phase4b_commit", "phase4c_commit", "phase4d_commit_resolution", "orchestrator_model_user_selection", "runtime_model_identity", "execution_mode", "platform_tool_identity", "image_model_identity", "platform_tool_invocation_count", "attempt_count", "rejection_count", "selected_image_count", "external_transport_call_count", "repository_network_call_count", "credential_lookup_count", "pngtopptx_used", "selected_artifacts", "timezone", "provenance_hash"],
+  "properties": {
+    "schema_name": {"const": "phase4_generation_provenance"}, "schema_version": {"const": "1.0.0"},
+    "product_name": {"const": "PPTX Generator"}, "system_name": {"const": "DeckCompiler"},
+    "phase3_source_run": {"type": "string"}, "phase3_source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "phase4b_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"}, "phase4c_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "phase4d_commit_resolution": {"type": "object"}, "orchestrator_model_user_selection": {"type": "string"}, "runtime_model_identity": {"type": "string"},
+    "execution_mode": {"const": "platform_managed_tool"}, "platform_tool_identity": {"const": "image_gen.imagegen"}, "image_model_identity": {"type": "string"},
+    "platform_tool_invocation_count": {"const": 15}, "attempt_count": {"const": 15}, "rejection_count": {"const": 2}, "selected_image_count": {"const": 13},
+    "external_transport_call_count": {"const": 0}, "repository_network_call_count": {"const": 0}, "credential_lookup_count": {"const": 0}, "pngtopptx_used": {"const": false},
+    "selected_artifacts": {"type": "array", "minItems": 13, "maxItems": 13, "items": {"type": "object"}}, "timezone": {"const": "Asia/Seoul"},
+    "provenance_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

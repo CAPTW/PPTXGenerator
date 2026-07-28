@@ -1,0 +1,24 @@
+{
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/phase6-acceptance.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DeckCompiler Phase 6 acceptance record",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_name": { "const": "phase6_acceptance" },
+    "schema_version": { "const": "1.0.0" },
+    "acceptance_id": { "pattern": "^phase6_acceptance_[0-9a-f]{20}$", "type": "string" },
+    "unified_release_gate_report_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "status": { "const": "ELIGIBLE_FOR_PACKAGING" },
+    "phase6_accepted": { "const": true },
+    "final_release_eligible": { "const": false },
+    "devpost_release_eligible": { "const": false },
+    "phase7_required": { "const": true },
+    "phase7_started": { "const": false },
+    "active_output_set": { "const": "phase5_baseline" },
+    "created_at": { "format": "date-time", "type": "string" },
+    "timezone": { "const": "Asia/Seoul" },
+    "acceptance_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" }
+  },
+  "required": ["schema_name", "schema_version", "acceptance_id", "unified_release_gate_report_hash", "status", "phase6_accepted", "final_release_eligible", "devpost_release_eligible", "phase7_required", "phase7_started", "active_output_set", "created_at", "timezone", "acceptance_hash"]
+}

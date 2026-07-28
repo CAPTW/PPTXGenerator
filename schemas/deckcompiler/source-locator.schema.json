@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/source-locator.schema.json",
+  "title": "DeckCompiler Source Locator",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["source_id", "locator_type"],
+  "properties": {
+    "source_id": {"type": "string", "pattern": "^src_[0-9a-f]{20}$"},
+    "locator_type": {
+      "enum": ["user_prompt", "document_section", "pdf_page", "pdf_text_span", "pdf_region", "image_region"]
+    },
+    "page_number": {"type": "integer", "minimum": 1},
+    "char_range": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end"],
+      "properties": {
+        "start": {"type": "integer", "minimum": 0},
+        "end": {"type": "integer", "minimum": 1}
+      }
+    },
+    "bbox": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "width", "height", "unit"],
+      "properties": {
+        "x": {"type": "number", "minimum": 0, "maximum": 1},
+        "y": {"type": "number", "minimum": 0, "maximum": 1},
+        "width": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+        "height": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+        "unit": {"const": "normalized"}
+      }
+    },
+    "section_path": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "asset_id": {"type": "string", "minLength": 1},
+    "quote": {"type": "string", "minLength": 1}
+  },
+  "$defs": {
+    "normalizedBbox": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "width", "height", "unit"],
+      "properties": {
+        "x": {"type": "number", "minimum": 0, "maximum": 1},
+        "y": {"type": "number", "minimum": 0, "maximum": 1},
+        "width": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+        "height": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+        "unit": {"const": "normalized"}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"locator_type": {"const": "user_prompt"}}, "required": ["locator_type"]},
+      "then": {"required": ["char_range"]}
+    },
+    {
+      "if": {"properties": {"locator_type": {"enum": ["pdf_page", "pdf_text_span", "pdf_region"]}}, "required": ["locator_type"]},
+      "then": {"required": ["page_number"]}
+    },
+    {
+      "if": {"properties": {"locator_type": {"const": "pdf_text_span"}}, "required": ["locator_type"]},
+      "then": {"required": ["char_range"]}
+    },
+    {
+      "if": {"properties": {"locator_type": {"enum": ["pdf_region", "image_region"]}}, "required": ["locator_type"]},
+      "then": {"required": ["bbox"]}
+    },
+    {
+      "if": {"properties": {"locator_type": {"const": "document_section"}}, "required": ["locator_type"]},
+      "then": {"required": ["section_path"]}
+    },
+    {
+      "if": {"properties": {"locator_type": {"const": "image_region"}}, "required": ["locator_type"]},
+      "then": {"required": ["asset_id"]}
+    }
+  ]
+}

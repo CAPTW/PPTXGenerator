@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/deckcompiler/phase4-input-provenance.schema.json",
+  "title": "Phase 4 Input Provenance",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "source_commit",
+    "phase3_run_id",
+    "phase3_artifact_hashes",
+    "phase3_verdict",
+    "evidence_unit_ids",
+    "source_count",
+    "evidence_unit_count",
+    "module_count",
+    "batch_count",
+    "slide_count"
+  ],
+  "properties": {
+    "schema_name": {"const": "phase4_input_provenance"},
+    "schema_version": {"const": "1.0.0"},
+    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "phase3_run_id": {"type": "string", "minLength": 1},
+    "phase3_artifact_hashes": {
+      "type": "object",
+      "minProperties": 16,
+      "maxProperties": 16,
+      "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+      "propertyNames": {"pattern": "^[a-z0-9_-]+\\.json$"}
+    },
+    "phase3_verdict": {"const": "GO"},
+    "evidence_unit_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^ev_[0-9a-f]{20}$"}
+    },
+    "source_count": {"const": 3},
+    "evidence_unit_count": {"type": "integer", "minimum": 1},
+    "module_count": {"const": 3},
+    "batch_count": {"const": 3},
+    "slide_count": {"const": 6}
+  }
+}

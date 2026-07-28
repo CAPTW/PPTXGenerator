@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "template_usability_report.schema.json",
+  "title": "Template Usability QA Report",
+  "type": "object",
+  "required": [
+    "schema_name",
+    "schema_version",
+    "status",
+    "golden_pptx_path",
+    "template_contracts_dir",
+    "findings_summary",
+    "category_summary",
+    "slides",
+    "findings"
+  ],
+  "properties": {
+    "schema_name": {"const": "template_usability_report"},
+    "schema_version": {"type": "string"},
+    "status": {"enum": ["passed", "issues_reported", "failed"]},
+    "golden_pptx_path": {"type": "string"},
+    "template_contracts_dir": {"type": "string"},
+    "findings_summary": {
+      "type": "object",
+      "required": ["total", "severe", "warning"],
+      "properties": {
+        "total": {"type": "integer"},
+        "severe": {"type": "integer"},
+        "warning": {"type": "integer"}
+      }
+    },
+    "category_summary": {"type": "object"},
+    "slides": {"type": "array", "items": {"type": "object"}},
+    "findings": {"type": "array", "items": {"type": "object"}}
+  },
+  "additionalProperties": true
+}

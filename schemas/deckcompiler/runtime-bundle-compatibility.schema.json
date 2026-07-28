@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/runtime-bundle-compatibility.schema.json",
+  "title": "DeckCompiler runtime bundle compatibility v1",
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "objectOid": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"},
+    "classification": {"enum": ["binary-exact", "json-semantic", "text-clean-filter", "exact-runtime-text", "unsupported"]},
+    "classificationPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["binary_exact_extensions", "json_semantic_extensions", "text_clean_filter_extensions", "duplicate_json_key_policy", "unsupported_file_policy"],
+      "properties": {
+        "binary_exact_extensions": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "json_semantic_extensions": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "text_clean_filter_extensions": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "duplicate_json_key_policy": {"const": "reject"},
+        "unsupported_file_policy": {"const": "block"}
+      }
+    },
+    "filePolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "classification", "expected_blob_oid", "expected_blob_sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "classification": {"$ref": "#/$defs/classification"},
+        "expected_blob_oid": {"$ref": "#/$defs/objectOid"},
+        "expected_blob_sha256": {"$ref": "#/$defs/sha256"},
+        "expected_semantic_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract", "classification_policy", "binary_exact_count", "json_semantic_count", "text_clean_filter_count", "exact_runtime_text_count", "unsupported_count", "files"],
+      "properties": {
+        "contract": {"const": "runtime_bundle_compatibility_v1"},
+        "classification_policy": {"$ref": "#/$defs/classificationPolicy"},
+        "binary_exact_count": {"type": "integer", "minimum": 0},
+        "json_semantic_count": {"type": "integer", "minimum": 0},
+        "text_clean_filter_count": {"type": "integer", "minimum": 0},
+        "exact_runtime_text_count": {"type": "integer", "minimum": 0},
+        "unsupported_count": {"type": "integer", "minimum": 0},
+        "files": {"type": "array", "items": {"$ref": "#/$defs/filePolicy"}}
+      }
+    },
+    "fileResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "classification", "present", "raw_sha256_match", "clean_filter_oid_match", "semantic_match", "status"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "classification": {"$ref": "#/$defs/classification"},
+        "present": {"type": "boolean"},
+        "raw_sha256_match": {"type": "boolean"},
+        "clean_filter_oid_match": {"type": "boolean"},
+        "semantic_match": {"type": ["boolean", "null"]},
+        "status": {"enum": ["PASS", "BLOCKED"]}
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "contract", "authority_id", "bundle_id", "subtree_path", "source_commit", "expected_file_count", "observed_file_count", "missing_file_count", "extra_file_count", "missing_paths", "extra_paths", "files", "failure_codes", "status", "report_hash"],
+  "properties": {
+    "schema_name": {"const": "runtime_bundle_compatibility"},
+    "schema_version": {"const": "1.0.0"},
+    "contract": {"const": "runtime_bundle_compatibility_v1"},
+    "authority_id": {"type": "string", "pattern": "^bundleauth_[0-9a-f]{20}$"},
+    "bundle_id": {"type": "string", "minLength": 1},
+    "subtree_path": {"type": "string", "minLength": 1},
+    "source_commit": {"$ref": "#/$defs/objectOid"},
+    "expected_file_count": {"type": "integer", "minimum": 0},
+    "observed_file_count": {"type": "integer", "minimum": 0},
+    "missing_file_count": {"type": "integer", "minimum": 0},
+    "extra_file_count": {"type": "integer", "minimum": 0},
+    "missing_paths": {"type": "array", "items": {"type": "string"}},
+    "extra_paths": {"type": "array", "items": {"type": "string"}},
+    "files": {"type": "array", "items": {"$ref": "#/$defs/fileResult"}},
+    "failure_codes": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "status": {"enum": ["PASS", "BLOCKED"]},
+    "report_hash": {"$ref": "#/$defs/sha256"}
+  }
+}

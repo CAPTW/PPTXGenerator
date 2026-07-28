@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/slide_blueprint.schema.json",
+  "title": "SlideBlueprint",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "slide_id",
+    "section_id",
+    "slide_type",
+    "title",
+    "subtitle",
+    "content_density",
+    "required_slots",
+    "content_blocks",
+    "chart_data",
+    "table_data",
+    "image_needs",
+    "speaker_notes",
+    "citations",
+    "design_intent"
+  ],
+  "properties": {
+    "schema_name": {
+      "const": "slide_blueprint"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "slide_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "section_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "slide_type": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "subtitle": {
+      "type": "string"
+    },
+    "content_density": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "required_slots": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "content_blocks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "block_id",
+          "slot",
+          "type",
+          "content"
+        ],
+        "properties": {
+          "block_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "slot": {
+            "type": "string",
+            "minLength": 1
+          },
+          "type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": [
+              "string",
+              "array",
+              "object",
+              "number",
+              "boolean",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "chart_data": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "table_data": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "image_needs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "slot",
+          "purpose"
+        ],
+        "properties": {
+          "slot": {
+            "type": "string",
+            "minLength": 1
+          },
+          "purpose": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_policy": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "speaker_notes": {
+      "type": "string"
+    },
+    "citations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "citation_id",
+          "label"
+        ],
+        "properties": {
+          "citation_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "design_intent": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

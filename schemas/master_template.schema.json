@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/master_template.schema.json",
+  "title": "MasterTemplate",
+  "type": "object",
+  "required": [
+    "stage",
+    "status",
+    "inputs",
+    "outputs",
+    "source_evidence",
+    "created_at"
+  ],
+  "properties": {
+    "stage": {
+      "const": "MASTER_TEMPLATE"
+    },
+    "status": {
+      "enum": [
+        "APPROVED",
+        "BLOCKED"
+      ]
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "source_evidence": {
+      "$ref": "intake_manifest.schema.json#/$defs/sourceEvidenceList"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "invalidates_downstream_from": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "template_bundle_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "style_tokens": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "source_reference_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "approval_basis": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "created_from_stage_attempt": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "theme_tokens": {
+      "type": "object"
+    },
+    "template_family": {
+      "type": "array"
+    },
+    "governance": {
+      "type": "object"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "APPROVED"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "template_bundle_path",
+          "style_tokens",
+          "source_reference_ids",
+          "approval_basis",
+          "created_from_stage_attempt"
+        ]
+      }
+    }
+  ],
+  "additionalProperties": true
+}

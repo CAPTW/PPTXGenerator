@@ -1,0 +1,24 @@
+{
+  "acceptance_hash": {
+    "algorithm": "sha256",
+    "byte_count": 1,
+    "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "hash_domain": "deckcompiler.external_execution.acceptance.v1"
+  },
+  "acceptance_id": "exaccept_d71160d106881d2a2873",
+  "accepted": true,
+  "created_at": "2026-07-17T00:00:02+09:00",
+  "evaluator_name": "deckcompiler-external-acceptance-evaluator",
+  "evaluator_version": "1.0.0",
+  "execution_id": "exec_0123456789abcdef0123",
+  "external_executable_id": "openai",
+  "missing_prerequisites": ["none"],
+  "policy_id": "phase4-external-execution-acceptance-v1-disabled",
+  "reason_codes": ["PROVIDER_SAID_PASS"],
+  "record_id": "exrec_db1ecb6dd29ecab22a49",
+  "release_eligible": true,
+  "schema_name": "external_execution_acceptance",
+  "schema_version": "1.0.0",
+  "status": "ACCEPTED",
+  "verifier_report_id": "exverify_516819bb9aa68a6d510a"
+}

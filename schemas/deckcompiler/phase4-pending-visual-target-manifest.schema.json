@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/deckcompiler/phase4-pending-visual-target-manifest.schema.json",
+  "title": "Phase 4 Pending Visual Target Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "manifest_id", "source_commit", "targets", "external_transport_calls", "platform_tool_calls", "generated_image_count", "validation_status", "manifest_hash"],
+  "properties": {
+    "schema_name": {"const": "phase4_pending_visual_target_manifest"}, "schema_version": {"const": "1.0.0"}, "manifest_id": {"type": "string"}, "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "targets": {
+      "type": "array", "minItems": 6, "maxItems": 6,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["slide_id", "module_id", "batch_id", "visual_target_id", "expected_sidecar_id", "prompt_id", "selected_family", "selected_layout", "generation_status", "actual_generation", "selected", "expected_aspect_ratio", "final_surface_role_prohibited", "source_commit", "validation_status"],
+        "properties": {
+          "slide_id": {"type": "string"}, "module_id": {"type": "string"}, "batch_id": {"type": "string"}, "visual_target_id": {"type": "string"}, "expected_sidecar_id": {"type": "string"}, "prompt_id": {"type": "string"}, "selected_family": {"type": "string"}, "selected_layout": {"type": "string"},
+          "generation_status": {"const": "PENDING"}, "actual_generation": {"const": false}, "selected": {"const": false}, "expected_aspect_ratio": {"const": "16:9"}, "final_surface_role_prohibited": {"const": true}, "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"}, "validation_status": {"const": "valid"}
+        }
+      }
+    },
+    "external_transport_calls": {"const": 0}, "platform_tool_calls": {"const": 0}, "generated_image_count": {"const": 0}, "validation_status": {"const": "valid"}, "manifest_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

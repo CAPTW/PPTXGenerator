@@ -1,0 +1,20 @@
+{
+  "active_output_set": "phase5_baseline",
+  "baseline_composite_report_hash": "682c4193a1cdac5f8195adfc555637d6db2bc091a37c3ce1e046d999d075a3d6",
+  "baseline_html": {
+    "path": "examples/deckcompiler_demo/phase5/outputs/html/index.html",
+    "sha256": "b1f161bed4d1dc37be576eceda0cf01d125580df4a767c4722582c8671983085"
+  },
+  "baseline_pptx": {
+    "path": "examples/deckcompiler_demo/phase5/outputs/pptx_generator_demo.pptx",
+    "sha256": "805eb4aa3d44d90ebe5b78c0247d02e412ebfc9468e57c778516b90de2d27676"
+  },
+  "created_at": "2026-07-22T10:30:00+09:00",
+  "phase4_bundle_aggregate_sha256": "4ad86fcc50ed669d57966dd471d50ea791c21499c3c280c8b29f484a49b8473c",
+  "phase5_bundle_aggregate_sha256": "98f88cc940cb0d9171c6b116c7ebb1290b2b51c29547580f13301b15cc74f20c",
+  "run_id": "phase6qa_9bd9b0fcf02397f92902",
+  "schema_name": "phase6_input_provenance",
+  "schema_version": "1.0.0",
+  "starting_head": "e2a6fabb1916680800097981fbda27abfe02b852",
+  "timezone": "Asia/Seoul"
+}

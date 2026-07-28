@@ -1,0 +1,52 @@
+{
+  "schema_name": "visual_target_manifest",
+  "schema_version": "1.0.0",
+  "artifact": {
+    "artifact_id": "art_30303030303030303030",
+    "artifact_type": "visual_target_manifest",
+    "artifact_version": "1.0.0",
+    "product": {
+      "product_name": "PPTX Generator",
+      "product_slug": "pptx-generator",
+      "system_name": "DeckCompiler",
+      "system_id": "deckcompiler",
+      "reconstruction_engine": "PNGtoPPTX"
+    },
+    "provenance": {
+      "created_at": "2026-07-15T21:11:02+09:00",
+      "producer": {"tool_name": "invalid-fixture", "tool_version": "1.0.0", "runtime": "test"},
+      "build_baseline": "e0259b7551c381f8c0de4cdd329d5943680fa502",
+      "source_commit": "39b4c104b23d4e09446388db2a8b2fb873a7824b",
+      "input_artifact_ids": []
+    },
+    "content_sha256": "3030303030303030303030303030303030303030303030303030303030303030"
+  },
+  "manifest_id": "targets_30303030303030303030",
+  "offline_regression_only": true,
+  "targets": [
+    {
+      "visual_target_id": "vt_30303030303030303030",
+      "slide_id": "s001",
+      "path": "visual_targets/invalid.png",
+      "media_type": "image/png",
+      "width": 1600,
+      "height": 1000,
+      "aspect_ratio": "16:9",
+      "sha256": "3030303030303030303030303030303030303030303030303030303030303030",
+      "visual_authority": true,
+      "semantic_authority": false,
+      "final_slide_surface_allowed": false,
+      "generation": {
+        "generation_mode": "locked_fixture",
+        "release_eligible": false,
+        "tool_identity": "offline-contract-fixture",
+        "model_identity": "none",
+        "prompt": "Invalid dimensions fixture.",
+        "prompt_sha256": "3030303030303030303030303030303030303030303030303030303030303030",
+        "reference_artifacts": [],
+        "attempt_number": 1,
+        "selected": true
+      }
+    }
+  ]
+}

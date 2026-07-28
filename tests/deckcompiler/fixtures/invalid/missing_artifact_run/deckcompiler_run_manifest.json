@@ -1,0 +1,42 @@
+{
+  "schema_name": "deckcompiler_run_manifest",
+  "schema_version": "1.0.0",
+  "artifact": {
+    "artifact_id": "art_ffffffffffffffffffff",
+    "artifact_type": "deckcompiler_run_manifest",
+    "artifact_version": "1.0.0",
+    "product": {
+      "product_name": "PPTX Generator",
+      "product_slug": "pptx-generator",
+      "system_name": "DeckCompiler",
+      "system_id": "deckcompiler",
+      "reconstruction_engine": "PNGtoPPTX"
+    },
+    "provenance": {
+      "created_at": "2026-07-15T21:10:05+09:00",
+      "producer": {"tool_name": "invalid-fixture", "tool_version": "1.0.0", "runtime": "test"},
+      "build_baseline": "e0259b7551c381f8c0de4cdd329d5943680fa502",
+      "source_commit": "39b4c104b23d4e09446388db2a8b2fb873a7824b",
+      "input_artifact_ids": []
+    },
+    "content_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+  },
+  "run_id": "run_ffffffffffffffffffff",
+  "started_at": "2026-07-15T21:10:05+09:00",
+  "updated_at": "2026-07-15T21:10:05+09:00",
+  "build_baseline": "e0259b7551c381f8c0de4cdd329d5943680fa502",
+  "source_commit": "39b4c104b23d4e09446388db2a8b2fb873a7824b",
+  "stage_status": {"source_contracts": "failed"},
+  "artifacts": [
+    {
+      "artifact_type": "source_corpus",
+      "artifact_id": "art_aaaaaaaaaaaaaaaaaaaa",
+      "path": "missing_source_corpus.json",
+      "required": true
+    }
+  ],
+  "retry_history": [],
+  "warnings": [],
+  "errors": ["Required source corpus is intentionally missing."],
+  "validation_status": "invalid"
+}

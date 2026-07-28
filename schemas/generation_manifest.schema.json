@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/generation_manifest.schema.json",
+  "title": "GenerationManifest",
+  "type": "object",
+  "required": [
+    "stage",
+    "status",
+    "inputs",
+    "outputs",
+    "source_evidence",
+    "created_at"
+  ],
+  "properties": {
+    "stage": {
+      "const": "GENERATE"
+    },
+    "status": {
+      "enum": [
+        "APPROVED",
+        "BLOCKED"
+      ]
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "source_evidence": {
+      "$ref": "intake_manifest.schema.json#/$defs/sourceEvidenceList"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "invalidates_downstream_from": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "asset_requests_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "asset_manifest_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "viz_spec_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "viz_manifest_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "slide_ledger_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "asset_count": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "visual_count": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

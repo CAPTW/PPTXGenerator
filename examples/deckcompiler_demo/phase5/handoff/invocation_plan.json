@@ -1,0 +1,152 @@
+{
+  "canary_capability": "single_slide_canary",
+  "companion_skills": [
+    "slide-text-layer-inpaint",
+    "slide-image-dual-render",
+    "slide-visual-polish-qa"
+  ],
+  "created_at": "2026-07-22T00:05:41.7991054+09:00",
+  "deckcompiler_commit": "8c05f69ccee081f838455fced7de3b77dd1baf29",
+  "dry_run_capability": true,
+  "environment_prerequisites": {
+    "api_credentials": "not_required_by_official_docs",
+    "network": "not_required_for_execution_with_preinstalled_dependencies",
+    "node_dependency_path": "<node-dependency-root>",
+    "node_runtime": "required"
+  },
+  "exact_official_invocation_mode": "official_node_cli",
+  "exact_orchestrator_skill": "slide-editable-deck-orchestrator",
+  "external_invocation_performed": false,
+  "external_skillset_pin": {
+    "pin_hash": "c98dee779823ec40d176f54f10363dce676bb7299d99ffb2216c9a6454dc1a27",
+    "pin_id": "pngpin_1c4af8ad011cc18786d8"
+  },
+  "input_paths": {
+    "asset_manifest": "project/assets/manifest.json",
+    "crop_plan": "project/work/crop_plan.json",
+    "semantic_sidecar_pattern": "project/work/slideNN/semantic_sidecar.json",
+    "source_png_pattern": "project/src/slideN.png"
+  },
+  "node_path": "<node-dependency-root>",
+  "official_entrypoints": {
+    "crop_generator": "<external-skill-root>\\slide-image-dual-render\\scripts\\make_crops.py",
+    "final_gate": "<external-skill-root>\\slide-image-dual-render\\scripts\\final_gate.js",
+    "orchestration_plan": "<external-skill-root>\\slide-editable-deck-orchestrator\\scripts\\plan_deck_workflow.js",
+    "pipeline": "<external-skill-root>\\slide-image-dual-render\\scripts\\slide_pipeline.js",
+    "visual_qa": "<external-skill-root>\\slide-visual-polish-qa\\scripts\\enforce_visual_qa.js"
+  },
+  "output_root": "project/out",
+  "planned_commands": {
+    "canary": [
+      "node",
+      "<external-skill-root>\\slide-image-dual-render\\scripts\\slide_pipeline.js",
+      "--project",
+      "<phase5.1-runtime>\\handoff\\project",
+      "--target",
+      "both",
+      "--profile",
+      "<external-skill-root>\\slide-image-dual-render\\styles\\corporate-light.json",
+      "--node-path",
+      "<node-dependency-root>",
+      "--pxw",
+      "1664",
+      "--pxh",
+      "936",
+      "--crop-plan",
+      "<phase5.1-runtime>\\handoff\\project\\work\\crop_plan.json",
+      "--slides",
+      "1",
+      "--quality",
+      "canary"
+    ],
+    "crop_preparation": [
+      "python",
+      "<external-skill-root>\\slide-image-dual-render\\scripts\\make_crops.py"
+    ],
+    "dry_run": [
+      "node",
+      "<external-skill-root>\\slide-image-dual-render\\scripts\\slide_pipeline.js",
+      "--project",
+      "<phase5.1-runtime>\\handoff\\project",
+      "--target",
+      "both",
+      "--profile",
+      "<external-skill-root>\\slide-image-dual-render\\styles\\corporate-light.json",
+      "--node-path",
+      "<node-dependency-root>",
+      "--pxw",
+      "1664",
+      "--pxh",
+      "936",
+      "--crop-plan",
+      "<phase5.1-runtime>\\handoff\\project\\work\\crop_plan.json",
+      "--slides",
+      "1,2,3,4,5,6",
+      "--quality",
+      "reconstruction",
+      "--allow-large-batch",
+      "--dry-run"
+    ],
+    "full_reconstruction": [
+      "node",
+      "<external-skill-root>\\slide-image-dual-render\\scripts\\slide_pipeline.js",
+      "--project",
+      "<phase5.1-runtime>\\handoff\\project",
+      "--target",
+      "both",
+      "--profile",
+      "<external-skill-root>\\slide-image-dual-render\\styles\\corporate-light.json",
+      "--node-path",
+      "<node-dependency-root>",
+      "--pxw",
+      "1664",
+      "--pxh",
+      "936",
+      "--crop-plan",
+      "<phase5.1-runtime>\\handoff\\project\\work\\crop_plan.json",
+      "--slides",
+      "1,2,3,4,5,6",
+      "--quality",
+      "reconstruction",
+      "--require-qa",
+      "--require-reconstruction",
+      "--allow-large-batch",
+      "--pptx-out",
+      "<phase5.1-runtime>\\handoff\\project\\out\\deckcompiler_phase5.pptx",
+      "--html-out",
+      "<phase5.1-runtime>\\handoff\\project\\out\\deckcompiler_phase5.html"
+    ],
+    "orchestration_plan": [
+      "node",
+      "<external-skill-root>\\slide-editable-deck-orchestrator\\scripts\\plan_deck_workflow.js",
+      "--project",
+      "<phase5.1-runtime>\\handoff\\project",
+      "--slides",
+      "1,2,3,4,5,6",
+      "--quality-level",
+      "blocking-zero",
+      "--max-iterations",
+      "3"
+    ]
+  },
+  "planned_environment": {
+    "crop_preparation": {
+      "CROP_PLAN": "<phase5.1-runtime>\\handoff\\project\\work\\crop_plan.json",
+      "DECK_ASSETS": "<phase5.1-runtime>\\handoff\\project\\assets",
+      "SRC_DIR": "<phase5.1-runtime>\\handoff\\project\\src"
+    }
+  },
+  "preflight_status": "PLANNED_NOT_EXECUTED",
+  "profile_path": "<external-skill-root>\\slide-image-dual-render\\styles\\corporate-light.json",
+  "prohibited_fallback": [
+    "repo_local_pngtopptx_skill",
+    "internal_converter",
+    "legacy_backend",
+    "direct_pptx_fallback"
+  ],
+  "project_root": "project",
+  "repair_wave_limit": 3,
+  "schema_name": "pngtopptx_invocation_plan",
+  "schema_version": "1.0.0",
+  "timezone": "Asia/Seoul"
+}

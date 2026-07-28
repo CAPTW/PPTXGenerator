@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/external-entrypoint-record.schema.json",
+  "title": "DeckCompiler external Python entrypoint record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "entrypoint_id",
+    "skill_id",
+    "relative_external_path_class",
+    "source_sha256",
+    "invoking_stage",
+    "interpreter_owner",
+    "canonical_reachability",
+    "imports",
+    "mapped_distributions",
+    "canary",
+    "validation_status"
+  ],
+  "properties": {
+    "entrypoint_id": {
+      "type": "string",
+      "pattern": "^external_entrypoint_[a-z0-9_]+$"
+    },
+    "skill_id": {"type": "string", "minLength": 1},
+    "relative_external_path_class": {
+      "type": "string",
+      "pattern": "^%DECKCOMPILER_EXTERNAL_SKILLS%/"
+    },
+    "source_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "invoking_stage": {"type": "string", "minLength": 1},
+    "interpreter_owner": {"const": "deckcompiler_sys_executable"},
+    "canonical_reachability": {
+      "enum": ["REQUIRED_CANONICAL", "REQUIRED_PREFLIGHT"]
+    },
+    "imports": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "mapped_distributions": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "canary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["canary_id", "kind", "expected_output_paths"],
+      "properties": {
+        "canary_id": {
+          "type": "string",
+          "pattern": "^canary_[a-z0-9_]+$"
+        },
+        "kind": {
+          "enum": [
+            "make_crops_stage",
+            "make_bg_stage",
+            "argument_parser_startup"
+          ]
+        },
+        "expected_output_paths": {
+          "type": "array",
+          "items": {"type": "string"},
+          "uniqueItems": true
+        }
+      }
+    },
+    "validation_status": {"const": "PASS"}
+  }
+}

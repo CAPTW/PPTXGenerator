@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/bundle-fingerprint-policy.schema.json",
+  "title": "DeckCompiler bundle fingerprint policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "git_object_identity", "runtime_compatibility", "supported_release_checkout", "legacy_current_authority_fallback", "policy_status", "policy_hash"],
+  "properties": {
+    "schema_name": {"const": "bundle_fingerprint_policy"},
+    "schema_version": {"const": "1.0.0"},
+    "git_object_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract", "source", "checkout_representation_independent", "record_ordering", "serialization", "symlink_policy", "submodule_policy"],
+      "properties": {
+        "contract": {"const": "git_object_bundle_fingerprint_v1"},
+        "source": {"const": "committed_git_tree_and_blob_objects"},
+        "checkout_representation_independent": {"const": true},
+        "record_ordering": {"type": "string"},
+        "serialization": {"type": "string"},
+        "symlink_policy": {"const": "reject"},
+        "submodule_policy": {"const": "reject"}
+      }
+    },
+    "runtime_compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract", "repository_identity", "binary_exact_extensions", "json_semantic_extensions", "text_clean_filter_extensions", "duplicate_json_key_policy", "unsupported_file_policy"],
+      "properties": {
+        "contract": {"const": "runtime_bundle_compatibility_v1"},
+        "repository_identity": {"const": false},
+        "binary_exact_extensions": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "json_semantic_extensions": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "text_clean_filter_extensions": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "duplicate_json_key_policy": {"const": "reject"},
+        "unsupported_file_policy": {"const": "block"}
+      }
+    },
+    "supported_release_checkout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["core_autocrlf", "reason", "exact_runtime_text"],
+      "properties": {
+        "core_autocrlf": {"const": false},
+        "reason": {"const": "exact_runtime_text_fixture"},
+        "exact_runtime_text": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "sha256"],
+            "properties": {
+              "path": {"type": "string", "minLength": 1},
+              "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            }
+          }
+        }
+      }
+    },
+    "legacy_current_authority_fallback": {"const": "forbidden"},
+    "policy_status": {"const": "ACTIVE"},
+    "policy_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

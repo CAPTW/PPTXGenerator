@@ -1,0 +1,37 @@
+{
+  "absolute_machine_path_count": 0,
+  "absolute_machine_paths": [],
+  "byte_size": 85014,
+  "content_sha256_without_this_field": "d5e3cd3038df94feba35d68509216b8df870e3cfdc0ffcb78496dc5596c9f6f7",
+  "entry": "outputs/html/index.html",
+  "external_network_dependencies": [],
+  "external_network_dependency_count": 0,
+  "failures": [],
+  "full_slide_screenshot_count": 0,
+  "html_sha256": "b1f161bed4d1dc37be576eceda0cf01d125580df4a767c4722582c8671983085",
+  "image_count": 0,
+  "local_assets": [],
+  "missing_local_asset_count": 0,
+  "native_table_count": 1,
+  "schema_name": "phase5_html_package_validation_report",
+  "schema_version": "1.0.0",
+  "selectable_text": true,
+  "slide_count": 6,
+  "slide_ids": [
+    "slide-1",
+    "slide-2",
+    "slide-3",
+    "slide-4",
+    "slide-5",
+    "slide-6"
+  ],
+  "slide_order": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6"
+  ],
+  "status": "PASS"
+}

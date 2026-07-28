@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/slide_body_blocks.schema.json",
+  "title": "SlideBodyBlocks",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["slide_id", "content_blocks"],
+  "properties": {
+    "schema_name": {"const": "slide_body_blocks"},
+    "schema_version": {"type": "string"},
+    "slide_id": {"type": "string", "minLength": 1},
+    "content_blocks": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["block_id", "slot", "type", "content"],
+        "properties": {
+          "block_id": {"type": "string", "minLength": 1},
+          "slot": {"type": "string", "minLength": 1},
+          "type": {"type": "string", "minLength": 1},
+          "content": {"type": ["string", "array", "object", "number", "boolean", "null"]}
+        }
+      }
+    }
+  }
+}

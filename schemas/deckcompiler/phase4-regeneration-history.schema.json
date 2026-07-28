@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/deckcompiler/phase4-regeneration-history.schema.json",
+  "title": "Phase 4 Regeneration History",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "attempt_limit_per_target", "automatic_retry", "explicit_retry_only", "attempt_count", "rejection_count", "attempts", "history_hash"],
+  "properties": {
+    "schema_name": {"const": "phase4_regeneration_history"}, "schema_version": {"const": "1.0.0"},
+    "attempt_limit_per_target": {"const": 2}, "automatic_retry": {"const": false}, "explicit_retry_only": {"const": true},
+    "attempt_count": {"const": 15}, "rejection_count": {"const": 2},
+    "attempts": {"type": "array", "minItems": 15, "maxItems": 15, "items": {"type": "object"}},
+    "history_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

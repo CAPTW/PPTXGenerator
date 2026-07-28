@@ -1,0 +1,18 @@
+{
+  "canonical_fresh_equivalence": "PASS",
+  "clone_integrity": "PASS",
+  "dependency_closure": "PASS",
+  "focused_tests": "PASS",
+  "fresh_canonical_run": "PASS",
+  "fresh_clone_clean": true,
+  "fresh_environment": "PASS",
+  "fresh_repeat_determinism": "PASS",
+  "fresh_repeat_run": "PASS",
+  "full_tests": "PASS",
+  "phase7d_accepted": true,
+  "report_hash": "653518b8cbcedc90fa3c952c20c6f6f34beceb12272595ea7ecd460dfe60ed45",
+  "schema_name": "phase7d_acceptance",
+  "schema_version": "1.0.0",
+  "status": "PASS",
+  "tested_runtime_commit": "5d845d373ae2255b5d490c45ce4e3435107c3d08"
+}

@@ -1,0 +1,26 @@
+{
+  "components": {
+    "asset_manifest": {
+      "post_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "pre_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    "crop_plan": {
+      "post_sha256": "8ca5934c049864fc69b856f0841ccba731980e2f6d756f04905b4086939aa089",
+      "pre_sha256": "8ca5934c049864fc69b856f0841ccba731980e2f6d756f04905b4086939aa089"
+    },
+    "native_table_js": {
+      "post_sha256": "91375691f036cb9ce42a0085ca84eb14ba28b621b5e468cdc4dc6248771dd22e",
+      "pre_sha256": "91375691f036cb9ce42a0085ca84eb14ba28b621b5e468cdc4dc6248771dd22e"
+    },
+    "slides_js": {
+      "post_sha256": "8130f47caa5decf4e1df5343f405fcc79ff18f6d7c6e1880d7e56733d45ae20b",
+      "pre_sha256": "8130f47caa5decf4e1df5343f405fcc79ff18f6d7c6e1880d7e56733d45ae20b"
+    }
+  },
+  "content_sha256_without_this_field": "8b6d9412634098345bbdeaa72af71c7c8fca183b73dd0c06f564164c0ac0bb0a",
+  "mismatch_count": 0,
+  "schema_name": "phase5_handoff_source_pre_post_fingerprint",
+  "schema_version": "1.0.0",
+  "scope": "final_wave_protected_handoff_sources",
+  "status": "PASS"
+}

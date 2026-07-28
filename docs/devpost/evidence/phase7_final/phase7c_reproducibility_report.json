@@ -1,0 +1,30 @@
+{
+  "comparison_id": "comparison_0ed168f90c995f2ae517",
+  "evidence_bindings_equal": true,
+  "html_structural_fingerprint_equal": true,
+  "ignored_volatile_fields": [
+    "completed_at",
+    "created_at",
+    "output_root",
+    "run_id",
+    "runtime_root",
+    "temp_path",
+    "timestamp"
+  ],
+  "logical_delivery_fingerprint_equivalent": true,
+  "mismatch_fields": [],
+  "pptx_structural_fingerprint_equal": true,
+  "report_hash": "b96698c5318a2cc2f1c9f70c641b3eb3b21e9e06243445ee043c467c69d7d9f8",
+  "run_ids": [
+    "phase7run_4e36616cd03ce7bff6a7",
+    "phase7run_5f242f8f1eacff54d148"
+  ],
+  "schema_name": "semantic_reproducibility_report",
+  "schema_version": "1.0.0",
+  "semantic_artifact_hash_maps_equal": true,
+  "sidecar_hashes_equal": true,
+  "slide_ids_order_equal": true,
+  "status": "PASS",
+  "unexplained_divergence_count": 0,
+  "visual_target_hashes_equal": true
+}

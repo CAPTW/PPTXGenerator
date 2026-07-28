@@ -1,0 +1,215 @@
+{
+  "contract_classification": "observed_external_contract_v1",
+  "created_at": "2026-07-22T00:05:41.7991054+09:00",
+  "crop_count": 0,
+  "crop_state": "ZERO_RASTER_CROPS",
+  "crop_state_reason": "No declared raster-allowed slot is materialized as a crop; semantic content remains native.",
+  "handoff_id": "pnghandoff_a52abef975f8490a5882",
+  "ordered_slide_ids": [
+    "slide-01-decision-framing",
+    "slide-02-system-process",
+    "slide-03-risk-findings",
+    "slide-04-options-comparison",
+    "slide-05-recommendation",
+    "slide-06-implementation-sources"
+  ],
+  "ordered_source_asset_ids": [
+    "cropsource_6cd3e2a7fcd7d52643d8",
+    "cropsource_1f0031899d354cca6e05",
+    "cropsource_c29fca48b367370ecec5",
+    "cropsource_cde89a929023edc78d23",
+    "cropsource_15799a35e295073920a1",
+    "cropsource_003dfe0da6fa451e71e5"
+  ],
+  "plan_id": "cropplan_5c181b629b12784a6574",
+  "producer": "DeckCompiler thin handoff adapter",
+  "schema_name": "pngtopptx_project_crop_plan",
+  "schema_version": "1.0.0",
+  "slide_count": 6,
+  "slides": {
+    "1": [],
+    "2": [],
+    "3": [],
+    "4": [],
+    "5": [],
+    "6": []
+  },
+  "source_assets": [
+    {
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "format": "PNG",
+      "full_slide_raster_forbidden": true,
+      "native_required_slot_ids": [
+        "title",
+        "subtitle",
+        "body",
+        "footer",
+        "source_notes",
+        "page_number"
+      ],
+      "ocr_canonical_text_forbidden": true,
+      "path": "src/slide1.png",
+      "raster_allowed_slot_ids": [
+        "bounded_illustration"
+      ],
+      "role": "slide_visual_target_design_reference",
+      "sequence": 1,
+      "sha256": "bb529c9644837050e4cf3a611e81dbaf9038fb083af13e262e79488f3966170f",
+      "sidecar_id": "sidecar_0ce9385de2639ae70f78",
+      "slide_id": "slide-01-decision-framing",
+      "source_asset_id": "cropsource_6cd3e2a7fcd7d52643d8",
+      "validation_status": "PASS",
+      "visual_target_id": "visualtarget_c917f32532dfa26b4560"
+    },
+    {
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "format": "PNG",
+      "full_slide_raster_forbidden": true,
+      "native_required_slot_ids": [
+        "title",
+        "subtitle",
+        "process",
+        "footer",
+        "source_notes",
+        "page_number"
+      ],
+      "ocr_canonical_text_forbidden": true,
+      "path": "src/slide2.png",
+      "raster_allowed_slot_ids": [
+        "bounded_illustration"
+      ],
+      "role": "slide_visual_target_design_reference",
+      "sequence": 2,
+      "sha256": "37f42109e03e22d0721da51ffd571e0a78452a5be1447bbcaec4f2d4008c9c72",
+      "sidecar_id": "sidecar_5d20f321f92a4fd268ac",
+      "slide_id": "slide-02-system-process",
+      "source_asset_id": "cropsource_1f0031899d354cca6e05",
+      "validation_status": "PASS",
+      "visual_target_id": "visualtarget_eb8bc3132476d2929014"
+    },
+    {
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "format": "PNG",
+      "full_slide_raster_forbidden": true,
+      "native_required_slot_ids": [
+        "title",
+        "subtitle",
+        "body",
+        "kpi",
+        "footer",
+        "source_notes",
+        "page_number"
+      ],
+      "ocr_canonical_text_forbidden": true,
+      "path": "src/slide3.png",
+      "raster_allowed_slot_ids": [
+        "bounded_illustration"
+      ],
+      "role": "slide_visual_target_design_reference",
+      "sequence": 3,
+      "sha256": "96fc9ac2da10198a5cf2edf1f2fe44b089618dc1c72f8cd0c3c51313c19bb3d4",
+      "sidecar_id": "sidecar_64ca44f39ae7dbd432e3",
+      "slide_id": "slide-03-risk-findings",
+      "source_asset_id": "cropsource_c29fca48b367370ecec5",
+      "validation_status": "PASS",
+      "visual_target_id": "visualtarget_04b7463dd0285b07a31a"
+    },
+    {
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "format": "PNG",
+      "full_slide_raster_forbidden": true,
+      "native_required_slot_ids": [
+        "title",
+        "subtitle",
+        "table",
+        "footer",
+        "source_notes",
+        "page_number"
+      ],
+      "ocr_canonical_text_forbidden": true,
+      "path": "src/slide4.png",
+      "raster_allowed_slot_ids": [],
+      "role": "slide_visual_target_design_reference",
+      "sequence": 4,
+      "sha256": "af9492fece0b40fc2f67ed42a1d073e2b82002eb15c58c64f955fe0cc70d9dbf",
+      "sidecar_id": "sidecar_669adc2c4ebcb89c3d6c",
+      "slide_id": "slide-04-options-comparison",
+      "source_asset_id": "cropsource_cde89a929023edc78d23",
+      "validation_status": "PASS",
+      "visual_target_id": "visualtarget_83244783582673b6aa13"
+    },
+    {
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "format": "PNG",
+      "full_slide_raster_forbidden": true,
+      "native_required_slot_ids": [
+        "title",
+        "subtitle",
+        "callout",
+        "body",
+        "footer",
+        "source_notes",
+        "page_number"
+      ],
+      "ocr_canonical_text_forbidden": true,
+      "path": "src/slide5.png",
+      "raster_allowed_slot_ids": [
+        "bounded_illustration"
+      ],
+      "role": "slide_visual_target_design_reference",
+      "sequence": 5,
+      "sha256": "8f42a53fd1fe62851082c147a280f2ac8487f450e0743d55a0c3c91d516ebb52",
+      "sidecar_id": "sidecar_3259b4d651ab52adc2b3",
+      "slide_id": "slide-05-recommendation",
+      "source_asset_id": "cropsource_15799a35e295073920a1",
+      "validation_status": "PASS",
+      "visual_target_id": "visualtarget_8a7c9dbcfafcedbe2b2c"
+    },
+    {
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "format": "PNG",
+      "full_slide_raster_forbidden": true,
+      "native_required_slot_ids": [
+        "title",
+        "subtitle",
+        "timeline",
+        "footer",
+        "source_notes",
+        "page_number"
+      ],
+      "ocr_canonical_text_forbidden": true,
+      "path": "src/slide6.png",
+      "raster_allowed_slot_ids": [
+        "bounded_illustration"
+      ],
+      "role": "slide_visual_target_design_reference",
+      "sequence": 6,
+      "sha256": "0274db749369959daac7fed17331e7f007ff5c47cc7b824698c3c298f5c0e4c2",
+      "sidecar_id": "sidecar_365e3284fc3e8132e688",
+      "slide_id": "slide-06-implementation-sources",
+      "source_asset_id": "cropsource_003dfe0da6fa451e71e5",
+      "validation_status": "PASS",
+      "visual_target_id": "visualtarget_1b24176472703beee735"
+    }
+  ],
+  "timezone": "Asia/Seoul",
+  "validation_status": "PASS"
+}

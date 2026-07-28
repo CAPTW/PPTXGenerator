@@ -1,0 +1,46 @@
+{
+  "baseline_commit_date": "2026-07-15T19:55:57+09:00",
+  "baseline_sha": "e0259b7551c381f8c0de4cdd329d5943680fa502",
+  "commit_range": {
+    "from_exclusive": "e0259b7551c381f8c0de4cdd329d5943680fa502",
+    "git_expression": "e0259b7551c381f8c0de4cdd329d5943680fa502..c3a2202078f3125b3861924ab356b31cf818b4e0",
+    "through_phase6": "c3a2202078f3125b3861924ab356b31cf818b4e0"
+  },
+  "final_evidence_commit_handling": "resolved_by_git_metadata",
+  "major_component_map": {
+    "adapted": 3,
+    "build_week_new": 15,
+    "existing": 2,
+    "external_existing": 2,
+    "historical_evidence": 0,
+    "platform_generated": 1,
+    "protected_not_used": 1
+  },
+  "no_overclaim_statement": "Pre-baseline, adapted, external, platform-generated, historical, and Build Week new components remain separately classified.",
+  "phase_commit_map": {
+    "architecture": "9a79d5f26e598816295be97df57c304f7ddba020",
+    "composite_qa": "ea6b8bc09011418cc2ca9d9d3e44e1b1f82d05c6",
+    "contracts": "54cabc22b4b19a0d13aec984a1c61e75325bb708",
+    "external_pin": "72dadc711f9fb80f3d7162b3b7bae1868e64b0bf",
+    "intake": "c82274308eda603594d83bd7465f256e70fe9dcb",
+    "phase7_evidence": "resolved_by_git_metadata",
+    "phase7_runtime": "resolved_after_phase_7_0_3_runtime_commit",
+    "reconstruction": "e2a6fabb1916680800097981fbda27abfe02b852",
+    "repair_closure": "c3a2202078f3125b3861924ab356b31cf818b4e0",
+    "visual_bundle": "3d3ad0c101a6f2cec390597da2ea52dd5ac55e3d"
+  },
+  "protected_historical_assets": [
+    "outputs/editable_template_spec.final.json",
+    "outputs/golden_template_masters.pptx",
+    "outputs/final_deck_large_premium.pptx"
+  ],
+  "provenance_hash": "eb2c90a6894e6736f44586cb5a56535c03fe1b60fa0f4cbae46d7a0e06ac789f",
+  "removed_quarantined_duplicate_history": {
+    "active": false,
+    "quarantine": "environment_only_not_packaged",
+    "skill": "image-to-editable-ppt-template"
+  },
+  "schema_name": "build_week_provenance",
+  "schema_version": "1.0.0",
+  "tested_runtime_commit_policy": "resolved_by_demo_run_manifest_from_phase7c_commit"
+}

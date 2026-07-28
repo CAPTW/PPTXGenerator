@@ -1,0 +1,23 @@
+{
+  "created_at": "2026-07-22T00:05:41.7991054+09:00",
+  "html_required": true,
+  "outputs": {
+    "crop_source_trace_manifest": "project/work/crop_source_trace_manifest.json",
+    "execution_record": "pngtopptx_execution_record.json",
+    "html": "project/out/deckcompiler_phase5.html",
+    "native_manifest": "project/work/native_object_manifest.json",
+    "orchestrator_execution_record": "pngtopptx_execution_record.json",
+    "package_openability_report": "project/work/package_openability_report.json",
+    "pptx": "project/out/deckcompiler_phase5.pptx",
+    "reconstruction_manifest": "project/work/reconstruction_manifest.json",
+    "repair_history": "project/work/repair_history.json",
+    "visual_qa_summary": "project/work/visual_qa_summary.json"
+  },
+  "pptx_must_be_editable": true,
+  "protected_outputs_must_remain_untouched": true,
+  "runtime_root_must_be_repository_external": true,
+  "schema_name": "expected_output_contract",
+  "schema_version": "1.0.0",
+  "slide_count": 6,
+  "timezone": "Asia/Seoul"
+}

@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/phase3-run-manifest.schema.json",
+  "title": "DeckCompiler Phase 3 Run Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "artifact",
+    "run_id",
+    "started_at",
+    "updated_at",
+    "completed_at",
+    "run_status",
+    "build_baseline",
+    "source_commit",
+    "inputs",
+    "stages",
+    "passed_stage_count",
+    "artifacts",
+    "retry_history",
+    "warnings",
+    "errors",
+    "validation_status",
+    "phase_boundary"
+  ],
+  "properties": {
+    "schema_name": {"const": "phase3_run_manifest"},
+    "schema_version": {"const": "1.0.0"},
+    "artifact": {
+      "allOf": [
+        {"$ref": "artifact-envelope.schema.json"},
+        {"properties": {"artifact_type": {"const": "deckcompiler_run_manifest"}}}
+      ]
+    },
+    "run_id": {"type": "string", "pattern": "^run_[0-9a-f]{20}$"},
+    "started_at": {"type": "string", "format": "date-time"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "completed_at": {"type": "string", "format": "date-time"},
+    "run_status": {"enum": ["completed", "failed"]},
+    "build_baseline": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["config", "prompt", "pdfs"],
+      "properties": {
+        "config": {"type": "string", "minLength": 1},
+        "prompt": {"type": ["string", "null"]},
+        "pdfs": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "stages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["stage", "status"],
+        "properties": {
+          "stage": {"type": "string", "minLength": 1},
+          "status": {"enum": ["not_started", "passed", "failed", "blocked", "skipped_by_mode", "skipped_by_phase"]}
+        }
+      }
+    },
+    "passed_stage_count": {"type": "integer", "minimum": 0},
+    "artifacts": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/artifactReference"}
+    },
+    "retry_history": {"type": "array", "items": {"type": "object"}},
+    "warnings": {"type": "array", "items": {"type": "string"}},
+    "errors": {"type": "array", "items": {"$ref": "#/$defs/error"}},
+    "validation_status": {"enum": ["valid", "invalid"]},
+    "phase_boundary": {
+      "type": "object",
+      "additionalProperties": {"const": "not_executed"},
+      "minProperties": 1
+    }
+  },
+  "$defs": {
+    "artifactReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_type", "schema_name", "artifact_id", "path", "semantic_content_sha256", "provenance_mode", "required"],
+      "properties": {
+        "artifact_type": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "schema_name": {"type": "string", "minLength": 1},
+        "artifact_id": {"type": "string", "pattern": "^art_[0-9a-f]{20}$"},
+        "path": {"type": "string", "pattern": "^[^/\\\\]+\\.json$"},
+        "semantic_content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "provenance_mode": {"enum": ["embedded_envelope", "manifest_reference"]},
+        "required": {"const": true}
+      }
+    },
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "stage", "artifact_path", "related_ids", "severity", "release_blocking", "message", "remediation_hint"],
+      "properties": {
+        "code": {"type": "string", "pattern": "^DC_[A-Z0-9_]+$"},
+        "stage": {"type": "string", "minLength": 1},
+        "artifact_path": {"type": ["string", "null"]},
+        "related_ids": {"type": "array", "items": {"type": "string"}},
+        "severity": {"enum": ["error", "warning"]},
+        "release_blocking": {"type": "boolean"},
+        "message": {"type": "string", "minLength": 1},
+        "remediation_hint": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

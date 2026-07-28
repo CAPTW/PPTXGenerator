@@ -1,0 +1,29 @@
+{
+  "attempt_id": "imageattempt_2502b789e69959c27135",
+  "checks": {
+    "adequate_negative_space": true,
+    "continuity_with_design_board": true,
+    "critical_content_clipping_absent": true,
+    "exact_16_9": true,
+    "minimum_resolution": true,
+    "module_mood_distinct": true,
+    "native_editability_regions": true,
+    "no_factual_claim": true,
+    "no_final_slide_copy": true,
+    "no_logo": true,
+    "no_microtext_dependency": true,
+    "no_numeric_glyphs": true,
+    "no_watermark": true,
+    "professional_academic_tone": true,
+    "reconstructable_visual_grammar": true
+  },
+  "findings": [],
+  "review_hash": "1d23f81812bb328fa10b8c9c146b40fb25a7fbfa6d7dcea0f97b38dda520e7c6",
+  "review_id": "imagereview_364b7b90d19120f974f7",
+  "reviewer": "Codex multimodal review",
+  "schema_name": "platform_image_visual_review",
+  "schema_version": "1.0.0",
+  "selected": true,
+  "target_artifact_id": "moduleanchor_3591b43d6cf6fe339284",
+  "visual_review_status": "ACCEPTED_FOR_PHASE4"
+}

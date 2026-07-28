@@ -1,0 +1,52 @@
+{
+  "schema_name": "slide_blueprint_collection",
+  "schema_version": "1.0.0",
+  "artifact": {
+    "artifact_id": "art_dddddddddddddddddddd",
+    "artifact_type": "slide_blueprint_collection",
+    "artifact_version": "1.0.0",
+    "product": {
+      "product_name": "PPTX Generator",
+      "product_slug": "pptx-generator",
+      "system_name": "DeckCompiler",
+      "system_id": "deckcompiler",
+      "reconstruction_engine": "PNGtoPPTX"
+    },
+    "provenance": {
+      "created_at": "2026-07-15T21:10:03+09:00",
+      "producer": {"tool_name": "invalid-fixture", "tool_version": "1.0.0", "runtime": "test"},
+      "build_baseline": "e0259b7551c381f8c0de4cdd329d5943680fa502",
+      "source_commit": "39b4c104b23d4e09446388db2a8b2fb873a7824b",
+      "input_artifact_ids": []
+    },
+    "content_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+  },
+  "collection_id": "blueprints_dddddddddddddddddddd",
+  "slides": [
+    {
+      "schema_name": "slide_blueprint",
+      "schema_version": "1.0.0",
+      "slide_id": "s001",
+      "section_id": "sec01",
+      "slide_type": "cover_hero",
+      "title": "Synthetic title",
+      "subtitle": "Synthetic subtitle",
+      "content_density": "low",
+      "required_slots": ["title"],
+      "content_blocks": [{"block_id": "b001", "slot": "title", "type": "text", "content": "Synthetic title"}],
+      "chart_data": null,
+      "table_data": null,
+      "image_needs": [],
+      "speaker_notes": "Synthetic notes.",
+      "citations": [],
+      "design_intent": "Contract validation only."
+    }
+  ],
+  "evidence_bindings": [
+    {
+      "slide_id": "s001",
+      "evidence_ids": ["ev_ffffffffffffffffffff"],
+      "allocation_role": "primary"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "content_sha256_without_this_field": "d050bf4d580f88295ae1e1dfb30b2670cb20046b4d5fcc8da58e1136a147ac86",
+  "matches_head": true,
+  "mismatch_count": 0,
+  "post_aggregate_sha256": "4ad86fcc50ed669d57966dd471d50ea791c21499c3c280c8b29f484a49b8473c",
+  "post_file_count": 107,
+  "pre_aggregate_sha256": "4ad86fcc50ed669d57966dd471d50ea791c21499c3c280c8b29f484a49b8473c",
+  "pre_file_count": 107,
+  "schema_name": "phase5_phase4_bundle_pre_post_fingerprint",
+  "schema_version": "1.0.0",
+  "source_commit": "00fefe71e3b02fa897794f9e9f3d6df5be715cd8",
+  "status": "PASS"
+}

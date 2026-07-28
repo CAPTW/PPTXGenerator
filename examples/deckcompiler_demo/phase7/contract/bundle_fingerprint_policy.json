@@ -1,0 +1,59 @@
+{
+  "git_object_identity": {
+    "checkout_representation_independent": true,
+    "contract": "git_object_bundle_fingerprint_v1",
+    "record_ordering": "unicode_code_point_ordinal_over_normalized_posix_paths",
+    "serialization": "compact_sorted_key_json_utf8_no_bom_no_trailing_newline",
+    "source": "committed_git_tree_and_blob_objects",
+    "submodule_policy": "reject",
+    "symlink_policy": "reject"
+  },
+  "legacy_current_authority_fallback": "forbidden",
+  "policy_hash": "973300a49c1201980fe57477aa401a8135f421315a16346345472f0d288612a1",
+  "policy_status": "ACTIVE",
+  "runtime_compatibility": {
+    "binary_exact_extensions": [
+      ".docx",
+      ".gif",
+      ".ico",
+      ".jpeg",
+      ".jpg",
+      ".pdf",
+      ".png",
+      ".pptx",
+      ".webp",
+      ".xlsx",
+      ".zip"
+    ],
+    "contract": "runtime_bundle_compatibility_v1",
+    "duplicate_json_key_policy": "reject",
+    "json_semantic_extensions": [
+      ".json"
+    ],
+    "repository_identity": false,
+    "text_clean_filter_extensions": [
+      ".css",
+      ".html",
+      ".js",
+      ".md",
+      ".ps1",
+      ".py",
+      ".txt",
+      ".yaml",
+      ".yml"
+    ],
+    "unsupported_file_policy": "block"
+  },
+  "schema_name": "bundle_fingerprint_policy",
+  "schema_version": "1.0.0",
+  "supported_release_checkout": {
+    "core_autocrlf": false,
+    "exact_runtime_text": [
+      {
+        "path": "src/presentation_agent/deckcompiler/qa/reconstruction_source/slides.js",
+        "sha256": "8130f47caa5decf4e1df5343f405fcc79ff18f6d7c6e1880d7e56733d45ae20b"
+      }
+    ],
+    "reason": "exact_runtime_text_fixture"
+  }
+}

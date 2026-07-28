@@ -1,0 +1,870 @@
+{
+  "authority": "Phase 4 semantic Sidecars + actual PPTX/HTML object evidence",
+  "content_sha256_without_this_field": "798ac2325d1c41b98b14e3d93564005aab6b358ed5f04cd39ad0c3760b99df10",
+  "failure_count": 0,
+  "native_requirement_count": 38,
+  "native_requirement_coverage": 1.0,
+  "native_requirement_pass_count": 38,
+  "requirements": [
+    {
+      "content_hashes": [
+        "7af2487512fc508b838ba1488653cfeaad44bbc9918d59c14d28b8b33a6cea73"
+      ],
+      "content_item_ids": [
+        "title"
+      ],
+      "emitted_object_type": "text_box",
+      "html_selectors": [
+        "#slide-1 > div:nth-of-type(3)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:3"
+      ],
+      "required_object_type": "text_box",
+      "requirement_index": 1,
+      "slide": 1,
+      "slot_id": "title"
+    },
+    {
+      "content_hashes": [
+        "b9b0047e90ff1fbe00da1175ea9ce6c6054b221b68243ac522f899bc2137e54d"
+      ],
+      "content_item_ids": [
+        "subtitle"
+      ],
+      "emitted_object_type": "text_box",
+      "html_selectors": [
+        "#slide-1 > div:nth-of-type(4)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:4"
+      ],
+      "required_object_type": "text_box",
+      "requirement_index": 2,
+      "slide": 1,
+      "slot_id": "subtitle"
+    },
+    {
+      "content_hashes": [
+        "77fd93346660814dcccdf4fd17d64e632d67d005343e8ee70f6c37de3ea2e0b6",
+        "af3d7425df48a62aa08a3509bcb564f287e66f07f89e7f876445e8fc7311e45e",
+        "4e8588692f5ae7dbb10f93b191be6fc70fe0140a628f730eddbb6fd5fda4216b"
+      ],
+      "content_item_ids": [
+        "slide-01-decision-framing-evidence-01",
+        "slide-01-decision-framing-evidence-02",
+        "slide-01-decision-framing-evidence-03"
+      ],
+      "emitted_object_type": "text_box",
+      "html_selectors": [
+        "#slide-1 > div:nth-of-type(17)",
+        "#slide-1 > div:nth-of-type(33)",
+        "#slide-1 > div:nth-of-type(37)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:17",
+        "shape:33",
+        "shape:37"
+      ],
+      "required_object_type": "text_box",
+      "requirement_index": 3,
+      "slide": 1,
+      "slot_id": "body"
+    },
+    {
+      "content_hashes": [
+        "cc34f5e43c4a3ece6698072e327b58469716055a432816bb398b77bf2d74de7e",
+        "0598fd24001026778bcd2b6990b62a2c9a2f07a54b8ff72be809f15abb4d2357",
+        null
+      ],
+      "content_item_ids": [
+        "citation-02",
+        "citation-03",
+        "citation-04"
+      ],
+      "emitted_object_type": "footer",
+      "html_selectors": [
+        "#slide-1 > div:nth-of-type(51)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:48"
+      ],
+      "required_object_type": "footer",
+      "requirement_index": 4,
+      "slide": 1,
+      "slot_id": "footer"
+    },
+    {
+      "content_hashes": [],
+      "content_item_ids": [],
+      "emitted_object_type": "footer",
+      "html_selectors": [
+        "#slide-1 > div:nth-of-type(52)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:49"
+      ],
+      "required_object_type": "footer",
+      "requirement_index": 5,
+      "slide": 1,
+      "slot_id": "source_notes"
+    },
+    {
+      "content_hashes": [],
+      "content_item_ids": [],
+      "emitted_object_type": "footer",
+      "html_selectors": [
+        "#slide-1 > div:nth-of-type(53)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:50"
+      ],
+      "required_object_type": "footer",
+      "requirement_index": 6,
+      "slide": 1,
+      "slot_id": "page_number"
+    },
+    {
+      "content_hashes": [
+        "4a7c5e7feac6e84649477c6c41c07d7c3d7db9a5859f38ed464db24f1bdc41a9"
+      ],
+      "content_item_ids": [
+        "title"
+      ],
+      "emitted_object_type": "text_box",
+      "html_selectors": [
+        "#slide-2 > div:nth-of-type(3)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:3"
+      ],
+      "required_object_type": "text_box",
+      "requirement_index": 1,
+      "slide": 2,
+      "slot_id": "title"
+    },
+    {
+      "content_hashes": [
+        "b9b0047e90ff1fbe00da1175ea9ce6c6054b221b68243ac522f899bc2137e54d"
+      ],
+      "content_item_ids": [
+        "subtitle"
+      ],
+      "emitted_object_type": "text_box",
+      "html_selectors": [
+        "#slide-2 > div:nth-of-type(4)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:4"
+      ],
+      "required_object_type": "text_box",
+      "requirement_index": 2,
+      "slide": 2,
+      "slot_id": "subtitle"
+    },
+    {
+      "content_hashes": [
+        "8bb218c91ee3bbda0e15c3d5499b3b7cf318891afc49de9474e1db30235e14ba",
+        "3adcde4ce319345ef6e4c20b7b7ef3e939a60ca69506396181b08e45c057112d",
+        "9343b262c7a3f7da07fd7694c7694593ecddf7386cb2720a766ff078dc181b74",
+        "34e2fb098ff0ab050d80a8bcf9b6218d3099eb72e0478a1743bc0047b878bc8d"
+      ],
+      "content_item_ids": [
+        "slide-02-system-process-evidence-01",
+        "slide-02-system-process-evidence-02",
+        "slide-02-system-process-evidence-03",
+        "slide-02-system-process-evidence-04"
+      ],
+      "emitted_object_type": "connector",
+      "html_selectors": [
+        "#slide-2 > div:nth-of-type(20)",
+        "#slide-2 > div:nth-of-type(28)",
+        "#slide-2 > div:nth-of-type(36)",
+        "#slide-2 > div:nth-of-type(44)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:20",
+        "shape:28",
+        "shape:36",
+        "shape:44"
+      ],
+      "required_object_type": "connector",
+      "requirement_index": 3,
+      "slide": 2,
+      "slot_id": "process"
+    },
+    {
+      "content_hashes": [
+        "97bbf13962d55659ab4179eda115f3ee76b4bd2a42bd2569a0113ba62595973f",
+        "82f79d45c4f2df83a42ee1ac6f7fac0aa20b50f5e683d0fe27fb0191e9b502a3",
+        "5f379efe1095156d6284c802cb3a3891c5de4b726d0b3e4c051efbb580d2cd1d",
+        null
+      ],
+      "content_item_ids": [
+        "citation-02",
+        "citation-03",
+        "citation-04",
+        "citation-05"
+      ],
+      "emitted_object_type": "footer",
+      "html_selectors": [
+        "#slide-2 > div:nth-of-type(49)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:49"
+      ],
+      "required_object_type": "footer",
+      "requirement_index": 4,
+      "slide": 2,
+      "slot_id": "footer"
+    },
+    {
+      "content_hashes": [],
+      "content_item_ids": [],
+      "emitted_object_type": "footer",
+      "html_selectors": [
+        "#slide-2 > div:nth-of-type(50)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:50"
+      ],
+      "required_object_type": "footer",
+      "requirement_index": 5,
+      "slide": 2,
+      "slot_id": "source_notes"
+    },
+    {
+      "content_hashes": [],
+      "content_item_ids": [],
+      "emitted_object_type": "footer",
+      "html_selectors": [
+        "#slide-2 > div:nth-of-type(51)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:51"
+      ],
+      "required_object_type": "footer",
+      "requirement_index": 6,
+      "slide": 2,
+      "slot_id": "page_number"
+    },
+    {
+      "content_hashes": [
+        "223304762d4b77e2da6c3ee80000988d146a1d15c53a40e9c540491034cdc40b"
+      ],
+      "content_item_ids": [
+        "title"
+      ],
+      "emitted_object_type": "text_box",
+      "html_selectors": [
+        "#slide-3 > div:nth-of-type(3)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:3"
+      ],
+      "required_object_type": "text_box",
+      "requirement_index": 1,
+      "slide": 3,
+      "slot_id": "title"
+    },
+    {
+      "content_hashes": [
+        "b9b0047e90ff1fbe00da1175ea9ce6c6054b221b68243ac522f899bc2137e54d"
+      ],
+      "content_item_ids": [
+        "subtitle"
+      ],
+      "emitted_object_type": "text_box",
+      "html_selectors": [
+        "#slide-3 > div:nth-of-type(4)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:4"
+      ],
+      "required_object_type": "text_box",
+      "requirement_index": 2,
+      "slide": 3,
+      "slot_id": "subtitle"
+    },
+    {
+      "content_hashes": [
+        "af3d7425df48a62aa08a3509bcb564f287e66f07f89e7f876445e8fc7311e45e",
+        "4e8588692f5ae7dbb10f93b191be6fc70fe0140a628f730eddbb6fd5fda4216b",
+        "a6cc92e789bbe44946926fc0d5c99e2d5efd117def44ecae055ebcb23a7d8e84",
+        "c69f036d3782421dc697a3da93cfb538edbe127221ddd569360c6435c35400aa",
+        "641b2c8c60036cd2f3be82b9cf7f53ae21d4bd435e44c411584e76b43be287db"
+      ],
+      "content_item_ids": [
+        "slide-03-risk-findings-evidence-01",
+        "slide-03-risk-findings-evidence-02",
+        "slide-03-risk-findings-evidence-03",
+        "slide-03-risk-findings-evidence-04",
+        "slide-03-risk-findings-evidence-05"
+      ],
+      "emitted_object_type": "text_box",
+      "html_selectors": [
+        "#slide-3 > div:nth-of-type(17)",
+        "#slide-3 > div:nth-of-type(22)",
+        "#slide-3 > div:nth-of-type(27)",
+        "#slide-3 > div:nth-of-type(32)",
+        "#slide-3 > div:nth-of-type(37)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:17",
+        "shape:22",
+        "shape:27",
+        "shape:32",
+        "shape:37"
+      ],
+      "required_object_type": "text_box",
+      "requirement_index": 3,
+      "slide": 3,
+      "slot_id": "body"
+    },
+    {
+      "content_hashes": [],
+      "content_item_ids": [],
+      "emitted_object_type": "approved_editable_vector_evidence_cards",
+      "html_selectors": [
+        "#slide-3"
+      ],
+      "limitation": "The Sidecar contains no chart series; the KPI slot is represented by editable vector evidence cards and remains subject to Phase 6 review.",
+      "pass": true,
+      "pptx_object_refs": [
+        "native-manifest-object:1",
+        "native-manifest-object:2",
+        "native-manifest-object:3",
+        "native-manifest-object:4",
+        "native-manifest-object:5",
+        "native-manifest-object:6",
+        "native-manifest-object:7",
+        "native-manifest-object:8"
+      ],
+      "required_object_type": "chart",
+      "requirement_index": 4,
+      "slide": 3,
+      "slot_id": "kpi"
+    },
+    {
+      "content_hashes": [
+        "0598fd24001026778bcd2b6990b62a2c9a2f07a54b8ff72be809f15abb4d2357",
+        "e892c83c813274b4ec01bd2240999ab85c566493b464a32f4a5b781b17f23310",
+        "c8c50f9ca1264c20a79e76a4de72e725e9efdb328310122b11b1d5ef8ea30adf",
+        "68b49972f28777b46f8de0093ee4435f692dcfcb55b934d81a9a1597208355fe",
+        null
+      ],
+      "content_item_ids": [
+        "citation-02",
+        "citation-03",
+        "citation-04",
+        "citation-05",
+        "citation-06"
+      ],
+      "emitted_object_type": "footer",
+      "html_selectors": [
+        "#slide-3 > div:nth-of-type(43)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:43"
+      ],
+      "required_object_type": "footer",
+      "requirement_index": 5,
+      "slide": 3,
+      "slot_id": "footer"
+    },
+    {
+      "content_hashes": [],
+      "content_item_ids": [],
+      "emitted_object_type": "footer",
+      "html_selectors": [
+        "#slide-3 > div:nth-of-type(44)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:44"
+      ],
+      "required_object_type": "footer",
+      "requirement_index": 6,
+      "slide": 3,
+      "slot_id": "source_notes"
+    },
+    {
+      "content_hashes": [],
+      "content_item_ids": [],
+      "emitted_object_type": "footer",
+      "html_selectors": [
+        "#slide-3 > div:nth-of-type(45)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:45"
+      ],
+      "required_object_type": "footer",
+      "requirement_index": 7,
+      "slide": 3,
+      "slot_id": "page_number"
+    },
+    {
+      "content_hashes": [
+        "567bbb95ea802aed1d667dbc47e29956d64799e27becaf7ec67bd669143ab62b"
+      ],
+      "content_item_ids": [
+        "title"
+      ],
+      "emitted_object_type": "text_box",
+      "html_selectors": [
+        "#slide-4 > div:nth-of-type(3)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:4"
+      ],
+      "required_object_type": "text_box",
+      "requirement_index": 1,
+      "slide": 4,
+      "slot_id": "title"
+    },
+    {
+      "content_hashes": [
+        "b9b0047e90ff1fbe00da1175ea9ce6c6054b221b68243ac522f899bc2137e54d"
+      ],
+      "content_item_ids": [
+        "subtitle"
+      ],
+      "emitted_object_type": "text_box",
+      "html_selectors": [
+        "#slide-4 > div:nth-of-type(4)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:5"
+      ],
+      "required_object_type": "text_box",
+      "requirement_index": 2,
+      "slide": 4,
+      "slot_id": "subtitle"
+    },
+    {
+      "content_hashes": [
+        "9988d2bd71591518d3bc1ee213e661fbedce9f73f7f00400f193d6ca1fa20715",
+        "9064f1e51ae0a83d5fae270930bf1ceebd4d2b59f766023f0a93fd6d72a8d4f1",
+        "8b7d58c35eb398b4d590534db51b20e81c097b68338296cf31f92e2e3041b0f8",
+        "2096d5daeeec19d961cfdc6436fa3c9cbc70e9a919aa959bbebc5592a3dcf62d"
+      ],
+      "content_item_ids": [
+        "slide-04-options-comparison-evidence-01",
+        "slide-04-options-comparison-evidence-02",
+        "slide-04-options-comparison-evidence-03",
+        "slide-04-options-comparison-evidence-04"
+      ],
+      "emitted_object_type": "native_table",
+      "html_selectors": [
+        "#slide-4 > table:nth-of-type(1)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:1"
+      ],
+      "required_object_type": "table",
+      "requirement_index": 3,
+      "slide": 4,
+      "slot_id": "table"
+    },
+    {
+      "content_hashes": [
+        "2e6245356dcab3618b9d9d0d49659415fdbe6957f34c3c2cc049f9da5e2513bb",
+        "84a664e1ab209f5c268b7153d2f36a792152db0cdead4b3cbc7c5ab76679be4a",
+        "14ecff788b7441337bcc562256c59b87c913c402caf1decdaf87f1211d666f04",
+        null
+      ],
+      "content_item_ids": [
+        "citation-02",
+        "citation-03",
+        "citation-04",
+        "citation-05"
+      ],
+      "emitted_object_type": "footer",
+      "html_selectors": [
+        "#slide-4 > div:nth-of-type(18)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:19"
+      ],
+      "required_object_type": "footer",
+      "requirement_index": 4,
+      "slide": 4,
+      "slot_id": "footer"
+    },
+    {
+      "content_hashes": [],
+      "content_item_ids": [],
+      "emitted_object_type": "footer",
+      "html_selectors": [
+        "#slide-4 > div:nth-of-type(19)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:20"
+      ],
+      "required_object_type": "footer",
+      "requirement_index": 5,
+      "slide": 4,
+      "slot_id": "source_notes"
+    },
+    {
+      "content_hashes": [],
+      "content_item_ids": [],
+      "emitted_object_type": "footer",
+      "html_selectors": [
+        "#slide-4 > div:nth-of-type(20)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:21"
+      ],
+      "required_object_type": "footer",
+      "requirement_index": 6,
+      "slide": 4,
+      "slot_id": "page_number"
+    },
+    {
+      "content_hashes": [
+        "6a9192bf9b8b3bf913bea10da344dfec063ccfd4cd8d15a02a0de61b94741ff9"
+      ],
+      "content_item_ids": [
+        "title"
+      ],
+      "emitted_object_type": "text_box",
+      "html_selectors": [
+        "#slide-5 > div:nth-of-type(3)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:3"
+      ],
+      "required_object_type": "text_box",
+      "requirement_index": 1,
+      "slide": 5,
+      "slot_id": "title"
+    },
+    {
+      "content_hashes": [
+        "b9b0047e90ff1fbe00da1175ea9ce6c6054b221b68243ac522f899bc2137e54d"
+      ],
+      "content_item_ids": [
+        "subtitle"
+      ],
+      "emitted_object_type": "text_box",
+      "html_selectors": [
+        "#slide-5 > div:nth-of-type(4)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:4"
+      ],
+      "required_object_type": "text_box",
+      "requirement_index": 2,
+      "slide": 5,
+      "slot_id": "subtitle"
+    },
+    {
+      "content_hashes": [
+        "77fd93346660814dcccdf4fd17d64e632d67d005343e8ee70f6c37de3ea2e0b6",
+        "8b7d58c35eb398b4d590534db51b20e81c097b68338296cf31f92e2e3041b0f8",
+        "af3d7425df48a62aa08a3509bcb564f287e66f07f89e7f876445e8fc7311e45e",
+        "4e8588692f5ae7dbb10f93b191be6fc70fe0140a628f730eddbb6fd5fda4216b"
+      ],
+      "content_item_ids": [
+        "slide-05-recommendation-evidence-01",
+        "slide-05-recommendation-evidence-02",
+        "slide-05-recommendation-evidence-03",
+        "slide-05-recommendation-evidence-04"
+      ],
+      "emitted_object_type": "text_box",
+      "html_selectors": [
+        "#slide-5 > div:nth-of-type(16)",
+        "#slide-5 > div:nth-of-type(24)",
+        "#slide-5 > div:nth-of-type(30)",
+        "#slide-5 > div:nth-of-type(36)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:16",
+        "shape:24",
+        "shape:30",
+        "shape:36"
+      ],
+      "required_object_type": "text_box",
+      "requirement_index": 3,
+      "slide": 5,
+      "slot_id": "callout"
+    },
+    {
+      "content_hashes": [],
+      "content_item_ids": [],
+      "emitted_object_type": "editable_callout_body_text",
+      "html_selectors": [
+        "#slide-5 > div:nth-of-type(16)",
+        "#slide-5 > div:nth-of-type(24)",
+        "#slide-5 > div:nth-of-type(30)",
+        "#slide-5 > div:nth-of-type(36)"
+      ],
+      "limitation": "The Sidecar binds the factual body blocks to the callout slot; the body requirement is satisfied by those editable callout text objects.",
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:16",
+        "shape:24",
+        "shape:30",
+        "shape:36"
+      ],
+      "required_object_type": "text_box",
+      "requirement_index": 4,
+      "slide": 5,
+      "slot_id": "body"
+    },
+    {
+      "content_hashes": [
+        "84a664e1ab209f5c268b7153d2f36a792152db0cdead4b3cbc7c5ab76679be4a",
+        "cc34f5e43c4a3ece6698072e327b58469716055a432816bb398b77bf2d74de7e",
+        "0598fd24001026778bcd2b6990b62a2c9a2f07a54b8ff72be809f15abb4d2357",
+        null
+      ],
+      "content_item_ids": [
+        "citation-02",
+        "citation-03",
+        "citation-04",
+        "citation-05"
+      ],
+      "emitted_object_type": "footer",
+      "html_selectors": [
+        "#slide-5 > div:nth-of-type(48)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:45"
+      ],
+      "required_object_type": "footer",
+      "requirement_index": 5,
+      "slide": 5,
+      "slot_id": "footer"
+    },
+    {
+      "content_hashes": [],
+      "content_item_ids": [],
+      "emitted_object_type": "footer",
+      "html_selectors": [
+        "#slide-5 > div:nth-of-type(49)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:46"
+      ],
+      "required_object_type": "footer",
+      "requirement_index": 6,
+      "slide": 5,
+      "slot_id": "source_notes"
+    },
+    {
+      "content_hashes": [],
+      "content_item_ids": [],
+      "emitted_object_type": "footer",
+      "html_selectors": [
+        "#slide-5 > div:nth-of-type(50)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:47"
+      ],
+      "required_object_type": "footer",
+      "requirement_index": 7,
+      "slide": 5,
+      "slot_id": "page_number"
+    },
+    {
+      "content_hashes": [
+        "5f58a604681522482479e05a6c109258c8ed629def17350d35b38e3d62857323"
+      ],
+      "content_item_ids": [
+        "title"
+      ],
+      "emitted_object_type": "text_box",
+      "html_selectors": [
+        "#slide-6 > div:nth-of-type(3)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:3"
+      ],
+      "required_object_type": "text_box",
+      "requirement_index": 1,
+      "slide": 6,
+      "slot_id": "title"
+    },
+    {
+      "content_hashes": [
+        "b9b0047e90ff1fbe00da1175ea9ce6c6054b221b68243ac522f899bc2137e54d"
+      ],
+      "content_item_ids": [
+        "subtitle"
+      ],
+      "emitted_object_type": "text_box",
+      "html_selectors": [
+        "#slide-6 > div:nth-of-type(4)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:4"
+      ],
+      "required_object_type": "text_box",
+      "requirement_index": 2,
+      "slide": 6,
+      "slot_id": "subtitle"
+    },
+    {
+      "content_hashes": [
+        "9343b262c7a3f7da07fd7694c7694593ecddf7386cb2720a766ff078dc181b74",
+        "34e2fb098ff0ab050d80a8bcf9b6218d3099eb72e0478a1743bc0047b878bc8d",
+        "6f9afc3294a9dbccd98b7856a99b470a93e4bc304059b585891bbdaf8366f382",
+        "635912eca2f3684e52fbf803a216c0adf264f7bdfd09461ea22613b3a1be505c"
+      ],
+      "content_item_ids": [
+        "slide-06-implementation-sources-evidence-01",
+        "slide-06-implementation-sources-evidence-02",
+        "slide-06-implementation-sources-evidence-03",
+        "slide-06-implementation-sources-evidence-04"
+      ],
+      "emitted_object_type": "connector",
+      "html_selectors": [
+        "#slide-6 > div:nth-of-type(22)",
+        "#slide-6 > div:nth-of-type(32)",
+        "#slide-6 > div:nth-of-type(42)",
+        "#slide-6 > div:nth-of-type(52)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:21",
+        "shape:30",
+        "shape:39",
+        "shape:48"
+      ],
+      "required_object_type": "connector",
+      "requirement_index": 3,
+      "slide": 6,
+      "slot_id": "timeline"
+    },
+    {
+      "content_hashes": [
+        "5f379efe1095156d6284c802cb3a3891c5de4b726d0b3e4c051efbb580d2cd1d",
+        "083c30ecf335cf81e2888c203198a91e04f179782442d5c5df2351f039733bb0",
+        "f5ca91670935ae6c652a98146f443c8be84dac6700a4012cf5f5b66796a51866",
+        null
+      ],
+      "content_item_ids": [
+        "citation-02",
+        "citation-03",
+        "citation-04",
+        "citation-05"
+      ],
+      "emitted_object_type": "footer",
+      "html_selectors": [
+        "#slide-6 > div:nth-of-type(57)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:53"
+      ],
+      "required_object_type": "footer",
+      "requirement_index": 4,
+      "slide": 6,
+      "slot_id": "footer"
+    },
+    {
+      "content_hashes": [],
+      "content_item_ids": [],
+      "emitted_object_type": "footer",
+      "html_selectors": [
+        "#slide-6 > div:nth-of-type(58)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:54"
+      ],
+      "required_object_type": "footer",
+      "requirement_index": 5,
+      "slide": 6,
+      "slot_id": "source_notes"
+    },
+    {
+      "content_hashes": [],
+      "content_item_ids": [],
+      "emitted_object_type": "footer",
+      "html_selectors": [
+        "#slide-6 > div:nth-of-type(59)"
+      ],
+      "limitation": null,
+      "pass": true,
+      "pptx_object_refs": [
+        "shape:55"
+      ],
+      "required_object_type": "footer",
+      "requirement_index": 6,
+      "slide": 6,
+      "slot_id": "page_number"
+    }
+  ],
+  "schema_name": "phase5_native_object_manifest",
+  "schema_version": "1.0.0",
+  "status": "PASS"
+}

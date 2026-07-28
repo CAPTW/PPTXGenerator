@@ -1,0 +1,36 @@
+{
+  "content_sha256_without_this_field": "e98d1f3153c021dcca8131bdd67b8f1ca354df25b83d722cbab80ca0d3fa2797",
+  "crop_count": 0,
+  "crop_source_trace_status": "not_applicable_zero_raster",
+  "full_slide_picture_count": 0,
+  "handoff_id": "pnghandoff_a52abef975f8490a5882",
+  "native_requirement_count": 38,
+  "native_requirement_pass_count": 38,
+  "official_orchestrator": "slide-editable-deck-orchestrator",
+  "outputs": {
+    "html": {
+      "byte_size": 85014,
+      "path": "outputs/html/index.html",
+      "sha256": "b1f161bed4d1dc37be576eceda0cf01d125580df4a767c4722582c8671983085"
+    },
+    "pptx": {
+      "byte_size": 261527,
+      "path": "outputs/pptx_generator_demo.pptx",
+      "sha256": "805eb4aa3d44d90ebe5b78c0247d02e412ebfc9468e57c778516b90de2d27676"
+    }
+  },
+  "picture_shape_count": 0,
+  "quality": "reconstruction",
+  "render_count": 6,
+  "repair_waves_allowed": 3,
+  "repair_waves_used": 3,
+  "run_id": "phase51run_a52abef975f8490a5882",
+  "schema_name": "phase5_reconstruction_manifest",
+  "schema_version": "1.0.0",
+  "screenshot_slide_count": 0,
+  "semantic_raster_violation_count": 0,
+  "slide_count": 6,
+  "source_commit": "8c05f69ccee081f838455fced7de3b77dd1baf29",
+  "status": "PASS",
+  "target": "both"
+}

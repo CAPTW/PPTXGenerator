@@ -1,0 +1,122 @@
+{
+  "content_hash": "3acc719b089726a34b81083cbbc31a327a696d27918640e318db2341745c7217",
+  "design_system": {
+    "canvas": {
+      "aspect_ratio": "16:9",
+      "height_in": 7.5,
+      "width_in": 13.333333333333334
+    },
+    "colors": {
+      "accent": "#087E8B",
+      "action": "#2A6F97",
+      "background": "#F5F8FA",
+      "muted_text": "#627D98",
+      "risk": "#C44536",
+      "surface": "#FFFFFF",
+      "text": "#102A43"
+    },
+    "components": {
+      "bounded_illustration_frame": {
+        "allowed_slots": [
+          "bounded_illustration"
+        ],
+        "component_type": "image_frame"
+      },
+      "source_rail": {
+        "allowed_slots": [
+          "footer",
+          "source_notes"
+        ],
+        "component_type": "footer_component"
+      }
+    },
+    "design_system_id": "designsystem_bd807020d129d8c5db9f",
+    "schema_version": "1.0.0",
+    "shape_style": {
+      "card_radius_in": 0.08,
+      "hairline_pt": 0.8,
+      "shadow_style": "subtle elevation only"
+    },
+    "spacing": {
+      "card_padding_in": 0.22,
+      "grid_gap_in": 0.22,
+      "page_margin_x_in": 0.6,
+      "page_margin_y_in": 0.38
+    },
+    "typography": {
+      "body": {
+        "color": "#243B53",
+        "font_family": "Aptos",
+        "line_height": 1.25,
+        "size_pt": 16,
+        "weight": 400
+      },
+      "footer": {
+        "color": "#627D98",
+        "font_family": "Aptos",
+        "line_height": 1.1,
+        "size_pt": 9,
+        "weight": 400
+      },
+      "label": {
+        "color": "#486581",
+        "font_family": "Aptos",
+        "line_height": 1.15,
+        "size_pt": 12,
+        "weight": 600
+      },
+      "section_title": {
+        "color": "#102A43",
+        "font_family": "Aptos Display",
+        "line_height": 1.1,
+        "size_pt": 22,
+        "weight": 600
+      },
+      "title": {
+        "color": "#102A43",
+        "font_family": "Aptos Display",
+        "line_height": 1.05,
+        "size_pt": 30,
+        "weight": 650
+      }
+    }
+  },
+  "policy": {
+    "citation_footer_policy": "Native, visible, quiet, and never rasterized.",
+    "composition_freedom": [
+      "title placement",
+      "panel count",
+      "focal point",
+      "negative space",
+      "diagram type",
+      "density level",
+      "reading direction"
+    ],
+    "full_slide_raster_prohibited": true,
+    "line_weight_families": [
+      0.8,
+      1.5,
+      2.5
+    ],
+    "minimum_legibility": {
+      "body_pt": 16,
+      "footer_pt": 9,
+      "label_pt": 12,
+      "microtext_forbidden": true
+    },
+    "module_differentiation_range": "composition, metaphor, focal behavior, density, and directional energy may vary by module",
+    "native_raster_policy": {
+      "bounded_continuous_tone": "raster_allowed",
+      "overlap_allowed": false,
+      "semantic_slots": "native_required"
+    },
+    "safe_area_rules": {
+      "footer_bottom": 0.03,
+      "outer_margin": 0.05,
+      "title_top": 0.05
+    }
+  },
+  "schema_name": "phase4_design_system",
+  "schema_version": "1.0.0",
+  "source_commit": "00fefe71e3b02fa897794f9e9f3d6df5be715cd8"
+}

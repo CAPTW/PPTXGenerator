@@ -1,0 +1,237 @@
+{
+  "acceptance_policy": {
+    "error_allowed": 0,
+    "external_provider_self_acceptance_allowed": false,
+    "release_blocking_warning_allowed": 0,
+    "severe_allowed": 0,
+    "unresolved_repairable_allowed": 0
+  },
+  "checks": {
+    "baseline_html_sha256": "b1f161bed4d1dc37be576eceda0cf01d125580df4a767c4722582c8671983085",
+    "baseline_pptx_sha256": "805eb4aa3d44d90ebe5b78c0247d02e412ebfc9468e57c778516b90de2d27676",
+    "dimension_report_count": 10,
+    "phase4_bundle_aggregate": "4ad86fcc50ed669d57966dd471d50ea791c21499c3c280c8b29f484a49b8473c",
+    "phase4_inventory_count": 107,
+    "phase5_bundle_aggregate": "98f88cc940cb0d9171c6b116c7ebb1290b2b51c29547580f13301b15cc74f20c",
+    "phase5_inventory_count": 38,
+    "prerequisite_hash_linkage": "PASS",
+    "report_hash_linkage": "PASS"
+  },
+  "created_at": "2026-07-22T10:30:00+09:00",
+  "dimension_reports": [
+    {
+      "path": "semantic_qa_report.json",
+      "report_hash": "bf693d153490037f2585e454e0ce89eb5cc5a5d5520237baa2ca88b561085cdf",
+      "schema_name": "phase6_semantic_qa_report",
+      "status": "PASS"
+    },
+    {
+      "path": "source_coverage_qa_report.json",
+      "report_hash": "a0722b82dd291b5709a70752ee5c9de34596084fa6eaa98f3dc10d6a211049f4",
+      "schema_name": "phase6_source_coverage_qa_report",
+      "status": "PASS"
+    },
+    {
+      "path": "creative_qa_report.json",
+      "report_hash": "cc187e925f1f9c5bf3542fae0d85a4467710822336fc9e79eeb736b1338b2cff",
+      "schema_name": "phase6_creative_qa_report",
+      "status": "PASS"
+    },
+    {
+      "path": "editability_qa_report.json",
+      "report_hash": "3606606e9389c799cb2b7462ba6c8fb263ae01db0c6924b875691f35000d3e2c",
+      "schema_name": "phase6_editability_qa_report",
+      "status": "PASS"
+    },
+    {
+      "path": "visual_qa_report.json",
+      "report_hash": "0a2e4949db25ac0d7b59079ae92b5e661e2f396c8fa200f29471b598f1c25885",
+      "schema_name": "phase6_visual_qa_report",
+      "status": "PASS"
+    },
+    {
+      "path": "package_render_qa_report.json",
+      "report_hash": "137429c2d7ed971b10d4afc24d06361cd12bccffd5330553b4ea24ca172558f4",
+      "schema_name": "phase6_package_render_qa_report",
+      "status": "PASS"
+    },
+    {
+      "path": "raster_crop_qa_report.json",
+      "report_hash": "75a6dc4e6c98eaae93bb158c80731fd8f942dc7a909f321ec5cbf6b39a53b74f",
+      "schema_name": "phase6_raster_crop_qa_report",
+      "status": "PASS"
+    },
+    {
+      "path": "cross_output_parity_qa_report.json",
+      "report_hash": "a962d1514619ae3990140c24020de2b3d2d530c3c235604e106d0c124d7a9c26",
+      "schema_name": "phase6_cross_output_parity_qa_report",
+      "status": "PASS"
+    },
+    {
+      "path": "reviewer_checklist.json",
+      "report_hash": "ca5bd486af69cc89403413252eacbdd6a8667f3fd4be261d292f16dcfe73df42",
+      "schema_name": "phase6_reviewer_checklist",
+      "status": "PASS"
+    },
+    {
+      "path": "contact_sheet_manifest.json",
+      "report_hash": "82603e0f3db36faeec57a8e8592c5cf9cf5c04057e5e7a5306d2a6fd8f1a497a",
+      "schema_name": "phase6_contact_sheet_manifest",
+      "status": "PASS"
+    }
+  ],
+  "findings": [
+    {
+      "artifact_id": null,
+      "category": "editable_reconstruction_tolerance",
+      "detector": "Pinned slide-visual-polish-qa adapter + DeckCompiler independent adjudicator",
+      "detector_version": "1.0.0",
+      "evidence": {
+        "decision_rule": "metric-only deltas are informational only when semantic editability is 100%, deterministic geometry gates pass, and model-assisted review confirms visual intent",
+        "external_counts": {
+          "fail": 4,
+          "needs_polish": 2,
+          "pass": 0
+        },
+        "external_exit_code": 1,
+        "external_mode": "qa-polish",
+        "fresh_powerpoint_render_hashes_match_reviewed_hashes": true
+      },
+      "finding_hash": "d4b2bb96798c0da31957a91889d46f6b7fda25293f9c9e204d50445b05525885",
+      "finding_id": "P6_EXTERNAL_VISUAL_POLISH_METRIC_DELTA",
+      "gate": "visual",
+      "message": "The official pixel comparator reported source/render spacing or palette deltas; independent geometry and reviewer checks found no material intent, clipping, hierarchy, or readability failure.",
+      "owning_artifact": "handoff project layout geometry",
+      "recommended_action": "Retain as measured evidence; reconsider only if a deterministic or reviewer material-deviation rule also fires.",
+      "release_blocking": false,
+      "repairable": false,
+      "resolved": true,
+      "rule_id": "P6-VIS-EXT-PIXEL-DELTA-001",
+      "severity": "info",
+      "slide_id": null
+    }
+  ],
+  "implementation_provenance": {
+    "acceptance_authority": "DeckCompiler independent composite gate",
+    "component": "presentation_agent.deckcompiler.qa",
+    "deckcompiler_commit": "e2a6fabb1916680800097981fbda27abfe02b852",
+    "detector_version": "1.0.0",
+    "external_outputs_may_self_accept": false
+  },
+  "producer": "DeckCompiler independent composite QA",
+  "report_hash": "682c4193a1cdac5f8195adfc555637d6db2bc091a37c3ce1e046d999d075a3d6",
+  "report_id": "report_059bebe46242a41b2466",
+  "run_id": "phase6qa_9bd9b0fcf02397f92902",
+  "schema_name": "phase6_composite_qa_report",
+  "schema_version": "1.0.0",
+  "severity_counts": {
+    "error": 0,
+    "info": 1,
+    "severe": 0,
+    "warning": 0
+  },
+  "source_artifacts": [
+    {
+      "artifact_id": "phase4-input-provenance",
+      "path": "examples/deckcompiler_demo/phase4/input_provenance.json",
+      "sha256": "d8e7659a779c7085d23a7ca049a9a9515401f943587f4d2365c11e6675a695ea"
+    },
+    {
+      "artifact_id": "phase4-geometry-fit",
+      "path": "examples/deckcompiler_demo/phase4/geometry_fit_report.json",
+      "sha256": "dcd87abdebfaffd19dfc1cddde1738329f134756df3f6481bd18f9024142f451"
+    },
+    {
+      "artifact_id": "phase4-bundle-acceptance",
+      "path": "examples/deckcompiler_demo/phase4/phase4_bundle_acceptance.json",
+      "sha256": "9e8570f96ae54e9666f54c6d2e0d0a6bc0affd54f1823a3cac7ee34a3172a2bd"
+    },
+    {
+      "artifact_id": "phase5-handoff",
+      "path": "examples/deckcompiler_demo/phase5/handoff/pngtopptx_handoff_manifest.json",
+      "sha256": "8548e4a21a0df26b4747af2273e407bd66a8d6c956a63d29d78cb5de67f35678"
+    },
+    {
+      "artifact_id": "phase5-reconstruction-constraints",
+      "path": "examples/deckcompiler_demo/phase5/handoff/reconstruction_constraints.json",
+      "sha256": "4f15ad4dcf389647d4db7bcd54b35f9db913f730d86bb1ae0f044ea89df04c46"
+    },
+    {
+      "artifact_id": "external-skillset-pin",
+      "path": "examples/deckcompiler_demo/phase5/external_skillset_pin.json",
+      "sha256": "be35c664bb3ed366d0ab558a58554f55cad2de56f790b1e0b68824ea45aee94a"
+    },
+    {
+      "artifact_id": "active-pptx",
+      "path": "active-output/pptx_generator_demo.pptx",
+      "sha256": "805eb4aa3d44d90ebe5b78c0247d02e412ebfc9468e57c778516b90de2d27676"
+    },
+    {
+      "artifact_id": "active-html",
+      "path": "active-output/html/index.html",
+      "sha256": "b1f161bed4d1dc37be576eceda0cf01d125580df4a767c4722582c8671983085"
+    },
+    {
+      "artifact_id": "artifact_db86bcbfdee3abef7294",
+      "path": "examples/deckcompiler_demo/phase4/semantic_sidecars/slide-001.semantic.json",
+      "sha256": "d64efb0fd8be9ae34be946e2649bf4462e22d9bce2b05418f9e27a9385877bc6"
+    },
+    {
+      "artifact_id": "artifact_e9de634311cff9b3cac9",
+      "path": "examples/deckcompiler_demo/phase4/semantic_sidecars/slide-002.semantic.json",
+      "sha256": "8716555d40f109bff559039a82bbc50004a663f5c0d2e10f4b35aa848214cc2c"
+    },
+    {
+      "artifact_id": "artifact_5127d8d1b1277c8f24c0",
+      "path": "examples/deckcompiler_demo/phase4/semantic_sidecars/slide-003.semantic.json",
+      "sha256": "e2268e400f51926e669e4f51bf2b474ba8f6a1eb58fbf8fb1786b239825cc6c3"
+    },
+    {
+      "artifact_id": "artifact_35f461ccdb3954692c6d",
+      "path": "examples/deckcompiler_demo/phase4/semantic_sidecars/slide-004.semantic.json",
+      "sha256": "a358fd52748cb0bb93699dea9b31c55927b8f72799e4aded4f8331065324a7b9"
+    },
+    {
+      "artifact_id": "artifact_b0fd337c0c45086f70ea",
+      "path": "examples/deckcompiler_demo/phase4/semantic_sidecars/slide-005.semantic.json",
+      "sha256": "a17b19ecb3c5453aa548a9df1e57cbc09bdb2fb19fb6b4813d7c611dd79add8a"
+    },
+    {
+      "artifact_id": "artifact_8ab300926d3f1c88b773",
+      "path": "examples/deckcompiler_demo/phase4/semantic_sidecars/slide-006.semantic.json",
+      "sha256": "fbb6d67cbccff2b063d50fdca7d20dd3290e895655066ea8d89faf73fe959587"
+    },
+    {
+      "artifact_id": "artifact_44ec7963d6feaff563f7",
+      "path": "examples/deckcompiler_demo/phase4/visual_targets/slide-001.png",
+      "sha256": "bb529c9644837050e4cf3a611e81dbaf9038fb083af13e262e79488f3966170f"
+    },
+    {
+      "artifact_id": "artifact_ecd46b993bd43411da8d",
+      "path": "examples/deckcompiler_demo/phase4/visual_targets/slide-002.png",
+      "sha256": "37f42109e03e22d0721da51ffd571e0a78452a5be1447bbcaec4f2d4008c9c72"
+    },
+    {
+      "artifact_id": "artifact_1a7b4d65e364654ef53d",
+      "path": "examples/deckcompiler_demo/phase4/visual_targets/slide-003.png",
+      "sha256": "96fc9ac2da10198a5cf2edf1f2fe44b089618dc1c72f8cd0c3c51313c19bb3d4"
+    },
+    {
+      "artifact_id": "artifact_7ff0d34d99747d7192b1",
+      "path": "examples/deckcompiler_demo/phase4/visual_targets/slide-004.png",
+      "sha256": "af9492fece0b40fc2f67ed42a1d073e2b82002eb15c58c64f955fe0cc70d9dbf"
+    },
+    {
+      "artifact_id": "artifact_e41b00231acf2abd7c05",
+      "path": "examples/deckcompiler_demo/phase4/visual_targets/slide-005.png",
+      "sha256": "8f42a53fd1fe62851082c147a280f2ac8487f450e0743d55a0c3c91d516ebb52"
+    },
+    {
+      "artifact_id": "artifact_e591dce29ea61dc74250",
+      "path": "examples/deckcompiler_demo/phase4/visual_targets/slide-006.png",
+      "sha256": "0274db749369959daac7fed17331e7f007ff5c47cc7b824698c3c298f5c0e4c2"
+    }
+  ],
+  "status": "PASS",
+  "timezone": "Asia/Seoul"
+}

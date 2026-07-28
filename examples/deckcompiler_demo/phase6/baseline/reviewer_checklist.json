@@ -1,0 +1,51 @@
+{
+  "checks": {
+    "citations_visible": "PASS",
+    "complete": true,
+    "contact_sheet_hash": "bc98b5ef65a528b6bda484f5ae0b85484ef209fc583e2efb1fe631453ab40adb",
+    "density": "PASS",
+    "external_metric_delta_whitelist_rule_id": "P6-VIS-EXT-PIXEL-DELTA-001",
+    "focal_clarity": "PASS",
+    "generic_card_wall_regression": false,
+    "hierarchy": "PASS",
+    "layout_repetition": "PASS",
+    "legibility": "PASS",
+    "module_differentiation": "PASS",
+    "palette_continuity": "PASS",
+    "random_logo_or_watermark_count": 0,
+    "repeated_saas_dashboard_pattern": false,
+    "reviewed_slide_count": 6,
+    "spacing": "PASS",
+    "visual_target_intent": "PASS"
+  },
+  "created_at": "2026-07-22T10:30:00+09:00",
+  "findings": [],
+  "implementation_provenance": {
+    "acceptance_authority": "DeckCompiler independent composite gate",
+    "component": "presentation_agent.deckcompiler.qa",
+    "deckcompiler_commit": "e2a6fabb1916680800097981fbda27abfe02b852",
+    "detector_version": "1.0.0",
+    "external_outputs_may_self_accept": false
+  },
+  "producer": "DeckCompiler composite visual reviewer",
+  "report_hash": "ca5bd486af69cc89403413252eacbdd6a8667f3fd4be261d292f16dcfe73df42",
+  "report_id": "report_60ccee2253c8659ecd45",
+  "run_id": "phase6qa_9bd9b0fcf02397f92902",
+  "schema_name": "phase6_reviewer_checklist",
+  "schema_version": "1.0.0",
+  "severity_counts": {
+    "error": 0,
+    "info": 0,
+    "severe": 0,
+    "warning": 0
+  },
+  "source_artifacts": [
+    {
+      "artifact_id": "baseline-contact-sheet",
+      "path": "baseline/contact_sheet.png",
+      "sha256": "bc98b5ef65a528b6bda484f5ae0b85484ef209fc583e2efb1fe631453ab40adb"
+    }
+  ],
+  "status": "PASS",
+  "timezone": "Asia/Seoul"
+}

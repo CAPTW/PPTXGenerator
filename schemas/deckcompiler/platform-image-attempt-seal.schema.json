@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/deckcompiler/platform-image-attempt-seal.schema.json",
+  "title": "Platform-managed Image Attempt Seal",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "request_id", "attempt_id", "target_artifact_id", "target_type", "prompt_id", "prompt_hash", "attempt_number", "prior_attempt_id", "expected_output_relative_path", "expected_output_absent_at_seal", "execution_mode", "platform_tool_id", "external_provider_id", "external_transport_used", "repository_network_calls", "credential_lookups", "sealed_at"],
+  "properties": {
+    "schema_name": {"const": "platform_image_attempt_seal"},
+    "schema_version": {"const": "1.0.0"},
+    "request_id": {"type": "string", "minLength": 1},
+    "attempt_id": {"type": "string", "minLength": 1},
+    "target_artifact_id": {"type": "string", "minLength": 1},
+    "target_type": {"enum": ["design_board", "module_anchor", "batch_template_reference", "slide_visual_target"]},
+    "prompt_id": {"type": "string", "minLength": 1},
+    "prompt_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "attempt_number": {"type": "integer", "minimum": 1, "maximum": 2},
+    "prior_attempt_id": {"type": ["string", "null"]},
+    "changed_prompt_fields": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "retry_reason": {"type": ["string", "null"]},
+    "reference_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["artifact_id", "relative_path", "sha256"],
+        "properties": {
+          "artifact_id": {"type": "string", "minLength": 1},
+          "relative_path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "expected_output_relative_path": {"type": "string", "minLength": 1},
+    "expected_output_absent_at_seal": {"const": true},
+    "execution_mode": {"const": "platform_managed_tool"},
+    "platform_tool_id": {"const": "image_gen.imagegen"},
+    "external_provider_id": {"type": "null"},
+    "external_transport_used": {"const": false},
+    "repository_network_calls": {"const": 0},
+    "credential_lookups": {"const": 0},
+    "sealed_at": {"type": "string", "minLength": 1}
+  }
+}

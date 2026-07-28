@@ -1,0 +1,615 @@
+{
+  "manifest_hash": "9c2996f5cc7b48c28c5a32bd27aab053b34b1e6bc114e32d1a47ba45faad5679",
+  "manifest_id": "phase4targets_05a689812c65c5b22ebd",
+  "schema_name": "phase4_visual_target_manifest",
+  "schema_version": "1.0.0",
+  "selected_target_count": 6,
+  "targets": [
+    {
+      "actual_generation": true,
+      "aspect_ratio": "16:9",
+      "attempt_count": 1,
+      "batch_id": "batch-01-01",
+      "canonical_demo_eligibility": true,
+      "capacity_fit": "PASS",
+      "differentiation_fit": "PASS",
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "editability_fit": "PASS",
+      "execution_mode": "platform_managed_tool",
+      "execution_verification_status": "VERIFIED",
+      "file_size_bytes": 810433,
+      "final_surface_role_prohibited": true,
+      "format": "PNG",
+      "image_metrics": {
+        "approximate_edge_density": 0.22111,
+        "approximate_luminance": 0.922051,
+        "approximate_whitespace_ratio": 0.577854,
+        "color_distribution_summary": [
+          {
+            "fraction": 0.459391,
+            "rgb": [
+              254,
+              254,
+              254
+            ]
+          },
+          {
+            "fraction": 0.330783,
+            "rgb": [
+              243,
+              243,
+              242
+            ]
+          },
+          {
+            "fraction": 0.108697,
+            "rgb": [
+              185,
+              186,
+              191
+            ]
+          },
+          {
+            "fraction": 0.099094,
+            "rgb": [
+              253,
+              253,
+              253
+            ]
+          },
+          {
+            "fraction": 0.002035,
+            "rgb": [
+              253,
+              254,
+              254
+            ]
+          }
+        ]
+      },
+      "image_model_identity": "not_exposed_by_tool",
+      "image_relative_path": "visual_targets/slide-001.png",
+      "module_id": "module-01-section_01_understand",
+      "normalized_path": "visual_targets/slide-001.png",
+      "original_runtime_path_reference": "artifacts/slide_targets/imageattempt_d28d1908a5c51365a84e/original.png",
+      "original_sha256": "5ee1a2ad4d8a2902bb738afed69486f2141e844b87efad2b9d0d72f12d3dcda6",
+      "platform_tool_identity": "image_gen.imagegen",
+      "prompt_id": "prompt_5ce39172fe5fd4b3d912",
+      "reference_ids": [
+        "designboard_61f00a55ee02666b3254",
+        "moduleanchor_3591b43d6cf6fe339284",
+        "batchreference_3473bb414e4059c9bdd2"
+      ],
+      "selected_attempt_id": "imageattempt_d28d1908a5c51365a84e",
+      "selected_family": "family-editorial-hero",
+      "selected_layout": "layout-decision-hero",
+      "semantic_fit": "PASS",
+      "sha256": "bb529c9644837050e4cf3a611e81dbaf9038fb083af13e262e79488f3966170f",
+      "sidecar_id": "sidecar_0ce9385de2639ae70f78",
+      "slide_id": "slide-01-decision-framing",
+      "transformation": {
+        "crop_box": [
+          4,
+          2,
+          1668,
+          938
+        ],
+        "nonuniform_resize_used": false,
+        "stretch_used": false,
+        "type": "aspect_preserving_crop",
+        "uniform_resize_to": null
+      },
+      "validation_status": "PASS",
+      "visual_review_status": "ACCEPTED_FOR_PHASE4",
+      "visual_target_id": "visualtarget_c917f32532dfa26b4560"
+    },
+    {
+      "actual_generation": true,
+      "aspect_ratio": "16:9",
+      "attempt_count": 2,
+      "batch_id": "batch-01-01",
+      "canonical_demo_eligibility": true,
+      "capacity_fit": "PASS",
+      "differentiation_fit": "PASS",
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "editability_fit": "PASS",
+      "execution_mode": "platform_managed_tool",
+      "execution_verification_status": "VERIFIED",
+      "file_size_bytes": 762312,
+      "final_surface_role_prohibited": true,
+      "format": "PNG",
+      "image_metrics": {
+        "approximate_edge_density": 0.235297,
+        "approximate_luminance": 0.929497,
+        "approximate_whitespace_ratio": 0.609484,
+        "color_distribution_summary": [
+          {
+            "fraction": 0.456896,
+            "rgb": [
+              254,
+              254,
+              254
+            ]
+          },
+          {
+            "fraction": 0.280707,
+            "rgb": [
+              244,
+              245,
+              247
+            ]
+          },
+          {
+            "fraction": 0.133328,
+            "rgb": [
+              185,
+              189,
+              193
+            ]
+          },
+          {
+            "fraction": 0.113851,
+            "rgb": [
+              253,
+              253,
+              253
+            ]
+          },
+          {
+            "fraction": 0.015218,
+            "rgb": [
+              254,
+              253,
+              254
+            ]
+          }
+        ]
+      },
+      "image_model_identity": "not_exposed_by_tool",
+      "image_relative_path": "visual_targets/slide-002.png",
+      "module_id": "module-01-section_01_understand",
+      "normalized_path": "visual_targets/slide-002.png",
+      "original_runtime_path_reference": "artifacts/slide_targets/imageattempt_e30820b3dbf57f09f410/original.png",
+      "original_sha256": "1cd0275afccba745cb8b7e4cbdb7e57b4d697f1354d7fdbcd5f849c83c60768c",
+      "platform_tool_identity": "image_gen.imagegen",
+      "prompt_id": "prompt_3399759c7182bb1a4def",
+      "reference_ids": [
+        "designboard_61f00a55ee02666b3254",
+        "moduleanchor_3591b43d6cf6fe339284",
+        "batchreference_3473bb414e4059c9bdd2"
+      ],
+      "selected_attempt_id": "imageattempt_e30820b3dbf57f09f410",
+      "selected_family": "family-process-flow",
+      "selected_layout": "layout-process-flow",
+      "semantic_fit": "PASS",
+      "sha256": "37f42109e03e22d0721da51ffd571e0a78452a5be1447bbcaec4f2d4008c9c72",
+      "sidecar_id": "sidecar_5d20f321f92a4fd268ac",
+      "slide_id": "slide-02-system-process",
+      "transformation": {
+        "crop_box": [
+          4,
+          2,
+          1668,
+          938
+        ],
+        "nonuniform_resize_used": false,
+        "stretch_used": false,
+        "type": "aspect_preserving_crop",
+        "uniform_resize_to": null
+      },
+      "validation_status": "PASS",
+      "visual_review_status": "ACCEPTED_FOR_PHASE4",
+      "visual_target_id": "visualtarget_eb8bc3132476d2929014"
+    },
+    {
+      "actual_generation": true,
+      "aspect_ratio": "16:9",
+      "attempt_count": 1,
+      "batch_id": "batch-02-01",
+      "canonical_demo_eligibility": true,
+      "capacity_fit": "PASS",
+      "differentiation_fit": "PASS",
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "editability_fit": "PASS",
+      "execution_mode": "platform_managed_tool",
+      "execution_verification_status": "VERIFIED",
+      "file_size_bytes": 996778,
+      "final_surface_role_prohibited": true,
+      "format": "PNG",
+      "image_metrics": {
+        "approximate_edge_density": 0.3007,
+        "approximate_luminance": 0.877423,
+        "approximate_whitespace_ratio": 0.434543,
+        "color_distribution_summary": [
+          {
+            "fraction": 0.264974,
+            "rgb": [
+              245,
+              247,
+              249
+            ]
+          },
+          {
+            "fraction": 0.219808,
+            "rgb": [
+              237,
+              238,
+              240
+            ]
+          },
+          {
+            "fraction": 0.188477,
+            "rgb": [
+              250,
+              251,
+              251
+            ]
+          },
+          {
+            "fraction": 0.164415,
+            "rgb": [
+              254,
+              254,
+              254
+            ]
+          },
+          {
+            "fraction": 0.162326,
+            "rgb": [
+              140,
+              143,
+              151
+            ]
+          }
+        ]
+      },
+      "image_model_identity": "not_exposed_by_tool",
+      "image_relative_path": "visual_targets/slide-003.png",
+      "module_id": "module-02-section_02_evaluate",
+      "normalized_path": "visual_targets/slide-003.png",
+      "original_runtime_path_reference": "artifacts/slide_targets/imageattempt_177fce1e9cea51fa8de2/original.png",
+      "original_sha256": "5b4ecf3c88739d02bc9dc9d5bd13e4e6e6b39193f8853c6ad1a3cd28c34e50e1",
+      "platform_tool_identity": "image_gen.imagegen",
+      "prompt_id": "prompt_d160d3ba92322b8bd950",
+      "reference_ids": [
+        "designboard_61f00a55ee02666b3254",
+        "moduleanchor_ffa35a3d6def1dfd4394",
+        "batchreference_9654720831fd18dc93f0"
+      ],
+      "selected_attempt_id": "imageattempt_177fce1e9cea51fa8de2",
+      "selected_family": "family-evidence-grid",
+      "selected_layout": "layout-risk-evidence-grid",
+      "semantic_fit": "PASS",
+      "sha256": "96fc9ac2da10198a5cf2edf1f2fe44b089618dc1c72f8cd0c3c51313c19bb3d4",
+      "sidecar_id": "sidecar_64ca44f39ae7dbd432e3",
+      "slide_id": "slide-03-risk-findings",
+      "transformation": {
+        "crop_box": [
+          4,
+          2,
+          1668,
+          938
+        ],
+        "nonuniform_resize_used": false,
+        "stretch_used": false,
+        "type": "aspect_preserving_crop",
+        "uniform_resize_to": null
+      },
+      "validation_status": "PASS",
+      "visual_review_status": "ACCEPTED_FOR_PHASE4",
+      "visual_target_id": "visualtarget_04b7463dd0285b07a31a"
+    },
+    {
+      "actual_generation": true,
+      "aspect_ratio": "16:9",
+      "attempt_count": 1,
+      "batch_id": "batch-02-01",
+      "canonical_demo_eligibility": true,
+      "capacity_fit": "PASS",
+      "differentiation_fit": "PASS",
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "editability_fit": "PASS",
+      "execution_mode": "platform_managed_tool",
+      "execution_verification_status": "VERIFIED",
+      "file_size_bytes": 899697,
+      "final_surface_role_prohibited": true,
+      "format": "PNG",
+      "image_metrics": {
+        "approximate_edge_density": 0.221137,
+        "approximate_luminance": 0.864996,
+        "approximate_whitespace_ratio": 0.422797,
+        "color_distribution_summary": [
+          {
+            "fraction": 0.31798,
+            "rgb": [
+              231,
+              234,
+              241
+            ]
+          },
+          {
+            "fraction": 0.246392,
+            "rgb": [
+              246,
+              245,
+              246
+            ]
+          },
+          {
+            "fraction": 0.179905,
+            "rgb": [
+              249,
+              249,
+              248
+            ]
+          },
+          {
+            "fraction": 0.134711,
+            "rgb": [
+              253,
+              253,
+              253
+            ]
+          },
+          {
+            "fraction": 0.121012,
+            "rgb": [
+              145,
+              148,
+              161
+            ]
+          }
+        ]
+      },
+      "image_model_identity": "not_exposed_by_tool",
+      "image_relative_path": "visual_targets/slide-004.png",
+      "module_id": "module-02-section_02_evaluate",
+      "normalized_path": "visual_targets/slide-004.png",
+      "original_runtime_path_reference": "artifacts/slide_targets/imageattempt_2cd78dc9f9becf16347d/original.png",
+      "original_sha256": "0660dba84257d97b637a571bc34ad2948d1473c50fb0ce880664797459b48179",
+      "platform_tool_identity": "image_gen.imagegen",
+      "prompt_id": "prompt_d44bd2bc4a3712e882d8",
+      "reference_ids": [
+        "designboard_61f00a55ee02666b3254",
+        "moduleanchor_ffa35a3d6def1dfd4394",
+        "batchreference_9654720831fd18dc93f0"
+      ],
+      "selected_attempt_id": "imageattempt_2cd78dc9f9becf16347d",
+      "selected_family": "family-comparison-matrix",
+      "selected_layout": "layout-options-matrix",
+      "semantic_fit": "PASS",
+      "sha256": "af9492fece0b40fc2f67ed42a1d073e2b82002eb15c58c64f955fe0cc70d9dbf",
+      "sidecar_id": "sidecar_669adc2c4ebcb89c3d6c",
+      "slide_id": "slide-04-options-comparison",
+      "transformation": {
+        "crop_box": [
+          4,
+          2,
+          1668,
+          938
+        ],
+        "nonuniform_resize_used": false,
+        "stretch_used": false,
+        "type": "aspect_preserving_crop",
+        "uniform_resize_to": null
+      },
+      "validation_status": "PASS",
+      "visual_review_status": "ACCEPTED_FOR_PHASE4",
+      "visual_target_id": "visualtarget_83244783582673b6aa13"
+    },
+    {
+      "actual_generation": true,
+      "aspect_ratio": "16:9",
+      "attempt_count": 1,
+      "batch_id": "batch-03-01",
+      "canonical_demo_eligibility": true,
+      "capacity_fit": "PASS",
+      "differentiation_fit": "PASS",
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "editability_fit": "PASS",
+      "execution_mode": "platform_managed_tool",
+      "execution_verification_status": "VERIFIED",
+      "file_size_bytes": 959385,
+      "final_surface_role_prohibited": true,
+      "format": "PNG",
+      "image_metrics": {
+        "approximate_edge_density": 0.269423,
+        "approximate_luminance": 0.869689,
+        "approximate_whitespace_ratio": 0.339003,
+        "color_distribution_summary": [
+          {
+            "fraction": 0.282389,
+            "rgb": [
+              247,
+              245,
+              244
+            ]
+          },
+          {
+            "fraction": 0.240424,
+            "rgb": [
+              240,
+              239,
+              240
+            ]
+          },
+          {
+            "fraction": 0.193576,
+            "rgb": [
+              250,
+              250,
+              250
+            ]
+          },
+          {
+            "fraction": 0.162815,
+            "rgb": [
+              154,
+              142,
+              140
+            ]
+          },
+          {
+            "fraction": 0.120795,
+            "rgb": [
+              253,
+              252,
+              252
+            ]
+          }
+        ]
+      },
+      "image_model_identity": "not_exposed_by_tool",
+      "image_relative_path": "visual_targets/slide-005.png",
+      "module_id": "module-03-section_03_act",
+      "normalized_path": "visual_targets/slide-005.png",
+      "original_runtime_path_reference": "artifacts/slide_targets/imageattempt_4fe07120625b0d561980/original.png",
+      "original_sha256": "f727a38dd3e7316c74dd75638cbff18d99ee88679a406094d76c21608a3777c6",
+      "platform_tool_identity": "image_gen.imagegen",
+      "prompt_id": "prompt_142401ff66cadaf9e579",
+      "reference_ids": [
+        "designboard_61f00a55ee02666b3254",
+        "moduleanchor_aea9b62a3605c1edb24c",
+        "batchreference_ff6138d8d01a504f5b49"
+      ],
+      "selected_attempt_id": "imageattempt_4fe07120625b0d561980",
+      "selected_family": "family-recommendation-focus",
+      "selected_layout": "layout-recommendation-focus",
+      "semantic_fit": "PASS",
+      "sha256": "8f42a53fd1fe62851082c147a280f2ac8487f450e0743d55a0c3c91d516ebb52",
+      "sidecar_id": "sidecar_3259b4d651ab52adc2b3",
+      "slide_id": "slide-05-recommendation",
+      "transformation": {
+        "crop_box": [
+          4,
+          2,
+          1668,
+          938
+        ],
+        "nonuniform_resize_used": false,
+        "stretch_used": false,
+        "type": "aspect_preserving_crop",
+        "uniform_resize_to": null
+      },
+      "validation_status": "PASS",
+      "visual_review_status": "ACCEPTED_FOR_PHASE4",
+      "visual_target_id": "visualtarget_8a7c9dbcfafcedbe2b2c"
+    },
+    {
+      "actual_generation": true,
+      "aspect_ratio": "16:9",
+      "attempt_count": 1,
+      "batch_id": "batch-03-01",
+      "canonical_demo_eligibility": true,
+      "capacity_fit": "PASS",
+      "differentiation_fit": "PASS",
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "editability_fit": "PASS",
+      "execution_mode": "platform_managed_tool",
+      "execution_verification_status": "VERIFIED",
+      "file_size_bytes": 900075,
+      "final_surface_role_prohibited": true,
+      "format": "PNG",
+      "image_metrics": {
+        "approximate_edge_density": 0.243625,
+        "approximate_luminance": 0.885231,
+        "approximate_whitespace_ratio": 0.398139,
+        "color_distribution_summary": [
+          {
+            "fraction": 0.256944,
+            "rgb": [
+              235,
+              234,
+              238
+            ]
+          },
+          {
+            "fraction": 0.233697,
+            "rgb": [
+              241,
+              242,
+              245
+            ]
+          },
+          {
+            "fraction": 0.200521,
+            "rgb": [
+              250,
+              250,
+              251
+            ]
+          },
+          {
+            "fraction": 0.194553,
+            "rgb": [
+              254,
+              254,
+              254
+            ]
+          },
+          {
+            "fraction": 0.114285,
+            "rgb": [
+              152,
+              141,
+              141
+            ]
+          }
+        ]
+      },
+      "image_model_identity": "not_exposed_by_tool",
+      "image_relative_path": "visual_targets/slide-006.png",
+      "module_id": "module-03-section_03_act",
+      "normalized_path": "visual_targets/slide-006.png",
+      "original_runtime_path_reference": "artifacts/slide_targets/imageattempt_98d1229c8a67bcab9c72/original.png",
+      "original_sha256": "7256efb9bc64665bbb7bb2780158d6f06e2f629afe8726039503a621ca17ed20",
+      "platform_tool_identity": "image_gen.imagegen",
+      "prompt_id": "prompt_4e5bb60fae3e814e9550",
+      "reference_ids": [
+        "designboard_61f00a55ee02666b3254",
+        "moduleanchor_aea9b62a3605c1edb24c",
+        "batchreference_ff6138d8d01a504f5b49"
+      ],
+      "selected_attempt_id": "imageattempt_98d1229c8a67bcab9c72",
+      "selected_family": "family-roadmap-sources",
+      "selected_layout": "layout-roadmap-sources",
+      "semantic_fit": "PASS",
+      "sha256": "0274db749369959daac7fed17331e7f007ff5c47cc7b824698c3c298f5c0e4c2",
+      "sidecar_id": "sidecar_365e3284fc3e8132e688",
+      "slide_id": "slide-06-implementation-sources",
+      "transformation": {
+        "crop_box": [
+          4,
+          2,
+          1668,
+          938
+        ],
+        "nonuniform_resize_used": false,
+        "stretch_used": false,
+        "type": "aspect_preserving_crop",
+        "uniform_resize_to": null
+      },
+      "validation_status": "PASS",
+      "visual_review_status": "ACCEPTED_FOR_PHASE4",
+      "visual_target_id": "visualtarget_1b24176472703beee735"
+    }
+  ]
+}

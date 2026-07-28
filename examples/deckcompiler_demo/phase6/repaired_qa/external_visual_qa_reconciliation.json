@@ -1,0 +1,12 @@
+{
+  "curated_report_hash": "981d9ddd53397631351e12de36fd7634d90a8cac9158ef4d4c6d346a0772ff0d",
+  "current_html_sha256": "4569882c7153f6e846b350df68322fa820adf7ff34508dc4aac07be2834e19a7",
+  "current_pptx_sha256": "6fd3fa50cab6d56c8fe943b515e93d36dde485a843e34b0ea710890ac8c845a5",
+  "external_finding_count": 6,
+  "mapped_coverage_ratio": 1.0,
+  "schema_name": "phase6_curated_repaired_external_reconciliation",
+  "schema_version": "1.0.0",
+  "source_report_hash": "8709c5707c376ef6ad9a884082b159f1075c2a831512b999d83ea89b5757b640",
+  "status": "PASS",
+  "unresolved_external_finding_count": 0
+}

@@ -1,0 +1,39 @@
+{
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/contact-sheet-manifest.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "checks": { "type": "object" },
+    "contact_sheet": {
+      "additionalProperties": false,
+      "properties": {
+        "byte_size": { "minimum": 1, "type": "integer" },
+        "columns": { "const": 3 },
+        "height": { "minimum": 1, "type": "integer" },
+        "path": { "minLength": 1, "type": "string" },
+        "rows": { "const": 2 },
+        "sha256": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+        "width": { "minimum": 1, "type": "integer" }
+      },
+      "required": ["path", "sha256", "byte_size", "width", "height", "columns", "rows"],
+      "type": "object"
+    },
+    "created_at": { "format": "date-time", "type": "string" },
+    "findings": { "type": "array" },
+    "implementation_provenance": { "type": "object" },
+    "producer": { "const": "DeckCompiler deterministic contact-sheet builder" },
+    "render_sources": { "items": { "type": "object" }, "minItems": 6, "type": "array" },
+    "report_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "report_id": { "minLength": 1, "type": "string" },
+    "run_id": { "minLength": 1, "type": "string" },
+    "schema_name": { "const": "phase6_contact_sheet_manifest" },
+    "schema_version": { "const": "1.0.0" },
+    "severity_counts": { "$ref": "https://pptx-generator.local/schemas/deckcompiler/qa-dimension-report.schema.json#/$defs/severityCounts" },
+    "source_artifacts": { "minItems": 1, "type": "array" },
+    "status": { "const": "PASS" },
+    "timezone": { "const": "Asia/Seoul" }
+  },
+  "required": ["schema_name", "schema_version", "report_id", "run_id", "source_artifacts", "producer", "checks", "findings", "severity_counts", "render_sources", "contact_sheet", "status", "created_at", "timezone", "implementation_provenance", "report_hash"],
+  "title": "DeckCompiler Phase 6 contact sheet manifest",
+  "type": "object"
+}

@@ -1,0 +1,62 @@
+{
+  "actual_generation": true,
+  "attempt_id": "imageattempt_0283a64ebabc8db7511f",
+  "credential_lookups": 0,
+  "execution_mode": "platform_managed_tool",
+  "external_provider_id": null,
+  "external_transport_used": false,
+  "image_model": "not_exposed_by_tool",
+  "output": {
+    "completion_timestamp": "2026-07-20T02:30:46.453+09:00",
+    "normalized_dimensions": {
+      "height": 936,
+      "width": 1664
+    },
+    "normalized_file_size_bytes": 923889,
+    "normalized_format": "PNG",
+    "normalized_relative_path": "artifacts/design_board/imageattempt_0283a64ebabc8db7511f/normalized.png",
+    "normalized_sha256": "0c25a3ae68c3da60747cec8f24b4ead4928b2d8320658c3e504017483e5224c6",
+    "original_dimensions": {
+      "height": 941,
+      "width": 1672
+    },
+    "original_file_size_bytes": 1053437,
+    "original_format": "PNG",
+    "original_relative_path": "artifacts/design_board/imageattempt_0283a64ebabc8db7511f/original.png",
+    "original_sha256": "656ea887b409fe3d98ae4bfd3a675413116e2394e0bd975eefd851edbcf2aeb1",
+    "prior_attempt_id": null,
+    "prompt_hash": "3c7b0d1fc8e29a4213200a2dd39d1fd2a04004d515e8d64fcc6a52540bcfbbc9",
+    "prompt_id": "prompt_d4b67d090ed2e0128c16",
+    "prompt_relative_path": "records/prompts/design-board-attempt-001.prompt.json",
+    "rejection_reason": "Numeric glyphs 1-5 and MODULE 01-03 violate the no-invented-number gate.",
+    "request_timestamp": "2026-07-20T02:29:14.655+09:00",
+    "seal_relative_path": "records/attempts/design-board-attempt-001.seal.json",
+    "selected": false,
+    "target_type": "design_board",
+    "transformation": {
+      "crop_box": [
+        4,
+        2,
+        1668,
+        938
+      ],
+      "nonuniform_resize_used": false,
+      "stretch_used": false,
+      "type": "aspect_preserving_crop",
+      "uniform_resize_to": null
+    },
+    "verification_status": "VERIFIED",
+    "visual_review_status": "REJECTED"
+  },
+  "platform_tool_channel": "commentary",
+  "platform_tool_id": "image_gen.imagegen",
+  "platform_tool_invocation_count": 1,
+  "record_hash": "ca218beb3a5836d4d4f8fdab1580af5c6cdd2b640694ee3052ac1d21a42b036d",
+  "record_id": "imageexecution_b2f3d8397cb5b68facd0",
+  "repository_network_calls": 0,
+  "request_id": "imagerequest_849385423afce7969c6c",
+  "schema_name": "platform_image_execution_record",
+  "schema_version": "1.0.0",
+  "target_artifact_id": "designboard_61f00a55ee02666b3254",
+  "tool_call_id": "not_exposed"
+}

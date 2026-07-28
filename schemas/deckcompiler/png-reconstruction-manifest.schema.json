@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/png-reconstruction-manifest.schema.json",
+  "title": "DeckCompiler PNGtoPPTX Reconstruction Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "artifact", "manifest_id", "reconstructions"],
+  "properties": {
+    "schema_name": {"const": "png_reconstruction_manifest"},
+    "schema_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "artifact": {
+      "allOf": [
+        {"$ref": "artifact-envelope.schema.json"},
+        {"properties": {"artifact_type": {"const": "png_reconstruction_manifest"}}}
+      ]
+    },
+    "manifest_id": {"type": "string", "pattern": "^recon_[0-9a-f]{20}$"},
+    "reconstructions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reconstruction_id",
+          "slide_id",
+          "visual_target_id",
+          "target_sha256",
+          "reconstruction_engine",
+          "status",
+          "geometry_trace",
+          "structured_output",
+          "safety"
+        ],
+        "properties": {
+          "reconstruction_id": {"type": "string", "pattern": "^pr_[0-9a-f]{20}$"},
+          "slide_id": {"type": "string", "minLength": 1},
+          "visual_target_id": {"type": "string", "pattern": "^vt_[0-9a-f]{20}$"},
+          "target_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "reconstruction_engine": {"const": "PNGtoPPTX"},
+          "status": {"enum": ["planned", "succeeded", "failed", "blocked"]},
+          "geometry_trace": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["region_id", "region_type", "bbox"],
+              "properties": {
+                "region_id": {"type": "string", "minLength": 1},
+                "region_type": {"enum": ["panel", "shape", "text_region", "diagram", "illustration_region", "placement"]},
+                "bbox": {"$ref": "source-locator.schema.json#/$defs/normalizedBbox"}
+              }
+            }
+          },
+          "structured_output": {
+            "type": ["object", "null"],
+            "properties": {
+              "artifact_type": {"enum": ["editable_scene_graph", "editable_template_spec", "native_object_plan"]},
+              "path": {"type": "string", "minLength": 1},
+              "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            },
+            "required": ["artifact_type", "path", "sha256"],
+            "additionalProperties": false
+          },
+          "safety": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["full_canvas_clean_plate", "full_slide_raster", "ocr_text_as_canonical", "fail_closed"],
+            "properties": {
+              "full_canvas_clean_plate": {"const": false},
+              "full_slide_raster": {"const": false},
+              "ocr_text_as_canonical": {"const": false},
+              "fail_closed": {"const": true}
+            }
+          }
+        }
+      }
+    }
+  }
+}

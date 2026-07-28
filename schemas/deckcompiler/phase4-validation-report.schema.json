@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/deckcompiler/phase4-validation-report.schema.json",
+  "title": "Phase 4 Complete Bundle Validation Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "report_id", "verdict", "selected_counts", "attempt_count", "rejection_count", "checks", "full_test_result", "phase2_result", "phase3_result", "phase4a_result", "binary_result", "ruff_changed_scope_result", "broad_ruff_preexisting_findings", "external_transport_calls", "repository_network_calls", "credential_lookups", "pngtopptx_used", "pptx_count", "html_count", "protected_output_mutation_count", "report_hash"],
+  "properties": {
+    "schema_name": {"const": "phase4_validation_report"}, "schema_version": {"const": "1.0.0"}, "report_id": {"type": "string"}, "verdict": {"const": "GO"},
+    "selected_counts": {"type": "object"}, "attempt_count": {"const": 15}, "rejection_count": {"const": 2}, "checks": {"type": "object"},
+    "full_test_result": {"type": "string"}, "phase2_result": {"const": "VALID"}, "phase3_result": {"const": "GO"}, "phase4a_result": {"type": "string"},
+    "binary_result": {"type": "string"}, "ruff_changed_scope_result": {"const": "PASS"}, "broad_ruff_preexisting_findings": {"const": 29},
+    "external_transport_calls": {"const": 0}, "repository_network_calls": {"const": 0}, "credential_lookups": {"const": 0}, "pngtopptx_used": {"const": false},
+    "pptx_count": {"const": 0}, "html_count": {"const": 0}, "protected_output_mutation_count": {"const": 0},
+    "report_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

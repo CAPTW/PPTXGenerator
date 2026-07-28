@@ -1,0 +1,983 @@
+{
+  "authority_id": "bundleauth_fed813e73c8237775ee8",
+  "bundle_id": "deckcompiler-phase4-frozen-visual-bundle",
+  "contract": "runtime_bundle_compatibility_v1",
+  "expected_file_count": 107,
+  "extra_file_count": 0,
+  "extra_paths": [],
+  "failure_codes": [],
+  "files": [
+    {
+      "classification": "text-clean-filter",
+      "clean_filter_oid_match": true,
+      "path": "README.md",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": null,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "capability_attestation.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "design_system.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "editable_template_spec.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "generation_provenance.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "geometry_fit_report.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "input_provenance.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "phase4_bundle_acceptance.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "phase4_validation_report.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "phase4c_validation_report.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "prompts/batch-001.prompt.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "prompts/batch-002.prompt.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "prompts/batch-003.prompt.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "prompts/design_board.prompt.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "prompts/module-001.prompt.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "prompts/module-002.prompt.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "prompts/module-003.prompt.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "prompts/slide-001.prompt.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "prompts/slide-002.prompt.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "prompts/slide-003.prompt.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "prompts/slide-004.prompt.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "prompts/slide-005.prompt.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "prompts/slide-006.prompt.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/attempts/batch-001-attempt-001.seal.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/attempts/batch-002-attempt-001.seal.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/attempts/batch-003-attempt-001.seal.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/attempts/design-board-attempt-001.seal.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/attempts/design-board-attempt-002.seal.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/attempts/module-001-attempt-001.seal.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/attempts/module-002-attempt-001.seal.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/attempts/module-003-attempt-001.seal.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/attempts/slide-001-attempt-001.seal.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/attempts/slide-002-attempt-001.seal.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/attempts/slide-002-attempt-002.seal.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/attempts/slide-003-attempt-001.seal.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/attempts/slide-004-attempt-001.seal.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/attempts/slide-005-attempt-001.seal.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/attempts/slide-006-attempt-001.seal.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/execution/imageattempt_0283a64ebabc8db7511f.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/execution/imageattempt_177fce1e9cea51fa8de2.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/execution/imageattempt_2502b789e69959c27135.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/execution/imageattempt_2cd78dc9f9becf16347d.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/execution/imageattempt_4fe07120625b0d561980.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/execution/imageattempt_70fe3aaea04afdff1d5f.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/execution/imageattempt_75c830b182fd0b7c79da.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/execution/imageattempt_83b2bd861408c6301c40.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/execution/imageattempt_841f1a2d3f85ffe84b12.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/execution/imageattempt_94c4f9b7fae345cecd3e.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/execution/imageattempt_98d1229c8a67bcab9c72.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/execution/imageattempt_d28d1908a5c51365a84e.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/execution/imageattempt_d92f27d010fdb6e62dce.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/execution/imageattempt_e30820b3dbf57f09f410.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/execution/imageattempt_f03ad42f2a12c3ddc487.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/prompts/design-board-attempt-001.prompt.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/prompts/slide-002-attempt-001.prompt.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/verification/imageattempt_0283a64ebabc8db7511f.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/verification/imageattempt_177fce1e9cea51fa8de2.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/verification/imageattempt_2502b789e69959c27135.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/verification/imageattempt_2cd78dc9f9becf16347d.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/verification/imageattempt_4fe07120625b0d561980.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/verification/imageattempt_70fe3aaea04afdff1d5f.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/verification/imageattempt_75c830b182fd0b7c79da.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/verification/imageattempt_83b2bd861408c6301c40.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/verification/imageattempt_841f1a2d3f85ffe84b12.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/verification/imageattempt_94c4f9b7fae345cecd3e.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/verification/imageattempt_98d1229c8a67bcab9c72.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/verification/imageattempt_d28d1908a5c51365a84e.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/verification/imageattempt_d92f27d010fdb6e62dce.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/verification/imageattempt_e30820b3dbf57f09f410.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/verification/imageattempt_f03ad42f2a12c3ddc487.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/visual_review/imageattempt_0283a64ebabc8db7511f.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/visual_review/imageattempt_177fce1e9cea51fa8de2.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/visual_review/imageattempt_2502b789e69959c27135.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/visual_review/imageattempt_2cd78dc9f9becf16347d.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/visual_review/imageattempt_4fe07120625b0d561980.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/visual_review/imageattempt_70fe3aaea04afdff1d5f.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/visual_review/imageattempt_75c830b182fd0b7c79da.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/visual_review/imageattempt_83b2bd861408c6301c40.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/visual_review/imageattempt_841f1a2d3f85ffe84b12.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/visual_review/imageattempt_94c4f9b7fae345cecd3e.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/visual_review/imageattempt_98d1229c8a67bcab9c72.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/visual_review/imageattempt_d28d1908a5c51365a84e.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/visual_review/imageattempt_d92f27d010fdb6e62dce.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/visual_review/imageattempt_e30820b3dbf57f09f410.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "records/visual_review/imageattempt_f03ad42f2a12c3ddc487.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "binary-exact",
+      "clean_filter_oid_match": true,
+      "path": "references/batch-001-template-reference.png",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": null,
+      "status": "PASS"
+    },
+    {
+      "classification": "binary-exact",
+      "clean_filter_oid_match": true,
+      "path": "references/batch-002-template-reference.png",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": null,
+      "status": "PASS"
+    },
+    {
+      "classification": "binary-exact",
+      "clean_filter_oid_match": true,
+      "path": "references/batch-003-template-reference.png",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": null,
+      "status": "PASS"
+    },
+    {
+      "classification": "binary-exact",
+      "clean_filter_oid_match": true,
+      "path": "references/design_board.png",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": null,
+      "status": "PASS"
+    },
+    {
+      "classification": "binary-exact",
+      "clean_filter_oid_match": true,
+      "path": "references/module-001-anchor.png",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": null,
+      "status": "PASS"
+    },
+    {
+      "classification": "binary-exact",
+      "clean_filter_oid_match": true,
+      "path": "references/module-002-anchor.png",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": null,
+      "status": "PASS"
+    },
+    {
+      "classification": "binary-exact",
+      "clean_filter_oid_match": true,
+      "path": "references/module-003-anchor.png",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": null,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "regeneration_history.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "semantic_sidecars/slide-001.semantic.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "semantic_sidecars/slide-002.semantic.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "semantic_sidecars/slide-003.semantic.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "semantic_sidecars/slide-004.semantic.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "semantic_sidecars/slide-005.semantic.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "semantic_sidecars/slide-006.semantic.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "visual_dna.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "json-semantic",
+      "clean_filter_oid_match": true,
+      "path": "visual_target_manifest.json",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": true,
+      "status": "PASS"
+    },
+    {
+      "classification": "binary-exact",
+      "clean_filter_oid_match": true,
+      "path": "visual_targets/slide-001.png",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": null,
+      "status": "PASS"
+    },
+    {
+      "classification": "binary-exact",
+      "clean_filter_oid_match": true,
+      "path": "visual_targets/slide-002.png",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": null,
+      "status": "PASS"
+    },
+    {
+      "classification": "binary-exact",
+      "clean_filter_oid_match": true,
+      "path": "visual_targets/slide-003.png",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": null,
+      "status": "PASS"
+    },
+    {
+      "classification": "binary-exact",
+      "clean_filter_oid_match": true,
+      "path": "visual_targets/slide-004.png",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": null,
+      "status": "PASS"
+    },
+    {
+      "classification": "binary-exact",
+      "clean_filter_oid_match": true,
+      "path": "visual_targets/slide-005.png",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": null,
+      "status": "PASS"
+    },
+    {
+      "classification": "binary-exact",
+      "clean_filter_oid_match": true,
+      "path": "visual_targets/slide-006.png",
+      "present": true,
+      "raw_sha256_match": true,
+      "semantic_match": null,
+      "status": "PASS"
+    }
+  ],
+  "missing_file_count": 0,
+  "missing_paths": [],
+  "observed_file_count": 107,
+  "report_hash": "594ba5434704933ebf6defb86f5d1962ff762d490b5731ebcd155e2d3e4f5316",
+  "schema_name": "runtime_bundle_compatibility",
+  "schema_version": "1.0.0",
+  "source_commit": "541e4d1627951fd93ef25ef0b260eebead396229",
+  "status": "PASS",
+  "subtree_path": "examples/deckcompiler_demo/phase4"
+}

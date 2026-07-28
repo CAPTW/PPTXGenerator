@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/reconstruction-constraints.schema.json",
+  "title": "PNGtoPPTX Reconstruction Constraints",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "created_at", "timezone", "canvas", "semantic_authority", "visual_reference_role", "full_slide_raster", "screenshot_slide", "ocr_as_canonical_text", "generated_microtext_as_canonical_text", "required_editable_categories", "native_required_slot_categories", "native_required_policy", "raster_allowed_policy", "bounded_illustration_policy", "crop_source_trace_required", "source_evidence_immutable", "slot_based_binding_required", "official_skill_modification_forbidden", "fallback_reconstruction_forbidden", "silent_legacy_fallback_forbidden", "internal_converter_fallback_forbidden", "exact_slide_count", "exact_slide_order_required", "repair_wave_limit", "raster_coverage_thresholds", "validation_thresholds"],
+  "properties": {
+    "schema_name": {"const": "reconstruction_constraints"}, "schema_version": {"const": "1.0.0"},
+    "created_at": {"type": "string", "minLength": 1}, "timezone": {"type": "string", "minLength": 1},
+    "canvas": {"type": "object", "additionalProperties": false, "required": ["width_px", "height_px", "aspect_ratio"], "properties": {"width_px": {"const": 1664}, "height_px": {"const": 936}, "aspect_ratio": {"const": "16:9"}}},
+    "semantic_authority": {"const": "phase4_semantic_sidecar"}, "visual_reference_role": {"const": "design_reference_only"},
+    "full_slide_raster": {"const": "forbidden"}, "screenshot_slide": {"const": "forbidden"}, "ocr_as_canonical_text": {"const": "forbidden"}, "generated_microtext_as_canonical_text": {"const": "forbidden"},
+    "required_editable_categories": {"type": "array", "minItems": 8, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "native_required_slot_categories": {"type": "array", "minItems": 9, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "native_required_policy": {"const": "sidecar_native_required_slot_ids"}, "raster_allowed_policy": {"const": "sidecar_raster_allowed_slot_ids_only"},
+    "bounded_illustration_policy": {"const": "declared_raster_allowed_slots_only"}, "crop_source_trace_required": {"const": true}, "source_evidence_immutable": {"const": true},
+    "slot_based_binding_required": {"const": true}, "official_skill_modification_forbidden": {"const": true}, "fallback_reconstruction_forbidden": {"const": true}, "silent_legacy_fallback_forbidden": {"const": true}, "internal_converter_fallback_forbidden": {"const": true},
+    "exact_slide_count": {"const": 6}, "exact_slide_order_required": {"const": true},
+    "repair_wave_limit": {"const": 3},
+    "raster_coverage_thresholds": {"type": "object", "additionalProperties": false, "required": ["non_cover_union_maximum", "explicit_cover_hero_union_maximum", "default_union_maximum", "single_raster_component_maximum", "semantic_slot_raster_coverage"], "properties": {"non_cover_union_maximum": {"const": 0.35}, "explicit_cover_hero_union_maximum": {"const": 0.60}, "default_union_maximum": {"const": 0.35}, "single_raster_component_maximum": {"const": 0.90}, "semantic_slot_raster_coverage": {"const": 0.0}}},
+    "validation_thresholds": {"type": "object", "additionalProperties": false, "required": ["pptx_package_valid", "html_slide_count", "native_semantic_coverage", "full_slide_raster_count"], "properties": {"pptx_package_valid": {"const": true}, "html_slide_count": {"const": 6}, "native_semantic_coverage": {"const": 1.0}, "full_slide_raster_count": {"const": 0}}}
+  }
+}

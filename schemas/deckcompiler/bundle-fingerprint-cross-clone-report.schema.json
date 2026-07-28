@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/bundle-fingerprint-cross-clone-report.schema.json",
+  "title": "DeckCompiler bundle fingerprint cross-clone report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "report_id", "tested_runtime_commit", "clone_a", "clone_b", "phase4", "phase5", "cross_clone_fingerprint_mismatch_count", "expected_diagnostic_incompatibilities", "unexpected_differences", "unexpected_difference_count", "verdict", "report_hash"],
+  "properties": {
+    "schema_name": {"const": "bundle_fingerprint_cross_clone_report"},
+    "schema_version": {"const": "1.0.0"},
+    "report_id": {"type": "string", "pattern": "^crossclone_[0-9a-f]{20}$"},
+    "tested_runtime_commit": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"},
+    "clone_a": {"$ref": "#/$defs/clone"},
+    "clone_b": {"$ref": "#/$defs/clone"},
+    "phase4": {"$ref": "#/$defs/comparison"},
+    "phase5": {"$ref": "#/$defs/comparison"},
+    "cross_clone_fingerprint_mismatch_count": {"const": 0},
+    "expected_diagnostic_incompatibilities": {"type": "array", "items": {"type": "string"}},
+    "unexpected_differences": {"type": "array", "items": {"type": "string"}},
+    "unexpected_difference_count": {"const": 0},
+    "verdict": {"const": "PASS"},
+    "report_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "clone": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "path_class", "physical_clone", "physical_git_directory", "reparse_point_absent", "alternates_absent", "core_autocrlf", "commit", "tree_oid", "starting_clean", "ending_clean", "runtime_compatibility", "exact_runtime_text_status"],
+      "properties": {
+        "label": {"enum": ["Clone A", "Clone B"]},
+        "path_class": {"enum": ["external_physical_clone_supported", "external_physical_clone_diagnostic"]},
+        "physical_clone": {"const": true},
+        "physical_git_directory": {"const": true},
+        "reparse_point_absent": {"const": true},
+        "alternates_absent": {"const": true},
+        "core_autocrlf": {"type": "boolean"},
+        "commit": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"},
+        "tree_oid": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"},
+        "starting_clean": {"const": true},
+        "ending_clean": {"const": true},
+        "runtime_compatibility": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["phase4", "phase5"],
+          "properties": {"phase4": {"enum": ["PASS", "BLOCKED"]}, "phase5": {"enum": ["PASS", "BLOCKED"]}}
+        },
+        "exact_runtime_text_status": {"enum": ["PASS", "RUNTIME_MATERIALIZATION_UNSUPPORTED_FOR_EXACT_TEXT"]}
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority_id", "subtree_tree_oid", "git_object_aggregate_sha256", "json_semantic_aggregate_sha256", "path_set_sha256", "file_count", "total_blob_bytes", "clone_a_equals_authority", "clone_b_equals_authority", "clone_a_equals_clone_b"],
+      "properties": {
+        "authority_id": {"type": "string", "pattern": "^bundleauth_[0-9a-f]{20}$"},
+        "subtree_tree_oid": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"},
+        "git_object_aggregate_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "json_semantic_aggregate_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "path_set_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "file_count": {"type": "integer", "minimum": 0},
+        "total_blob_bytes": {"type": "integer", "minimum": 0},
+        "clone_a_equals_authority": {"const": true},
+        "clone_b_equals_authority": {"const": true},
+        "clone_a_equals_clone_b": {"const": true}
+      }
+    }
+  }
+}

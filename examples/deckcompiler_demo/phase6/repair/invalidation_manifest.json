@@ -1,0 +1,176 @@
+{
+  "created_at": "2026-07-22T10:25:25.265696+09:00",
+  "invalidated_artifact_count": 27,
+  "invalidated_artifacts": [
+    {
+      "artifact_id": "generated_runtime_source",
+      "prior_sha256": "ed30ddbd3f390b705a1e90bb134d93c33496b32decc3d21473b5221991cc781c",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "handoff_project",
+      "prior_sha256": "685fde70bfff652b0469145679171e26709ccd787ade029d59470eeccae3cec2",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "project_crop_plan",
+      "prior_sha256": "e4573a4721ef9a0efae2945bcd6a4ec5f3abd52728fc1bca30355c2eb11d449e",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "asset_manifest",
+      "prior_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "per_slide_crop_evidence",
+      "prior_sha256": "4b8c5cd412c8afe448ffbf8f8d5da42665572ded36130ed439ac139256f0a7dc",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "reconstruction_manifest",
+      "prior_sha256": "7877f39a3fcaa59f9df56fb2668cab41865eb0fd2cb0efdff1144ad4cd40d898",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "pptx",
+      "prior_sha256": "b9595e23e659cc748f084b130a6ff1345cfdfd781517f63d17bad441ae3e1230",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "html",
+      "prior_sha256": "b1b6943c79948b9cce80660b0ea8dd2984414970d82ba9fcbf3de187e7ca732a",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "powerpoint_renders",
+      "prior_sha256": "93c5356f6c4132fc4fb3be1fc4d906e6a0ab5460b0588da1b7e2062ccbc4ae07",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "html_screenshots",
+      "prior_sha256": "4475a207455dc021bfe07954bc75609eddb1f1892d97bca5dd39a07c2897e12d",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "pptx_raster_evidence",
+      "prior_sha256": "66db7dbe878fb171841b21c642c944e5df7ef328f1f089d8cb180fc24a9b0157",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "html_screenshot_evidence",
+      "prior_sha256": "0973a03ee54517352812218288d7a7183bd229b1f9d0dc3afe7890da34229b10",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "objective_evidence",
+      "prior_sha256": "280684f5f8052a3fec8453278c4e7273c32d72091c845c9b6101abfad44b60cf",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "reconstruction_score",
+      "prior_sha256": "cd5d61043c108cc4f151d282771acdc53a12fa3616783d1063e04c92e0120d97",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "official_final_gate_report",
+      "prior_sha256": "068eea4ef6b8d729cb68c395fb50a781e66ac75a411fee69fa8760fb91eaa8df",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "external_qa_output",
+      "prior_sha256": "992f136e0a964b2b1af45c65bb0773d98f8c8e1ae1cb02abfc5bb9e62efffe60",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "external_reconciliation",
+      "prior_sha256": "f251a07e29d19414b5da05d8b5ad7d6058879bf41dc304d65fbc16c3f5dfa0c7",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "semantic_qa",
+      "prior_sha256": "7c1fb0f9ceec6df85ac65b10baaa5867f0b517ea181b0e88eaa470b060a71993",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "source_coverage_qa",
+      "prior_sha256": "22af1a4d27754918c60d5171f164189ac37fe1413442f466180aacf659275bb0",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "creative_qa",
+      "prior_sha256": "040bcc4992daee48aaee5bb2f4b27c330a3b5b92365c681a9a397307e6983488",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "editability_qa",
+      "prior_sha256": "917403a39ea6078f58aaefaa51963ac4a4ba161557f4aefb0f8b87a2e5b5301a",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "visual_qa",
+      "prior_sha256": "65ba0fe05eeb26249faf28dab9a3406aaeaae69c989bc951066fa5cd851f2363",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "raster_crop_qa",
+      "prior_sha256": "44a7b3514143ec3a139d9ea880b618d089fc09a55a15137f00e6498e4213ea1c",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "parity_qa",
+      "prior_sha256": "277046529967dd8f258150053f359f998bbe04cb523a7df66210f6c8cd132031",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "contact_sheet",
+      "prior_sha256": "b8fad91200f7ee1610ff5124b818fab3c77bf7bfc8c4fc95b0ff9483c1529e5e",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "composite_report",
+      "prior_sha256": "bb6380eaa0b9ba8de6f608d5b11cddc574db92b2d57a3b6ab3f020afa53e75ed",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    },
+    {
+      "artifact_id": "acceptance_report",
+      "prior_sha256": "d7ee070190c6f85f4ff15e8c889e92da158285e24d16e0a9a61129bf4fec8236",
+      "reason": "canonical_upstream_owner_rematerialized",
+      "status": "INVALIDATED"
+    }
+  ],
+  "invalidation_hash": "5e9e8cb6255a9f9907a2903cf4432ed191c3bd1f4e208203efbe5ac54c476944",
+  "manifest_id": "invalidation_fe8c08d2d76014272d17",
+  "regeneration_required": true,
+  "repair_plan_hash": "66774f6af9d3c3ac4ba6bd84b53d64d63101d181bc77c8757862db8dbeb1edd9",
+  "schema_name": "phase6_invalidation_manifest",
+  "schema_version": "1.0.0",
+  "stale_artifact_policy": "reject_all_prior_downstream_evidence",
+  "timezone": "Asia/Seoul"
+}

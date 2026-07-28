@@ -1,0 +1,28 @@
+{
+  "attempt_id": "imageattempt_841f1a2d3f85ffe84b12",
+  "attempt_number": 2,
+  "changed_prompt_fields": [
+    "prompt_text",
+    "prompt_id",
+    "request_id",
+    "prompt_hash"
+  ],
+  "credential_lookups": 0,
+  "execution_mode": "platform_managed_tool",
+  "expected_output_absent_at_seal": true,
+  "expected_output_relative_path": "artifacts/design_board/imageattempt_841f1a2d3f85ffe84b12/original.png",
+  "external_provider_id": null,
+  "external_transport_used": false,
+  "platform_tool_id": "image_gen.imagegen",
+  "prior_attempt_id": "imageattempt_0283a64ebabc8db7511f",
+  "prompt_hash": "223f9a0826c02037f3c3d2a46c4c1c78d96bdd7364d6c51c84443f796cd293f0",
+  "prompt_id": "prompt_77ef39e31d92666aa704",
+  "repository_network_calls": 0,
+  "request_id": "imagerequest_eaa2f2fff6662540456a",
+  "retry_reason": "Reject numeric glyphs that violate the no-invented-number visual-review gate.",
+  "schema_name": "platform_image_attempt_seal",
+  "schema_version": "1.0.0",
+  "sealed_at": "2026-07-20T02:32:19.306+09:00",
+  "target_artifact_id": "designboard_61f00a55ee02666b3254",
+  "target_type": "design_board"
+}

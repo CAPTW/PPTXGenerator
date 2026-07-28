@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/pngtopptx-project-asset-manifest.schema.json",
+  "title": "PNGtoPPTX Project Asset Manifest",
+  "description": "Observed output contract of official make_crops.py. An empty object is valid only when cross-validation proves a rich zero-crop input plan.",
+  "type": "object",
+  "propertyNames": {"pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"},
+  "additionalProperties": {"$ref": "#/$defs/asset"},
+  "$defs": {
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "source_asset_id",
+        "slide",
+        "slot_id",
+        "x",
+        "y",
+        "w",
+        "h",
+        "file",
+        "content_type",
+        "reconstruction_reason",
+        "editable_replacement"
+      ],
+      "properties": {
+        "name": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"},
+        "source_asset_id": {"type": "string", "pattern": "^cropsource_[0-9a-f]{20}$"},
+        "slide": {"type": "integer", "minimum": 1, "maximum": 6},
+        "slot_id": {"type": "string", "minLength": 1},
+        "x": {"type": "integer", "minimum": 0},
+        "y": {"type": "integer", "minimum": 0},
+        "w": {"type": "integer", "minimum": 1},
+        "h": {"type": "integer", "minimum": 1},
+        "file": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*\\.png$"},
+        "content_type": {"type": "string", "minLength": 1},
+        "reconstruction_reason": {"type": "string", "minLength": 1},
+        "editable_replacement": {"type": "string", "minLength": 1},
+        "allow_large_crop": {"type": "boolean"},
+        "reason": {"type": "string", "minLength": 1}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"allow_large_crop": {"const": true}}, "required": ["allow_large_crop"]},
+          "then": {"required": ["reason"]}
+        }
+      ]
+    }
+  }
+}

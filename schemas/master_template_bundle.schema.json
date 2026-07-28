@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/master_template_bundle.schema.json",
+  "title": "MasterTemplateBundle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "deck_title",
+    "style_tokens",
+    "source_reference_ids",
+    "approval_basis",
+    "created_from_stage_attempt"
+  ],
+  "properties": {
+    "schema_name": {
+      "const": "master_template_bundle"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "deck_title": {
+      "type": "string"
+    },
+    "style_tokens": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "source_reference_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "approval_basis": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "created_from_stage_attempt": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "workflow_plan_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reference_dna_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "brand_inputs_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

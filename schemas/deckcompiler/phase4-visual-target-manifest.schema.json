@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/deckcompiler/phase4-visual-target-manifest.schema.json",
+  "title": "Phase 4 Selected Visual Target Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "manifest_id", "selected_target_count", "targets", "manifest_hash"],
+  "properties": {
+    "schema_name": {"const": "phase4_visual_target_manifest"},
+    "schema_version": {"const": "1.0.0"},
+    "manifest_id": {"type": "string", "minLength": 1},
+    "selected_target_count": {"const": 6},
+    "targets": {
+      "type": "array", "minItems": 6, "maxItems": 6,
+      "items": {
+        "type": "object",
+        "required": ["slide_id", "module_id", "batch_id", "visual_target_id", "sidecar_id", "prompt_id", "selected_family", "selected_layout", "image_relative_path", "original_runtime_path_reference", "normalized_path", "dimensions", "aspect_ratio", "format", "file_size_bytes", "sha256", "original_sha256", "selected_attempt_id", "attempt_count", "execution_mode", "platform_tool_identity", "image_model_identity", "reference_ids", "actual_generation", "transformation", "execution_verification_status", "visual_review_status", "semantic_fit", "capacity_fit", "editability_fit", "differentiation_fit", "final_surface_role_prohibited", "canonical_demo_eligibility", "validation_status", "image_metrics"],
+        "properties": {
+          "slide_id": {"type": "string"}, "module_id": {"type": "string"}, "batch_id": {"type": "string"},
+          "visual_target_id": {"type": "string"}, "sidecar_id": {"type": "string"}, "prompt_id": {"type": "string"},
+          "selected_family": {"type": "string"}, "selected_layout": {"type": "string"},
+          "image_relative_path": {"type": "string"}, "original_runtime_path_reference": {"type": "string"}, "normalized_path": {"type": "string"},
+          "dimensions": {"type": "object"}, "aspect_ratio": {"const": "16:9"}, "format": {"const": "PNG"},
+          "file_size_bytes": {"type": "integer", "minimum": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "original_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "selected_attempt_id": {"type": "string"}, "attempt_count": {"type": "integer", "minimum": 1, "maximum": 2},
+          "execution_mode": {"const": "platform_managed_tool"}, "platform_tool_identity": {"const": "image_gen.imagegen"}, "image_model_identity": {"type": "string"},
+          "reference_ids": {"type": "array", "minItems": 3, "uniqueItems": true, "items": {"type": "string"}},
+          "actual_generation": {"const": true}, "transformation": {"type": "object"},
+          "execution_verification_status": {"const": "VERIFIED"}, "visual_review_status": {"const": "ACCEPTED_FOR_PHASE4"},
+          "semantic_fit": {"const": "PASS"}, "capacity_fit": {"const": "PASS"}, "editability_fit": {"const": "PASS"}, "differentiation_fit": {"const": "PASS"},
+          "final_surface_role_prohibited": {"const": true}, "canonical_demo_eligibility": {"const": true}, "validation_status": {"const": "PASS"},
+          "image_metrics": {"type": "object"}
+        }
+      }
+    },
+    "manifest_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

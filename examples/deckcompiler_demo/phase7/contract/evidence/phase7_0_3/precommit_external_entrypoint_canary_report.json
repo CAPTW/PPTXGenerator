@@ -1,0 +1,94 @@
+{
+  "canaries": [
+    {
+      "canary_id": "canary_make_crops",
+      "canary_kind": "make_crops_stage",
+      "created_outputs": [
+        "assets/crop.png",
+        "assets/manifest.json"
+      ],
+      "entrypoint_id": "external_entrypoint_make_crops",
+      "exit_code": 0,
+      "external_source_mutation_count": 0,
+      "interpreter_owner": "deckcompiler_sys_executable",
+      "script_sha256": "d1fb348d40d6d98c7cafc8a4c313521fd46cbedddd156c488523d82ebfe7726d",
+      "status": "PASS",
+      "unexpected_output_count": 0
+    },
+    {
+      "canary_id": "canary_make_bg",
+      "canary_kind": "make_bg_stage",
+      "created_outputs": [
+        "assets/bg.png"
+      ],
+      "entrypoint_id": "external_entrypoint_make_bg",
+      "exit_code": 0,
+      "external_source_mutation_count": 0,
+      "interpreter_owner": "deckcompiler_sys_executable",
+      "script_sha256": "ffd89410c1419ce921f487861a129b029aece28950634fe5cd53d8749aa1449f",
+      "status": "PASS",
+      "unexpected_output_count": 0
+    },
+    {
+      "canary_id": "canary_validate_pptx_package",
+      "canary_kind": "argument_parser_startup",
+      "created_outputs": [],
+      "entrypoint_id": "external_entrypoint_validate_pptx_package",
+      "exit_code": 0,
+      "external_source_mutation_count": 0,
+      "interpreter_owner": "deckcompiler_sys_executable",
+      "script_sha256": "14f7b0aa24252439f6cb34ab0d86af1a062083b54ddb3b302e74f82e2ee3666a",
+      "status": "PASS",
+      "unexpected_output_count": 0
+    },
+    {
+      "canary_id": "canary_rasterize_pptx",
+      "canary_kind": "argument_parser_startup",
+      "created_outputs": [],
+      "entrypoint_id": "external_entrypoint_rasterize_pptx",
+      "exit_code": 0,
+      "external_source_mutation_count": 0,
+      "interpreter_owner": "deckcompiler_sys_executable",
+      "script_sha256": "4ccf00b5766fb3ca0b53c513bde6bfc4726c72b3f8efdbd245715e65d252c310",
+      "status": "PASS",
+      "unexpected_output_count": 0
+    },
+    {
+      "canary_id": "canary_capture_html_screenshot",
+      "canary_kind": "argument_parser_startup",
+      "created_outputs": [],
+      "entrypoint_id": "external_entrypoint_capture_html_screenshot",
+      "exit_code": 0,
+      "external_source_mutation_count": 0,
+      "interpreter_owner": "deckcompiler_sys_executable",
+      "script_sha256": "d6b12a483bbdfec3a067afbaf8deeca3d330ed79b99932ab5535214af041229c",
+      "status": "PASS",
+      "unexpected_output_count": 0
+    },
+    {
+      "canary_id": "canary_compare_slide_images",
+      "canary_kind": "argument_parser_startup",
+      "created_outputs": [],
+      "entrypoint_id": "external_entrypoint_compare_slide_images",
+      "exit_code": 0,
+      "external_source_mutation_count": 0,
+      "interpreter_owner": "deckcompiler_sys_executable",
+      "script_sha256": "9756742f5c9ec5ca630c3ae8ac2f8f274dd19d6fb61fce3a4df4f869bb923874",
+      "status": "PASS",
+      "unexpected_output_count": 0
+    }
+  ],
+  "canary_count": 6,
+  "failure_count": 0,
+  "interpreter_owner": "deckcompiler_sys_executable",
+  "manifest_hash": "1f895c6e45ef7fc9e807631566de9edcb403211b9ac9aa9666e6101eef626e07",
+  "output_path_class": "%USER_SUPPLIED_EXTERNAL_OUTPUT%/dependency_canary",
+  "report_hash": "dd090aa982cfbefd7d554c2c6064d2954433b652e1eed80ec0afabddd589ab75",
+  "schema_name": "external_entrypoint_canary_report",
+  "schema_version": "1.0.0",
+  "status": "PASS",
+  "tested_external_skill_pin": {
+    "aggregate_sha256": "3dd4541fb0f2f4cf421d2a5c3cf2002390c0b00661a2e4d3a588d4467600022a",
+    "artifact_sha256": "61b64ca02cb1301c215d1cfa90b1f558ae127d3a19b2d49f2b82746930ef0a84"
+  }
+}

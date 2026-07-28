@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/phase-7-0-3-acceptance.schema.json",
+  "title": "DeckCompiler Phase 7.0.3 acceptance",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "tested_runtime_commit",
+    "runtime_tree_sha256",
+    "dependency_manifest_hash",
+    "lock_sha256",
+    "external_entrypoint_count",
+    "locked_distribution_count",
+    "focused_tests",
+    "full_tests",
+    "phase7c_recertification",
+    "phase7d_fresh_clone",
+    "final_release_eligible",
+    "status",
+    "report_hash"
+  ],
+  "properties": {
+    "schema_name": {"const": "phase_7_0_3_acceptance"},
+    "schema_version": {"const": "1.0.0"},
+    "tested_runtime_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "runtime_tree_sha256": {"$ref": "#/$defs/sha256"},
+    "dependency_manifest_hash": {"$ref": "#/$defs/sha256"},
+    "lock_sha256": {"$ref": "#/$defs/sha256"},
+    "external_entrypoint_count": {"type": "integer", "minimum": 1},
+    "locked_distribution_count": {"type": "integer", "minimum": 1},
+    "focused_tests": {"enum": ["PASS", "BLOCKED"]},
+    "full_tests": {"enum": ["PASS", "BLOCKED"]},
+    "phase7c_recertification": {"enum": ["PASS", "BLOCKED"]},
+    "phase7d_fresh_clone": {"enum": ["PASS", "BLOCKED"]},
+    "final_release_eligible": {"type": "boolean"},
+    "status": {
+      "enum": [
+        "BLOCKED",
+        "ELIGIBLE_FOR_DEVPOST_SUBMISSION"
+      ]
+    },
+    "report_hash": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

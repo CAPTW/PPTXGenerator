@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/slide_chart_data.schema.json",
+  "title": "SlideChartData",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["slide_id", "chart_data"],
+  "properties": {
+    "schema_name": {"const": "slide_chart_data"},
+    "schema_version": {"type": "string"},
+    "slide_id": {"type": "string", "minLength": 1},
+    "chart_data": {"type": ["object", "null"]}
+  }
+}

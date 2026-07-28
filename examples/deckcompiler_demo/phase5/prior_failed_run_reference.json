@@ -1,0 +1,20 @@
+{
+  "accepted": false,
+  "classification": "immutable_diagnostic_evidence",
+  "committed": false,
+  "content_sha256_without_this_field": "a786288b776bba8a072fd46a77a394e48194111b06a33d966758e60ef36425fd",
+  "curated": false,
+  "diagnostic_html_sha256": "08c0a92e539aeeda77d88b33da68d1e8878ea28642f7272f06af3c24c1ead265",
+  "diagnostic_pptx_sha256": "83e9866a8d3db303ce329422fc7b3fb7f1b37057f9d0de7098d5c5a69d602aac",
+  "modified_by_phase5_1": false,
+  "path_classification": "external_temp_runtime_not_curated",
+  "prior_runtime_directory_name": "pptx-generator-phase5-20260720-6e5f703-b5",
+  "repair_status": "exhausted",
+  "repair_waves_allowed": 3,
+  "repair_waves_used": 3,
+  "run_closed": true,
+  "schema_name": "phase5_prior_failed_run_reference",
+  "schema_version": "1.0.0",
+  "status": "FAILED_CLOSED",
+  "used_as_new_run_input": false
+}

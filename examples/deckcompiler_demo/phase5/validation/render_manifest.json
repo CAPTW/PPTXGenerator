@@ -1,0 +1,77 @@
+{
+  "content_sha256_without_this_field": "bff4728d717b97f2e71309c1e1f75453c685ac92f74695c2ed504a2660b9f44e",
+  "render_count": 6,
+  "rendered_at_utc": "2026-07-21T15:54:34.376160+00:00",
+  "renderer_identity": "Microsoft PowerPoint COM",
+  "renderer_tool": "powerpoint-com",
+  "renderer_version": "16.0",
+  "repair_warning_count": 0,
+  "schema_name": "phase5_render_manifest",
+  "schema_version": "1.0.0",
+  "slides": [
+    {
+      "aspect_ratio": "16:9",
+      "byte_size": 95737,
+      "decode_valid": true,
+      "height": 1080,
+      "path": "renders/slide-001.png",
+      "sha256": "1d9753e704f776238d07862082540ee78dbc64630d50a8136e43151a28633684",
+      "slide": 1,
+      "width": 1920
+    },
+    {
+      "aspect_ratio": "16:9",
+      "byte_size": 100803,
+      "decode_valid": true,
+      "height": 1080,
+      "path": "renders/slide-002.png",
+      "sha256": "95da832e8af843baa86227eddd0933ee122d3238d4264a6fdd1647746c1df13e",
+      "slide": 2,
+      "width": 1920
+    },
+    {
+      "aspect_ratio": "16:9",
+      "byte_size": 94729,
+      "decode_valid": true,
+      "height": 1080,
+      "path": "renders/slide-003.png",
+      "sha256": "8da4216332f596e20de3df53e34c1592c5b31818181f06e64b21f06ca2f2901f",
+      "slide": 3,
+      "width": 1920
+    },
+    {
+      "aspect_ratio": "16:9",
+      "byte_size": 73027,
+      "decode_valid": true,
+      "height": 1080,
+      "path": "renders/slide-004.png",
+      "sha256": "855ae16e06b6e3c70aa795a7ce8feac03d699327135f2e5aff320c94e7a064a8",
+      "slide": 4,
+      "width": 1920
+    },
+    {
+      "aspect_ratio": "16:9",
+      "byte_size": 91074,
+      "decode_valid": true,
+      "height": 1080,
+      "path": "renders/slide-005.png",
+      "sha256": "1a9ecda45b6d0d475425dd84b83b441deeb8f040357c3a97fc6af43caf5659e2",
+      "slide": 5,
+      "width": 1920
+    },
+    {
+      "aspect_ratio": "16:9",
+      "byte_size": 95604,
+      "decode_valid": true,
+      "height": 1080,
+      "path": "renders/slide-006.png",
+      "sha256": "6f838b7d761103fea32ed7d90872db13d764ba088f6b0e3f7c159b5e160aa870",
+      "slide": 6,
+      "width": 1920
+    }
+  ],
+  "source_pptx": "outputs/pptx_generator_demo.pptx",
+  "source_pptx_sha256": "805eb4aa3d44d90ebe5b78c0247d02e412ebfc9468e57c778516b90de2d27676",
+  "status": "PASS",
+  "warning_count": 0
+}

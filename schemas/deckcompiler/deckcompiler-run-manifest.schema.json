@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/deckcompiler-run-manifest.schema.json",
+  "title": "DeckCompiler Run Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "artifact",
+    "run_id",
+    "started_at",
+    "updated_at",
+    "build_baseline",
+    "source_commit",
+    "stage_status",
+    "artifacts",
+    "retry_history",
+    "warnings",
+    "errors",
+    "validation_status"
+  ],
+  "properties": {
+    "schema_name": {"const": "deckcompiler_run_manifest"},
+    "schema_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "artifact": {
+      "allOf": [
+        {"$ref": "artifact-envelope.schema.json"},
+        {"properties": {"artifact_type": {"const": "deckcompiler_run_manifest"}}}
+      ]
+    },
+    "run_id": {"type": "string", "pattern": "^run_[0-9a-f]{20}$"},
+    "started_at": {"type": "string", "format": "date-time"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "build_baseline": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "stage_status": {
+      "type": "object",
+      "additionalProperties": {"enum": ["not_started", "planned", "running", "passed", "failed", "blocked", "skipped"]}
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["artifact_type", "artifact_id", "path", "required"],
+        "properties": {
+          "artifact_type": {
+            "enum": ["source_corpus", "evidence_unit_registry", "slide_blueprint_collection", "visual_target_manifest", "png_reconstruction_manifest"]
+          },
+          "artifact_id": {"type": "string", "pattern": "^art_[0-9a-f]{20}$"},
+          "path": {"type": "string", "minLength": 1},
+          "required": {"type": "boolean"}
+        }
+      }
+    },
+    "retry_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["stage", "attempt", "timestamp", "reason"],
+        "properties": {
+          "stage": {"type": "string", "minLength": 1},
+          "attempt": {"type": "integer", "minimum": 1},
+          "timestamp": {"type": "string", "format": "date-time"},
+          "reason": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "warnings": {"type": "array", "items": {"type": "string"}},
+    "errors": {"type": "array", "items": {"type": "string"}},
+    "validation_status": {"enum": ["not_validated", "valid", "invalid", "blocked"]}
+  }
+}

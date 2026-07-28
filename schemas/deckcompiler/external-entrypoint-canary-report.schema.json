@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/external-entrypoint-canary-report.schema.json",
+  "title": "DeckCompiler external entrypoint canary report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "manifest_hash",
+    "tested_external_skill_pin",
+    "interpreter_owner",
+    "output_path_class",
+    "canaries",
+    "canary_count",
+    "failure_count",
+    "status",
+    "report_hash"
+  ],
+  "properties": {
+    "schema_name": {"const": "external_entrypoint_canary_report"},
+    "schema_version": {"const": "1.0.0"},
+    "manifest_hash": {"$ref": "#/$defs/sha256"},
+    "tested_external_skill_pin": {"type": "object"},
+    "interpreter_owner": {"const": "deckcompiler_sys_executable"},
+    "output_path_class": {
+      "const": "%USER_SUPPLIED_EXTERNAL_OUTPUT%/dependency_canary"
+    },
+    "canaries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "canary_id",
+          "entrypoint_id",
+          "canary_kind",
+          "interpreter_owner",
+          "script_sha256",
+          "created_outputs",
+          "unexpected_output_count",
+          "external_source_mutation_count",
+          "exit_code",
+          "status"
+        ],
+        "properties": {
+          "canary_id": {"type": "string"},
+          "entrypoint_id": {"type": "string"},
+          "canary_kind": {"type": "string"},
+          "interpreter_owner": {"const": "deckcompiler_sys_executable"},
+          "script_sha256": {"$ref": "#/$defs/sha256"},
+          "created_outputs": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "unexpected_output_count": {"const": 0},
+          "external_source_mutation_count": {"const": 0},
+          "exit_code": {"const": 0},
+          "status": {"const": "PASS"}
+        }
+      }
+    },
+    "canary_count": {"type": "integer", "minimum": 1},
+    "failure_count": {"const": 0},
+    "status": {"const": "PASS"},
+    "report_hash": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

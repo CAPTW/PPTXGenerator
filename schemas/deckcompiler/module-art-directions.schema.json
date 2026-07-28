@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/module-art-directions.schema.json",
+  "title": "DeckCompiler Module Art Directions",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "artifact",
+    "direction_set_id",
+    "presentation_architecture_id",
+    "design_invariant_set_id",
+    "modules"
+  ],
+  "properties": {
+    "schema_name": {"const": "module_art_directions"},
+    "schema_version": {"const": "1.0.0"},
+    "artifact": {
+      "allOf": [
+        {"$ref": "artifact-envelope.schema.json"},
+        {"properties": {"artifact_type": {"const": "module_art_directions"}}}
+      ]
+    },
+    "direction_set_id": {"type": "string", "pattern": "^directions_[0-9a-f]{20}$"},
+    "presentation_architecture_id": {"type": "string", "minLength": 1},
+    "design_invariant_set_id": {"type": "string", "pattern": "^invariants_[0-9a-f]{20}$"},
+    "modules": {
+      "type": "array",
+      "minItems": 2,
+      "items": {"$ref": "#/$defs/module"}
+    }
+  },
+  "$defs": {
+    "batchGrammar": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["batch_id", "visual_grammar_intent", "transition_from", "transition_to"],
+      "properties": {
+        "batch_id": {"type": "string", "minLength": 1},
+        "visual_grammar_intent": {"type": "string", "minLength": 1},
+        "transition_from": {"type": "string", "minLength": 1},
+        "transition_to": {"type": "string", "minLength": 1}
+      }
+    },
+    "module": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "module_id",
+        "narrative_objective",
+        "visual_metaphor",
+        "composition_energy",
+        "spatial_direction",
+        "focal_behavior",
+        "illustration_language",
+        "diagram_language",
+        "density_range",
+        "contrast_strategy",
+        "continuity_with_previous_module",
+        "differentiation_from_other_modules",
+        "forbidden_visual_patterns",
+        "batch_visual_grammar"
+      ],
+      "properties": {
+        "module_id": {"type": "string", "minLength": 1},
+        "narrative_objective": {"type": "string", "minLength": 1},
+        "visual_metaphor": {"type": "string", "minLength": 1},
+        "composition_energy": {"type": "string", "minLength": 1},
+        "spatial_direction": {"type": "string", "minLength": 1},
+        "focal_behavior": {"type": "string", "minLength": 1},
+        "illustration_language": {"type": "string", "minLength": 1},
+        "diagram_language": {"type": "string", "minLength": 1},
+        "density_range": {"type": "string", "minLength": 1},
+        "contrast_strategy": {"type": "string", "minLength": 1},
+        "continuity_with_previous_module": {"type": "string", "minLength": 1},
+        "differentiation_from_other_modules": {"type": "string", "minLength": 1},
+        "forbidden_visual_patterns": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        },
+        "batch_visual_grammar": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/batchGrammar"}
+        }
+      }
+    }
+  }
+}

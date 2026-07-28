@@ -1,0 +1,1020 @@
+{
+  "authority": "Phase 4 semantic Sidecars",
+  "canonical_item_count": 66,
+  "canonical_item_pass_count": 66,
+  "canonical_text_fidelity": 1.0,
+  "citation_source_note_count": 30,
+  "citation_source_note_pass_count": 30,
+  "content_sha256_without_this_field": "0704bee850f95f2f1df131b80d21eacf247a1e78f3991884117fed35bab76258",
+  "items": [
+    {
+      "canonical_value": "Decision framing and thesis: AI Data-center Cooling-system",
+      "content_hash": "7af2487512fc508b838ba1488653cfeaad44bbc9918d59c14d28b8b33a6cea73",
+      "item_id": "title",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        3
+      ],
+      "shape_names": [
+        "Text 2"
+      ],
+      "slide": 1,
+      "slot_id": "title"
+    },
+    {
+      "canonical_value": "Claim origin: documentary fact",
+      "content_hash": "b9b0047e90ff1fbe00da1175ea9ce6c6054b221b68243ac522f899bc2137e54d",
+      "item_id": "subtitle",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        4
+      ],
+      "shape_names": [
+        "Text 3"
+      ],
+      "slide": 1,
+      "slot_id": "subtitle"
+    },
+    {
+      "canonical_value": "Approve a phased combined response: instrument the baseline, commission automated pump failover, and then tighten sensor calibration governance.",
+      "content_hash": "77fd93346660814dcccdf4fd17d64e632d67d005343e8ee70f6c37de3ea2e0b6",
+      "item_id": "slide-01-decision-framing-evidence-01",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        17
+      ],
+      "shape_names": [
+        "Text 16"
+      ],
+      "slide": 1,
+      "slot_id": "body"
+    },
+    {
+      "canonical_value": "Redundant sensing reduces single-point blind spots but does not remove calibration drift risk.",
+      "content_hash": "af3d7425df48a62aa08a3509bcb564f287e66f07f89e7f876445e8fc7311e45e",
+      "item_id": "slide-01-decision-framing-evidence-02",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        33
+      ],
+      "shape_names": [
+        "Text 32"
+      ],
+      "slide": 1,
+      "slot_id": "body"
+    },
+    {
+      "canonical_value": "A loss of reliable flow telemetry can hide a developing restriction until component temperatures begin to rise.",
+      "content_hash": "4e8588692f5ae7dbb10f93b191be6fc70fe0140a628f730eddbb6fd5fda4216b",
+      "item_id": "slide-01-decision-framing-evidence-03",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        37
+      ],
+      "shape_names": [
+        "Text 36"
+      ],
+      "slide": 1,
+      "slot_id": "body"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling Risk Decision Report, page 3",
+      "content_hash": "cc34f5e43c4a3ece6698072e327b58469716055a432816bb398b77bf2d74de7e",
+      "item_id": "citation-02",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        48
+      ],
+      "shape_names": [
+        "Text 47"
+      ],
+      "slide": 1,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling System Overview, page 2",
+      "content_hash": "0598fd24001026778bcd2b6990b62a2c9a2f07a54b8ff72be809f15abb4d2357",
+      "item_id": "citation-03",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        48
+      ],
+      "shape_names": [
+        "Text 47"
+      ],
+      "slide": 1,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling System Overview, page 2",
+      "content_hash": null,
+      "item_id": "citation-04",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        48
+      ],
+      "shape_names": [
+        "Text 47"
+      ],
+      "slide": 1,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "Source notes: page 3, block 2 — AI Data Center Cooling Risk Decision Report; page 2, block 6 — AI Data Center Cooling System Overview; page 2, block 5 — AI Data Center Cooling System Overview",
+      "content_hash": "274d8e61e624fde428712210eb5bd30ae2e7dab7167f5fc71860a5ebc59e60fb",
+      "item_id": "speaker_notes",
+      "kind": "speaker_notes",
+      "pass": true,
+      "shape_indices": [
+        49
+      ],
+      "shape_names": [
+        "Text 48"
+      ],
+      "slide": 1,
+      "slot_id": "speaker_notes"
+    },
+    {
+      "canonical_value": "System and operating process",
+      "content_hash": "4a7c5e7feac6e84649477c6c41c07d7c3d7db9a5859f38ed464db24f1bdc41a9",
+      "item_id": "title",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        3
+      ],
+      "shape_names": [
+        "Text 2"
+      ],
+      "slide": 2,
+      "slot_id": "title"
+    },
+    {
+      "canonical_value": "Claim origin: documentary fact",
+      "content_hash": "b9b0047e90ff1fbe00da1175ea9ce6c6054b221b68243ac522f899bc2137e54d",
+      "item_id": "subtitle",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        4
+      ],
+      "shape_names": [
+        "Text 3"
+      ],
+      "slide": 2,
+      "slot_id": "subtitle"
+    },
+    {
+      "canonical_value": "Heat rejection is the transfer of collected thermal energy from the facility loop to an external sink without mixing the two fluids.",
+      "content_hash": "8bb218c91ee3bbda0e15c3d5499b3b7cf318891afc49de9474e1db30235e14ba",
+      "item_id": "slide-02-system-process-evidence-01",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        20
+      ],
+      "shape_names": [
+        "Text 19"
+      ],
+      "slide": 2,
+      "slot_id": "process"
+    },
+    {
+      "canonical_value": "The primary cooling loop is the closed fluid path that carries heat from compute cold plates to a facility heat exchanger.",
+      "content_hash": "3adcde4ce319345ef6e4c20b7b7ef3e939a60ca69506396181b08e45c057112d",
+      "item_id": "slide-02-system-process-evidence-02",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        28
+      ],
+      "shape_names": [
+        "Text 27"
+      ],
+      "slide": 2,
+      "slot_id": "process"
+    },
+    {
+      "canonical_value": "Temperature, flow, and differential-pressure sensors feed a local controller that adjusts pump speed and valve position every control interval.",
+      "content_hash": "9343b262c7a3f7da07fd7694c7694593ecddf7386cb2720a766ff078dc181b74",
+      "item_id": "slide-02-system-process-evidence-03",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        36
+      ],
+      "shape_names": [
+        "Text 35"
+      ],
+      "slide": 2,
+      "slot_id": "process"
+    },
+    {
+      "canonical_value": "Stage 1 moves coolant through cold plates where server heat enters the primary loop.",
+      "content_hash": "34e2fb098ff0ab050d80a8bcf9b6218d3099eb72e0478a1743bc0047b878bc8d",
+      "item_id": "slide-02-system-process-evidence-04",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        44
+      ],
+      "shape_names": [
+        "Text 43"
+      ],
+      "slide": 2,
+      "slot_id": "process"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling System Overview, page 1",
+      "content_hash": "97bbf13962d55659ab4179eda115f3ee76b4bd2a42bd2569a0113ba62595973f",
+      "item_id": "citation-02",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        49
+      ],
+      "shape_names": [
+        "Text 48"
+      ],
+      "slide": 2,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling System Overview, page 1",
+      "content_hash": "82f79d45c4f2df83a42ee1ac6f7fac0aa20b50f5e683d0fe27fb0191e9b502a3",
+      "item_id": "citation-03",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        49
+      ],
+      "shape_names": [
+        "Text 48"
+      ],
+      "slide": 2,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling System Overview, page 2",
+      "content_hash": "5f379efe1095156d6284c802cb3a3891c5de4b726d0b3e4c051efbb580d2cd1d",
+      "item_id": "citation-04",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        49
+      ],
+      "shape_names": [
+        "Text 48"
+      ],
+      "slide": 2,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling System Overview, page 1",
+      "content_hash": null,
+      "item_id": "citation-05",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        49
+      ],
+      "shape_names": [
+        "Text 48"
+      ],
+      "slide": 2,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "Source notes: page 1, block 3 — AI Data Center Cooling System Overview; page 1, block 2 — AI Data Center Cooling System Overview; page 2, block 2 — AI Data Center Cooling System Overview; page 1, block 4 — AI Data Center Cooling System Overview",
+      "content_hash": "1fccac58595033c6896089ade56adfc0080f2b9f0cc73f4ca76c24ee12181a5d",
+      "item_id": "speaker_notes",
+      "kind": "speaker_notes",
+      "pass": true,
+      "shape_indices": [
+        50
+      ],
+      "shape_names": [
+        "Text 49"
+      ],
+      "slide": 2,
+      "slot_id": "speaker_notes"
+    },
+    {
+      "canonical_value": "Evidence-backed risk findings",
+      "content_hash": "223304762d4b77e2da6c3ee80000988d146a1d15c53a40e9c540491034cdc40b",
+      "item_id": "title",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        3
+      ],
+      "shape_names": [
+        "Text 2"
+      ],
+      "slide": 3,
+      "slot_id": "title"
+    },
+    {
+      "canonical_value": "Claim origin: documentary fact",
+      "content_hash": "b9b0047e90ff1fbe00da1175ea9ce6c6054b221b68243ac522f899bc2137e54d",
+      "item_id": "subtitle",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        4
+      ],
+      "shape_names": [
+        "Text 3"
+      ],
+      "slide": 3,
+      "slot_id": "subtitle"
+    },
+    {
+      "canonical_value": "Redundant sensing reduces single-point blind spots but does not remove calibration drift risk.",
+      "content_hash": "af3d7425df48a62aa08a3509bcb564f287e66f07f89e7f876445e8fc7311e45e",
+      "item_id": "slide-03-risk-findings-evidence-01",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        17
+      ],
+      "shape_names": [
+        "Text 16"
+      ],
+      "slide": 3,
+      "slot_id": "body"
+    },
+    {
+      "canonical_value": "A loss of reliable flow telemetry can hide a developing restriction until component temperatures begin to rise.",
+      "content_hash": "4e8588692f5ae7dbb10f93b191be6fc70fe0140a628f730eddbb6fd5fda4216b",
+      "item_id": "slide-03-risk-findings-evidence-02",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        22
+      ],
+      "shape_names": [
+        "Text 21"
+      ],
+      "slide": 3,
+      "slot_id": "body"
+    },
+    {
+      "canonical_value": "Shared heat-rejection saturation can affect multiple compute rows at the same time.",
+      "content_hash": "a6cc92e789bbe44946926fc0d5c99e2d5efd117def44ecae055ebcb23a7d8e84",
+      "item_id": "slide-03-risk-findings-evidence-03",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        27
+      ],
+      "shape_names": [
+        "Text 26"
+      ],
+      "slide": 3,
+      "slot_id": "body"
+    },
+    {
+      "canonical_value": "A combined option can address both rapid flow loss and slower sensor degradation without requiring a full plant redesign.",
+      "content_hash": "c69f036d3782421dc697a3da93cfb538edbe127221ddd569360c6435c35400aa",
+      "item_id": "slide-03-risk-findings-evidence-04",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        32
+      ],
+      "shape_names": [
+        "Text 31"
+      ],
+      "slide": 3,
+      "slot_id": "body"
+    },
+    {
+      "canonical_value": "Facility heat-rejection capacity remains a shared upstream constraint even when the primary loop is healthy.",
+      "content_hash": "641b2c8c60036cd2f3be82b9cf7f53ae21d4bd435e44c411584e76b43be287db",
+      "item_id": "slide-03-risk-findings-evidence-05",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        37
+      ],
+      "shape_names": [
+        "Text 36"
+      ],
+      "slide": 3,
+      "slot_id": "body"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling System Overview, page 2",
+      "content_hash": "0598fd24001026778bcd2b6990b62a2c9a2f07a54b8ff72be809f15abb4d2357",
+      "item_id": "citation-02",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        43
+      ],
+      "shape_names": [
+        "Text 42"
+      ],
+      "slide": 3,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling System Overview, page 2",
+      "content_hash": "e892c83c813274b4ec01bd2240999ab85c566493b464a32f4a5b781b17f23310",
+      "item_id": "citation-03",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        43
+      ],
+      "shape_names": [
+        "Text 42"
+      ],
+      "slide": 3,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling Risk Decision Report, page 1",
+      "content_hash": "c8c50f9ca1264c20a79e76a4de72e725e9efdb328310122b11b1d5ef8ea30adf",
+      "item_id": "citation-04",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        43
+      ],
+      "shape_names": [
+        "Text 42"
+      ],
+      "slide": 3,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling Risk Decision Report, page 2",
+      "content_hash": "68b49972f28777b46f8de0093ee4435f692dcfcb55b934d81a9a1597208355fe",
+      "item_id": "citation-05",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        43
+      ],
+      "shape_names": [
+        "Text 42"
+      ],
+      "slide": 3,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling System Overview, page 3",
+      "content_hash": null,
+      "item_id": "citation-06",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        43
+      ],
+      "shape_names": [
+        "Text 42"
+      ],
+      "slide": 3,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "Source notes: page 2, block 6 — AI Data Center Cooling System Overview; page 2, block 5 — AI Data Center Cooling System Overview; page 1, block 4 — AI Data Center Cooling Risk Decision Report; page 2, block 5 — AI Data Center Cooling Risk Decision Report; page 3, block 4 — AI Data Center Cooling System Overview",
+      "content_hash": "7d512ac2e4583c2ab59dbe64ade6a74a560831ef745405b1714f03c7fedda2b7",
+      "item_id": "speaker_notes",
+      "kind": "speaker_notes",
+      "pass": true,
+      "shape_indices": [
+        44
+      ],
+      "shape_names": [
+        "Text 43"
+      ],
+      "slide": 3,
+      "slot_id": "speaker_notes"
+    },
+    {
+      "canonical_value": "Response options and trade-offs",
+      "content_hash": "567bbb95ea802aed1d667dbc47e29956d64799e27becaf7ec67bd669143ab62b",
+      "item_id": "title",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        4
+      ],
+      "shape_names": [
+        "Text 2"
+      ],
+      "slide": 4,
+      "slot_id": "title"
+    },
+    {
+      "canonical_value": "Claim origin: documentary fact",
+      "content_hash": "b9b0047e90ff1fbe00da1175ea9ce6c6054b221b68243ac522f899bc2137e54d",
+      "item_id": "subtitle",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        5
+      ],
+      "shape_names": [
+        "Text 3"
+      ],
+      "slide": 4,
+      "slot_id": "subtitle"
+    },
+    {
+      "canonical_value": "Option A adds pump-path redundancy and automated failover, giving the strongest interruption protection at the highest implementation effort.",
+      "content_hash": "9988d2bd71591518d3bc1ee213e661fbedce9f73f7f00400f193d6ca1fa20715",
+      "item_id": "slide-04-options-comparison-evidence-01",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        1
+      ],
+      "shape_names": [
+        "Table 0"
+      ],
+      "slide": 4,
+      "slot_id": "table"
+    },
+    {
+      "canonical_value": "Option B increases monitoring and calibration frequency, reducing detection delay at lower effort but leaving pump-path exposure unchanged.",
+      "content_hash": "9064f1e51ae0a83d5fae270930bf1ceebd4d2b59f766023f0a93fd6d72a8d4f1",
+      "item_id": "slide-04-options-comparison-evidence-02",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        1
+      ],
+      "shape_names": [
+        "Table 0"
+      ],
+      "slide": 4,
+      "slot_id": "table"
+    },
+    {
+      "canonical_value": "Prefer an option that protects thermal margin, preserves maintainability, and can be verified through staged commissioning.",
+      "content_hash": "8b7d58c35eb398b4d590534db51b20e81c097b68338296cf31f92e2e3041b0f8",
+      "item_id": "slide-04-options-comparison-evidence-03",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        1
+      ],
+      "shape_names": [
+        "Table 0"
+      ],
+      "slide": 4,
+      "slot_id": "table"
+    },
+    {
+      "canonical_value": "The synthetic normal supply-temperature target is 27 C with an allowed steady-state band of plus or minus 1 C.",
+      "content_hash": "2096d5daeeec19d961cfdc6436fa3c9cbc70e9a919aa959bbebc5592a3dcf62d",
+      "item_id": "slide-04-options-comparison-evidence-04",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        1
+      ],
+      "shape_names": [
+        "Table 0"
+      ],
+      "slide": 4,
+      "slot_id": "table"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling Risk Decision Report, page 2",
+      "content_hash": "2e6245356dcab3618b9d9d0d49659415fdbe6957f34c3c2cc049f9da5e2513bb",
+      "item_id": "citation-02",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        19
+      ],
+      "shape_names": [
+        "Text 17"
+      ],
+      "slide": 4,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling Risk Decision Report, page 2",
+      "content_hash": "84a664e1ab209f5c268b7153d2f36a792152db0cdead4b3cbc7c5ab76679be4a",
+      "item_id": "citation-03",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        19
+      ],
+      "shape_names": [
+        "Text 17"
+      ],
+      "slide": 4,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling Risk Decision Report, page 2",
+      "content_hash": "14ecff788b7441337bcc562256c59b87c913c402caf1decdaf87f1211d666f04",
+      "item_id": "citation-04",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        19
+      ],
+      "shape_names": [
+        "Text 17"
+      ],
+      "slide": 4,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling System Overview, page 2",
+      "content_hash": null,
+      "item_id": "citation-05",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        19
+      ],
+      "shape_names": [
+        "Text 17"
+      ],
+      "slide": 4,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "Source notes: page 2, block 2 — AI Data Center Cooling Risk Decision Report; page 2, block 3 — AI Data Center Cooling Risk Decision Report; page 2, block 4 — AI Data Center Cooling Risk Decision Report; page 2, block 3 — AI Data Center Cooling System Overview",
+      "content_hash": "823a9a907ed5c64e3d7f28df78534c84e41a7af90b6a6c628e9c3a6c2d3fcb6f",
+      "item_id": "speaker_notes",
+      "kind": "speaker_notes",
+      "pass": true,
+      "shape_indices": [
+        20
+      ],
+      "shape_names": [
+        "Text 18"
+      ],
+      "slide": 4,
+      "slot_id": "speaker_notes"
+    },
+    {
+      "canonical_value": "Recommendation and rationale",
+      "content_hash": "6a9192bf9b8b3bf913bea10da344dfec063ccfd4cd8d15a02a0de61b94741ff9",
+      "item_id": "title",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        3
+      ],
+      "shape_names": [
+        "Text 2"
+      ],
+      "slide": 5,
+      "slot_id": "title"
+    },
+    {
+      "canonical_value": "Claim origin: documentary fact",
+      "content_hash": "b9b0047e90ff1fbe00da1175ea9ce6c6054b221b68243ac522f899bc2137e54d",
+      "item_id": "subtitle",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        4
+      ],
+      "shape_names": [
+        "Text 3"
+      ],
+      "slide": 5,
+      "slot_id": "subtitle"
+    },
+    {
+      "canonical_value": "Approve a phased combined response: instrument the baseline, commission automated pump failover, and then tighten sensor calibration governance.",
+      "content_hash": "77fd93346660814dcccdf4fd17d64e632d67d005343e8ee70f6c37de3ea2e0b6",
+      "item_id": "slide-05-recommendation-evidence-01",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        16
+      ],
+      "shape_names": [
+        "Text 15"
+      ],
+      "slide": 5,
+      "slot_id": "callout"
+    },
+    {
+      "canonical_value": "Prefer an option that protects thermal margin, preserves maintainability, and can be verified through staged commissioning.",
+      "content_hash": "8b7d58c35eb398b4d590534db51b20e81c097b68338296cf31f92e2e3041b0f8",
+      "item_id": "slide-05-recommendation-evidence-02",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        24
+      ],
+      "shape_names": [
+        "Text 23"
+      ],
+      "slide": 5,
+      "slot_id": "callout"
+    },
+    {
+      "canonical_value": "Redundant sensing reduces single-point blind spots but does not remove calibration drift risk.",
+      "content_hash": "af3d7425df48a62aa08a3509bcb564f287e66f07f89e7f876445e8fc7311e45e",
+      "item_id": "slide-05-recommendation-evidence-03",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        30
+      ],
+      "shape_names": [
+        "Text 29"
+      ],
+      "slide": 5,
+      "slot_id": "callout"
+    },
+    {
+      "canonical_value": "A loss of reliable flow telemetry can hide a developing restriction until component temperatures begin to rise.",
+      "content_hash": "4e8588692f5ae7dbb10f93b191be6fc70fe0140a628f730eddbb6fd5fda4216b",
+      "item_id": "slide-05-recommendation-evidence-04",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        36
+      ],
+      "shape_names": [
+        "Text 35"
+      ],
+      "slide": 5,
+      "slot_id": "callout"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling Risk Decision Report, page 3",
+      "content_hash": "84a664e1ab209f5c268b7153d2f36a792152db0cdead4b3cbc7c5ab76679be4a",
+      "item_id": "citation-02",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        45
+      ],
+      "shape_names": [
+        "Text 44"
+      ],
+      "slide": 5,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling Risk Decision Report, page 2",
+      "content_hash": "cc34f5e43c4a3ece6698072e327b58469716055a432816bb398b77bf2d74de7e",
+      "item_id": "citation-03",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        45
+      ],
+      "shape_names": [
+        "Text 44"
+      ],
+      "slide": 5,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling System Overview, page 2",
+      "content_hash": "0598fd24001026778bcd2b6990b62a2c9a2f07a54b8ff72be809f15abb4d2357",
+      "item_id": "citation-04",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        45
+      ],
+      "shape_names": [
+        "Text 44"
+      ],
+      "slide": 5,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling System Overview, page 2",
+      "content_hash": null,
+      "item_id": "citation-05",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        45
+      ],
+      "shape_names": [
+        "Text 44"
+      ],
+      "slide": 5,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "Source notes: page 3, block 2 — AI Data Center Cooling Risk Decision Report; page 2, block 4 — AI Data Center Cooling Risk Decision Report; page 2, block 6 — AI Data Center Cooling System Overview; page 2, block 5 — AI Data Center Cooling System Overview",
+      "content_hash": "6c522c9905598845d33e5b47c8960e2a375cdf848d03ee6f62f59654ef1ff5b1",
+      "item_id": "speaker_notes",
+      "kind": "speaker_notes",
+      "pass": true,
+      "shape_indices": [
+        46
+      ],
+      "shape_names": [
+        "Text 45"
+      ],
+      "slide": 5,
+      "slot_id": "speaker_notes"
+    },
+    {
+      "canonical_value": "Implementation path and source notes",
+      "content_hash": "5f58a604681522482479e05a6c109258c8ed629def17350d35b38e3d62857323",
+      "item_id": "title",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        3
+      ],
+      "shape_names": [
+        "Text 2"
+      ],
+      "slide": 6,
+      "slot_id": "title"
+    },
+    {
+      "canonical_value": "Claim origin: documentary fact",
+      "content_hash": "b9b0047e90ff1fbe00da1175ea9ce6c6054b221b68243ac522f899bc2137e54d",
+      "item_id": "subtitle",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        4
+      ],
+      "shape_names": [
+        "Text 3"
+      ],
+      "slide": 6,
+      "slot_id": "subtitle"
+    },
+    {
+      "canonical_value": "Temperature, flow, and differential-pressure sensors feed a local controller that adjusts pump speed and valve position every control interval.",
+      "content_hash": "9343b262c7a3f7da07fd7694c7694593ecddf7386cb2720a766ff078dc181b74",
+      "item_id": "slide-06-implementation-sources-evidence-01",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        21
+      ],
+      "shape_names": [
+        "Text 20"
+      ],
+      "slide": 6,
+      "slot_id": "timeline"
+    },
+    {
+      "canonical_value": "Stage 1 moves coolant through cold plates where server heat enters the primary loop.",
+      "content_hash": "34e2fb098ff0ab050d80a8bcf9b6218d3099eb72e0478a1743bc0047b878bc8d",
+      "item_id": "slide-06-implementation-sources-evidence-02",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        30
+      ],
+      "shape_names": [
+        "Text 29"
+      ],
+      "slide": 6,
+      "slot_id": "timeline"
+    },
+    {
+      "canonical_value": "Phase 1 records baseline alarms and flow availability; Phase 2 commissions failover under controlled load; Phase 3 audits sensor drift and operating procedures.",
+      "content_hash": "6f9afc3294a9dbccd98b7856a99b470a93e4bc304059b585891bbdaf8366f382",
+      "item_id": "slide-06-implementation-sources-evidence-03",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        39
+      ],
+      "shape_names": [
+        "Text 38"
+      ],
+      "slide": 6,
+      "slot_id": "timeline"
+    },
+    {
+      "canonical_value": "On a high-temperature alarm, the controller verifies sensor agreement, raises pump output, opens the standby path, and requests compute-load reduction if recovery fails.",
+      "content_hash": "635912eca2f3684e52fbf803a216c0adf264f7bdfd09461ea22613b3a1be505c",
+      "item_id": "slide-06-implementation-sources-evidence-04",
+      "kind": "text",
+      "pass": true,
+      "shape_indices": [
+        48
+      ],
+      "shape_names": [
+        "Text 47"
+      ],
+      "slide": 6,
+      "slot_id": "timeline"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling System Overview, page 2",
+      "content_hash": "5f379efe1095156d6284c802cb3a3891c5de4b726d0b3e4c051efbb580d2cd1d",
+      "item_id": "citation-02",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        53
+      ],
+      "shape_names": [
+        "Text 52"
+      ],
+      "slide": 6,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling System Overview, page 1",
+      "content_hash": "083c30ecf335cf81e2888c203198a91e04f179782442d5c5df2351f039733bb0",
+      "item_id": "citation-03",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        53
+      ],
+      "shape_names": [
+        "Text 52"
+      ],
+      "slide": 6,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling Risk Decision Report, page 3",
+      "content_hash": "f5ca91670935ae6c652a98146f443c8be84dac6700a4012cf5f5b66796a51866",
+      "item_id": "citation-04",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        53
+      ],
+      "shape_names": [
+        "Text 52"
+      ],
+      "slide": 6,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "AI Data Center Cooling System Overview, page 3",
+      "content_hash": null,
+      "item_id": "citation-05",
+      "kind": "citation",
+      "pass": true,
+      "shape_indices": [
+        53
+      ],
+      "shape_names": [
+        "Text 52"
+      ],
+      "slide": 6,
+      "slot_id": "footer"
+    },
+    {
+      "canonical_value": "Source notes: page 2, block 2 — AI Data Center Cooling System Overview; page 1, block 4 — AI Data Center Cooling System Overview; page 3, block 3 — AI Data Center Cooling Risk Decision Report; page 3, block 2 — AI Data Center Cooling System Overview",
+      "content_hash": "974cd6d64866510878eb4c1fad269a5062dbdc347892e0126418f74f4423afa2",
+      "item_id": "speaker_notes",
+      "kind": "speaker_notes",
+      "pass": true,
+      "shape_indices": [
+        54
+      ],
+      "shape_names": [
+        "Text 53"
+      ],
+      "slide": 6,
+      "slot_id": "speaker_notes"
+    }
+  ],
+  "missing_canonical_item_count": 0,
+  "normalization": [
+    "Unicode NFC",
+    "line-ending normalization",
+    "NBSP normalization",
+    "presentation whitespace collapse",
+    "case/punctuation/numbers preserved"
+  ],
+  "number_unit_fidelity": 1.0,
+  "number_unit_token_count": 79,
+  "number_unit_token_pass_count": 79,
+  "schema_name": "phase5_pptx_semantic_fidelity_report",
+  "schema_version": "1.0.0",
+  "status": "PASS",
+  "table_cell_count": 4,
+  "table_cell_fidelity": 1.0,
+  "table_cell_pass_count": 4,
+  "unknown_factual_addition_count": 0,
+  "unknown_factual_additions": []
+}

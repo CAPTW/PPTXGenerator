@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/design-invariants.schema.json",
+  "title": "DeckCompiler Design Invariants",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "artifact", "invariant_set_id", "presentation_architecture_id", "invariants", "editability_policy", "phase_boundary"],
+  "properties": {
+    "schema_name": {"const": "design_invariants"},
+    "schema_version": {"const": "1.0.0"},
+    "artifact": {"allOf": [{"$ref": "artifact-envelope.schema.json"}, {"properties": {"artifact_type": {"const": "design_invariants"}}}]},
+    "invariant_set_id": {"type": "string", "pattern": "^invariants_[0-9a-f]{20}$"},
+    "presentation_architecture_id": {"type": "string", "minLength": 1},
+    "invariants": {"type": "array", "minItems": 20, "items": {"type": "string", "minLength": 1}, "uniqueItems": true, "contains": {"const": "full-slide raster forbidden"}},
+    "editability_policy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["real_text", "tables", "charts", "cards", "replaceable_images", "full_slide_raster"],
+      "properties": {
+        "real_text": {"const": "native_required"}, "tables": {"const": "native_required"}, "charts": {"const": "native_required"}, "cards": {"const": "native_required"}, "replaceable_images": {"const": "framed_raster_allowed"}, "full_slide_raster": {"const": "forbidden"}
+      }
+    },
+    "phase_boundary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["visual_target_status", "semantic_sidecar_status", "reconstruction_status"],
+      "properties": {"visual_target_status": {"const": "not_created"}, "semantic_sidecar_status": {"const": "not_finalized"}, "reconstruction_status": {"const": "not_executed"}}
+    }
+  }
+}

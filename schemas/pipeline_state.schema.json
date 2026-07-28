@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/pipeline_state.schema.json",
+  "title": "PipelineState",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "current_stage",
+    "status",
+    "approved_artifacts",
+    "fingerprints",
+    "history"
+  ],
+  "properties": {
+    "current_stage": {
+      "type": "string",
+      "enum": [
+        "INGEST",
+        "DESIGN_REFERENCE_CHECK",
+        "MASTER_TEMPLATE",
+        "CONTENT_PLAN",
+        "GENERATE",
+        "QA",
+        "RENDER_LOCAL_PPTX"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "RUNNING",
+        "BLOCKED",
+        "COMPLETE"
+      ]
+    },
+    "approved_artifacts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "invalidated_from_stage": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "INGEST",
+        "DESIGN_REFERENCE_CHECK",
+        "MASTER_TEMPLATE",
+        "CONTENT_PLAN",
+        "GENERATE",
+        "QA",
+        "RENDER_LOCAL_PPTX",
+        null
+      ]
+    },
+    "last_input_fingerprint": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "fingerprints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "digest",
+          "invalidates_from_stage",
+          "sources"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "digest": {
+            "type": "string"
+          },
+          "invalidates_from_stage": {
+            "type": "string",
+            "enum": [
+              "INGEST",
+              "DESIGN_REFERENCE_CHECK",
+              "MASTER_TEMPLATE",
+              "CONTENT_PLAN",
+              "GENERATE",
+              "QA",
+              "RENDER_LOCAL_PPTX"
+            ]
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stage",
+          "status",
+          "artifact",
+          "created_at"
+        ],
+        "properties": {
+          "stage": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "artifact": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  }
+}

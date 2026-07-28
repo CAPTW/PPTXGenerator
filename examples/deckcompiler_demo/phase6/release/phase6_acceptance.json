@@ -1,0 +1,16 @@
+{
+  "acceptance_hash": "802f794f395e9a3d63dbeab12065470a736c0ddca86ca5a4eb989c287c8be6d1",
+  "acceptance_id": "phase6_acceptance_d422c9a13cb3118fad9a",
+  "active_output_set": "phase5_baseline",
+  "created_at": "2026-07-22T10:29:26.436575+09:00",
+  "devpost_release_eligible": false,
+  "final_release_eligible": false,
+  "phase6_accepted": true,
+  "phase7_required": true,
+  "phase7_started": false,
+  "schema_name": "phase6_acceptance",
+  "schema_version": "1.0.0",
+  "status": "ELIGIBLE_FOR_PACKAGING",
+  "timezone": "Asia/Seoul",
+  "unified_release_gate_report_hash": "fad95607449de5ebfe1d643d62e77894d9beefe4e8a2b8a36ca49e63b830dd3f"
+}

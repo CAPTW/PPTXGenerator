@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/slide_speaker_notes.schema.json",
+  "title": "SlideSpeakerNotes",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["slide_id", "speaker_notes"],
+  "properties": {
+    "schema_name": {"const": "slide_speaker_notes"},
+    "schema_version": {"type": "string"},
+    "slide_id": {"type": "string", "minLength": 1},
+    "speaker_notes": {"type": "string", "maxLength": 1200}
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "active_output_set": "phase5_baseline",
+  "baseline_repair_required": false,
+  "baseline_repair_waves": 0,
+  "html": {
+    "byte_size": 85014,
+    "path": "examples/deckcompiler_demo/phase5/outputs/html/index.html",
+    "sha256": "b1f161bed4d1dc37be576eceda0cf01d125580df4a767c4722582c8671983085"
+  },
+  "pptx": {
+    "byte_size": 261527,
+    "path": "examples/deckcompiler_demo/phase5/outputs/pptx_generator_demo.pptx",
+    "sha256": "805eb4aa3d44d90ebe5b78c0247d02e412ebfc9468e57c778516b90de2d27676"
+  },
+  "schema_name": "phase6_active_output_set",
+  "schema_version": "1.0.0",
+  "status": "PASS"
+}

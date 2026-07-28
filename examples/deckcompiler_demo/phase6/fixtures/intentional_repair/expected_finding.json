@@ -1,0 +1,19 @@
+{
+  "canonical_repair_owner": "src/presentation_agent/deckcompiler/qa/reconstruction_source/slides.js",
+  "contract_hash": "85cee1ab537ff6a2962aaef307db4ac91393c8ced5e4fd5206310edafe6a953c",
+  "finding_id": "VISUAL_TEXT_OFF_CANVAS_SLIDE_001",
+  "fixture_id": "phase6-fixture-text-off-canvas-slide-001",
+  "gate": "visual",
+  "injection_surface": "lib/slides.js",
+  "object_id": "recommended-decision-body-text",
+  "owning_artifact": "handoff/project/lib/slides.js",
+  "release_blocking": true,
+  "repairable": true,
+  "rule_id": "P6-VIS-TEXT-OFF-CANVAS-001",
+  "schema_name": "phase6_expected_finding",
+  "schema_version": "1.0.0",
+  "severity": "severe",
+  "slide_id": "slide-001",
+  "slot_id": "recommended-decision-body",
+  "target_field": "#/functions/s1/recommended_decision_body/x"
+}

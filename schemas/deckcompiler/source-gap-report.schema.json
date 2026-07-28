@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/source-gap-report.schema.json",
+  "title": "DeckCompiler Source Gap Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "artifact", "report_id", "documentary_evidence_status", "gaps", "unsupported_claim_policy", "invented_citations_forbidden", "invented_quantitative_evidence_forbidden"],
+  "properties": {
+    "schema_name": {"const": "source_gap_report"},
+    "schema_version": {"const": "1.0.0"},
+    "artifact": {"allOf": [{"$ref": "artifact-envelope.schema.json"}, {"properties": {"artifact_type": {"const": "source_gap_report"}}}]},
+    "report_id": {"type": "string", "pattern": "^gaps_[0-9a-f]{20}$"},
+    "documentary_evidence_status": {"enum": ["present", "absent"]},
+    "gaps": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "unsupported_claim_policy": {"const": "declare_as_source_gap_or_inference"},
+    "invented_citations_forbidden": {"const": true},
+    "invented_quantitative_evidence_forbidden": {"const": true}
+  }
+}

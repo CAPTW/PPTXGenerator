@@ -1,0 +1,67 @@
+{
+  "asset_manifest_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+  "content_sha256_without_this_field": "ef52ead5e6cd1dfe743ada76a4b249e9bbe4cd1b5c549fc0ba267db89a19c248",
+  "crop_count": 0,
+  "crop_plan_sha256": "8ca5934c049864fc69b856f0841ccba731980e2f6d756f04905b4086939aa089",
+  "crop_source_trace_status": "not_applicable_zero_raster",
+  "crop_trace_denominator_policy": "No crop components were emitted; coverage is N/A rather than a 0/0 percentage. Native requirements remain independently enforced.",
+  "failures": [],
+  "hero_union_raster_coverage": 0.0,
+  "largest_raster_area_ratio": 0.0,
+  "non_cover_union_raster_coverage": 0.0,
+  "official_slide_coverage": {
+    "1": {
+      "crops": [],
+      "denseInfographicCropAreaRatio": 0,
+      "largestCropAreaRatio": 0,
+      "photorealCropAreaRatio": 0,
+      "textOrTableCropAreaRatio": 0,
+      "totalCropAreaRatio": 0
+    },
+    "2": {
+      "crops": [],
+      "denseInfographicCropAreaRatio": 0,
+      "largestCropAreaRatio": 0,
+      "photorealCropAreaRatio": 0,
+      "textOrTableCropAreaRatio": 0,
+      "totalCropAreaRatio": 0
+    },
+    "3": {
+      "crops": [],
+      "denseInfographicCropAreaRatio": 0,
+      "largestCropAreaRatio": 0,
+      "photorealCropAreaRatio": 0,
+      "textOrTableCropAreaRatio": 0,
+      "totalCropAreaRatio": 0
+    },
+    "4": {
+      "crops": [],
+      "denseInfographicCropAreaRatio": 0,
+      "largestCropAreaRatio": 0,
+      "photorealCropAreaRatio": 0,
+      "textOrTableCropAreaRatio": 0,
+      "totalCropAreaRatio": 0
+    },
+    "5": {
+      "crops": [],
+      "denseInfographicCropAreaRatio": 0,
+      "largestCropAreaRatio": 0,
+      "photorealCropAreaRatio": 0,
+      "textOrTableCropAreaRatio": 0,
+      "totalCropAreaRatio": 0
+    },
+    "6": {
+      "crops": [],
+      "denseInfographicCropAreaRatio": 0,
+      "largestCropAreaRatio": 0,
+      "photorealCropAreaRatio": 0,
+      "textOrTableCropAreaRatio": 0,
+      "totalCropAreaRatio": 0
+    }
+  },
+  "schema_name": "phase5_crop_coverage_summary",
+  "schema_version": "1.0.0",
+  "semantic_slot_raster_coverage": 0.0,
+  "status": "PASS",
+  "unknown_source_count": 0
+}

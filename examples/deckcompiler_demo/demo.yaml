@@ -1,0 +1,30 @@
+product:
+  name: PPTX Generator
+  slug: pptx-generator
+system:
+  name: DeckCompiler
+  id: deckcompiler
+mode: prompt_plus_two_pdfs
+inputs:
+  prompt: inputs/prompt.txt
+  pdfs:
+    - inputs/cooling_system_overview.pdf
+    - inputs/cooling_risk_decision_report.pdf
+presentation:
+  slide_count: 6
+  audience: engineering managers
+  purpose: decision brief
+  language: English
+  tone:
+    - professional
+    - academic
+    - creative
+  workflow: decision_brief
+policies:
+  remote_sources: forbidden
+  scanned_pdf_ocr: unsupported
+  full_slide_raster: forbidden
+  silent_source_omission: forbidden
+  invented_citations: forbidden
+phase:
+  stop_after: creative_architecture

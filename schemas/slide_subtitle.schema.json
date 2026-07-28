@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/slide_subtitle.schema.json",
+  "title": "SlideSubtitle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["slide_id", "subtitle"],
+  "properties": {
+    "schema_name": {"const": "slide_subtitle"},
+    "schema_version": {"type": "string"},
+    "slide_id": {"type": "string", "minLength": 1},
+    "subtitle": {"type": "string", "maxLength": 180}
+  }
+}

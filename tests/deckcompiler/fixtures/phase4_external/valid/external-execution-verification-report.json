@@ -1,0 +1,30 @@
+{
+  "created_at": "2026-07-17T00:00:01+09:00",
+  "errors": [],
+  "execution_id": "exec_0123456789abcdef0123",
+  "final_status": "PASS",
+  "output_verification_statuses": [],
+  "provenance_verification_status": "valid",
+  "record_id": "exrec_db1ecb6dd29ecab22a49",
+  "record_verification_status": "valid",
+  "report_hash": {
+    "algorithm": "sha256",
+    "byte_count": 742,
+    "digest": "3dc890daa7cc90ce5443c2556253c296fe614753c98057083a2d923e593da503",
+    "hash_domain": "deckcompiler.external_execution.verification_report.v1"
+  },
+  "report_id": "exverify_516819bb9aa68a6d510a",
+  "request_verification_status": "valid",
+  "response_verification_status": "absent_expected",
+  "schema_name": "external_execution_verification_report",
+  "schema_version": "1.0.0",
+  "transport_policy_verification_status": "valid",
+  "verified_artifact_ids": [
+    "exrec_db1ecb6dd29ecab22a49",
+    "extreq_655c5a81a8345b69f517",
+    "art_0123456789abcdef0123"
+  ],
+  "verifier_name": "deckcompiler-external-execution-verifier",
+  "verifier_version": "1.0.0",
+  "warnings": []
+}

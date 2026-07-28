@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/extracted_slide_archetypes.schema.json",
+  "title": "ExtractedSlideArchetypes",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "prompt_id", "archetypes"],
+  "properties": {
+    "schema_name": {"const": "extracted_slide_archetypes"},
+    "schema_version": {"type": "string"},
+    "prompt_id": {"type": "string", "minLength": 1},
+    "archetypes": {
+      "type": "array",
+      "minItems": 18,
+      "maxItems": 18,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "archetype_id",
+          "source_prompt_slide_type",
+          "compatible_slide_types",
+          "layout_role",
+          "required_slots",
+          "optional_slots",
+          "recommended_density",
+          "layout_geometry_description",
+          "title_zone",
+          "navigation_zone",
+          "content_zone",
+          "visual_zone",
+          "footer_zone",
+          "normalized_geometry",
+          "slot_geometry",
+          "visual_primitives",
+          "deck_scale_fit",
+          "tone_affinity",
+          "image_policy",
+          "chart_table_policy",
+          "component_variants",
+          "fallback_layout"
+        ],
+        "properties": {
+          "archetype_id": {"type": "string", "minLength": 1},
+          "source_prompt_slide_type": {"type": "string", "minLength": 1},
+          "compatible_slide_types": {"$ref": "#/$defs/string_array"},
+          "layout_role": {"type": "string", "minLength": 1},
+          "required_slots": {"$ref": "#/$defs/string_array"},
+          "optional_slots": {"type": "array", "items": {"type": "string"}},
+          "recommended_density": {"enum": ["low", "medium", "high"]},
+          "layout_geometry_description": {"type": "string", "minLength": 1},
+          "title_zone": {"$ref": "#/$defs/zone"},
+          "navigation_zone": {"$ref": "#/$defs/zone"},
+          "content_zone": {"$ref": "#/$defs/zone"},
+          "visual_zone": {"$ref": "#/$defs/zone"},
+          "footer_zone": {"$ref": "#/$defs/zone"},
+          "normalized_geometry": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "title_zone",
+              "navigation_zone",
+              "content_zone",
+              "visual_zone",
+              "footer_zone",
+              "safe_margin"
+            ],
+            "properties": {
+              "title_zone": {"$ref": "#/$defs/box"},
+              "navigation_zone": {"$ref": "#/$defs/box"},
+              "content_zone": {"$ref": "#/$defs/box"},
+              "visual_zone": {"$ref": "#/$defs/box"},
+              "footer_zone": {"$ref": "#/$defs/box"},
+              "safe_margin": {"$ref": "#/$defs/safe_margin"}
+            }
+          },
+          "slot_geometry": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["slot_id", "x", "y", "w", "h", "role", "priority"],
+              "properties": {
+                "slot_id": {"type": "string", "minLength": 1},
+                "x": {"type": "number", "minimum": 0, "maximum": 1},
+                "y": {"type": "number", "minimum": 0, "maximum": 1},
+                "w": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+                "h": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+                "role": {"type": "string", "minLength": 1},
+                "priority": {"type": "integer", "minimum": 1}
+              }
+            }
+          },
+          "visual_primitives": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "background_panels",
+              "diagonal_panels",
+              "card_groups",
+              "chart_frames",
+              "table_frames",
+              "image_masks",
+              "connector_paths",
+              "section_markers",
+              "footer_segments"
+            ],
+            "properties": {
+              "background_panels": {"$ref": "#/$defs/string_array_loose"},
+              "diagonal_panels": {"$ref": "#/$defs/string_array_loose"},
+              "card_groups": {"$ref": "#/$defs/string_array_loose"},
+              "chart_frames": {"$ref": "#/$defs/string_array_loose"},
+              "table_frames": {"$ref": "#/$defs/string_array_loose"},
+              "image_masks": {"$ref": "#/$defs/string_array_loose"},
+              "connector_paths": {"$ref": "#/$defs/string_array_loose"},
+              "section_markers": {"$ref": "#/$defs/string_array_loose"},
+              "footer_segments": {"$ref": "#/$defs/string_array_loose"}
+            }
+          },
+          "deck_scale_fit": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["small", "medium", "large", "very_large"],
+            "properties": {
+              "small": {"type": "string", "minLength": 1},
+              "medium": {"type": "string", "minLength": 1},
+              "large": {"type": "string", "minLength": 1},
+              "very_large": {"type": "string", "minLength": 1}
+            }
+          },
+          "tone_affinity": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["academic", "professional", "creative"],
+            "properties": {
+              "academic": {"type": "number", "minimum": 0, "maximum": 1},
+              "professional": {"type": "number", "minimum": 0, "maximum": 1},
+              "creative": {"type": "number", "minimum": 0, "maximum": 1}
+            }
+          },
+          "image_policy": {"type": "string", "minLength": 1},
+          "chart_table_policy": {"type": "string", "minLength": 1},
+          "component_variants": {"$ref": "#/$defs/string_array"},
+          "fallback_layout": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "string_array": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "string_array_loose": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "box": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "w", "h"],
+      "properties": {
+        "x": {"type": "number", "minimum": 0, "maximum": 1},
+        "y": {"type": "number", "minimum": 0, "maximum": 1},
+        "w": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+        "h": {"type": "number", "exclusiveMinimum": 0, "maximum": 1}
+      }
+    },
+    "safe_margin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["top", "right", "bottom", "left"],
+      "properties": {
+        "top": {"type": "number", "minimum": 0, "maximum": 1},
+        "right": {"type": "number", "minimum": 0, "maximum": 1},
+        "bottom": {"type": "number", "minimum": 0, "maximum": 1},
+        "left": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "zone": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["description", "editable_primitives"],
+      "properties": {
+        "description": {"type": "string", "minLength": 1},
+        "editable_primitives": {"$ref": "#/$defs/string_array"}
+      }
+    }
+  }
+}

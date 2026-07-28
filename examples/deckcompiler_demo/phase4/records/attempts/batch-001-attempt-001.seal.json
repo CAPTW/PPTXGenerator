@@ -1,0 +1,33 @@
+{
+  "attempt_id": "imageattempt_83b2bd861408c6301c40",
+  "attempt_number": 1,
+  "credential_lookups": 0,
+  "execution_mode": "platform_managed_tool",
+  "expected_output_absent_at_seal": true,
+  "expected_output_relative_path": "artifacts/batch_references/imageattempt_83b2bd861408c6301c40/original.png",
+  "external_provider_id": null,
+  "external_transport_used": false,
+  "platform_tool_id": "image_gen.imagegen",
+  "prior_attempt_id": null,
+  "prompt_hash": "410bbea89a4a60b0d8d8b88b3a6c7d05d0205b1003c5932f1e9a6cb79126d620",
+  "prompt_id": "prompt_e07f6cafd112106f1076",
+  "reference_artifacts": [
+    {
+      "artifact_id": "designboard_61f00a55ee02666b3254",
+      "relative_path": "artifacts/design_board/imageattempt_841f1a2d3f85ffe84b12/normalized.png",
+      "sha256": "a0229b8e27b4a103c177682b2d742ae3d4dd6eb9bb70c675cbf9f88293dd666d"
+    },
+    {
+      "artifact_id": "moduleanchor_3591b43d6cf6fe339284",
+      "relative_path": "artifacts/module_anchors/imageattempt_2502b789e69959c27135/normalized.png",
+      "sha256": "632207323326068436325ea377f0477995de06e6e0de5546483c10e259b74f90"
+    }
+  ],
+  "repository_network_calls": 0,
+  "request_id": "imagerequest_a6ab4daee1f9caeff7ce",
+  "schema_name": "platform_image_attempt_seal",
+  "schema_version": "1.0.0",
+  "sealed_at": "2026-07-20T02:53:46.267+09:00",
+  "target_artifact_id": "batchreference_3473bb414e4059c9bdd2",
+  "target_type": "batch_template_reference"
+}

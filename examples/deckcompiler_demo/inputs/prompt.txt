@@ -1,0 +1,5 @@
+Create a concise six-slide professional and visually creative decision deck
+for engineering managers. Explain AI data-center cooling-system operation,
+the most important technical and operational risks, the available response
+options, the recommended decision, and a practical implementation path.
+Use only the two supplied synthetic reports for factual claims.

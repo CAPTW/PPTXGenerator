@@ -1,0 +1,397 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "template_contract_v2.schema.json",
+  "title": "Template Contract V2",
+  "type": "object",
+  "required": [
+    "contract_version",
+    "archetype_id",
+    "layout_id",
+    "required_slots",
+    "slot_contracts",
+    "editable_object_assertions",
+    "semantic_component_assertions",
+    "asset_policy",
+    "raster_policy",
+    "fallback_policy",
+    "overflow_policy",
+    "protected_zones",
+    "source_binding_requirements",
+    "citation_binding_requirements",
+    "render_policy",
+    "structural_ledger_requirements",
+    "warning_policy",
+    "qa_policy"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "contract_version": {
+      "const": "2"
+    },
+    "archetype_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "layout_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "template_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "required_slots": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "slot_contracts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/slot_contract"
+      }
+    },
+    "editable_object_assertions": {
+      "type": "object",
+      "required": [
+        "all_real_text_is_ppt_text",
+        "cards_are_ppt_shapes",
+        "panels_are_ppt_shapes",
+        "dividers_are_ppt_shapes",
+        "footer_is_ppt_shapes_or_text",
+        "source_strip_is_editable",
+        "semantic_icons_are_svg_or_vector",
+        "semantic_tables_are_native_or_editable_shape_grid",
+        "semantic_charts_are_native_or_editable_shape_chart",
+        "hero_photo_is_replaceable_frame",
+        "reference_image_not_embedded_as_background"
+      ],
+      "properties": {
+        "all_real_text_is_ppt_text": {"type": "boolean"},
+        "cards_are_ppt_shapes": {"type": "boolean"},
+        "panels_are_ppt_shapes": {"type": "boolean"},
+        "dividers_are_ppt_shapes": {"type": "boolean"},
+        "footer_is_ppt_shapes_or_text": {"type": "boolean"},
+        "source_strip_is_editable": {"type": "boolean"},
+        "semantic_icons_are_svg_or_vector": {"type": "boolean"},
+        "semantic_tables_are_native_or_editable_shape_grid": {"type": "boolean"},
+        "semantic_charts_are_native_or_editable_shape_chart": {"type": "boolean"},
+        "hero_photo_is_replaceable_frame": {"type": "boolean"},
+        "reference_image_not_embedded_as_background": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "semantic_component_assertions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": ["string", "boolean"]
+      }
+    },
+    "asset_policy": {
+      "type": "object",
+      "required": [
+        "reference_images_allowed_as_design_inputs_only",
+        "reference_images_may_be_embedded",
+        "semantic_svg_icons_required"
+      ],
+      "properties": {
+        "reference_images_allowed_as_design_inputs_only": {"type": "boolean"},
+        "reference_images_may_be_embedded": {"type": "boolean"},
+        "semantic_svg_icons_required": {"type": "boolean"}
+      },
+      "additionalProperties": true
+    },
+    "raster_policy": {
+      "type": "object",
+      "required": [
+        "full_slide_raster_allowed",
+        "content_bearing_raster_allowed",
+        "photo_frame_raster_allowed",
+        "texture_raster_allowed",
+        "semantic_component_raster_allowed"
+      ],
+      "properties": {
+        "full_slide_raster_allowed": {"type": "boolean", "default": false},
+        "content_bearing_raster_allowed": {"type": "boolean", "default": false},
+        "photo_frame_raster_allowed": {"type": "boolean", "default": true},
+        "texture_raster_allowed": {"enum": ["forbidden", "allowlisted_only", "allowed_limited"]},
+        "semantic_component_raster_allowed": {"type": "boolean", "default": false}
+      },
+      "additionalProperties": false
+    },
+    "fallback_policy": {
+      "type": "object",
+      "required": [
+        "fallback_allowed",
+        "semantic_component_fallback_allowed",
+        "all_fallbacks_must_be_recorded",
+        "unrecorded_fallback_is_fatal",
+        "raster_fallback_requires_allowlist"
+      ],
+      "properties": {
+        "fallback_allowed": {"type": "boolean", "default": false},
+        "semantic_component_fallback_allowed": {"type": "boolean", "default": false},
+        "all_fallbacks_must_be_recorded": {"type": "boolean", "default": true},
+        "unrecorded_fallback_is_fatal": {"type": "boolean", "default": true},
+        "raster_fallback_requires_allowlist": {"type": "boolean", "default": true}
+      },
+      "additionalProperties": true
+    },
+    "overflow_policy": {
+      "type": "object",
+      "required": [
+        "text_overflow_allowed",
+        "unbounded_placeholder_content_allowed"
+      ],
+      "properties": {
+        "text_overflow_allowed": {"type": "boolean", "default": false},
+        "unbounded_placeholder_content_allowed": {"type": "boolean", "default": false}
+      },
+      "additionalProperties": true
+    },
+    "protected_zones": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/protected_zone"
+      }
+    },
+    "source_binding_requirements": {
+      "$ref": "#/$defs/binding_requirements"
+    },
+    "citation_binding_requirements": {
+      "$ref": "#/$defs/binding_requirements"
+    },
+    "render_policy": {
+      "type": "object",
+      "required": [
+        "render_required",
+        "renderer_skip_allowed",
+        "structural_ledger_required_if_render_skipped"
+      ],
+      "properties": {
+        "render_required": {"type": "boolean"},
+        "renderer_skip_allowed": {"type": "boolean"},
+        "structural_ledger_required_if_render_skipped": {"type": "boolean"}
+      },
+      "additionalProperties": true
+    },
+    "structural_ledger_requirements": {
+      "type": "object",
+      "required": [
+        "required",
+        "min_slide_count",
+        "require_object_ledger"
+      ],
+      "properties": {
+        "required": {"type": "boolean"},
+        "min_slide_count": {"type": "integer", "minimum": 0},
+        "require_object_ledger": {"type": "boolean"}
+      },
+      "additionalProperties": true
+    },
+    "warning_policy": {
+      "type": "object",
+      "required": [
+        "allowlist"
+      ],
+      "properties": {
+        "fatal_codes": {
+          "type": "array",
+          "items": {"type": "string"},
+          "uniqueItems": true
+        },
+        "warning_codes": {
+          "type": "array",
+          "items": {"type": "string"},
+          "uniqueItems": true
+        },
+        "allowed_codes": {
+          "type": "array",
+          "items": {"type": "string"},
+          "uniqueItems": true
+        },
+        "deprecated_codes": {
+          "type": "array",
+          "items": {"type": "string"},
+          "uniqueItems": true
+        },
+        "allowlist": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/allowlist_entry"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "qa_policy": {
+      "type": "object",
+      "required": [
+        "qa_report_required",
+        "zero_unallowlisted_warnings",
+        "selected_route_required"
+      ],
+      "properties": {
+        "qa_report_required": {"type": "boolean"},
+        "zero_unallowlisted_warnings": {"type": "boolean"},
+        "selected_route_required": {"enum": ["editable_template"]}
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "slot_contract": {
+      "type": "object",
+      "required": [
+        "slot_id",
+        "slot_type",
+        "required",
+        "editable_required",
+        "min_capacity_chars",
+        "max_capacity_chars",
+        "overflow_allowed",
+        "allowed_primitives",
+        "forbidden_primitives",
+        "source_binding_required",
+        "citation_binding_required",
+        "protected_zone_id",
+        "fallback_allowed",
+        "fallback_allowlist"
+      ],
+      "properties": {
+        "slot_id": {"type": "string", "minLength": 1},
+        "slot_type": {
+          "enum": [
+            "title",
+            "subtitle",
+            "body",
+            "card",
+            "chart",
+            "table",
+            "image_frame",
+            "icon",
+            "footer",
+            "source_strip",
+            "callout",
+            "decorative"
+          ]
+        },
+        "required": {"type": "boolean"},
+        "editable_required": {"type": "boolean"},
+        "min_capacity_chars": {"type": "integer", "minimum": 0},
+        "max_capacity_chars": {"type": "integer", "minimum": 0},
+        "overflow_allowed": {"type": "boolean"},
+        "allowed_primitives": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        },
+        "forbidden_primitives": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        },
+        "source_binding_required": {"type": "boolean"},
+        "citation_binding_required": {"type": "boolean"},
+        "protected_zone_id": {"type": ["string", "null"]},
+        "fallback_allowed": {"type": "boolean"},
+        "fallback_allowlist": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/allowlist_entry"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "protected_zone": {
+      "type": "object",
+      "required": [
+        "zone_id",
+        "bbox",
+        "intrusion_allowed"
+      ],
+      "properties": {
+        "zone_id": {"type": "string", "minLength": 1},
+        "bbox": {
+          "$ref": "#/$defs/bbox"
+        },
+        "intrusion_allowed": {"type": "boolean"}
+      },
+      "additionalProperties": true
+    },
+    "bbox": {
+      "type": "object",
+      "required": ["x", "y", "w", "h"],
+      "properties": {
+        "x": {"type": "number"},
+        "y": {"type": "number"},
+        "w": {"type": "number", "minimum": 0},
+        "h": {"type": "number", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "binding_requirements": {
+      "type": "object",
+      "required": [
+        "required_for_content_slides",
+        "required_slot_types"
+      ],
+      "properties": {
+        "required_for_content_slides": {"type": "boolean"},
+        "required_slot_types": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "title",
+              "subtitle",
+              "body",
+              "card",
+              "chart",
+              "table",
+              "image_frame",
+              "icon",
+              "footer",
+              "source_strip",
+              "callout",
+              "decorative"
+            ]
+          },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "allowlist_entry": {
+      "type": "object",
+      "required": [
+        "code",
+        "reason",
+        "owner"
+      ],
+      "properties": {
+        "code": {"type": "string", "minLength": 1},
+        "object_id": {"type": "string", "minLength": 1},
+        "slot_id": {"type": "string", "minLength": 1},
+        "reason": {"type": "string", "minLength": 1},
+        "owner": {"type": "string", "minLength": 1},
+        "expiration": {"type": "string", "minLength": 1},
+        "scope": {"type": "string", "minLength": 1}
+      },
+      "anyOf": [
+        {"required": ["object_id"]},
+        {"required": ["slot_id"]}
+      ],
+      "oneOf": [
+        {"required": ["expiration"]},
+        {"required": ["scope"]}
+      ],
+      "additionalProperties": true
+    }
+  }
+}

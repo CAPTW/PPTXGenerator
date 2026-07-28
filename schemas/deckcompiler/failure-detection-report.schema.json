@@ -1,0 +1,57 @@
+{
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/failure-detection-report.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "checks": { "type": "object" },
+    "canonical_repair_owner": { "const": "src/presentation_agent/deckcompiler/qa/reconstruction_source/slides.js" },
+    "composite_report_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "created_at": { "format": "date-time", "type": "string" },
+    "current_faulty_evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "html_screenshot_capture_manifest_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+        "html_screenshot_sha256_by_slide": {
+          "additionalProperties": false,
+          "maxProperties": 6,
+          "minProperties": 6,
+          "patternProperties": { "^slide-[0-9]{3}$": { "pattern": "^[0-9a-f]{64}$", "type": "string" } },
+          "type": "object"
+        },
+        "html_sha256": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+        "pptx_render_sha256_by_slide": {
+          "additionalProperties": false,
+          "maxProperties": 6,
+          "minProperties": 6,
+          "patternProperties": { "^slide-[0-9]{3}$": { "pattern": "^[0-9a-f]{64}$", "type": "string" } },
+          "type": "object"
+        },
+        "pptx_sha256": { "pattern": "^[0-9a-f]{64}$", "type": "string" }
+      },
+      "required": ["pptx_sha256", "html_sha256", "html_screenshot_capture_manifest_hash", "pptx_render_sha256_by_slide", "html_screenshot_sha256_by_slide"],
+      "type": "object"
+    },
+    "detected_finding": { "$ref": "https://pptx-generator.local/schemas/deckcompiler/qa-finding.schema.json" },
+    "expected_finding_contract_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "evidence_capsule_manifest_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "external_reconciliation_report_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "fault_application_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "final_release_eligible": { "const": false },
+    "fixture_id": { "minLength": 1, "type": "string" },
+    "injection_surface": { "const": "lib/slides.js" },
+    "implementation_provenance": { "type": "object" },
+    "phase6_accepted": { "const": false },
+    "report_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "report_id": { "minLength": 1, "type": "string" },
+    "schema_name": { "const": "phase6_failure_detection_report" },
+    "schema_version": { "const": "1.0.0" },
+    "status": { "const": "NEEDS_REPAIR" },
+    "target_field": { "const": "#/functions/s1/recommended_decision_body/x" },
+    "target_object": { "const": "recommended-decision-body-text" },
+    "target_slot": { "const": "recommended-decision-body" },
+    "timezone": { "const": "Asia/Seoul" }
+  },
+  "required": ["schema_name", "schema_version", "report_id", "fixture_id", "composite_report_hash", "fault_application_hash", "expected_finding_contract_hash", "evidence_capsule_manifest_hash", "external_reconciliation_report_hash", "detected_finding", "injection_surface", "canonical_repair_owner", "target_object", "target_slot", "target_field", "current_faulty_evidence", "checks", "status", "phase6_accepted", "final_release_eligible", "created_at", "timezone", "implementation_provenance", "report_hash"],
+  "title": "DeckCompiler Phase 6 intentional failure detection report",
+  "type": "object"
+}

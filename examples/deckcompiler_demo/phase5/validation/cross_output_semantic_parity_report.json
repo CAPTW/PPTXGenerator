@@ -1,0 +1,11 @@
+{
+  "canonical_item_count": 66,
+  "content_sha256_without_this_field": "2a5ad6630d15f420cbfa2e650b93ef47406b00b2dfa2026777a5c0c70329ac04",
+  "mismatch_count": 0,
+  "mismatches": [],
+  "parity_fidelity": 1.0,
+  "parity_pass_count": 66,
+  "schema_name": "phase5_cross_output_semantic_parity_report",
+  "schema_version": "1.0.0",
+  "status": "PASS"
+}

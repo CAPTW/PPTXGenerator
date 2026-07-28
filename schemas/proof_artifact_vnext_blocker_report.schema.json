@@ -1,0 +1,507 @@
+{
+  "$defs": {
+    "ProofArtifactFingerprintContinuityRisk": {
+      "enum": [
+        "none",
+        "semantic-normalization-required",
+        "legacy-alias-still-required",
+        "compat-surface-still-required",
+        "missing-canonical-proof-artifact",
+        "not-applicable"
+      ],
+      "title": "ProofArtifactFingerprintContinuityRisk",
+      "type": "string"
+    },
+    "ProofArtifactFleetDiscoveryIssue": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "issue_code": {
+          "title": "Issue Code",
+          "type": "string"
+        },
+        "detail": {
+          "title": "Detail",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "issue_code",
+        "detail"
+      ],
+      "title": "ProofArtifactFleetDiscoveryIssue",
+      "type": "object"
+    },
+    "ProofArtifactRemovalExitCriterion": {
+      "additionalProperties": false,
+      "properties": {
+        "criterion_id": {
+          "title": "Criterion Id",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/ProofArtifactRemovalExitCriterionStatus",
+          "default": "fail"
+        },
+        "blocker_categories": {
+          "items": {
+            "$ref": "#/$defs/ProofArtifactSunsetBlockerCategory"
+          },
+          "title": "Blocker Categories",
+          "type": "array"
+        },
+        "blocker_count": {
+          "default": 0,
+          "title": "Blocker Count",
+          "type": "integer"
+        },
+        "detail": {
+          "title": "Detail",
+          "type": "string"
+        }
+      },
+      "required": [
+        "criterion_id",
+        "description",
+        "detail"
+      ],
+      "title": "ProofArtifactRemovalExitCriterion",
+      "type": "object"
+    },
+    "ProofArtifactRemovalExitCriterionStatus": {
+      "enum": [
+        "pass",
+        "fail"
+      ],
+      "title": "ProofArtifactRemovalExitCriterionStatus",
+      "type": "string"
+    },
+    "ProofArtifactRemovalRehearsalStatus": {
+      "enum": [
+        "blocked-by-empty-scope",
+        "blocked-by-discovery-errors",
+        "blocked-by-normal-path-regression",
+        "blocked-by-workspace-blockers",
+        "blocked-by-alias-active-workspace-state",
+        "blocked-by-compat-surface-debt",
+        "ready-for-vnext-manifest-removal"
+      ],
+      "title": "ProofArtifactRemovalRehearsalStatus",
+      "type": "string"
+    },
+    "ProofArtifactSunsetBlockerCategory": {
+      "enum": [
+        "workspace_manifest_only",
+        "workspace_mixed_artifacts",
+        "workspace_missing_registry_artifact",
+        "legacy_fingerprint_alias_dependency",
+        "compat_schema_or_example_dependency",
+        "compat_test_or_fixture_dependency",
+        "compat_cli_runtime_dependency",
+        "normal_path_manifest_regression",
+        "unknown_or_unclassified"
+      ],
+      "title": "ProofArtifactSunsetBlockerCategory",
+      "type": "string"
+    },
+    "ProofArtifactSunsetBlockerScope": {
+      "enum": [
+        "workspace",
+        "repo-surface",
+        "fleet"
+      ],
+      "title": "ProofArtifactSunsetBlockerScope",
+      "type": "string"
+    },
+    "ProofArtifactVNextBlocker": {
+      "additionalProperties": false,
+      "properties": {
+        "scope_kind": {
+          "$ref": "#/$defs/ProofArtifactSunsetBlockerScope",
+          "default": "fleet"
+        },
+        "scope_ref": {
+          "title": "Scope Ref",
+          "type": "string"
+        },
+        "workflow_option": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Workflow Option"
+        },
+        "blocker_category": {
+          "$ref": "#/$defs/ProofArtifactSunsetBlockerCategory"
+        },
+        "blocker_code": {
+          "title": "Blocker Code",
+          "type": "string"
+        },
+        "detail": {
+          "title": "Detail",
+          "type": "string"
+        },
+        "suggested_action": {
+          "title": "Suggested Action",
+          "type": "string"
+        },
+        "fingerprint_continuity_risk": {
+          "$ref": "#/$defs/ProofArtifactFingerprintContinuityRisk",
+          "default": "none"
+        }
+      },
+      "required": [
+        "scope_ref",
+        "blocker_category",
+        "blocker_code",
+        "detail",
+        "suggested_action"
+      ],
+      "title": "ProofArtifactVNextBlocker",
+      "type": "object"
+    },
+    "ProofArtifactVNextWorkspaceReport": {
+      "additionalProperties": false,
+      "properties": {
+        "workspace_root": {
+          "title": "Workspace Root",
+          "type": "string"
+        },
+        "config_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Config Path"
+        },
+        "workflow_option": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Workflow Option"
+        },
+        "direct_shared_proof_consumer": {
+          "default": false,
+          "title": "Direct Shared Proof Consumer",
+          "type": "boolean"
+        },
+        "workspace_classification": {
+          "default": "not-applicable",
+          "title": "Workspace Classification",
+          "type": "string"
+        },
+        "normalization_classification": {
+          "default": "not-applicable",
+          "title": "Normalization Classification",
+          "type": "string"
+        },
+        "removal_ready": {
+          "default": false,
+          "title": "Removal Ready",
+          "type": "boolean"
+        },
+        "doctor_report_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doctor Report Path"
+        },
+        "proof_unit_registry_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Proof Unit Registry Path"
+        },
+        "proof_module_manifest_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Proof Module Manifest Path"
+        },
+        "content_plan_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Content Plan Path"
+        },
+        "pipeline_state_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pipeline State Path"
+        },
+        "fingerprint_continuity_status": {
+          "default": "not-applicable",
+          "title": "Fingerprint Continuity Status",
+          "type": "string"
+        },
+        "fingerprint_continuity_risk": {
+          "$ref": "#/$defs/ProofArtifactFingerprintContinuityRisk",
+          "default": "not-applicable"
+        },
+        "blocker_categories": {
+          "items": {
+            "$ref": "#/$defs/ProofArtifactSunsetBlockerCategory"
+          },
+          "title": "Blocker Categories",
+          "type": "array"
+        },
+        "blocker_codes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Blocker Codes",
+          "type": "array"
+        },
+        "suggested_actions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Suggested Actions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "workspace_root"
+      ],
+      "title": "ProofArtifactVNextWorkspaceReport",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_name": {
+      "default": "",
+      "title": "Schema Name",
+      "type": "string"
+    },
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scan_root": {
+      "title": "Scan Root",
+      "type": "string"
+    },
+    "report_path": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Report Path"
+    },
+    "source_fleet_report_path": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Fleet Report Path"
+    },
+    "rehearsal_mode": {
+      "default": "registry-only-vnext-removal",
+      "title": "Rehearsal Mode",
+      "type": "string"
+    },
+    "strict_mode_simulated": {
+      "default": true,
+      "title": "Strict Mode Simulated",
+      "type": "boolean"
+    },
+    "dry_run": {
+      "default": true,
+      "title": "Dry Run",
+      "type": "boolean"
+    },
+    "discovered_workspace_count": {
+      "default": 0,
+      "title": "Discovered Workspace Count",
+      "type": "integer"
+    },
+    "direct_shared_proof_consumer_count": {
+      "default": 0,
+      "title": "Direct Shared Proof Consumer Count",
+      "type": "integer"
+    },
+    "removal_ready_workspace_count": {
+      "default": 0,
+      "title": "Removal Ready Workspace Count",
+      "type": "integer"
+    },
+    "workspace_counts_by_classification": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Workspace Counts By Classification",
+      "type": "object"
+    },
+    "workspace_counts_by_normalization_classification": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Workspace Counts By Normalization Classification",
+      "type": "object"
+    },
+    "fingerprint_continuity_counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Fingerprint Continuity Counts",
+      "type": "object"
+    },
+    "blocker_counts_by_category": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Blocker Counts By Category",
+      "type": "object"
+    },
+    "compat_debt_summary": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Compat Debt Summary",
+      "type": "object"
+    },
+    "repo_surface_status_counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Repo Surface Status Counts",
+      "type": "object"
+    },
+    "blocker_categories_present": {
+      "items": {
+        "$ref": "#/$defs/ProofArtifactSunsetBlockerCategory"
+      },
+      "title": "Blocker Categories Present",
+      "type": "array"
+    },
+    "removal_ready": {
+      "default": false,
+      "title": "Removal Ready",
+      "type": "boolean"
+    },
+    "rehearsal_status": {
+      "$ref": "#/$defs/ProofArtifactRemovalRehearsalStatus",
+      "default": "blocked-by-empty-scope"
+    },
+    "removal_exit_criteria_passed": {
+      "default": false,
+      "title": "Removal Exit Criteria Passed",
+      "type": "boolean"
+    },
+    "exit_criteria": {
+      "items": {
+        "$ref": "#/$defs/ProofArtifactRemovalExitCriterion"
+      },
+      "title": "Exit Criteria",
+      "type": "array"
+    },
+    "discovery_errors": {
+      "items": {
+        "$ref": "#/$defs/ProofArtifactFleetDiscoveryIssue"
+      },
+      "title": "Discovery Errors",
+      "type": "array"
+    },
+    "blockers": {
+      "items": {
+        "$ref": "#/$defs/ProofArtifactVNextBlocker"
+      },
+      "title": "Blockers",
+      "type": "array"
+    },
+    "workspaces": {
+      "items": {
+        "$ref": "#/$defs/ProofArtifactVNextWorkspaceReport"
+      },
+      "title": "Workspaces",
+      "type": "array"
+    },
+    "recommended_next_step": {
+      "default": "Audit the selected workspaces before scheduling manifest removal.",
+      "title": "Recommended Next Step",
+      "type": "string"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "scan_root"
+  ],
+  "title": "ProofArtifactVNextBlockerReport",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/proof_artifact_vnext_blocker_report.schema.json"
+}

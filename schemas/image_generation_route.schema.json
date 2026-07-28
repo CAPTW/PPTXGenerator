@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PPTXlocal Image Generation Route Config",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "image_generation_enabled",
+    "provider",
+    "model",
+    "api",
+    "output_format",
+    "quality",
+    "default_size",
+    "allow_network_calls",
+    "require_env_api_key",
+    "env_api_key_name",
+    "do_not_store_secrets",
+    "approved_use_scope"
+  ],
+  "properties": {
+    "image_generation_enabled": { "type": "boolean" },
+    "provider": { "const": "openai" },
+    "model": { "const": "gpt-image-2" },
+    "api": { "const": "image_api" },
+    "output_format": { "const": "png" },
+    "quality": { "enum": ["low", "medium", "high"] },
+    "default_size": { "type": "string", "pattern": "^[0-9]+x[0-9]+$" },
+    "allow_network_calls": { "type": "boolean" },
+    "require_env_api_key": { "const": true },
+    "env_api_key_name": { "const": "OPENAI_API_KEY" },
+    "do_not_store_secrets": { "const": true },
+    "approved_use_scope": { "const": "d07_2_visual_field_assets_only" }
+  }
+}

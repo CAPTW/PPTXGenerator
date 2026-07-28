@@ -1,0 +1,34 @@
+{
+  "attempt_id": "imageattempt_0283a64ebabc8db7511f",
+  "checks": {
+    "adequate_negative_space": true,
+    "creative_not_decorative": true,
+    "critical_content_clipping_absent": true,
+    "diagram_grammar_coherent": true,
+    "exact_16_9": true,
+    "minimum_resolution": true,
+    "no_factual_claim": true,
+    "no_final_slide_copy": true,
+    "no_invented_number": false,
+    "no_malformed_composition": true,
+    "no_microtext_dependency": true,
+    "no_random_logo": true,
+    "no_watermark": true,
+    "palette_usable": true,
+    "professional_academic_tone": true,
+    "reconstructable_visual_grammar": true,
+    "three_module_reference_usable": true,
+    "typography_safe_regions": true
+  },
+  "findings": [
+    "Numeric glyphs 1-5 and MODULE 01-03 violate the no-invented-number gate."
+  ],
+  "review_hash": "a5e9c29a11b7b228b3b23c460a6f0e7f2699e72bbe4666b50df1aab17f5673e7",
+  "review_id": "imagereview_f4853ea8ff65fac51517",
+  "reviewer": "Codex multimodal review",
+  "schema_name": "platform_image_visual_review",
+  "schema_version": "1.0.0",
+  "selected": false,
+  "target_artifact_id": "designboard_61f00a55ee02666b3254",
+  "visual_review_status": "REJECTED"
+}

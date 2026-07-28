@@ -1,0 +1,13 @@
+{
+  "content_sha256_without_this_field": "cde1d90944f8d14a3fe43db4e8c7a15bd0026b34e8dbaa4ab6567f82d182a107",
+  "external_skill_modified": false,
+  "mismatch_count": 0,
+  "pin_id": "pngpin_1c4af8ad011cc18786d8",
+  "post_aggregate_sha256": "3dd4541fb0f2f4cf421d2a5c3cf2002390c0b00661a2e4d3a588d4467600022a",
+  "post_file_count": 99,
+  "pre_aggregate_sha256": "3dd4541fb0f2f4cf421d2a5c3cf2002390c0b00661a2e4d3a588d4467600022a",
+  "pre_file_count": 99,
+  "schema_name": "phase5_external_skillset_pre_post_fingerprint",
+  "schema_version": "1.0.0",
+  "status": "PASS"
+}

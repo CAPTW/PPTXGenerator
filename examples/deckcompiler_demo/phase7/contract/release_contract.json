@@ -1,0 +1,156 @@
+{
+  "binary_determinism_policy": "semantic_and_package_fingerprints_for_office_and_render_outputs",
+  "bundle_fingerprint_policy_path": "examples/deckcompiler_demo/phase7/contract/bundle_fingerprint_policy.json",
+  "canonical_browser_requirement": "Playwright Chromium",
+  "canonical_config_path": "examples/deckcompiler_demo/demo.yaml",
+  "canonical_input_fixture": {
+    "pdfs": [
+      {
+        "path": "examples/deckcompiler_demo/inputs/cooling_system_overview.pdf",
+        "sha256": "b72c5cbe32f36b1311c618e968d075bc6a921b0380085987e7d17d03a6556d68"
+      },
+      {
+        "path": "examples/deckcompiler_demo/inputs/cooling_risk_decision_report.pdf",
+        "sha256": "912228a063639e78287499c1490a478f6dad590b10a093274b72a0df301775fc"
+      }
+    ],
+    "prompt": {
+      "path": "examples/deckcompiler_demo/inputs/prompt.txt",
+      "sha256": "4b654a7ab83bc7e693b89058b2b21fdd7997312e74db00917c0c64bffb4efff6"
+    },
+    "source_count": 3,
+    "types": [
+      "prompt",
+      "searchable_pdf",
+      "searchable_pdf"
+    ]
+  },
+  "composite_qa_requirement": "PASS",
+  "contract_hash": "673755b3309657c46211aed673a05fd8f6c4af4387956b3f9ba6b27965c8e422",
+  "credential_requirement": false,
+  "devpost_release_eligible": false,
+  "expected_slide_count": 6,
+  "external_pin_path": "docs/devpost/evidence/pngtopptx_external_skillset_pin.json",
+  "external_pin_sha256": "61b64ca02cb1301c215d1cfa90b1f558ae127d3a19b2d49f2b82746930ef0a84",
+  "external_python_dependency_manifest_hash": "1f895c6e45ef7fc9e807631566de9edcb403211b9ac9aa9666e6101eef626e07",
+  "external_python_dependency_manifest_path": "examples/deckcompiler_demo/phase7/contract/external_python_runtime_dependency_manifest.json",
+  "external_python_dependency_manifest_sha256": "17428a1a37e8824f87882f6877c0d503890910bf5e3c1e390bf16af11de1ddfc",
+  "external_python_dependency_policy": {
+    "external_skill_source": "external_read_only",
+    "interpreter_owner": "deckcompiler_sys_executable",
+    "lock_owner": "requirements/devpost-release.lock.txt",
+    "path_fallback": false,
+    "system_site_packages": false,
+    "user_site_packages": false
+  },
+  "external_skill_pin": {
+    "aggregate_sha256": "3dd4541fb0f2f4cf421d2a5c3cf2002390c0b00661a2e4d3a588d4467600022a",
+    "artifact_sha256": "61b64ca02cb1301c215d1cfa90b1f558ae127d3a19b2d49f2b82746930ef0a84",
+    "mode": "git_tree_pin",
+    "path": "docs/devpost/evidence/pngtopptx_external_skillset_pin.json"
+  },
+  "final_release_eligible": false,
+  "final_status_vocabulary": [
+    "BLOCKED",
+    "ELIGIBLE_FOR_DEVPOST_SUBMISSION"
+  ],
+  "input_paths": [
+    "examples/deckcompiler_demo/demo.yaml",
+    "examples/deckcompiler_demo/inputs/prompt.txt",
+    "examples/deckcompiler_demo/inputs/cooling_system_overview.pdf",
+    "examples/deckcompiler_demo/inputs/cooling_risk_decision_report.pdf",
+    "examples/deckcompiler_demo/phase4",
+    "examples/deckcompiler_demo/phase5",
+    "examples/deckcompiler_demo/phase7/contract/bundle_fingerprint_policy.json",
+    "examples/deckcompiler_demo/phase7/contract/phase4_bundle_fingerprint_authority.json",
+    "examples/deckcompiler_demo/phase7/contract/phase5_bundle_fingerprint_authority.json",
+    "docs/devpost/evidence/legacy_bundle_fingerprint_correction.json",
+    "docs/devpost/evidence/pngtopptx_external_skillset_pin.json",
+    "examples/deckcompiler_demo/phase7/contract/external_python_runtime_dependency_manifest.json",
+    "examples/deckcompiler_demo/phase6/release/unified_release_gate_report.json"
+  ],
+  "internal_system": "DeckCompiler",
+  "live_image_generation_mode": "disabled_frozen_verified_visual_bundle",
+  "output_directory_policy": {
+    "automatic_clear": false,
+    "mandatory": true,
+    "new_or_empty": true,
+    "reparse_point_forbidden": true,
+    "repository_external": true
+  },
+  "package_content_contract": "verified_delivery_not_runtime_dump",
+  "phase4_authority_manifest_path": "examples/deckcompiler_demo/phase7/contract/phase4_bundle_fingerprint_authority.json",
+  "phase4_bundle_path": "examples/deckcompiler_demo/phase4",
+  "phase4_frozen_visual_bundle": {
+    "authority_id": "bundleauth_fed813e73c8237775ee8",
+    "authority_manifest_path": "examples/deckcompiler_demo/phase7/contract/phase4_bundle_fingerprint_authority.json",
+    "file_count": 107,
+    "generation_provenance_verified": true,
+    "git_object_aggregate_sha256": "b7b7356cde7fc61b42de4d8a8ac369f77fd2a898d71dea75ae8ff4e32b7be969",
+    "json_semantic_aggregate_sha256": "f4c189c0fca2281153afe6e6b6b7f83bdc336f8d31a29feb9e3d81073fc30be9",
+    "legacy_recorded_aggregate_sha256": "4ad86fcc50ed669d57966dd471d50ea791c21499c3c280c8b29f484a49b8473c",
+    "live_image_generation_reexecuted": false,
+    "path": "examples/deckcompiler_demo/phase4",
+    "path_set_sha256": "acb119384dc4fc18e9afa10b93089e0c40132486a62608e53889a99bfec1985d",
+    "runtime_compatibility_report_path": "examples/deckcompiler_demo/phase7/contract/phase4_runtime_bundle_compatibility.json",
+    "subtree_tree_oid": "bb6a1c07e5844511ebeb63e9bfd8b3947dc4377d"
+  },
+  "phase4_runtime_compatibility_report_path": "examples/deckcompiler_demo/phase7/contract/phase4_runtime_bundle_compatibility.json",
+  "phase5_authority_manifest_path": "examples/deckcompiler_demo/phase7/contract/phase5_bundle_fingerprint_authority.json",
+  "phase5_baseline_bundle": {
+    "authority_id": "bundleauth_39b009a998d4b5ab87e4",
+    "authority_manifest_path": "examples/deckcompiler_demo/phase7/contract/phase5_bundle_fingerprint_authority.json",
+    "file_count": 38,
+    "git_object_aggregate_sha256": "15876d5597a9f1e5bdf2e777b6d37d1b9cdd5fde95c893a93763a5b727978e0a",
+    "json_semantic_aggregate_sha256": "24b0d52d5b230a28fc94be3cd8579b79709ad3d40e446fbffd58fd062752bb1f",
+    "legacy_recorded_aggregate_sha256": "98f88cc940cb0d9171c6b116c7ebb1290b2b51c29547580f13301b15cc74f20c",
+    "path": "examples/deckcompiler_demo/phase5",
+    "path_set_sha256": "7e11658c0d9c811e1676d4d37bf57c56a4e5a6c92557f2a58e81b78c8e5bc784",
+    "reconstruction_input": false,
+    "runtime_compatibility_report_path": "examples/deckcompiler_demo/phase7/contract/phase5_runtime_bundle_compatibility.json",
+    "subtree_tree_oid": "ea490d8f605c40ed25971825cda60387a4453f2e"
+  },
+  "phase5_bundle_path": "examples/deckcompiler_demo/phase5",
+  "phase5_runtime_compatibility_report_path": "examples/deckcompiler_demo/phase7/contract/phase5_runtime_bundle_compatibility.json",
+  "phase6_authority_bridge_path": "docs/devpost/evidence/legacy_bundle_fingerprint_correction.json",
+  "phase6_evidence": {
+    "intentional_fault_reexecuted_by_default": false,
+    "path": "examples/deckcompiler_demo/phase6",
+    "proof_validation_only": true,
+    "unified_gate_hash": "fad95607449de5ebfe1d643d62e77894d9beefe4e8a2b8a36ca49e63b830dd3f"
+  },
+  "phase6_evidence_path": "examples/deckcompiler_demo/phase6",
+  "phase6_status": "ELIGIBLE_FOR_PACKAGING",
+  "playwright_chromium_available": true,
+  "powerpoint_com_available": true,
+  "protected_path_policy": "absent_not_generated_not_input_not_packaged",
+  "protected_paths": [
+    "outputs/editable_template_spec.final.json",
+    "outputs/golden_template_masters.pptx",
+    "outputs/final_deck_large_premium.pptx"
+  ],
+  "public_product": "PPTX Generator",
+  "push_performed": false,
+  "python_lock_path": "requirements/devpost-release.lock.txt",
+  "python_lock_sha256": "4fde8f6fd2584f66e2c5f6c0f57f822da19809cb9d12259e35537d3d378a21dc",
+  "python_version": "3.11.9",
+  "real_renderer_requirement": "Microsoft PowerPoint COM",
+  "release_profile_id": "devpost_p0_frozen_visuals",
+  "reproducibility_policy": "physical_clone_and_isolated_locked_python",
+  "schema_name": "release_contract",
+  "schema_version": "1.2.0",
+  "selected_route": "editable_pngtopptx",
+  "semantic_determinism_policy": "exact_declared_semantic_fields",
+  "source_commit_handling": "tested_runtime_commit_plus_evidence_only_descendant",
+  "submission_performed": false,
+  "supported_os": "Windows",
+  "supported_release_checkout": {
+    "core_autocrlf": false,
+    "exact_runtime_text_path": "src/presentation_agent/deckcompiler/qa/reconstruction_source/slides.js",
+    "exact_runtime_text_sha256": "8130f47caa5decf4e1df5343f405fcc79ff18f6d7c6e1880d7e56733d45ae20b",
+    "reason": "exact_runtime_text_fixture"
+  },
+  "tag_created": false,
+  "validation_status": "PASS",
+  "workflow_mode": "decision_brief"
+}

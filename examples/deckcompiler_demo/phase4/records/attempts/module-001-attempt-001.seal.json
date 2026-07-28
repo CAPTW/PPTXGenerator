@@ -1,0 +1,28 @@
+{
+  "attempt_id": "imageattempt_2502b789e69959c27135",
+  "attempt_number": 1,
+  "credential_lookups": 0,
+  "execution_mode": "platform_managed_tool",
+  "expected_output_absent_at_seal": true,
+  "expected_output_relative_path": "artifacts/module_anchors/imageattempt_2502b789e69959c27135/original.png",
+  "external_provider_id": null,
+  "external_transport_used": false,
+  "platform_tool_id": "image_gen.imagegen",
+  "prior_attempt_id": null,
+  "prompt_hash": "95057d1d6f8ec2db2133bac32f35eefdefb92e4f20470eed58a5d1ad88357113",
+  "prompt_id": "prompt_c3a48cd8e39b930c5a30",
+  "reference_artifacts": [
+    {
+      "artifact_id": "designboard_61f00a55ee02666b3254",
+      "relative_path": "artifacts/design_board/imageattempt_841f1a2d3f85ffe84b12/normalized.png",
+      "sha256": "a0229b8e27b4a103c177682b2d742ae3d4dd6eb9bb70c675cbf9f88293dd666d"
+    }
+  ],
+  "repository_network_calls": 0,
+  "request_id": "imagerequest_936343dec5ef85952ae7",
+  "schema_name": "platform_image_attempt_seal",
+  "schema_version": "1.0.0",
+  "sealed_at": "2026-07-20T02:48:08.383+09:00",
+  "target_artifact_id": "moduleanchor_3591b43d6cf6fe339284",
+  "target_type": "module_anchor"
+}

@@ -1,0 +1,149 @@
+{
+  "canonical_powerpoint_contact_sheet_review": {
+    "layout_collapse_count": 0,
+    "missing_major_region_count": 0,
+    "render_count": 6,
+    "slide_1_title_subtitle_obstruction": "resolved_in_repair_wave_3",
+    "unreadable_obstruction_count": 0,
+    "wrong_slide_mapping_count": 0
+  },
+  "content_sha256_without_this_field": "c5cf6a0e8c3e121a61c7da2a40780a5f620555b295ebdd6455cad720d178de70",
+  "critical_failure_count": 0,
+  "critical_failure_types": [
+    "clipping",
+    "layout_break",
+    "missing_major_region",
+    "readability_loss",
+    "wrong_slide"
+  ],
+  "critical_failures": [],
+  "official_compare_mode": "qa-polish",
+  "official_counts": {
+    "fail": 4,
+    "missing": 0,
+    "needs_polish": 2,
+    "pass": 0
+  },
+  "phase5_enforcement_mode": "qa-draft",
+  "phase5_minimum_pass": true,
+  "phase6_visual_polish_backlog": true,
+  "schema_name": "phase5_external_visual_qa_summary",
+  "schema_version": "1.0.0",
+  "slides": [
+    {
+      "issues": [
+        {
+          "severity": "blocking",
+          "type": "spacing"
+        },
+        {
+          "severity": "blocking",
+          "type": "spacing"
+        },
+        {
+          "severity": "noticeable",
+          "type": "pptx_html_mismatch"
+        }
+      ],
+      "severity": "blocking",
+      "slide": 1,
+      "status": "fail"
+    },
+    {
+      "issues": [
+        {
+          "severity": "noticeable",
+          "type": "spacing"
+        },
+        {
+          "severity": "noticeable",
+          "type": "spacing"
+        },
+        {
+          "severity": "noticeable",
+          "type": "pptx_html_mismatch"
+        }
+      ],
+      "severity": "noticeable",
+      "slide": 2,
+      "status": "needs_polish"
+    },
+    {
+      "issues": [
+        {
+          "severity": "blocking",
+          "type": "spacing"
+        },
+        {
+          "severity": "blocking",
+          "type": "spacing"
+        },
+        {
+          "severity": "noticeable",
+          "type": "pptx_html_mismatch"
+        }
+      ],
+      "severity": "blocking",
+      "slide": 3,
+      "status": "fail"
+    },
+    {
+      "issues": [
+        {
+          "severity": "blocking",
+          "type": "spacing"
+        },
+        {
+          "severity": "blocking",
+          "type": "palette_drift"
+        },
+        {
+          "severity": "noticeable",
+          "type": "pptx_html_mismatch"
+        }
+      ],
+      "severity": "blocking",
+      "slide": 4,
+      "status": "fail"
+    },
+    {
+      "issues": [
+        {
+          "severity": "blocking",
+          "type": "spacing"
+        },
+        {
+          "severity": "blocking",
+          "type": "spacing"
+        },
+        {
+          "severity": "noticeable",
+          "type": "pptx_html_mismatch"
+        }
+      ],
+      "severity": "blocking",
+      "slide": 5,
+      "status": "fail"
+    },
+    {
+      "issues": [
+        {
+          "severity": "noticeable",
+          "type": "spacing"
+        },
+        {
+          "severity": "noticeable",
+          "type": "spacing"
+        },
+        {
+          "severity": "noticeable",
+          "type": "pptx_html_mismatch"
+        }
+      ],
+      "severity": "noticeable",
+      "slide": 6,
+      "status": "needs_polish"
+    }
+  ],
+  "status": "PASS_PHASE5_MINIMUM"
+}

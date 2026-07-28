@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/slide_semantic_sidecar.schema.json",
+  "title": "SlideSemanticSidecar",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "slide_id",
+    "module_id",
+    "batch_id",
+    "template_family_id",
+    "layout_id",
+    "canonical_content",
+    "native_required",
+    "raster_allowed",
+    "source_bindings",
+    "editability_policy",
+    "content_hash"
+  ],
+  "properties": {
+    "schema_name": {"const": "slide_semantic_sidecar"},
+    "schema_version": {"type": "string", "minLength": 1},
+    "slide_id": {"type": "string", "minLength": 1},
+    "module_id": {"type": "string", "minLength": 1},
+    "batch_id": {"type": "string", "minLength": 1},
+    "template_family_id": {"type": "string", "minLength": 1},
+    "layout_id": {"type": "string", "minLength": 1},
+    "canonical_content": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/contentItem"}
+    },
+    "native_required": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/nativeRequirement"}
+    },
+    "raster_allowed": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/rasterAllowance"}
+    },
+    "source_bindings": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/sourceBinding"}
+    },
+    "editability_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["full_slide_raster", "text", "tables", "charts", "cards", "image_frames", "speaker_notes"],
+      "properties": {
+        "full_slide_raster": {"const": "forbidden"},
+        "text": {"const": "native_required"},
+        "tables": {"const": "native_required"},
+        "charts": {"const": "native_required"},
+        "cards": {"const": "native_required"},
+        "image_frames": {"const": "replaceable"},
+        "speaker_notes": {"const": "native_required"}
+      }
+    },
+    "content_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "contentItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slot_id", "kind", "value"],
+      "properties": {
+        "slot_id": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["text", "bullets", "kpi", "table", "chart", "image_need", "citation", "structured", "speaker_notes"]},
+        "value": {}
+      }
+    },
+    "nativeRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slot_id", "object_type"],
+      "properties": {
+        "slot_id": {"type": "string", "minLength": 1},
+        "object_type": {"enum": ["text_box", "shape", "table", "chart", "svg_icon", "connector", "footer", "speaker_notes"]}
+      }
+    },
+    "rasterAllowance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slot_id", "usage"],
+      "properties": {
+        "slot_id": {"type": "string", "minLength": 1},
+        "usage": {"enum": ["photo", "source_figure", "replaceable_image_frame"]}
+      }
+    },
+    "sourceBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["element", "evidence_ids"],
+      "properties": {
+        "element": {"type": "string", "minLength": 1},
+        "evidence_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}

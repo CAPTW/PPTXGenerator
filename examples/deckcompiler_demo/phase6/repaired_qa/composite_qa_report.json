@@ -1,0 +1,24 @@
+{
+  "composite_acceptance": "PASS",
+  "composite_dimension_checks": "PASS",
+  "curated_report_hash": "05a154b4165bc24ecbc82efeaef2aacd149fd19f9a43d5988fb78761f3190862",
+  "expected_fault_finding_present": false,
+  "external_visual_reconciliation": "PASS",
+  "html_sha256": "4569882c7153f6e846b350df68322fa820adf7ff34508dc4aac07be2834e19a7",
+  "phase4_bundle_aggregate": "4ad86fcc50ed669d57966dd471d50ea791c21499c3c280c8b29f484a49b8473c",
+  "phase4_inventory_count": 107,
+  "phase5_bundle_aggregate": "98f88cc940cb0d9171c6b116c7ebb1290b2b51c29547580f13301b15cc74f20c",
+  "phase5_inventory_count": 38,
+  "pptx_sha256": "6fd3fa50cab6d56c8fe943b515e93d36dde485a843e34b0ea710890ac8c845a5",
+  "schema_name": "phase6_curated_repaired_composite_qa_report",
+  "schema_version": "1.0.0",
+  "severity_counts": {
+    "error": 0,
+    "info": 1,
+    "severe": 0,
+    "warning": 0
+  },
+  "source_acceptance_hash": "e61ee51fa344db849cc7172c46c31b5ab2c3ae6288f471817cb3257d64861513",
+  "source_report_hash": "87ca613e1fe5f7ef8edb842e3d3f470611f8471259bc27c72cbd547afe6aaa1d",
+  "status": "PASS"
+}

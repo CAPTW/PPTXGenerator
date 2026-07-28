@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/external-execution-request.schema.json",
+  "title": "DeckCompiler External Execution Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "request_id",
+    "run_id",
+    "slide_id",
+    "execution_id",
+    "attempt_number",
+    "external_executable_id",
+    "prompt_id",
+    "prompt",
+    "composition_plan_id",
+    "composition_plan_sha256",
+    "requested_model",
+    "requested_width",
+    "requested_height",
+    "requested_media_type",
+    "references",
+    "source_commit",
+    "upstream_artifact_ids"
+  ],
+  "properties": {
+    "schema_name": {"const": "external_execution_request"},
+    "schema_version": {"const": "1.0.0"},
+    "request_id": {"type": "string", "pattern": "^extreq_[0-9a-f]{20}$"},
+    "run_id": {"type": "string", "pattern": "^run_[0-9a-f]{20}$"},
+    "slide_id": {"type": "string", "minLength": 1},
+    "execution_id": {"type": "string", "pattern": "^exec_[0-9a-f]{20}$"},
+    "attempt_number": {"type": "integer", "minimum": 1},
+    "external_executable_id": {"$ref": "#/$defs/externalExecutableId"},
+    "prompt_id": {"type": "string", "minLength": 1},
+    "prompt": {"type": "string", "minLength": 1},
+    "composition_plan_id": {"type": "string", "minLength": 1},
+    "composition_plan_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "requested_model": {"type": "string", "minLength": 1},
+    "requested_width": {"type": "integer", "minimum": 1},
+    "requested_height": {"type": "integer", "minimum": 1},
+    "requested_media_type": {"enum": ["image/png", "image/jpeg"]},
+    "references": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/referenceInput"},
+      "uniqueItems": true
+    },
+    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "upstream_artifact_ids": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^art_[0-9a-f]{20}$"},
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "externalExecutableId": {
+      "type": "string",
+      "enum": ["openai", "openai_api", "scout_assist", "scout_suggestions"]
+    },
+    "referenceInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_id", "sha256"],
+      "properties": {
+        "artifact_id": {"type": "string", "pattern": "^art_[0-9a-f]{20}$"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  }
+}

@@ -1,0 +1,202 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/creative_frontend/template_reference_design_system.schema.json",
+  "title": "Creative Front-End Template Reference Design System",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "design_system_id",
+    "canvas",
+    "colors",
+    "typography",
+    "spacing",
+    "shape_style"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "Semantic version for schema compatibility."
+    },
+    "design_system_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "canvas": {
+      "type": "object",
+      "required": ["width_in", "height_in", "aspect_ratio"],
+      "additionalProperties": false,
+      "properties": {
+        "width_in": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 40
+        },
+        "height_in": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 40
+        },
+        "aspect_ratio": {
+          "type": "string",
+          "pattern": "^(\\d+\\.?\\d*):(\\d+\\.?\\d*)$"
+        }
+      }
+    },
+    "colors": {
+      "type": "object",
+      "required": ["background", "surface", "text", "muted_text", "accent"],
+      "additionalProperties": {
+        "type": "string",
+        "description": "Color token value (hex, rgb, hsl, oklch, etc.)."
+      },
+      "properties": {
+        "background": {
+          "type": "string",
+          "minLength": 1
+        },
+        "surface": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "muted_text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "accent": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "typography": {
+      "type": "object",
+      "required": ["title", "section_title", "body", "label", "footer"],
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "$ref": "#/definitions/typography_style"
+        },
+        "section_title": {
+          "$ref": "#/definitions/typography_style"
+        },
+        "body": {
+          "$ref": "#/definitions/typography_style"
+        },
+        "label": {
+          "$ref": "#/definitions/typography_style"
+        },
+        "footer": {
+          "$ref": "#/definitions/typography_style"
+        }
+      }
+    },
+    "spacing": {
+      "type": "object",
+      "required": [
+        "page_margin_x_in",
+        "page_margin_y_in",
+        "grid_gap_in",
+        "card_padding_in"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "page_margin_x_in": {
+          "type": "number",
+          "minimum": 0
+        },
+        "page_margin_y_in": {
+          "type": "number",
+          "minimum": 0
+        },
+        "grid_gap_in": {
+          "type": "number",
+          "minimum": 0
+        },
+        "card_padding_in": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "shape_style": {
+      "type": "object",
+      "required": ["card_radius_in", "hairline_pt", "shadow_style"],
+      "additionalProperties": false,
+      "properties": {
+        "card_radius_in": {
+          "type": "number",
+          "minimum": 0
+        },
+        "hairline_pt": {
+          "type": "number",
+          "minimum": 0
+        },
+        "shadow_style": {
+          "type": "string"
+        }
+      }
+    },
+    "components": {
+      "type": "object",
+      "description": "Reusable named component defaults for later template assembly.",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["component_type", "allowed_slots"],
+        "additionalProperties": true,
+        "properties": {
+          "component_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "allowed_slots": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": []
+          }
+        }
+      },
+      "default": {}
+    }
+  },
+  "definitions": {
+    "typography_style": {
+      "type": "object",
+      "required": [
+        "font_family",
+        "size_pt",
+        "weight",
+        "color",
+        "line_height"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "font_family": {
+          "type": "string",
+          "minLength": 1
+        },
+        "size_pt": {
+          "type": "number",
+          "minimum": 1
+        },
+        "weight": {
+          "type": ["string", "number"]
+        },
+        "color": {
+          "type": "string",
+          "minLength": 1
+        },
+        "line_height": {
+          "type": "number",
+          "minimum": 0.5
+        }
+      }
+    }
+  }
+}

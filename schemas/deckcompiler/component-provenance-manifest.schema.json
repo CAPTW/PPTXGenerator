@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://pptx-generator.local/schemas/deckcompiler/component-provenance-manifest.schema.json", "title": "DeckCompiler component provenance manifest",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "components", "classification_counts", "component_count", "no_overclaim", "provenance_hash"],
+  "properties": {"schema_name": {"const": "component_provenance_manifest"}, "schema_version": {"const": "1.0.0"}, "components": {"type": "array", "items": {"type": "object", "required": ["component", "classification", "origin", "evidence"], "properties": {"component": {"type": "string"}, "classification": {"enum": ["existing", "adapted", "build_week_new", "external_existing", "platform_generated", "historical_evidence", "protected_not_used"]}, "origin": {"type": "string"}, "evidence": {"type": "array"}}, "additionalProperties": false}}, "classification_counts": {"type": "object"}, "component_count": {"minimum": 1, "type": "integer"}, "no_overclaim": {"const": true}, "provenance_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"}}
+}

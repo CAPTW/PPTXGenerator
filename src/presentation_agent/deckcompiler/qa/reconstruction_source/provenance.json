@@ -1,0 +1,19 @@
+{
+  "schema_name": "phase6_1_reconstruction_source_provenance",
+  "schema_version": "1.0.0",
+  "owner_classification": "deck_owned_canonical_reconstruction_geometry_source",
+  "source_role": "project-owned lib/slides.js materialized into each fresh isolated handoff",
+  "producer_contract": "slide-image-dual-render project source interface",
+  "higher_geometry_source_present": false,
+  "semantic_authority": false,
+  "semantic_source": "fresh handoff work/slideNN/semantic_sidecar.json",
+  "slides_js_sha256": "8130f47caa5decf4e1df5343f405fcc79ff18f6d7c6e1880d7e56733d45ae20b",
+  "native_table_js_sha256": "91375691f036cb9ce42a0085ca84eb14ba28b621b5e468cdc4dc6248771dd22e",
+  "accepted_phase5_ownership_evidence": [
+    "examples/deckcompiler_demo/phase5/provenance/repair_history.json",
+    "examples/deckcompiler_demo/phase5/provenance/handoff_source_pre_post_fingerprint.json"
+  ],
+  "external_skill_source_copied": false,
+  "runtime_output_or_qa_evidence_copied": false,
+  "direct_final_output_patch": false
+}

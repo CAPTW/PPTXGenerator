@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/slide_cards.schema.json",
+  "title": "SlideCards",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["slide_id", "cards"],
+  "properties": {
+    "schema_name": {"const": "slide_cards"},
+    "schema_version": {"type": "string"},
+    "slide_id": {"type": "string", "minLength": 1},
+    "cards": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["title", "body"],
+        "properties": {
+          "title": {"type": "string", "minLength": 1, "maxLength": 80},
+          "body": {"type": "string", "minLength": 1, "maxLength": 240}
+        }
+      }
+    }
+  }
+}

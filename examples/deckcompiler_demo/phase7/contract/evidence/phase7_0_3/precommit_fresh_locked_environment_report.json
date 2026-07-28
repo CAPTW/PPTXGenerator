@@ -1,0 +1,171 @@
+{
+  "distributions": [
+    {
+      "name": "annotated-types",
+      "version": "0.7.0"
+    },
+    {
+      "name": "attrs",
+      "version": "26.1.0"
+    },
+    {
+      "name": "cairocffi",
+      "version": "1.7.1"
+    },
+    {
+      "name": "cairosvg",
+      "version": "2.9.0"
+    },
+    {
+      "name": "cffi",
+      "version": "2.1.0"
+    },
+    {
+      "name": "cssselect2",
+      "version": "0.9.0"
+    },
+    {
+      "name": "defusedxml",
+      "version": "0.7.1"
+    },
+    {
+      "name": "greenlet",
+      "version": "3.5.3"
+    },
+    {
+      "name": "imageio",
+      "version": "2.37.2"
+    },
+    {
+      "name": "jsonschema",
+      "version": "4.26.0"
+    },
+    {
+      "name": "jsonschema-specifications",
+      "version": "2025.9.1"
+    },
+    {
+      "name": "lazy-loader",
+      "version": "0.4"
+    },
+    {
+      "name": "lxml",
+      "version": "6.1.1"
+    },
+    {
+      "name": "networkx",
+      "version": "3.6.1"
+    },
+    {
+      "name": "numpy",
+      "version": "2.2.6"
+    },
+    {
+      "name": "opencv-python-headless",
+      "version": "4.12.0.88"
+    },
+    {
+      "name": "packaging",
+      "version": "25.0"
+    },
+    {
+      "name": "pillow",
+      "version": "11.3.0"
+    },
+    {
+      "name": "playwright",
+      "version": "1.61.0"
+    },
+    {
+      "name": "pycparser",
+      "version": "3.0"
+    },
+    {
+      "name": "pydantic",
+      "version": "2.13.4"
+    },
+    {
+      "name": "pydantic-core",
+      "version": "2.46.4"
+    },
+    {
+      "name": "pyee",
+      "version": "13.0.1"
+    },
+    {
+      "name": "pymupdf",
+      "version": "1.28.0"
+    },
+    {
+      "name": "python-docx",
+      "version": "1.2.0"
+    },
+    {
+      "name": "python-pptx",
+      "version": "1.0.2"
+    },
+    {
+      "name": "pywin32",
+      "version": "311"
+    },
+    {
+      "name": "pyyaml",
+      "version": "6.0.3"
+    },
+    {
+      "name": "referencing",
+      "version": "0.37.0"
+    },
+    {
+      "name": "rpds-py",
+      "version": "2026.6.3"
+    },
+    {
+      "name": "scikit-image",
+      "version": "0.26.0"
+    },
+    {
+      "name": "scipy",
+      "version": "1.17.0"
+    },
+    {
+      "name": "tifffile",
+      "version": "2026.1.14"
+    },
+    {
+      "name": "tinycss2",
+      "version": "1.5.1"
+    },
+    {
+      "name": "typing-extensions",
+      "version": "4.16.0"
+    },
+    {
+      "name": "typing-inspection",
+      "version": "0.4.2"
+    },
+    {
+      "name": "webencodings",
+      "version": "0.5.1"
+    },
+    {
+      "name": "xlsxwriter",
+      "version": "3.2.9"
+    }
+  ],
+  "implementation": "CPython",
+  "interpreter_owner": "deckcompiler_sys_executable",
+  "interpreter_path_class": "%FRESH_VENV%/Scripts/python.exe",
+  "lock_sha256": "4fde8f6fd2584f66e2c5f6c0f57f822da19809cb9d12259e35537d3d378a21dc",
+  "locked_distribution_count": 38,
+  "pip_check_status": "PASS",
+  "platform": "Windows_x64",
+  "python_version": "3.11.9",
+  "report_hash": "989cc11a4d745218be5cef123e6e5bf99b18a0a154a6da0e385af7fc864430e4",
+  "schema_name": "fresh_locked_environment_report",
+  "schema_version": "1.0.0",
+  "status": "PASS",
+  "system_site_packages": false,
+  "unexpected_distribution_count": 0,
+  "user_site_packages": false
+}

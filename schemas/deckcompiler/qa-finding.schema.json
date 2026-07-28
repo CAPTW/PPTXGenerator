@@ -1,0 +1,27 @@
+{
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/qa-finding.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifact_id": { "type": ["string", "null"] },
+    "category": { "minLength": 1, "type": "string" },
+    "detector": { "minLength": 1, "type": "string" },
+    "detector_version": { "minLength": 1, "type": "string" },
+    "evidence": { "type": "object" },
+    "finding_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "finding_id": { "minLength": 1, "type": "string" },
+    "gate": { "minLength": 1, "type": "string" },
+    "message": { "minLength": 1, "type": "string" },
+    "owning_artifact": { "minLength": 1, "type": "string" },
+    "recommended_action": { "minLength": 1, "type": "string" },
+    "release_blocking": { "type": "boolean" },
+    "repairable": { "type": "boolean" },
+    "resolved": { "type": "boolean" },
+    "rule_id": { "minLength": 1, "type": "string" },
+    "severity": { "enum": ["info", "warning", "error", "severe"] },
+    "slide_id": { "type": ["string", "null"] }
+  },
+  "required": ["finding_id", "gate", "category", "severity", "slide_id", "artifact_id", "rule_id", "message", "evidence", "owning_artifact", "recommended_action", "repairable", "release_blocking", "resolved", "detector", "detector_version", "finding_hash"],
+  "title": "DeckCompiler Phase 6 QA finding",
+  "type": "object"
+}

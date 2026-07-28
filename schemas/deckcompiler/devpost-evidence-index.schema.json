@@ -1,0 +1,5 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://pptx-generator.local/schemas/deckcompiler/devpost-evidence-index.schema.json", "title": "DeckCompiler DevPost evidence index", "type": "object", "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "public_product", "internal_system", "tested_runtime_commit", "documents", "artifact_count", "submission_performed", "index_hash"],
+  "properties": {"schema_name": {"const": "devpost_evidence_index"}, "schema_version": {"const": "1.0.0"}, "public_product": {"const": "PPTX Generator"}, "internal_system": {"const": "DeckCompiler"}, "tested_runtime_commit": {"pattern": "^[0-9a-f]{40}$", "type": "string"}, "documents": {"type": "array", "minItems": 13}, "artifact_count": {"minimum": 13, "type": "integer"}, "submission_performed": {"const": false}, "index_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"}}
+}

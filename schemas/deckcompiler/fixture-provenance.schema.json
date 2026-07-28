@@ -1,0 +1,25 @@
+{
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/fixture-provenance.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "accepted_source_artifact_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "canonical_phase4_aggregate": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "canonical_phase5_aggregate": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "canonical_repair_owner": { "const": "src/presentation_agent/deckcompiler/qa/reconstruction_source/slides.js" },
+    "created_at": { "format": "date-time", "type": "string" },
+    "deckcompiler_commit": { "pattern": "^[0-9a-f]{40}$", "type": "string" },
+    "fixture_id": { "minLength": 1, "type": "string" },
+    "full_handoff_export_required": { "const": true },
+    "old_phase5_repair_history_reused": { "const": false },
+    "provenance_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "runtime_location_policy": { "const": "new_isolated_directory_outside_repository" },
+    "schema_name": { "const": "phase6_fixture_provenance" },
+    "schema_version": { "const": "1.0.0" },
+    "source_provenance": { "minLength": 1, "type": "string" },
+    "timezone": { "const": "Asia/Seoul" }
+  },
+  "required": ["schema_name", "schema_version", "fixture_id", "source_provenance", "canonical_repair_owner", "accepted_source_artifact_hash", "deckcompiler_commit", "canonical_phase4_aggregate", "canonical_phase5_aggregate", "runtime_location_policy", "full_handoff_export_required", "old_phase5_repair_history_reused", "created_at", "timezone", "provenance_hash"],
+  "title": "DeckCompiler Phase 6 fixture provenance",
+  "type": "object"
+}

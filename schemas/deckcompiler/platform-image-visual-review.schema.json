@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/deckcompiler/platform-image-visual-review.schema.json",
+  "title": "Platform-managed Image Visual Review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "review_id", "attempt_id", "target_artifact_id", "reviewer", "checks", "findings", "visual_review_status", "selected", "review_hash"],
+  "properties": {
+    "schema_name": {"const": "platform_image_visual_review"}, "schema_version": {"const": "1.0.0"},
+    "review_id": {"type": "string"}, "attempt_id": {"type": "string"}, "target_artifact_id": {"type": "string"}, "reviewer": {"type": "string"},
+    "checks": {"type": "object"}, "findings": {"type": "array", "items": {"type": "string"}},
+    "visual_review_status": {"enum": ["ACCEPTED_FOR_PHASE4", "REJECTED"]}, "selected": {"type": "boolean"},
+    "review_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/extracted_style_tokens.schema.json",
+  "title": "ExtractedStyleTokens",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "prompt_id",
+    "colors",
+    "color_estimates",
+    "typography",
+    "typography_scale",
+    "spacing",
+    "line_weights",
+    "card_radius",
+    "footer_height",
+    "grid_spacing",
+    "ornament_density",
+    "shadow_policy",
+    "chart_table_density",
+    "borders",
+    "shadows",
+    "grids",
+    "background_layers",
+    "chart_style",
+    "table_style",
+    "card_style",
+    "footer_style",
+    "section_number_style",
+    "tone_variants"
+  ],
+  "properties": {
+    "schema_name": {"const": "extracted_style_tokens"},
+    "schema_version": {"type": "string"},
+    "prompt_id": {"type": "string", "minLength": 1},
+    "colors": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"type": "string", "pattern": "^#[0-9A-Fa-f]{6}$"}
+    },
+    "color_estimates": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"type": "string", "pattern": "^#[0-9A-Fa-f]{6}$"}
+    },
+    "typography": {"type": "object", "minProperties": 1},
+    "typography_scale": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"type": "number", "exclusiveMinimum": 0}
+    },
+    "spacing": {"type": "object", "minProperties": 1},
+    "line_weights": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"type": "number", "minimum": 0}
+    },
+    "card_radius": {"type": "number", "minimum": 0},
+    "footer_height": {"type": "number", "exclusiveMinimum": 0},
+    "grid_spacing": {"type": "number", "exclusiveMinimum": 0},
+    "ornament_density": {"enum": ["none", "low", "medium", "high"]},
+    "shadow_policy": {"type": "string", "minLength": 1},
+    "chart_table_density": {"enum": ["low", "medium", "high"]},
+    "borders": {"type": "object", "minProperties": 1},
+    "shadows": {"type": "object", "minProperties": 1},
+    "grids": {"type": "object", "minProperties": 1},
+    "background_layers": {"type": "object", "minProperties": 1},
+    "chart_style": {"type": "object", "minProperties": 1},
+    "table_style": {"type": "object", "minProperties": 1},
+    "card_style": {"type": "object", "minProperties": 1},
+    "footer_style": {"type": "object", "minProperties": 1},
+    "section_number_style": {"type": "object", "minProperties": 1},
+    "tone_variants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["academic", "professional", "creative"],
+      "properties": {
+        "academic": {"$ref": "#/$defs/tone_variant"},
+        "professional": {"$ref": "#/$defs/tone_variant"},
+        "creative": {"$ref": "#/$defs/tone_variant"}
+      }
+    }
+  },
+  "$defs": {
+    "tone_variant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["description", "token_adjustments"],
+      "properties": {
+        "description": {"type": "string", "minLength": 1},
+        "token_adjustments": {"type": "object", "minProperties": 1}
+      }
+    }
+  }
+}

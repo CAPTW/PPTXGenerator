@@ -1,0 +1,65 @@
+{
+  "baseline_output_set": {
+    "active_output_set": "phase5_baseline",
+    "descriptor_sha256": "0594eb424bbcc0d7bfd365e8683304be3f08783c8ba4b082485f1489602fa078",
+    "html_sha256": "b1f161bed4d1dc37be576eceda0cf01d125580df4a767c4722582c8671983085",
+    "pptx_sha256": "805eb4aa3d44d90ebe5b78c0247d02e412ebfc9468e57c778516b90de2d27676"
+  },
+  "canonical_repair_owner": {
+    "derivative_path": "lib/slides.js",
+    "field": "#/functions/s1/recommended_decision_body/x",
+    "higher_geometry_source_present": false,
+    "owner_classification": "deck_owned_canonical_reconstruction_geometry_source",
+    "path": "src/presentation_agent/deckcompiler/qa/reconstruction_source/slides.js",
+    "producer_function": "presentation_agent.deckcompiler.qa.reachability._stage_reconstruction_source",
+    "sha256": "8130f47caa5decf4e1df5343f405fcc79ff18f6d7c6e1880d7e56733d45ae20b"
+  },
+  "created_at": "2026-07-22T11:20:00+09:00",
+  "deterministic_seed": "not_applicable",
+  "evidence_binding_changed": false,
+  "expected_detector_owner": "handoff/project/lib/slides.js",
+  "expected_finding_id": "VISUAL_TEXT_OFF_CANVAS_SLIDE_001",
+  "expected_gate": "visual",
+  "expected_invalidated_artifacts": [
+    "handoff_project",
+    "asset_manifest",
+    "crop_plan",
+    "reconstruction_manifest",
+    "pptx",
+    "html",
+    "renders",
+    "native_object_manifest",
+    "crop_coverage_summary",
+    "qa_evidence_summary",
+    "official_final_gate_report",
+    "semantic_qa_reports",
+    "visual_qa_reports",
+    "composite_qa_report",
+    "acceptance_report",
+    "contact_sheet"
+  ],
+  "expected_owner": "src/presentation_agent/deckcompiler/qa/reconstruction_source/slides.js",
+  "expected_repair_action": "Rematerialize the unchanged canonical reconstruction geometry source so the slide-001 recommended-decision body x coordinate returns from -220 to 210, then fully rebuild downstream outputs.",
+  "expected_severity": "severe",
+  "fixture_hash": "396528a39f557654f0b2880f2a316970e0ca91834398e6f469560de8dc277ec5",
+  "fixture_id": "phase6-fixture-text-off-canvas-slide-001",
+  "injected_value": -220,
+  "injection_type": "replace_exact_layout_fragment",
+  "mutation": {
+    "injected_fragment": "  T(s, d.body[0], -220, 246, 452, 128, { sz: 16.5, b: true, color: P.ink, valign: 'middle', lh: 1.06, shrink: true });",
+    "original_fragment": "  T(s, d.body[0], 210, 246, 452, 128, { sz: 16.5, b: true, color: P.ink, valign: 'middle', lh: 1.06, shrink: true });"
+  },
+  "original_value": 210,
+  "schema_name": "phase6_fault_injection_spec",
+  "schema_version": "1.0.0",
+  "semantic_content_changed": false,
+  "target_field": "#/functions/s1/recommended_decision_body/x",
+  "target_upstream_artifact": {
+    "artifact_id": "fresh-isolated-handoff-project-slides-js",
+    "artifact_role": "isolated_handoff_derivative",
+    "path": "lib/slides.js",
+    "sha256": "8130f47caa5decf4e1df5343f405fcc79ff18f6d7c6e1880d7e56733d45ae20b"
+  },
+  "timezone": "Asia/Seoul",
+  "visual_target_changed": false
+}

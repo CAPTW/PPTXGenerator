@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/deckcompiler/phase4-design-system.schema.json",
+  "title": "DeckCompiler Phase 4 Design System Wrapper",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "source_commit", "design_system", "policy", "content_hash"],
+  "properties": {
+    "schema_name": {"const": "phase4_design_system"},
+    "schema_version": {"const": "1.0.0"},
+    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "design_system": {"$ref": "https://presentation-agent.local/schemas/creative_frontend/template_reference_design_system.schema.json"},
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["line_weight_families", "citation_footer_policy", "minimum_legibility", "safe_area_rules", "native_raster_policy", "full_slide_raster_prohibited", "module_differentiation_range", "composition_freedom"],
+      "properties": {
+        "line_weight_families": {"type": "array", "items": {"type": "number"}},
+        "citation_footer_policy": {"type": "string", "minLength": 1},
+        "minimum_legibility": {"type": "object"},
+        "safe_area_rules": {"type": "object"},
+        "native_raster_policy": {"type": "object"},
+        "full_slide_raster_prohibited": {"const": true},
+        "module_differentiation_range": {"type": "string", "minLength": 1},
+        "composition_freedom": {"type": "array", "minItems": 5, "items": {"type": "string"}, "uniqueItems": true}
+      }
+    },
+    "content_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "browser_binary_count": 0,
+  "external_python_dependency_manifest": "examples/deckcompiler_demo/phase7/contract/external_python_runtime_dependency_manifest.json",
+  "external_skill_redistribution": false,
+  "external_skill_source_included": false,
+  "font_binary_count": 0,
+  "platform_generated_visual_provenance": "examples/deckcompiler_demo/phase4/generation_provenance.json",
+  "report_hash": "2ad87d32de08408f41d409165fc7ab9f934e0439d560d280475ffc5ce308b733",
+  "repository_authored_fixture_ownership": "owner_supplied_synthetic_fixture",
+  "repository_license_present": false,
+  "repository_source_in_delivery_package": false,
+  "required_notices_included": true,
+  "runtime_distribution_count": 38,
+  "runtime_distribution_delta_count": 9,
+  "runtime_distribution_license_status": "PASS",
+  "schema_name": "license_and_attribution_report",
+  "schema_version": "1.0.0",
+  "status": "PASS",
+  "third_party_source_content_count": 0,
+  "unresolved_redistribution_blocker_count": 0
+}

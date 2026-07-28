@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/deckcompiler/platform-image-verification-report.schema.json",
+  "title": "Platform-managed Image Verification Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "verification_id", "record_id", "attempt_id", "target_artifact_id", "actual_bytes_retrievable", "decode_valid", "format", "width", "height", "aspect_ratio_valid", "minimum_resolution_valid", "file_size_bytes", "sha256", "request_relation_valid", "record_hash_valid", "output_path_inside_runtime_root", "status", "report_hash"],
+  "properties": {
+    "schema_name": {"const": "platform_image_verification_report"}, "schema_version": {"const": "1.0.0"},
+    "verification_id": {"type": "string"}, "record_id": {"type": "string"}, "attempt_id": {"type": "string"}, "target_artifact_id": {"type": "string"},
+    "actual_bytes_retrievable": {"type": "boolean"}, "decode_valid": {"type": "boolean"}, "format": {"type": "string"},
+    "width": {"type": "integer", "minimum": 1}, "height": {"type": "integer", "minimum": 1}, "aspect_ratio_valid": {"type": "boolean"}, "minimum_resolution_valid": {"type": "boolean"},
+    "file_size_bytes": {"type": "integer", "minimum": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "request_relation_valid": {"type": "boolean"}, "record_hash_valid": {"type": "boolean"}, "output_path_inside_runtime_root": {"type": "boolean"},
+    "status": {"enum": ["VERIFIED", "FAILED"]}, "report_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

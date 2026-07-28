@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/package-inventory.schema.json",
+  "title": "DeckCompiler delivery package inventory",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "file_count",
+    "total_bytes",
+    "logical_package_fingerprint",
+    "files",
+    "inventory_hash"
+  ],
+  "properties": {
+    "schema_name": {"const": "package_inventory"},
+    "schema_version": {"const": "1.0.0"},
+    "file_count": {"minimum": 0, "type": "integer"},
+    "total_bytes": {"minimum": 0, "type": "integer"},
+    "logical_package_fingerprint": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "files": {"type": "array", "items": {"type": "object"}},
+    "inventory_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"}
+  }
+}

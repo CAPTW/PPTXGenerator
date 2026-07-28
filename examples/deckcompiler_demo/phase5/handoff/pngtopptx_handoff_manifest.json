@@ -1,0 +1,184 @@
+{
+  "artifact_paths": {
+    "asset_manifest": "project/assets/manifest.json",
+    "constraints": "reconstruction_constraints.json",
+    "crop_plan": "project/work/crop_plan.json",
+    "expected_outputs": "expected_output_contract.json",
+    "invocation_plan": "pngtopptx_invocation_plan.json"
+  },
+  "created_at": "2026-07-22T00:05:41.7991054+09:00",
+  "deckcompiler_commit": "8c05f69ccee081f838455fced7de3b77dd1baf29",
+  "external_invocation_performed": false,
+  "external_skill_files_copied": false,
+  "external_skillset_pin": {
+    "combined_aggregate_sha256": "3dd4541fb0f2f4cf421d2a5c3cf2002390c0b00661a2e4d3a588d4467600022a",
+    "pin_hash": "c98dee779823ec40d176f54f10363dce676bb7299d99ffb2216c9a6454dc1a27",
+    "pin_id": "pngpin_1c4af8ad011cc18786d8"
+  },
+  "external_skillset_unchanged": true,
+  "handoff_id": "pnghandoff_a52abef975f8490a5882",
+  "implementation_provenance": {
+    "external_skill_implementation_copied": false,
+    "external_skill_implementation_modified": false,
+    "fallback_converter_present": false,
+    "implementation": "DeckCompiler thin handoff adapter"
+  },
+  "official_project_root": "project",
+  "ordered_slide_ids": [
+    "slide-01-decision-framing",
+    "slide-02-system-process",
+    "slide-03-risk-findings",
+    "slide-04-options-comparison",
+    "slide-05-recommendation",
+    "slide-06-implementation-sources"
+  ],
+  "output_root": ".",
+  "phase4_bundle": {
+    "aggregate_sha256": "4ad86fcc50ed669d57966dd471d50ea791c21499c3c280c8b29f484a49b8473c",
+    "manifest_hash": "9c2996f5cc7b48c28c5a32bd27aab053b34b1e6bc114e32d1a47ba45faad5679",
+    "manifest_id": "phase4targets_05a689812c65c5b22ebd",
+    "path": "examples/deckcompiler_demo/phase4"
+  },
+  "phase4_head_status": "MATCHES_HEAD",
+  "phase4_source_commit": "00fefe71e3b02fa897794f9e9f3d6df5be715cd8",
+  "schema_name": "pngtopptx_handoff_manifest",
+  "schema_version": "1.0.0",
+  "slide_count": 6,
+  "slides": [
+    {
+      "content_addressed_sidecar_relative_path": "semantic_sidecars/f5892d7ed69257ec352b88be9c9ce2848be84bfc89c48b9db189b7fdd41791b6.json",
+      "content_addressed_target_relative_path": "visual_targets/bb529c9644837050e4cf3a611e81dbaf9038fb083af13e262e79488f3966170f.png",
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "exported_sidecar_relative_path": "project/work/slide01/semantic_sidecar.json",
+      "exported_sidecar_semantic_sha256": "f5892d7ed69257ec352b88be9c9ce2848be84bfc89c48b9db189b7fdd41791b6",
+      "exported_target_relative_path": "project/src/slide1.png",
+      "exported_target_sha256": "bb529c9644837050e4cf3a611e81dbaf9038fb083af13e262e79488f3966170f",
+      "role": "slide_visual_target_design_reference",
+      "sequence": 1,
+      "sidecar_id": "sidecar_0ce9385de2639ae70f78",
+      "sidecar_semantic_sha256": "f5892d7ed69257ec352b88be9c9ce2848be84bfc89c48b9db189b7fdd41791b6",
+      "slide_id": "slide-01-decision-framing",
+      "source_sidecar_relative_path": "semantic_sidecars/slide-001.semantic.json",
+      "source_target_relative_path": "visual_targets/slide-001.png",
+      "source_target_sha256": "bb529c9644837050e4cf3a611e81dbaf9038fb083af13e262e79488f3966170f",
+      "target_byte_equal": true,
+      "visual_target_id": "visualtarget_c917f32532dfa26b4560"
+    },
+    {
+      "content_addressed_sidecar_relative_path": "semantic_sidecars/63f7c5dd1564c6e69deef7d7391e5ee4660d8d7741814f6cd352548caecb0e0e.json",
+      "content_addressed_target_relative_path": "visual_targets/37f42109e03e22d0721da51ffd571e0a78452a5be1447bbcaec4f2d4008c9c72.png",
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "exported_sidecar_relative_path": "project/work/slide02/semantic_sidecar.json",
+      "exported_sidecar_semantic_sha256": "63f7c5dd1564c6e69deef7d7391e5ee4660d8d7741814f6cd352548caecb0e0e",
+      "exported_target_relative_path": "project/src/slide2.png",
+      "exported_target_sha256": "37f42109e03e22d0721da51ffd571e0a78452a5be1447bbcaec4f2d4008c9c72",
+      "role": "slide_visual_target_design_reference",
+      "sequence": 2,
+      "sidecar_id": "sidecar_5d20f321f92a4fd268ac",
+      "sidecar_semantic_sha256": "63f7c5dd1564c6e69deef7d7391e5ee4660d8d7741814f6cd352548caecb0e0e",
+      "slide_id": "slide-02-system-process",
+      "source_sidecar_relative_path": "semantic_sidecars/slide-002.semantic.json",
+      "source_target_relative_path": "visual_targets/slide-002.png",
+      "source_target_sha256": "37f42109e03e22d0721da51ffd571e0a78452a5be1447bbcaec4f2d4008c9c72",
+      "target_byte_equal": true,
+      "visual_target_id": "visualtarget_eb8bc3132476d2929014"
+    },
+    {
+      "content_addressed_sidecar_relative_path": "semantic_sidecars/783172dc71e032c778468c6ba7adfd2439424d6163ec42e010b37572944943e7.json",
+      "content_addressed_target_relative_path": "visual_targets/96fc9ac2da10198a5cf2edf1f2fe44b089618dc1c72f8cd0c3c51313c19bb3d4.png",
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "exported_sidecar_relative_path": "project/work/slide03/semantic_sidecar.json",
+      "exported_sidecar_semantic_sha256": "783172dc71e032c778468c6ba7adfd2439424d6163ec42e010b37572944943e7",
+      "exported_target_relative_path": "project/src/slide3.png",
+      "exported_target_sha256": "96fc9ac2da10198a5cf2edf1f2fe44b089618dc1c72f8cd0c3c51313c19bb3d4",
+      "role": "slide_visual_target_design_reference",
+      "sequence": 3,
+      "sidecar_id": "sidecar_64ca44f39ae7dbd432e3",
+      "sidecar_semantic_sha256": "783172dc71e032c778468c6ba7adfd2439424d6163ec42e010b37572944943e7",
+      "slide_id": "slide-03-risk-findings",
+      "source_sidecar_relative_path": "semantic_sidecars/slide-003.semantic.json",
+      "source_target_relative_path": "visual_targets/slide-003.png",
+      "source_target_sha256": "96fc9ac2da10198a5cf2edf1f2fe44b089618dc1c72f8cd0c3c51313c19bb3d4",
+      "target_byte_equal": true,
+      "visual_target_id": "visualtarget_04b7463dd0285b07a31a"
+    },
+    {
+      "content_addressed_sidecar_relative_path": "semantic_sidecars/c82f0e3de1b731fb5b537e28830886099efdd32da3b428efcf84990d95bc725f.json",
+      "content_addressed_target_relative_path": "visual_targets/af9492fece0b40fc2f67ed42a1d073e2b82002eb15c58c64f955fe0cc70d9dbf.png",
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "exported_sidecar_relative_path": "project/work/slide04/semantic_sidecar.json",
+      "exported_sidecar_semantic_sha256": "c82f0e3de1b731fb5b537e28830886099efdd32da3b428efcf84990d95bc725f",
+      "exported_target_relative_path": "project/src/slide4.png",
+      "exported_target_sha256": "af9492fece0b40fc2f67ed42a1d073e2b82002eb15c58c64f955fe0cc70d9dbf",
+      "role": "slide_visual_target_design_reference",
+      "sequence": 4,
+      "sidecar_id": "sidecar_669adc2c4ebcb89c3d6c",
+      "sidecar_semantic_sha256": "c82f0e3de1b731fb5b537e28830886099efdd32da3b428efcf84990d95bc725f",
+      "slide_id": "slide-04-options-comparison",
+      "source_sidecar_relative_path": "semantic_sidecars/slide-004.semantic.json",
+      "source_target_relative_path": "visual_targets/slide-004.png",
+      "source_target_sha256": "af9492fece0b40fc2f67ed42a1d073e2b82002eb15c58c64f955fe0cc70d9dbf",
+      "target_byte_equal": true,
+      "visual_target_id": "visualtarget_83244783582673b6aa13"
+    },
+    {
+      "content_addressed_sidecar_relative_path": "semantic_sidecars/c7ba38a5dcaa2cb67c1302125dbc9c76aa05aef4bab32968e91d7072fae0aee9.json",
+      "content_addressed_target_relative_path": "visual_targets/8f42a53fd1fe62851082c147a280f2ac8487f450e0743d55a0c3c91d516ebb52.png",
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "exported_sidecar_relative_path": "project/work/slide05/semantic_sidecar.json",
+      "exported_sidecar_semantic_sha256": "c7ba38a5dcaa2cb67c1302125dbc9c76aa05aef4bab32968e91d7072fae0aee9",
+      "exported_target_relative_path": "project/src/slide5.png",
+      "exported_target_sha256": "8f42a53fd1fe62851082c147a280f2ac8487f450e0743d55a0c3c91d516ebb52",
+      "role": "slide_visual_target_design_reference",
+      "sequence": 5,
+      "sidecar_id": "sidecar_3259b4d651ab52adc2b3",
+      "sidecar_semantic_sha256": "c7ba38a5dcaa2cb67c1302125dbc9c76aa05aef4bab32968e91d7072fae0aee9",
+      "slide_id": "slide-05-recommendation",
+      "source_sidecar_relative_path": "semantic_sidecars/slide-005.semantic.json",
+      "source_target_relative_path": "visual_targets/slide-005.png",
+      "source_target_sha256": "8f42a53fd1fe62851082c147a280f2ac8487f450e0743d55a0c3c91d516ebb52",
+      "target_byte_equal": true,
+      "visual_target_id": "visualtarget_8a7c9dbcfafcedbe2b2c"
+    },
+    {
+      "content_addressed_sidecar_relative_path": "semantic_sidecars/e49a5ac8237bb337ba7ee2be8a13e644c9d48981eb8b9e5580c288c860ccb35f.json",
+      "content_addressed_target_relative_path": "visual_targets/0274db749369959daac7fed17331e7f007ff5c47cc7b824698c3c298f5c0e4c2.png",
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "exported_sidecar_relative_path": "project/work/slide06/semantic_sidecar.json",
+      "exported_sidecar_semantic_sha256": "e49a5ac8237bb337ba7ee2be8a13e644c9d48981eb8b9e5580c288c860ccb35f",
+      "exported_target_relative_path": "project/src/slide6.png",
+      "exported_target_sha256": "0274db749369959daac7fed17331e7f007ff5c47cc7b824698c3c298f5c0e4c2",
+      "role": "slide_visual_target_design_reference",
+      "sequence": 6,
+      "sidecar_id": "sidecar_365e3284fc3e8132e688",
+      "sidecar_semantic_sha256": "e49a5ac8237bb337ba7ee2be8a13e644c9d48981eb8b9e5580c288c860ccb35f",
+      "slide_id": "slide-06-implementation-sources",
+      "source_sidecar_relative_path": "semantic_sidecars/slide-006.semantic.json",
+      "source_target_relative_path": "visual_targets/slide-006.png",
+      "source_target_sha256": "0274db749369959daac7fed17331e7f007ff5c47cc7b824698c3c298f5c0e4c2",
+      "target_byte_equal": true,
+      "visual_target_id": "visualtarget_1b24176472703beee735"
+    }
+  ],
+  "source_bundle_unchanged": true,
+  "timezone": "Asia/Seoul",
+  "validation_status": "PASS"
+}

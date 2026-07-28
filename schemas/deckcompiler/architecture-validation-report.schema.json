@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/architecture-validation-report.schema.json",
+  "title": "DeckCompiler Architecture Validation Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "artifact", "report_id", "presentation_architecture_id", "creative_architecture_id", "adapter_version", "existing_creative_frontend_builder_used", "planning_creative_reason", "slide_assignment_count", "orphan_slide_ids", "duplicate_slide_assignments", "module_ranges_contiguous", "batch_ranges_contiguous", "slide_order_preserved", "documentary_source_slide_counts", "design_invariant_set_id", "module_art_direction_set_id", "creative_fit_report_id", "presentation_architecture_content_sha256", "creative_template_architecture_content_sha256", "validation_status"],
+  "properties": {
+    "schema_name": {"const": "architecture_validation_report"}, "schema_version": {"const": "1.0.0"},
+    "artifact": {"allOf": [{"$ref": "artifact-envelope.schema.json"}, {"properties": {"artifact_type": {"const": "architecture_validation_report"}}}]},
+    "report_id": {"type": "string", "pattern": "^archvalidation_[0-9a-f]{20}$"}, "presentation_architecture_id": {"type": "string", "minLength": 1}, "creative_architecture_id": {"type": "string", "minLength": 1},
+    "adapter_version": {"const": "deckcompiler-creative-frontend-adapter-v1"}, "existing_creative_frontend_builder_used": {"const": "build_presentation_architecture"}, "planning_creative_reason": {"type": "string", "minLength": 1},
+    "slide_assignment_count": {"type": "integer", "minimum": 5, "maximum": 6}, "orphan_slide_ids": {"type": "array", "maxItems": 0}, "duplicate_slide_assignments": {"type": "array", "maxItems": 0},
+    "module_ranges_contiguous": {"const": true}, "batch_ranges_contiguous": {"const": true}, "slide_order_preserved": {"const": true},
+    "documentary_source_slide_counts": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 1}},
+    "design_invariant_set_id": {"type": "string", "pattern": "^invariants_[0-9a-f]{20}$"}, "module_art_direction_set_id": {"type": "string", "pattern": "^directions_[0-9a-f]{20}$"}, "creative_fit_report_id": {"type": "string", "pattern": "^fit_[0-9a-f]{20}$"},
+    "presentation_architecture_content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "creative_template_architecture_content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "validation_status": {"const": "valid"}
+  }
+}

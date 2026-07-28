@@ -1,0 +1,1341 @@
+{
+  "counts": {
+    "lock_mismatch": 0,
+    "missing": 0,
+    "unexpected_installed": 0,
+    "unknown_dynamic": 0
+  },
+  "credential_requirement": false,
+  "dynamic_imports": [],
+  "entrypoint_canary_commands": [
+    "python %DECKCOMPILER_EXTERNAL_SKILLS%/slide-image-dual-render/scripts/make_crops.py",
+    "python %DECKCOMPILER_EXTERNAL_SKILLS%/slide-image-dual-render/scripts/make_bg.py",
+    "python %DECKCOMPILER_EXTERNAL_SKILLS%/slide-image-dual-render/scripts/validate_pptx_package.py --help",
+    "python %DECKCOMPILER_EXTERNAL_SKILLS%/slide-visual-polish-qa/scripts/rasterize_pptx.py --help",
+    "python %DECKCOMPILER_EXTERNAL_SKILLS%/slide-visual-polish-qa/scripts/capture_html_screenshot.py --help",
+    "python %DECKCOMPILER_EXTERNAL_SKILLS%/slide-visual-polish-qa/scripts/compare_slide_images.py --help"
+  ],
+  "external_entrypoints": [
+    {
+      "canary": {
+        "canary_id": "canary_make_crops",
+        "expected_output_paths": [
+          "assets/crop.png",
+          "assets/manifest.json"
+        ],
+        "kind": "make_crops_stage"
+      },
+      "canonical_reachability": "REQUIRED_CANONICAL",
+      "entrypoint_id": "external_entrypoint_make_crops",
+      "imports": [
+        "numpy",
+        "PIL"
+      ],
+      "interpreter_owner": "deckcompiler_sys_executable",
+      "invoking_stage": "crop_contract_preflight",
+      "mapped_distributions": [
+        "numpy",
+        "Pillow"
+      ],
+      "relative_external_path_class": "%DECKCOMPILER_EXTERNAL_SKILLS%/slide-image-dual-render/scripts/make_crops.py",
+      "skill_id": "slide-image-dual-render",
+      "source_sha256": "d1fb348d40d6d98c7cafc8a4c313521fd46cbedddd156c488523d82ebfe7726d",
+      "validation_status": "PASS"
+    },
+    {
+      "canary": {
+        "canary_id": "canary_make_bg",
+        "expected_output_paths": [
+          "assets/bg.png"
+        ],
+        "kind": "make_bg_stage"
+      },
+      "canonical_reachability": "REQUIRED_CANONICAL",
+      "entrypoint_id": "external_entrypoint_make_bg",
+      "imports": [
+        "numpy",
+        "PIL"
+      ],
+      "interpreter_owner": "deckcompiler_sys_executable",
+      "invoking_stage": "official_orchestrator",
+      "mapped_distributions": [
+        "numpy",
+        "Pillow"
+      ],
+      "relative_external_path_class": "%DECKCOMPILER_EXTERNAL_SKILLS%/slide-image-dual-render/scripts/make_bg.py",
+      "skill_id": "slide-image-dual-render",
+      "source_sha256": "ffd89410c1419ce921f487861a129b029aece28950634fe5cd53d8749aa1449f",
+      "validation_status": "PASS"
+    },
+    {
+      "canary": {
+        "canary_id": "canary_validate_pptx_package",
+        "expected_output_paths": [],
+        "kind": "argument_parser_startup"
+      },
+      "canonical_reachability": "REQUIRED_CANONICAL",
+      "entrypoint_id": "external_entrypoint_validate_pptx_package",
+      "imports": [],
+      "interpreter_owner": "deckcompiler_sys_executable",
+      "invoking_stage": "official_final_gate",
+      "mapped_distributions": [],
+      "relative_external_path_class": "%DECKCOMPILER_EXTERNAL_SKILLS%/slide-image-dual-render/scripts/validate_pptx_package.py",
+      "skill_id": "slide-image-dual-render",
+      "source_sha256": "14f7b0aa24252439f6cb34ab0d86af1a062083b54ddb3b302e74f82e2ee3666a",
+      "validation_status": "PASS"
+    },
+    {
+      "canary": {
+        "canary_id": "canary_rasterize_pptx",
+        "expected_output_paths": [],
+        "kind": "argument_parser_startup"
+      },
+      "canonical_reachability": "REQUIRED_CANONICAL",
+      "entrypoint_id": "external_entrypoint_rasterize_pptx",
+      "imports": [
+        "win32com.client"
+      ],
+      "interpreter_owner": "deckcompiler_sys_executable",
+      "invoking_stage": "powerpoint_com_render",
+      "mapped_distributions": [
+        "pywin32"
+      ],
+      "relative_external_path_class": "%DECKCOMPILER_EXTERNAL_SKILLS%/slide-visual-polish-qa/scripts/rasterize_pptx.py",
+      "skill_id": "slide-visual-polish-qa",
+      "source_sha256": "4ccf00b5766fb3ca0b53c513bde6bfc4726c72b3f8efdbd245715e65d252c310",
+      "validation_status": "PASS"
+    },
+    {
+      "canary": {
+        "canary_id": "canary_capture_html_screenshot",
+        "expected_output_paths": [],
+        "kind": "argument_parser_startup"
+      },
+      "canonical_reachability": "REQUIRED_CANONICAL",
+      "entrypoint_id": "external_entrypoint_capture_html_screenshot",
+      "imports": [
+        "playwright.sync_api"
+      ],
+      "interpreter_owner": "deckcompiler_sys_executable",
+      "invoking_stage": "html_screenshot_evidence",
+      "mapped_distributions": [
+        "playwright"
+      ],
+      "relative_external_path_class": "%DECKCOMPILER_EXTERNAL_SKILLS%/slide-visual-polish-qa/scripts/capture_html_screenshot.py",
+      "skill_id": "slide-visual-polish-qa",
+      "source_sha256": "d6b12a483bbdfec3a067afbaf8deeca3d330ed79b99932ab5535214af041229c",
+      "validation_status": "PASS"
+    },
+    {
+      "canary": {
+        "canary_id": "canary_compare_slide_images",
+        "expected_output_paths": [],
+        "kind": "argument_parser_startup"
+      },
+      "canonical_reachability": "REQUIRED_CANONICAL",
+      "entrypoint_id": "external_entrypoint_compare_slide_images",
+      "imports": [
+        "skimage.metrics",
+        "cv2",
+        "PIL",
+        "numpy"
+      ],
+      "interpreter_owner": "deckcompiler_sys_executable",
+      "invoking_stage": "composite_qa",
+      "mapped_distributions": [
+        "scikit-image",
+        "opencv-python-headless",
+        "Pillow",
+        "numpy"
+      ],
+      "relative_external_path_class": "%DECKCOMPILER_EXTERNAL_SKILLS%/slide-visual-polish-qa/scripts/compare_slide_images.py",
+      "skill_id": "slide-visual-polish-qa",
+      "source_sha256": "9756742f5c9ec5ca630c3ae8ac2f8f274dd19d6fb61fce3a4df4f869bb923874",
+      "validation_status": "PASS"
+    }
+  ],
+  "external_skill_source_packaged": false,
+  "implementation_provenance": {
+    "audit_path": "docs/devpost/PHASE_07_0_3_EXTERNAL_PYTHON_DEPENDENCY_AUDIT.md",
+    "classification": "build_week_new",
+    "external_packages_classification": "external_existing",
+    "source_path": "src/presentation_agent/deckcompiler/release/external_python_runtime.py"
+  },
+  "import_preflight_commands": [
+    "python -I -c \"import numpy\"",
+    "python -I -c \"import PIL\"",
+    "python -I -c \"import win32com.client\"",
+    "python -I -c \"import playwright.sync_api\"",
+    "python -I -c \"import skimage.metrics\"",
+    "python -I -c \"import cv2\""
+  ],
+  "live_image_generation": false,
+  "lock": {
+    "install_command": "python -m pip install --require-hashes -r requirements/devpost-release.lock.txt",
+    "path": "requirements/devpost-release.lock.txt",
+    "sha256": "4fde8f6fd2584f66e2c5f6c0f57f822da19809cb9d12259e35537d3d378a21dc"
+  },
+  "manifest_hash": "1f895c6e45ef7fc9e807631566de9edcb403211b9ac9aa9666e6101eef626e07",
+  "manifest_id": "externalpydeps_7a122d50f4ffda57606a",
+  "module_to_distribution_mappings": [
+    {
+      "distribution": "numpy",
+      "import_preflight_command": "python -I -c \"import numpy\"",
+      "module": "numpy",
+      "reachability": "REQUIRED_CANONICAL"
+    },
+    {
+      "distribution": "Pillow",
+      "import_preflight_command": "python -I -c \"import PIL\"",
+      "module": "PIL",
+      "reachability": "REQUIRED_CANONICAL"
+    },
+    {
+      "distribution": "pywin32",
+      "import_preflight_command": "python -I -c \"import win32com.client\"",
+      "module": "win32com.client",
+      "reachability": "REQUIRED_CANONICAL"
+    },
+    {
+      "distribution": "playwright",
+      "import_preflight_command": "python -I -c \"import playwright.sync_api\"",
+      "module": "playwright.sync_api",
+      "reachability": "REQUIRED_CANONICAL"
+    },
+    {
+      "distribution": "scikit-image",
+      "import_preflight_command": "python -I -c \"import skimage.metrics\"",
+      "module": "skimage.metrics",
+      "reachability": "REQUIRED_CANONICAL"
+    },
+    {
+      "distribution": "opencv-python-headless",
+      "import_preflight_command": "python -I -c \"import cv2\"",
+      "module": "cv2",
+      "reachability": "REQUIRED_CANONICAL"
+    }
+  ],
+  "network_policy": {
+    "artifact_acquisition": "public_index_without_credentials",
+    "canonical_demo": "not_required_after_lock_artifacts_are_available"
+  },
+  "ocr_enabled": false,
+  "optional_unreached_distributions": [
+    {
+      "name": "pytesseract",
+      "reachability": "OPTIONAL_UNREACHED",
+      "reason": "slide-text-layer-inpaint Python entrypoints are outside the canonical six-slide release graph"
+    }
+  ],
+  "release_profile_id": "devpost_p0_frozen_visuals",
+  "required_distributions": [
+    {
+      "artifacts": [
+        {
+          "filename": "annotated_types-0.7.0-py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [],
+      "license": {
+        "classification": "existing release license boundary",
+        "evidence_sha256": "fe1049884b1a0d9342901e88e07f32925d24b3121d9972b6a6805fb9824b095d",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "annotated-types",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "0.7.0",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "attrs-26.1.0-py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [],
+      "license": {
+        "classification": "MIT",
+        "evidence_sha256": "882115c95dfc2af1eeb6714f8ec6d5cbcabf667caff8729f42420da63f714e9f",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "attrs",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "26.1.0",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "cairocffi-1.7.1-py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "9803a0e11f6c962f3b0ae2ec8ba6ae45e957a146a004697a1ac1bbf16b073b3f",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [
+        "cffi"
+      ],
+      "license": {
+        "classification": "existing release license boundary",
+        "evidence_sha256": "501c0ecaea5f4db177120b3e413c6da814f5575246b603463899efb6204b5528",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "cairocffi",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "1.7.1",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "cairosvg-2.9.0-py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "4b82d07d145377dffdfc19d9791bd5fb65539bb4da0adecf0bdbd9cd4ffd7c68",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [
+        "cairocffi",
+        "cssselect2",
+        "defusedxml",
+        "pillow",
+        "tinycss2"
+      ],
+      "license": {
+        "classification": "LGPL-3.0-or-later",
+        "evidence_sha256": "ea8af5e789cb2d4e9b10bce3874982ade163b749b6bfbdb32e2df21c4d106de1",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "CairoSVG",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "2.9.0",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "cffi-2.1.0-cp311-cp311-win_amd64.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "4f26194e3d95e06501b942642855aed4f953d55e95d7d01b7c4483db3ecff458",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [
+        "pycparser"
+      ],
+      "license": {
+        "classification": "MIT-0",
+        "evidence_sha256": "5ba24ddc57067f9249add644c3afc41a5d6dc37e23433ef759d95df370b0af63",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "cffi",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "2.1.0",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "cssselect2-0.9.0-py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "6a99e5f91f9a016a304dd929b0966ca464bcfda15177b6fb4a118fc0fb5d9563",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [
+        "tinycss2",
+        "webencodings"
+      ],
+      "license": {
+        "classification": "existing release license boundary",
+        "evidence_sha256": "6fd97229a1d1b0f6a8b41e109f413426dbc0874b1e03746d66cc33282601c2c2",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "cssselect2",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "0.9.0",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "defusedxml-0.7.1-py2.py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "a352e7e428770286cc899e2542b6cdaedb2b4953ff269a210103ec58f6198a61",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [],
+      "license": {
+        "classification": "PSFL",
+        "evidence_sha256": "b80ce9da8c42a1f91079627fbbe2bf27210ae108a0ffe5f077d5b08e076c24c8",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "defusedxml",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "0.7.1",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "greenlet-3.5.3-cp311-cp311-win_amd64.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "0f41e4a05a3c0cb31b17023eff28dd111e1d16bf7d7d00406cd7df23f31398a7",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [],
+      "license": {
+        "classification": "MIT AND PSF-2.0",
+        "evidence_sha256": "ab977b654605670319509481ece49198f405a129372ac38c96f51cd96c2f452e",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "greenlet",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "3.5.3",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "imageio-2.37.2-py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "ad9adfb20335d718c03de457358ed69f141021a333c40a53e57273d8a5bd0b9b",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [
+        "numpy",
+        "pillow"
+      ],
+      "license": {
+        "classification": "BSD-2-Clause",
+        "evidence_sha256": "35641774b137b62cec00d0af29313a9d13de0c152c977a34e591b231dab62a0f",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "ImageIO",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_CANONICAL",
+      "version": "2.37.2",
+      "version_selection_authority": "successful_Phase_7C_interpreter"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "jsonschema-4.26.0-py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "d489f15263b8d200f8387e64b4c3a75f06629559fb73deb8fdfb525f2dab50ce",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [
+        "attrs",
+        "jsonschema-specifications",
+        "referencing",
+        "rpds-py"
+      ],
+      "license": {
+        "classification": "MIT",
+        "evidence_sha256": "4f92a015a13c4d1a040bef018aa13430b4f1bc73b41b16bb846c346766de7439",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "jsonschema",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "4.26.0",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "jsonschema_specifications-2025.9.1-py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "98802fee3a11ee76ecaca44429fda8a41bff98b00a0f2838151b113f210cc6fe",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [
+        "referencing"
+      ],
+      "license": {
+        "classification": "MIT",
+        "evidence_sha256": "42dcd63495f87b4eb7c7757afa379bb55a53f94afd7a5f657d9adf57236e515c",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "jsonschema-specifications",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "2025.9.1",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "lazy_loader-0.4-py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "342aa8e14d543a154047afb4ba8ef17f5563baad3fc610d7b15b213b0f119efc",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [
+        "packaging"
+      ],
+      "license": {
+        "classification": "BSD-3-Clause",
+        "evidence_sha256": "797b6937a4f976836efbbbb3ae333d7866ddc3eb3cb152972b2be348d3529372",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "lazy_loader",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_CANONICAL",
+      "version": "0.4",
+      "version_selection_authority": "successful_Phase_7C_interpreter"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "lxml-6.1.1-cp311-cp311-win_amd64.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "abbefa31eee84842140f67acef1c828e28bba8bbf0c3bc6e5492a9af88152c28",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [],
+      "license": {
+        "classification": "BSD-3-Clause",
+        "evidence_sha256": "e7c3ce8d76331b0101cc46790ab43958ea90a364bcf962ed8763d5a818340e69",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "lxml",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "6.1.1",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "networkx-3.6.1-py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "d47fbf302e7d9cbbb9e2555a0d267983d2aa476bac30e90dfbe5669bd57f3762",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [],
+      "license": {
+        "classification": "BSD-3-Clause",
+        "evidence_sha256": "3cf7c3a179d817b23b8b8568211769fefdf93797d207d984b8b2fa24d0220b33",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "networkx",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_CANONICAL",
+      "version": "3.6.1",
+      "version_selection_authority": "successful_Phase_7C_interpreter"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "numpy-2.2.6-cp311-cp311-win_amd64.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "e8213002e427c69c45a52bbd94163084025f533a55a59d6f9c5b820774ef3303",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [],
+      "license": {
+        "classification": "BSD-3-Clause with bundled third-party notices",
+        "evidence_sha256": "14256cc3a2c9d32ac284da96b937feb44f72dd90bee2317ac3020166846ad99d",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "numpy",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_CANONICAL",
+      "version": "2.2.6",
+      "version_selection_authority": "successful_Phase_7C_interpreter"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "opencv_python_headless-4.12.0.88-cp37-abi3-win_amd64.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "86b413bdd6c6bf497832e346cd5371995de148e579b9774f8eba686dee3f5528",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [
+        "numpy"
+      ],
+      "license": {
+        "classification": "MIT wrapper; Apache-2.0 OpenCV with bundled third-party notices",
+        "evidence_sha256": "edef0fac1eb08d29d34563f724742e078da2513e196133a12c6ad9ff01e26107",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "opencv-python-headless",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_CANONICAL",
+      "version": "4.12.0.88",
+      "version_selection_authority": "successful_Phase_7C_interpreter"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "packaging-25.0-py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "29572ef2b1f17581046b3a2227d5c611fb25ec70ca1ba8554b24b0e69331a484",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [],
+      "license": {
+        "classification": "Apache-2.0 OR BSD-2-Clause",
+        "evidence_sha256": "cad1ef5bd340d73e074ba614d26f7deaca5c7940c3d8c34852e65c4909686c48",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "packaging",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_CANONICAL",
+      "version": "25.0",
+      "version_selection_authority": "successful_Phase_7C_interpreter"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "pillow-11.3.0-cp311-cp311-win_amd64.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "1a992e86b0dd7aeb1f053cd506508c0999d710a8f07b4c791c63843fc6a807ac",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [],
+      "license": {
+        "classification": "MIT-CMU",
+        "evidence_sha256": "19544bf53af689a3319a4fb5067370f0f0d68d2c5300a2157674f5ef8a4fd965",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "pillow",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_CANONICAL",
+      "version": "11.3.0",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "playwright-1.61.0-py3-none-win_amd64.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "35c6cc4589a5d00964a59d7b3e59641e0aac0c02f15479a7af77d20f6bc79597",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [
+        "greenlet",
+        "pyee"
+      ],
+      "license": {
+        "classification": "Apache-2.0",
+        "evidence_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "playwright",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_CANONICAL",
+      "version": "1.61.0",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "pycparser-3.0-py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [],
+      "license": {
+        "classification": "BSD-3-Clause",
+        "evidence_sha256": "0c846399369ea76ddd7b5c44fe6d16497415fcf015f5cbb508c24bf98b81c5b1",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "pycparser",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "3.0",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "pydantic-2.13.4-py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "45a282cde31d808236fd7ea9d919b128653c8b38b393d1c4ab335c62924d9aba",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [
+        "annotated-types",
+        "pydantic-core",
+        "typing-extensions",
+        "typing-inspection"
+      ],
+      "license": {
+        "classification": "MIT",
+        "evidence_sha256": "a9e186f3ca16b5eef84318e7a701721351a00cb7b8ae3a4394b67b49e3529ef3",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "pydantic",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "2.13.4",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "pydantic_core-2.46.4-cp311-cp311-win_amd64.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "6f2eeda33a839975441c86a4119e1383c50b47faf0cbb5176985565c6bb02c33",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [
+        "typing-extensions"
+      ],
+      "license": {
+        "classification": "MIT",
+        "evidence_sha256": "fbe7f615f18d135c07000e5a86325db27f42c7729699ef166ac1f7a3f4586bf4",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "pydantic_core",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "2.46.4",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "pyee-13.0.1-py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "af2f8fede4171ef667dfded53f96e2ed0d6e6bd7ee3bb46437f77e3b57689228",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [
+        "typing-extensions"
+      ],
+      "license": {
+        "classification": "MIT",
+        "evidence_sha256": "1ff556ca206b107f10e1c562ae454d3292e0296c3510eb90eb7f114caee32a66",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "pyee",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "13.0.1",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "pymupdf-1.28.0-cp310-abi3-win_amd64.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "e01e90fd86abfeb37ceb921eddb951f988a11d45ff6ce6b7664f2039849068ec",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [],
+      "license": {
+        "classification": "Dual Licensed - GNU AFFERO GPL 3.0 or Artifex Commercial License",
+        "evidence_sha256": "f0e2033d3c1efb8d58c4f4650110319a63aa36d0070a9a224b956e03640d5d05",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "pymupdf",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "1.28.0",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "python_docx-1.2.0-py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "3fd478f3250fbbbfd3b94fe1e985955737c145627498896a8a6bf81f4baf66c7",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [
+        "lxml",
+        "typing-extensions"
+      ],
+      "license": {
+        "classification": "MIT",
+        "evidence_sha256": "7652f271e46d0d533e9dc463f3b5fcbdcacf4d6a9c8d6b554d15efd0f37f6132",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "python-docx",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "1.2.0",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "python_pptx-1.0.2-py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "160838e0b8565a8b1f67947675886e9fea18aa5e795db7ae531606d68e785cba",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [
+        "lxml",
+        "pillow",
+        "typing-extensions",
+        "xlsxwriter"
+      ],
+      "license": {
+        "classification": "MIT",
+        "evidence_sha256": "7652f271e46d0d533e9dc463f3b5fcbdcacf4d6a9c8d6b554d15efd0f37f6132",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "python-pptx",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "1.0.2",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "pywin32-311-cp311-cp311-win_amd64.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "3ce80b34b22b17ccbd937a6e78e7225d80c52f5ab9940fe0506a1a16f3dab503",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [],
+      "license": {
+        "classification": "PSF",
+        "evidence_sha256": "c2dd5b63b3925e6fd9169bd448da00fe45c47f9433e1b619a0abb5f823e10752",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "pywin32",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_CANONICAL",
+      "version": "311",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "pyyaml-6.0.3-cp311-cp311-win_amd64.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "9f3bfb4965eb874431221a3ff3fdcddc7e74e3b07799e0e84ca4a0f867d449bf",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [],
+      "license": {
+        "classification": "MIT",
+        "evidence_sha256": "8d3928f9dc4490fd635707cb88eb26bd764102a7282954307d3e5167a577e8a4",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "PyYAML",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "6.0.3",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "referencing-0.37.0-py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "381329a9f99628c9069361716891d34ad94af76e461dcb0335825aecc7692231",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [
+        "attrs",
+        "rpds-py",
+        "typing-extensions"
+      ],
+      "license": {
+        "classification": "MIT",
+        "evidence_sha256": "42dcd63495f87b4eb7c7757afa379bb55a53f94afd7a5f657d9adf57236e515c",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "referencing",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "0.37.0",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "rpds_py-2026.6.3-cp311-cp311-win_amd64.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "2c54a076ca4d370980ab57bc0e31df57bbe8d41340436a90ef8b1219a3cbb127",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [],
+      "license": {
+        "classification": "MIT",
+        "evidence_sha256": "8bcb72c82ea8ae74802293c41d93ad7d51434001b0ae45a603a5af0f507aee0a",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "rpds-py",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "2026.6.3",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "scikit_image-0.26.0-cp311-cp311-win_amd64.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "9490360c8d3f9a7e85c8de87daf7c0c66507960cf4947bb9610d1751928721c7",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [
+        "imageio",
+        "lazy-loader",
+        "networkx",
+        "numpy",
+        "packaging",
+        "pillow",
+        "scipy",
+        "tifffile"
+      ],
+      "license": {
+        "classification": "BSD-3-Clause with bundled third-party notices",
+        "evidence_sha256": "c0ae0d653416915f77a6364eef489ab59fcb319514a806422285cb4359657c5b",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "scikit-image",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_CANONICAL",
+      "version": "0.26.0",
+      "version_selection_authority": "successful_Phase_7C_interpreter"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "scipy-1.17.0-cp311-cp311-win_amd64.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "255c0da161bd7b32a6c898e7891509e8a9289f0b1c6c7d96142ee0d2b114c2ea",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [
+        "numpy"
+      ],
+      "license": {
+        "classification": "BSD-3-Clause with bundled third-party notices",
+        "evidence_sha256": "564d63dbef2ef3eb1dec94908966d3edf5f11c487ee2cf2baf8bf3faef01bdd9",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "scipy",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_CANONICAL",
+      "version": "1.17.0",
+      "version_selection_authority": "successful_Phase_7C_interpreter"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "tifffile-2026.1.14-py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "29cf4adb43562a4624fc959018ab1b44e0342015d3db4581b983fe40e05f5924",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [
+        "numpy"
+      ],
+      "license": {
+        "classification": "BSD-3-Clause",
+        "evidence_sha256": "65e641f17cfce25ed2c02f0d53c94cfa2382cc8817eca649a7fff2b890114aa4",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "tifffile",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_CANONICAL",
+      "version": "2026.1.14",
+      "version_selection_authority": "successful_Phase_7C_interpreter"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "tinycss2-1.5.1-py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "3415ba0f5839c062696996998176c4a3751d18b7edaaeeb658c9ce21ec150661",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [
+        "webencodings"
+      ],
+      "license": {
+        "classification": "existing release license boundary",
+        "evidence_sha256": "6b94acee20ec9f2709333134f3ba70322535fb420af0ce8c1455d9cbe297f1d5",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "tinycss2",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "1.5.1",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "typing_extensions-4.16.0-py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [],
+      "license": {
+        "classification": "PSF-2.0",
+        "evidence_sha256": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "typing_extensions",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "4.16.0",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "typing_inspection-0.4.2-py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "4ed1cacbdc298c220f1bd249ed5287caa16f34d44ef4e9c3d0cbad5b521545e7",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [
+        "typing-extensions"
+      ],
+      "license": {
+        "classification": "MIT",
+        "evidence_sha256": "804b59b25f2c31bd278f9202a19ae49a3945aa2664387e2d0a128c7cacc61ec3",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "typing-inspection",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "0.4.2",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "webencodings-0.5.1-py2.py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [],
+      "license": {
+        "classification": "BSD",
+        "evidence_sha256": "290ec583c2efe3f9db5006f3012dbd426897cc6ec79d62c85e9176a0de0fdaee",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "webencodings",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "0.5.1",
+      "version_selection_authority": "existing_release_lock"
+    },
+    {
+      "artifacts": [
+        {
+          "filename": "xlsxwriter-3.2.9-py3-none-any.whl",
+          "platform_compatibility": "Windows_x64_CPython_3.11",
+          "sha256": "9a5db42bc5dff014806c58a20b9eae7322a134abb6fce3c92c181bfb275ec5b3",
+          "source_index_class": "public_pypi"
+        }
+      ],
+      "dependencies": [],
+      "license": {
+        "classification": "BSD-2-Clause",
+        "evidence_sha256": "10d504f188e087f07a06b9038ed0535f37ac072c232e60c075ddb0aedb7b7d78",
+        "metadata_source": "wheel_METADATA_and_license_files",
+        "unresolved": false
+      },
+      "name": "xlsxwriter",
+      "provenance": {
+        "classification": "external_existing",
+        "delivery_zip_inclusion": false,
+        "source_packaged": false,
+        "wheel_installed_in_runtime": true
+      },
+      "reachability": "REQUIRED_PREFLIGHT",
+      "version": "3.2.9",
+      "version_selection_authority": "existing_release_lock"
+    }
+  ],
+  "schema_name": "external_python_runtime_dependency_manifest",
+  "schema_version": "1.0.0",
+  "status": "PASS",
+  "supported_runtime": {
+    "architecture": "AMD64/x64",
+    "implementation": "CPython",
+    "os": "Windows",
+    "platform": "win_amd64",
+    "python_version": "3.11.9"
+  },
+  "tested_external_skill_pin": {
+    "aggregate_sha256": "3dd4541fb0f2f4cf421d2a5c3cf2002390c0b00661a2e4d3a588d4467600022a",
+    "artifact_sha256": "61b64ca02cb1301c215d1cfa90b1f558ae127d3a19b2d49f2b82746930ef0a84"
+  }
+}

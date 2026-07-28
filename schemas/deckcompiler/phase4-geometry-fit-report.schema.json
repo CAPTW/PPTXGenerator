@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/deckcompiler/phase4-geometry-fit-report.schema.json",
+  "title": "Phase 4 Geometry-aware Fit Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "report_id", "slide_count", "layout_ids", "unique_layout_count", "layout_repetition_violation_count", "module_differentiation_status", "semantic_fit_status", "capacity_fit_status", "editability_fit_status", "differentiation_fit_status", "slides", "status", "report_hash"],
+  "properties": {
+    "schema_name": {"const": "phase4_geometry_fit_report"}, "schema_version": {"const": "1.0.0"}, "report_id": {"type": "string"},
+    "slide_count": {"const": 6}, "layout_ids": {"type": "array", "minItems": 6, "maxItems": 6, "uniqueItems": true}, "unique_layout_count": {"const": 6},
+    "layout_repetition_violation_count": {"const": 0}, "module_differentiation_status": {"const": "PASS"},
+    "semantic_fit_status": {"const": "PASS"}, "capacity_fit_status": {"const": "PASS"}, "editability_fit_status": {"const": "PASS"}, "differentiation_fit_status": {"const": "PASS"},
+    "slides": {"type": "array", "minItems": 6, "maxItems": 6, "items": {"type": "object"}}, "status": {"const": "PASS"},
+    "report_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

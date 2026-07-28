@@ -1,0 +1,37 @@
+{
+  "created_at": "2026-07-22T10:29:26.436575+09:00",
+  "direct_final_output_patch": false,
+  "evidence_bindings_unchanged": true,
+  "manifest_hash": "c9c2496a7d70e618c6b26cad38d94b0ab44a866a3dc800c4fe6ac51cb7f64ae3",
+  "manifest_id": "before_after_99336b552f1c1f988ab2",
+  "repair_plan_hash": "66774f6af9d3c3ac4ba6bd84b53d64d63101d181bc77c8757862db8dbeb1edd9",
+  "schema_name": "phase6_before_after_manifest",
+  "schema_version": "1.0.0",
+  "semantic_content_unchanged": true,
+  "states": {
+    "baseline": {
+      "html_sha256": "4569882c7153f6e846b350df68322fa820adf7ff34508dc4aac07be2834e19a7",
+      "pptx_sha256": "a96df5566eb850d38efa18b56033c547a65192b606723588c8fa6ad09d2ab034",
+      "upstream_sha256": "8130f47caa5decf4e1df5343f405fcc79ff18f6d7c6e1880d7e56733d45ae20b"
+    },
+    "faulty": {
+      "html_sha256": "b1b6943c79948b9cce80660b0ea8dd2984414970d82ba9fcbf3de187e7ca732a",
+      "pptx_sha256": "b9595e23e659cc748f084b130a6ff1345cfdfd781517f63d17bad441ae3e1230",
+      "upstream_sha256": "ed30ddbd3f390b705a1e90bb134d93c33496b32decc3d21473b5221991cc781c"
+    },
+    "repaired": {
+      "html_sha256": "4569882c7153f6e846b350df68322fa820adf7ff34508dc4aac07be2834e19a7",
+      "pptx_sha256": "6fd3fa50cab6d56c8fe943b515e93d36dde485a843e34b0ea710890ac8c845a5",
+      "upstream_sha256": "8130f47caa5decf4e1df5343f405fcc79ff18f6d7c6e1880d7e56733d45ae20b"
+    }
+  },
+  "timezone": "Asia/Seoul",
+  "visual_evidence": {
+    "baseline_slide_001_sha256": "17ca4cea2f906ba914242fc125f14f8fa193c634d95be811e92e8b800070a239",
+    "contact_sheet_sha256": "57c30bcca3d2e7b69afd8782357925395b230754f2cb13cdb026a66d68d584b0",
+    "faulty_slide_001_sha256": "3a78c7a9f2ab0f5bb4c7a6718b1394a0f79ff9fabedb0c2ef855660d1df49110",
+    "labels_outside_slide_image_regions": true,
+    "repaired_slide_001_sha256": "1d9753e704f776238d07862082540ee78dbc64630d50a8136e43151a28633684"
+  },
+  "visual_targets_unchanged": true
+}

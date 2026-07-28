@@ -1,0 +1,36 @@
+{
+  "active_output_set": "phase5_baseline",
+  "checks": {
+    "all_dimension_reports_pass": true,
+    "error_count": 0,
+    "release_blocking_warning_count": 0,
+    "severe_count": 0,
+    "unresolved_repairable_count": 0
+  },
+  "composite_report_hash": "682c4193a1cdac5f8195adfc555637d6db2bc091a37c3ce1e046d999d075a3d6",
+  "created_at": "2026-07-22T10:30:00+09:00",
+  "final_release_eligible": false,
+  "implementation_provenance": {
+    "acceptance_authority": "DeckCompiler independent composite gate",
+    "component": "presentation_agent.deckcompiler.qa",
+    "deckcompiler_commit": "e2a6fabb1916680800097981fbda27abfe02b852",
+    "detector_version": "1.0.0",
+    "external_outputs_may_self_accept": false
+  },
+  "phase7_required": true,
+  "producer": "DeckCompiler independent composite acceptance",
+  "report_hash": "f242fbfa2dae2cca82cb3c7f574fd2386d2e14709f07c8f5b235a3e2109bc9cf",
+  "report_id": "report_300751f9a706c801a342",
+  "run_id": "phase6qa_9bd9b0fcf02397f92902",
+  "schema_name": "phase6_baseline_composite_acceptance",
+  "schema_version": "1.0.0",
+  "source_artifacts": [
+    {
+      "artifact_id": "report_059bebe46242a41b2466",
+      "path": "composite_qa_report.json",
+      "sha256": "682c4193a1cdac5f8195adfc555637d6db2bc091a37c3ce1e046d999d075a3d6"
+    }
+  ],
+  "status": "PASS",
+  "timezone": "Asia/Seoul"
+}

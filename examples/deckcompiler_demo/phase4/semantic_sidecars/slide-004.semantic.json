@@ -1,0 +1,328 @@
+{
+  "artifact_hash": "969fc9609a6dc86a546e736606f3e7755a4ddc57c3d14fbf55c2e089adbd2389",
+  "expected_visual_target_id": "visualtarget_83244783582673b6aa13",
+  "phase4_metadata": {
+    "accessibility_description": "Response options and trade-offs. Compare viable response options against explicit decision criteria.",
+    "canonical_content_hashes": {
+      "citation-01": "5de40ffbd84b62c89c64eb30bcb3a1a2f562c55e0f4d5e6d1df2fff4fb458a96",
+      "citation-02": "2e6245356dcab3618b9d9d0d49659415fdbe6957f34c3c2cc049f9da5e2513bb",
+      "citation-03": "84a664e1ab209f5c268b7153d2f36a792152db0cdead4b3cbc7c5ab76679be4a",
+      "citation-04": "14ecff788b7441337bcc562256c59b87c913c402caf1decdaf87f1211d666f04",
+      "slide-04-options-comparison-evidence-01": "9988d2bd71591518d3bc1ee213e661fbedce9f73f7f00400f193d6ca1fa20715",
+      "slide-04-options-comparison-evidence-02": "9064f1e51ae0a83d5fae270930bf1ceebd4d2b59f766023f0a93fd6d72a8d4f1",
+      "slide-04-options-comparison-evidence-03": "8b7d58c35eb398b4d590534db51b20e81c097b68338296cf31f92e2e3041b0f8",
+      "slide-04-options-comparison-evidence-04": "2096d5daeeec19d961cfdc6436fa3c9cbc70e9a919aa959bbebc5592a3dcf62d",
+      "speaker_notes": "823a9a907ed5c64e3d7f28df78534c84e41a7af90b6a6c628e9c3a6c2d3fcb6f",
+      "subtitle": "b9b0047e90ff1fbe00da1175ea9ce6c6054b221b68243ac522f899bc2137e54d",
+      "title": "567bbb95ea802aed1d667dbc47e29956d64799e27becaf7ec67bd669143ab62b"
+    },
+    "citations": [
+      {
+        "citation_id": "ev_692a15a6856df4a9484c",
+        "label": "AI Data Center Cooling Risk Decision Report, page 2",
+        "source": "src_e35364d65cb7cc6e21dd"
+      },
+      {
+        "citation_id": "ev_e184c02fa9909a06fe7b",
+        "label": "AI Data Center Cooling Risk Decision Report, page 2",
+        "source": "src_e35364d65cb7cc6e21dd"
+      },
+      {
+        "citation_id": "ev_7b513d3be05ca22d959d",
+        "label": "AI Data Center Cooling Risk Decision Report, page 2",
+        "source": "src_e35364d65cb7cc6e21dd"
+      },
+      {
+        "citation_id": "ev_0fe80954e95f7fb477e8",
+        "label": "AI Data Center Cooling System Overview, page 2",
+        "source": "src_28f15fd546b6f681dba7"
+      }
+    ],
+    "diagram_edges": [],
+    "diagram_nodes": [],
+    "evidence_unit_bindings": [
+      "ev_0fe80954e95f7fb477e8",
+      "ev_692a15a6856df4a9484c",
+      "ev_7b513d3be05ca22d959d",
+      "ev_e184c02fa9909a06fe7b"
+    ],
+    "exact_body_blocks": [
+      {
+        "content_item_id": "slide-04-options-comparison-evidence-01",
+        "slot": "table",
+        "text": "Option A adds pump-path redundancy and automated failover, giving the strongest interruption protection at the highest implementation effort.",
+        "type": "source_evidence"
+      },
+      {
+        "content_item_id": "slide-04-options-comparison-evidence-02",
+        "slot": "table",
+        "text": "Option B increases monitoring and calibration frequency, reducing detection delay at lower effort but leaving pump-path exposure unchanged.",
+        "type": "source_evidence"
+      },
+      {
+        "content_item_id": "slide-04-options-comparison-evidence-03",
+        "slot": "table",
+        "text": "Prefer an option that protects thermal margin, preserves maintainability, and can be verified through staged commissioning.",
+        "type": "source_evidence"
+      },
+      {
+        "content_item_id": "slide-04-options-comparison-evidence-04",
+        "slot": "table",
+        "text": "The synthetic normal supply-temperature target is 27 C with an allowed steady-state band of plus or minus 1 C.",
+        "type": "source_evidence"
+      }
+    ],
+    "exact_labels": [
+      "TITLE",
+      "SUBTITLE",
+      "TABLE",
+      "FOOTER",
+      "SOURCE_NOTES",
+      "PAGE_NUMBER"
+    ],
+    "exact_numbers": [
+      {
+        "context": "The synthetic normal supply-temperature target is 27 C with an allowed steady-state band of plus or minus 1 C.",
+        "evidence_id": "ev_0fe80954e95f7fb477e8",
+        "unit": "C",
+        "value": 27
+      }
+    ],
+    "exact_subtitle": "Claim origin: documentary fact",
+    "exact_title": "Response options and trade-offs",
+    "exact_units": [
+      "C"
+    ],
+    "factual_content_item_ids": [
+      "slide-04-options-comparison-evidence-01",
+      "slide-04-options-comparison-evidence-02",
+      "slide-04-options-comparison-evidence-03",
+      "slide-04-options-comparison-evidence-04"
+    ],
+    "full_slide_raster_forbidden": true,
+    "native_required_slot_ids": [
+      "title",
+      "subtitle",
+      "table",
+      "footer",
+      "source_notes",
+      "page_number"
+    ],
+    "ocr_canonical_text_forbidden": true,
+    "primary_message": "Compare viable response options against explicit decision criteria.",
+    "raster_allowed_slot_ids": [],
+    "slide_role": "option_comparison",
+    "source_note_policy": "Visible native footer/source-note region; exact citation text remains Sidecar authority.",
+    "speaker_note_candidates": [
+      "Source notes: page 2, block 2 — AI Data Center Cooling Risk Decision Report; page 2, block 3 — AI Data Center Cooling Risk Decision Report; page 2, block 4 — AI Data Center Cooling Risk Decision Report; page 2, block 3 — AI Data Center Cooling System Overview"
+    ],
+    "structured_chart_data": {
+      "series": []
+    },
+    "structured_table_data": {
+      "columns": [
+        "evidence_statement"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Option A adds pump-path redundancy and automated failover, giving the strongest interruption protection at the highest implementation effort."
+          ],
+          "row_id": "slide-04-options-comparison-evidence-01"
+        },
+        {
+          "cells": [
+            "Option B increases monitoring and calibration frequency, reducing detection delay at lower effort but leaving pump-path exposure unchanged."
+          ],
+          "row_id": "slide-04-options-comparison-evidence-02"
+        },
+        {
+          "cells": [
+            "Prefer an option that protects thermal margin, preserves maintainability, and can be verified through staged commissioning."
+          ],
+          "row_id": "slide-04-options-comparison-evidence-03"
+        },
+        {
+          "cells": [
+            "The synthetic normal supply-temperature target is 27 C with an allowed steady-state band of plus or minus 1 C."
+          ],
+          "row_id": "slide-04-options-comparison-evidence-04"
+        }
+      ]
+    },
+    "visual_target_is_not_semantic_source": true
+  },
+  "schema_name": "phase4_semantic_sidecar",
+  "schema_version": "1.0.0",
+  "sidecar": {
+    "batch_id": "batch-02-01",
+    "canonical_content": [
+      {
+        "kind": "text",
+        "slot_id": "title",
+        "value": "Response options and trade-offs"
+      },
+      {
+        "kind": "text",
+        "slot_id": "subtitle",
+        "value": "Claim origin: documentary fact"
+      },
+      {
+        "kind": "text",
+        "slot_id": "table",
+        "value": "Option A adds pump-path redundancy and automated failover, giving the strongest interruption protection at the highest implementation effort."
+      },
+      {
+        "kind": "text",
+        "slot_id": "table",
+        "value": "Option B increases monitoring and calibration frequency, reducing detection delay at lower effort but leaving pump-path exposure unchanged."
+      },
+      {
+        "kind": "text",
+        "slot_id": "table",
+        "value": "Prefer an option that protects thermal margin, preserves maintainability, and can be verified through staged commissioning."
+      },
+      {
+        "kind": "text",
+        "slot_id": "table",
+        "value": "The synthetic normal supply-temperature target is 27 C with an allowed steady-state band of plus or minus 1 C."
+      },
+      {
+        "kind": "citation",
+        "slot_id": "footer",
+        "value": {
+          "citation_id": "ev_692a15a6856df4a9484c",
+          "label": "AI Data Center Cooling Risk Decision Report, page 2",
+          "source": "src_e35364d65cb7cc6e21dd"
+        }
+      },
+      {
+        "kind": "citation",
+        "slot_id": "footer",
+        "value": {
+          "citation_id": "ev_e184c02fa9909a06fe7b",
+          "label": "AI Data Center Cooling Risk Decision Report, page 2",
+          "source": "src_e35364d65cb7cc6e21dd"
+        }
+      },
+      {
+        "kind": "citation",
+        "slot_id": "footer",
+        "value": {
+          "citation_id": "ev_7b513d3be05ca22d959d",
+          "label": "AI Data Center Cooling Risk Decision Report, page 2",
+          "source": "src_e35364d65cb7cc6e21dd"
+        }
+      },
+      {
+        "kind": "citation",
+        "slot_id": "footer",
+        "value": {
+          "citation_id": "ev_0fe80954e95f7fb477e8",
+          "label": "AI Data Center Cooling System Overview, page 2",
+          "source": "src_28f15fd546b6f681dba7"
+        }
+      },
+      {
+        "kind": "speaker_notes",
+        "slot_id": "speaker_notes",
+        "value": "Source notes: page 2, block 2 — AI Data Center Cooling Risk Decision Report; page 2, block 3 — AI Data Center Cooling Risk Decision Report; page 2, block 4 — AI Data Center Cooling Risk Decision Report; page 2, block 3 — AI Data Center Cooling System Overview"
+      }
+    ],
+    "content_hash": "64659c295b7708267a6a1b12f7ff54920416110290a87893ba454f1da2f04f29",
+    "editability_policy": {
+      "cards": "native_required",
+      "charts": "native_required",
+      "full_slide_raster": "forbidden",
+      "image_frames": "replaceable",
+      "speaker_notes": "native_required",
+      "tables": "native_required",
+      "text": "native_required"
+    },
+    "layout_id": "layout-options-matrix",
+    "module_id": "module-02-section_02_evaluate",
+    "native_required": [
+      {
+        "object_type": "text_box",
+        "slot_id": "title"
+      },
+      {
+        "object_type": "text_box",
+        "slot_id": "subtitle"
+      },
+      {
+        "object_type": "table",
+        "slot_id": "table"
+      },
+      {
+        "object_type": "footer",
+        "slot_id": "footer"
+      },
+      {
+        "object_type": "footer",
+        "slot_id": "source_notes"
+      },
+      {
+        "object_type": "footer",
+        "slot_id": "page_number"
+      }
+    ],
+    "raster_allowed": [],
+    "schema_name": "slide_semantic_sidecar",
+    "schema_version": "1.0.0",
+    "slide_id": "slide-04-options-comparison",
+    "source_bindings": [
+      {
+        "element": "slide-04-options-comparison-evidence-01",
+        "evidence_ids": [
+          "ev_692a15a6856df4a9484c"
+        ]
+      },
+      {
+        "element": "slide-04-options-comparison-evidence-02",
+        "evidence_ids": [
+          "ev_e184c02fa9909a06fe7b"
+        ]
+      },
+      {
+        "element": "slide-04-options-comparison-evidence-03",
+        "evidence_ids": [
+          "ev_7b513d3be05ca22d959d"
+        ]
+      },
+      {
+        "element": "slide-04-options-comparison-evidence-04",
+        "evidence_ids": [
+          "ev_0fe80954e95f7fb477e8"
+        ]
+      },
+      {
+        "element": "citation-01",
+        "evidence_ids": [
+          "ev_692a15a6856df4a9484c"
+        ]
+      },
+      {
+        "element": "citation-02",
+        "evidence_ids": [
+          "ev_e184c02fa9909a06fe7b"
+        ]
+      },
+      {
+        "element": "citation-03",
+        "evidence_ids": [
+          "ev_7b513d3be05ca22d959d"
+        ]
+      },
+      {
+        "element": "citation-04",
+        "evidence_ids": [
+          "ev_0fe80954e95f7fb477e8"
+        ]
+      }
+    ],
+    "template_family_id": "family-comparison-matrix"
+  },
+  "sidecar_id": "sidecar_669adc2c4ebcb89c3d6c",
+  "source_commit": "00fefe71e3b02fa897794f9e9f3d6df5be715cd8"
+}

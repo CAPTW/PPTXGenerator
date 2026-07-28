@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/external-visual-qa-source-results.schema.json",
+  "title": "DeckCompiler canonical external visual QA source results",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name", "schema_version", "source_tool", "source_command", "source_output_version",
+    "source_summary_reference", "source_summary_sha256", "reported_counts", "reported_total",
+    "reported_nonpass_count", "parsed_source_result_count", "parsed_summary_record_count",
+    "parsed_rule_record_count", "duplicate_source_result_count", "unsupported_source_result_count",
+    "source_results", "conservation", "status", "created_at", "timezone", "report_hash"
+  ],
+  "properties": {
+    "schema_name": {"const": "external_visual_qa_source_results"},
+    "schema_version": {"const": "1.0.0"},
+    "source_tool": {"const": "slide-visual-polish-qa"},
+    "source_command": {"type": "array", "items": {"type": "string"}},
+    "source_output_version": {"type": "string", "minLength": 1},
+    "source_summary_reference": {"type": "string", "minLength": 1},
+    "source_summary_sha256": {"$ref": "#/$defs/hash"},
+    "reported_counts": {"$ref": "#/$defs/counts"},
+    "reported_total": {"type": "integer", "minimum": 0},
+    "reported_nonpass_count": {"type": "integer", "minimum": 0},
+    "parsed_source_result_count": {"type": "integer", "minimum": 0},
+    "parsed_summary_record_count": {"type": "integer", "minimum": 0, "maximum": 1},
+    "parsed_rule_record_count": {"type": "integer", "minimum": 0},
+    "duplicate_source_result_count": {"type": "integer", "minimum": 0},
+    "unsupported_source_result_count": {"type": "integer", "minimum": 0},
+    "source_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "source_result_id", "source_result_index", "source_granularity", "source_tool",
+          "source_command", "source_output_version", "source_report_reference", "source_report_sha256",
+          "source_slide_id", "source_rule_id", "source_status", "source_severity", "source_metric",
+          "source_actual", "source_threshold", "source_message", "source_raw_fragment_hash",
+          "covered_result_count", "parse_status", "canonicalization_status", "rule_records",
+          "evidence_files", "critical_issue_signals"
+        ]
+      }
+    },
+    "conservation": {"type": "object"},
+    "status": {"enum": ["PASS", "BLOCKED"]},
+    "created_at": {"type": "string", "minLength": 1},
+    "timezone": {"const": "Asia/Seoul"},
+    "report_hash": {"$ref": "#/$defs/hash"}
+  },
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fail", "needs_polish", "pass", "missing"],
+      "properties": {
+        "fail": {"type": "integer", "minimum": 0},
+        "needs_polish": {"type": "integer", "minimum": 0},
+        "pass": {"type": "integer", "minimum": 0},
+        "missing": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

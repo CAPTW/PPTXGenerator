@@ -1,0 +1,22 @@
+{
+  "actual_bytes_retrievable": true,
+  "aspect_ratio_valid": true,
+  "attempt_id": "imageattempt_94c4f9b7fae345cecd3e",
+  "decode_valid": true,
+  "file_size_bytes": 1239240,
+  "format": "PNG",
+  "height": 936,
+  "minimum_resolution_valid": true,
+  "output_path_inside_runtime_root": true,
+  "record_hash_valid": true,
+  "record_id": "imageexecution_158c109ea6e8fe2c48c1",
+  "report_hash": "0fd017d56945a00ce8cbd292fbcebd46b2e10c0346ff7ec3bbb63422aadc1e12",
+  "request_relation_valid": true,
+  "schema_name": "platform_image_verification_report",
+  "schema_version": "1.0.0",
+  "sha256": "691b71390310872ff17a2a9a151060805a50a11977662a0cf6f3a834dec3615f",
+  "status": "VERIFIED",
+  "target_artifact_id": "moduleanchor_aea9b62a3605c1edb24c",
+  "verification_id": "imageverification_83cd58240b99f73d60bc",
+  "width": 1664
+}

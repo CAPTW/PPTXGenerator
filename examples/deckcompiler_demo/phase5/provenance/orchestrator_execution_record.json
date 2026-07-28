@@ -1,0 +1,31 @@
+{
+  "actual_official_pipeline_entrypoint": "slide-image-dual-render/scripts/slide_pipeline.js",
+  "canonical_worktree_clean_after_runtime_execution": true,
+  "content_sha256_without_this_field": "b62544df78a5fa1eb1e2c54f5c63c72e40285f15683b254ef93424d67c623612",
+  "exact_orchestrator": "slide-editable-deck-orchestrator",
+  "external_pin_hash": "c98dee779823ec40d176f54f10363dce676bb7299d99ffb2216c9a6454dc1a27",
+  "external_pin_id": "pngpin_1c4af8ad011cc18786d8",
+  "external_skill_modified": false,
+  "fallback_converter_used": false,
+  "full_slide_screenshot_route_used": false,
+  "handoff_id": "pnghandoff_a52abef975f8490a5882",
+  "legacy_fallback_used": false,
+  "official_crop_stage": "slide-image-dual-render/scripts/make_crops.py",
+  "official_dry_run": "PASS",
+  "official_final_gate": "PASS",
+  "official_orchestration_plan": "PASS",
+  "official_single_slide_canary": {
+    "slide": 1,
+    "status": "PASS"
+  },
+  "official_six_slide_reconstruction": "PASS",
+  "phase4_bundle_modified": false,
+  "preflight": "PASS",
+  "quality": "reconstruction",
+  "run_id": "phase51run_a52abef975f8490a5882",
+  "schema_name": "phase5_orchestrator_execution_record",
+  "schema_version": "1.0.0",
+  "source_commit": "8c05f69ccee081f838455fced7de3b77dd1baf29",
+  "status": "PASS",
+  "target": "both"
+}

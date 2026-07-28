@@ -1,0 +1,79 @@
+{
+  "actual_generation": true,
+  "attempt_id": "imageattempt_177fce1e9cea51fa8de2",
+  "credential_lookups": 0,
+  "execution_mode": "platform_managed_tool",
+  "external_provider_id": null,
+  "external_transport_used": false,
+  "image_model": "not_exposed_by_tool",
+  "output": {
+    "completion_timestamp": "2026-07-20T03:07:39.555+09:00",
+    "normalized_dimensions": {
+      "height": 936,
+      "width": 1664
+    },
+    "normalized_file_size_bytes": 996778,
+    "normalized_format": "PNG",
+    "normalized_relative_path": "visual_targets/slide-003.png",
+    "normalized_sha256": "96fc9ac2da10198a5cf2edf1f2fe44b089618dc1c72f8cd0c3c51313c19bb3d4",
+    "original_dimensions": {
+      "height": 941,
+      "width": 1672
+    },
+    "original_file_size_bytes": 1115358,
+    "original_format": "PNG",
+    "original_relative_path": "artifacts/slide_targets/imageattempt_177fce1e9cea51fa8de2/original.png",
+    "original_sha256": "5b4ecf3c88739d02bc9dc9d5bd13e4e6e6b39193f8853c6ad1a3cd28c34e50e1",
+    "prior_attempt_id": null,
+    "prompt_hash": "44622c232c52137ba1c7ddbbbbc62ed1fef80f7e0558e16333b078d9dfc794d5",
+    "prompt_id": "prompt_d160d3ba92322b8bd950",
+    "prompt_relative_path": "prompts/slide-003.prompt.json",
+    "reference_artifacts": [
+      {
+        "artifact_id": "designboard_61f00a55ee02666b3254",
+        "relative_path": "references/design_board.png",
+        "sha256": "a0229b8e27b4a103c177682b2d742ae3d4dd6eb9bb70c675cbf9f88293dd666d"
+      },
+      {
+        "artifact_id": "moduleanchor_ffa35a3d6def1dfd4394",
+        "relative_path": "references/module-002-anchor.png",
+        "sha256": "e0d530dc0b15be88b59d81c7126ce74b8aff4b00def199465801342e6f7ac9de"
+      },
+      {
+        "artifact_id": "batchreference_9654720831fd18dc93f0",
+        "relative_path": "references/batch-002-template-reference.png",
+        "sha256": "ad6573245ba1210a49287ecda3561f2ba9a8ea4e52e5ea4a917b2bd4c5e8d6f1"
+      }
+    ],
+    "rejection_reason": null,
+    "request_timestamp": "2026-07-20T03:05:12.469+09:00",
+    "seal_relative_path": "records/attempts/slide-003-attempt-001.seal.json",
+    "selected": true,
+    "target_type": "slide_visual_target",
+    "transformation": {
+      "crop_box": [
+        4,
+        2,
+        1668,
+        938
+      ],
+      "nonuniform_resize_used": false,
+      "stretch_used": false,
+      "type": "aspect_preserving_crop",
+      "uniform_resize_to": null
+    },
+    "verification_status": "VERIFIED",
+    "visual_review_status": "ACCEPTED_FOR_PHASE4"
+  },
+  "platform_tool_channel": "commentary",
+  "platform_tool_id": "image_gen.imagegen",
+  "platform_tool_invocation_count": 1,
+  "record_hash": "21ea744d64ac5d96097ba947b2b3b3584a3dd9a3b52461c12fa5a5b96b38ec85",
+  "record_id": "imageexecution_97c500512f43f099e4d6",
+  "repository_network_calls": 0,
+  "request_id": "imagerequest_ae60bb068c07b33df267",
+  "schema_name": "platform_image_execution_record",
+  "schema_version": "1.0.0",
+  "target_artifact_id": "visualtarget_04b7463dd0285b07a31a",
+  "tool_call_id": "not_exposed"
+}

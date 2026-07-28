@@ -1,0 +1,281 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/external-python-runtime-dependency-manifest.schema.json",
+  "title": "DeckCompiler external Python runtime dependency manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "manifest_id",
+    "release_profile_id",
+    "supported_runtime",
+    "tested_external_skill_pin",
+    "external_entrypoints",
+    "module_to_distribution_mappings",
+    "required_distributions",
+    "optional_unreached_distributions",
+    "dynamic_imports",
+    "lock",
+    "import_preflight_commands",
+    "entrypoint_canary_commands",
+    "counts",
+    "implementation_provenance",
+    "status",
+    "manifest_hash"
+  ],
+  "properties": {
+    "schema_name": {
+      "const": "external_python_runtime_dependency_manifest"
+    },
+    "schema_version": {"const": "1.0.0"},
+    "manifest_id": {
+      "type": "string",
+      "pattern": "^externalpydeps_[0-9a-f]{20}$"
+    },
+    "release_profile_id": {"const": "devpost_p0_frozen_visuals"},
+    "supported_runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "python_version",
+        "implementation",
+        "os",
+        "platform",
+        "architecture"
+      ],
+      "properties": {
+        "python_version": {"const": "3.11.9"},
+        "implementation": {"const": "CPython"},
+        "os": {"const": "Windows"},
+        "platform": {"const": "win_amd64"},
+        "architecture": {"const": "AMD64/x64"}
+      }
+    },
+    "tested_external_skill_pin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["aggregate_sha256", "artifact_sha256"],
+      "properties": {
+        "aggregate_sha256": {"$ref": "#/$defs/sha256"},
+        "artifact_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "external_entrypoints": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "external-entrypoint-record.schema.json"},
+      "uniqueItems": true
+    },
+    "module_to_distribution_mappings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "module",
+          "distribution",
+          "reachability",
+          "import_preflight_command"
+        ],
+        "properties": {
+          "module": {"type": "string", "minLength": 1},
+          "distribution": {"type": "string", "minLength": 1},
+          "reachability": {
+            "enum": ["REQUIRED_CANONICAL", "REQUIRED_PREFLIGHT"]
+          },
+          "import_preflight_command": {"type": "string", "minLength": 1}
+        }
+      },
+      "uniqueItems": true
+    },
+    "required_distributions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/distribution"},
+      "uniqueItems": true
+    },
+    "optional_unreached_distributions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "reachability", "reason"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "reachability": {
+            "enum": [
+              "OPTIONAL_UNREACHED",
+              "PLATFORM_CONDITIONAL_UNREACHED"
+            ]
+          },
+          "reason": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "dynamic_imports": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["expression", "status"],
+        "properties": {
+          "expression": {"type": "string"},
+          "module": {"type": "string"},
+          "status": {"enum": ["RESOLVED_LITERAL", "UNKNOWN_DYNAMIC"]}
+        }
+      }
+    },
+    "lock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "install_command"],
+      "properties": {
+        "path": {"const": "requirements/devpost-release.lock.txt"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "install_command": {
+          "const": "python -m pip install --require-hashes -r requirements/devpost-release.lock.txt"
+        }
+      }
+    },
+    "import_preflight_commands": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "minItems": 1
+    },
+    "entrypoint_canary_commands": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "minItems": 1
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "missing",
+        "unknown_dynamic",
+        "lock_mismatch",
+        "unexpected_installed"
+      ],
+      "properties": {
+        "missing": {"const": 0},
+        "unknown_dynamic": {"const": 0},
+        "lock_mismatch": {"const": 0},
+        "unexpected_installed": {"const": 0}
+      }
+    },
+    "implementation_provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "classification",
+        "external_packages_classification"
+      ],
+      "properties": {
+        "classification": {"const": "build_week_new"},
+        "external_packages_classification": {"const": "external_existing"},
+        "source_path": {"type": "string"},
+        "audit_path": {"type": "string"}
+      }
+    },
+    "network_policy": {"type": "object"},
+    "credential_requirement": {"const": false},
+    "external_skill_source_packaged": {"const": false},
+    "ocr_enabled": {"const": false},
+    "live_image_generation": {"const": false},
+    "status": {"const": "PASS"},
+    "manifest_hash": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "distribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version",
+        "reachability",
+        "dependencies",
+        "artifacts",
+        "license",
+        "provenance"
+      ],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "version": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9.+!-]*$"
+        },
+        "reachability": {
+          "enum": ["REQUIRED_CANONICAL", "REQUIRED_PREFLIGHT"]
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        },
+        "artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "filename",
+              "sha256",
+              "platform_compatibility",
+              "source_index_class"
+            ],
+            "properties": {
+              "filename": {"type": "string", "pattern": "\\.whl$"},
+              "sha256": {"$ref": "#/$defs/sha256"},
+              "platform_compatibility": {
+                "const": "Windows_x64_CPython_3.11"
+              },
+              "source_index_class": {"const": "public_pypi"}
+            }
+          }
+        },
+        "license": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "classification",
+            "evidence_sha256",
+            "metadata_source",
+            "unresolved"
+          ],
+          "properties": {
+            "classification": {"type": "string", "minLength": 1},
+            "evidence_sha256": {"$ref": "#/$defs/sha256"},
+            "metadata_source": {
+              "const": "wheel_METADATA_and_license_files"
+            },
+            "unresolved": {"const": false}
+          }
+        },
+        "provenance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "classification",
+            "source_packaged",
+            "wheel_installed_in_runtime",
+            "delivery_zip_inclusion"
+          ],
+          "properties": {
+            "classification": {"const": "external_existing"},
+            "source_packaged": {"const": false},
+            "wheel_installed_in_runtime": {"const": true},
+            "delivery_zip_inclusion": {"const": false}
+          }
+        },
+        "version_selection_authority": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

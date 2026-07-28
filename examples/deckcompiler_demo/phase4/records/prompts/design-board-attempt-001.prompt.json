@@ -1,0 +1,84 @@
+{
+  "artifact_type": "design_board",
+  "batch_id": null,
+  "composition_goals": [
+    "one coherent design language",
+    "three differentiated module moods",
+    "reconstructable editorial primitives"
+  ],
+  "credential_lookup": false,
+  "design_system_reference": {
+    "path": "design_system.json",
+    "sha256": "3acc719b089726a34b81083cbbc31a327a696d27918640e318db2341745c7217"
+  },
+  "execution_mode": "platform_managed_tool",
+  "external_provider_id": null,
+  "external_transport_used": false,
+  "fallback_normalization_policy": {
+    "allowed": [
+      "aspect_preserving_crop",
+      "aspect_preserving_pad",
+      "uniform_resize_after_crop_or_pad"
+    ],
+    "forbidden": [
+      "stretch",
+      "nonuniform_resize",
+      "critical_content_clipping"
+    ],
+    "minimum_final_dimensions": {
+      "height": 900,
+      "width": 1600
+    }
+  },
+  "forbidden_elements": [
+    "full-slide raster background",
+    "screenshot slide",
+    "microtext",
+    "invented fact",
+    "invented number",
+    "invented citation",
+    "random logo",
+    "watermark",
+    "pseudo-language"
+  ],
+  "hierarchy_goals": [
+    "clear title tier",
+    "visual grammar tier",
+    "quiet citation/footer tier"
+  ],
+  "implementation_provenance": "build_week_new",
+  "module_id": null,
+  "native_raster_intent": {
+    "continuous_tone_art": "bounded_raster_allowed",
+    "full_slide_raster": "forbidden",
+    "semantic_slots": "native_required"
+  },
+  "negative_space_target": "generous and intentionally distributed",
+  "prior_selected_visual_reference_ids": [],
+  "prompt_hash": "3c7b0d1fc8e29a4213200a2dd39d1fd2a04004d515e8d64fcc6a52540bcfbbc9",
+  "prompt_id": "prompt_d4b67d090ed2e0128c16",
+  "prompt_text": "Create one spacious landscape 16:9 contemporary technical-editorial design board for a professional academic presentation. Show palette relationships, typography character, shape and line-weight language, diagram and chart grammar, citation/footer treatment, negative-space behavior, and three visibly distinct module moods. Use only generic semantic placeholders such as TITLE, PRIMARY VISUAL, PROCESS, EVIDENCE, COMPARISON, RECOMMENDATION, IMPLEMENTATION, and SOURCE NOTES. No source claims, statistics, citations, paragraphs, microtext, logos, watermarks, screenshots, dashboards, blob collages, or generic card walls. Make the grammar reconstructable with native slide objects.",
+  "request_id": "imagerequest_849385423afce7969c6c",
+  "requested_aspect_ratio": "16:9",
+  "requested_dimensions": {
+    "height": 1152,
+    "width": 2048
+  },
+  "requested_orientation": "landscape",
+  "schema_name": "platform_image_request",
+  "schema_version": "1.0.0",
+  "selected_family": null,
+  "selected_layout": null,
+  "semantic_sidecar_reference": null,
+  "slide_id": null,
+  "target_artifact_id": "designboard_61f00a55ee02666b3254",
+  "text_policy": {
+    "ocr_canonical_text": "forbidden",
+    "reference_prompts": "generic_placeholders_only",
+    "slide_prompts": "sidecar_authoritative_native_text_regions"
+  },
+  "visual_dna_reference": {
+    "path": "visual_dna.json",
+    "sha256": "4c25c3d627dc72087d650072b7a4241d5fb74b0508c8dd48f82e0b9b4e8b9241"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://pptx-generator.local/schemas/deckcompiler/build-week-provenance.schema.json", "title": "DeckCompiler Build Week provenance",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "baseline_sha", "baseline_commit_date", "tested_runtime_commit_policy", "final_evidence_commit_handling", "commit_range", "phase_commit_map", "major_component_map", "protected_historical_assets", "removed_quarantined_duplicate_history", "no_overclaim_statement", "provenance_hash"],
+  "properties": {"schema_name": {"const": "build_week_provenance"}, "schema_version": {"const": "1.0.0"}, "baseline_sha": {"pattern": "^[0-9a-f]{40}$", "type": "string"}, "baseline_commit_date": {"format": "date-time", "type": "string"}, "tested_runtime_commit_policy": {"type": "string"}, "final_evidence_commit_handling": {"type": "string"}, "commit_range": {"type": "object"}, "phase_commit_map": {"type": "object"}, "major_component_map": {"type": "object"}, "protected_historical_assets": {"type": "array"}, "removed_quarantined_duplicate_history": {"type": "object"}, "no_overclaim_statement": {"type": "string"}, "provenance_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"}}
+}

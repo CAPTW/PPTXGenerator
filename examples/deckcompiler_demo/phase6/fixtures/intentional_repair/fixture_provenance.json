@@ -1,0 +1,17 @@
+{
+  "accepted_source_artifact_hash": "8130f47caa5decf4e1df5343f405fcc79ff18f6d7c6e1880d7e56733d45ae20b",
+  "canonical_phase4_aggregate": "4ad86fcc50ed669d57966dd471d50ea791c21499c3c280c8b29f484a49b8473c",
+  "canonical_phase5_aggregate": "98f88cc940cb0d9171c6b116c7ebb1290b2b51c29547580f13301b15cc74f20c",
+  "canonical_repair_owner": "src/presentation_agent/deckcompiler/qa/reconstruction_source/slides.js",
+  "created_at": "2026-07-22T11:20:00+09:00",
+  "deckcompiler_commit": "d85c666a42823f970a035b9a1d1b2e8f05543450",
+  "fixture_id": "phase6-fixture-text-off-canvas-slide-001",
+  "full_handoff_export_required": true,
+  "old_phase5_repair_history_reused": false,
+  "provenance_hash": "3c83e227c9c8c0569622cddbdbc2bc990c93bcc9044e5b407e6eab3d2c989d0f",
+  "runtime_location_policy": "new_isolated_directory_outside_repository",
+  "schema_name": "phase6_fixture_provenance",
+  "schema_version": "1.0.0",
+  "source_provenance": "Phase 5.1B accepted deck-owned reconstruction source; copied by hash into a fresh Phase 6 handoff project without prior repair history or derived outputs.",
+  "timezone": "Asia/Seoul"
+}

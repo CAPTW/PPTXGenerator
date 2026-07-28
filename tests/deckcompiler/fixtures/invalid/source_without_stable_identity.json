@@ -1,0 +1,48 @@
+{
+  "schema_name": "source_corpus",
+  "schema_version": "1.0.0",
+  "artifact": {
+    "artifact_id": "art_10101010101010101010",
+    "artifact_type": "source_corpus",
+    "artifact_version": "1.0.0",
+    "product": {
+      "product_name": "PPTX Generator",
+      "product_slug": "pptx-generator",
+      "system_name": "DeckCompiler",
+      "system_id": "deckcompiler",
+      "reconstruction_engine": "PNGtoPPTX"
+    },
+    "provenance": {
+      "created_at": "2026-07-15T21:11:00+09:00",
+      "producer": {"tool_name": "invalid-fixture", "tool_version": "1.0.0", "runtime": "test"},
+      "build_baseline": "e0259b7551c381f8c0de4cdd329d5943680fa502",
+      "source_commit": "39b4c104b23d4e09446388db2a8b2fb873a7824b",
+      "input_artifact_ids": []
+    },
+    "content_sha256": "1010101010101010101010101010101010101010101010101010101010101010"
+  },
+  "corpus_id": "corpus_10101010101010101010",
+  "sources": [
+    {
+      "source_id": "src_10101010101010101010",
+      "source_type": "pdf",
+      "display_name": "Missing stable identity",
+      "original_filename": "missing-identity.pdf",
+      "locator_strategy": "pdf_page_text_span",
+      "extraction_status": "extracted",
+      "language": "en",
+      "rights_privacy_note": "Repository-authored invalid fixture.",
+      "child_assets": []
+    }
+  ],
+  "normalized_segments": [
+    {
+      "segment_id": "seg_10101010101010101010",
+      "source_id": "src_10101010101010101010",
+      "source_locator": {"source_id": "src_10101010101010101010", "locator_type": "pdf_page", "page_number": 1},
+      "canonical_text": "Synthetic invalid identity fixture.",
+      "language": "en",
+      "content_sha256": "1010101010101010101010101010101010101010101010101010101010101010"
+    }
+  ]
+}

@@ -1,0 +1,4750 @@
+{
+  "content_sha256_without_this_field": "f3fdfd764b32adfe06c554d2047d6030bb4f9c4d321129f5482802a41dbc9208",
+  "pptx_sha256": "805eb4aa3d44d90ebe5b78c0247d02e412ebfc9468e57c778516b90de2d27676",
+  "schema_name": "phase5_pptx_object_inventory",
+  "schema_version": "1.0.0",
+  "slide_count": 6,
+  "slides": [
+    {
+      "chart_count": 0,
+      "max_raster_area_ratio": 0.0,
+      "picture_count": 0,
+      "shape_count": 51,
+      "shapes": [
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1025957,
+            "left": 102413,
+            "top": 117043,
+            "width": 58522
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 1,
+          "shape_name": "Shape 0",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 58522,
+            "left": 160934,
+            "top": 117043,
+            "width": 512978
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 2,
+          "shape_name": "Shape 1",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 688543,
+            "left": 381305,
+            "top": 160934,
+            "width": 9378086
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 3,
+          "shape_name": "Text 2",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Decision framing and thesis: AI Data-center Cooling-system"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 160934,
+            "left": 395935,
+            "top": 908914,
+            "width": 7179869
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 4,
+          "shape_name": "Text 3",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Claim origin: documentary fact"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 395935,
+            "left": 10623499,
+            "top": 308153,
+            "width": 1099109
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 5,
+          "shape_name": "Text 4",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "01"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 9671609,
+            "top": 894283,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 6,
+          "shape_name": "Shape 5",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 9876434,
+            "top": 842162,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 7,
+          "shape_name": "Shape 6",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 10081260,
+            "top": 790956,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 8,
+          "shape_name": "Shape 7",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 10287000,
+            "top": 739750,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 9,
+          "shape_name": "Shape 8",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 10491826,
+            "top": 688543,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 10,
+          "shape_name": "Shape 9",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 160934,
+            "top": 1143000,
+            "width": 11649456
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 11,
+          "shape_name": "Shape 10",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 2549347,
+            "left": 322783,
+            "top": 1391717,
+            "width": 4835347
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 12,
+          "shape_name": "Shape 11",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 322783,
+            "top": 1391717,
+            "width": 4835347
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 13,
+          "shape_name": "Shape 12",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 410566,
+            "top": 1391717,
+            "width": 4659782
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 14,
+          "shape_name": "Text 13",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "RECOMMENDED DECISION"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 761695,
+            "left": 571500,
+            "top": 1875434,
+            "width": 761695
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 15,
+          "shape_name": "Shape 14",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 761695,
+            "left": 571500,
+            "top": 1875434,
+            "width": 761695
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 16,
+          "shape_name": "Text 15",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "✓"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 938174,
+            "left": 1538935,
+            "top": 1802282,
+            "width": 3311957
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 17,
+          "shape_name": "Text 16",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Approve a phased combined response: instrument the baseline, commission automated pump failover, and then tighten sensor calibration governance."
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 571500,
+            "top": 2930652,
+            "width": 4278478
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 18,
+          "shape_name": "Shape 17",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 615391,
+            "top": 3165653,
+            "width": 263347
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 19,
+          "shape_name": "Shape 18",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 615391,
+            "top": 3165653,
+            "width": 263347
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 20,
+          "shape_name": "Text 19",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "1"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 293522,
+            "left": 952805,
+            "top": 3151022,
+            "width": 938174
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 21,
+          "shape_name": "Text 20",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "BASELINE"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 2007108,
+            "top": 3165653,
+            "width": 263347
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 22,
+          "shape_name": "Shape 21",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 2007108,
+            "top": 3165653,
+            "width": 263347
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 23,
+          "shape_name": "Text 22",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "2"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 293522,
+            "left": 2344522,
+            "top": 3151022,
+            "width": 938174
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 24,
+          "shape_name": "Text 23",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "FAILOVER"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 3399739,
+            "top": 3165653,
+            "width": 263347
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 25,
+          "shape_name": "Shape 24",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 3399739,
+            "top": 3165653,
+            "width": 263347
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 26,
+          "shape_name": "Text 25",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "3"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 293522,
+            "left": 3736238,
+            "top": 3151022,
+            "width": 938174
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 27,
+          "shape_name": "Text 26",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "GOVERNANCE"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 5436108,
+            "top": 1391717,
+            "width": 6403543
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 28,
+          "shape_name": "Shape 27",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 5524805,
+            "top": 1391717,
+            "width": 6227978
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 29,
+          "shape_name": "Text 28",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "EVIDENCE"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1011326,
+            "left": 5436108,
+            "top": 1773022,
+            "width": 6403543
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 30,
+          "shape_name": "Shape 29",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 308153,
+            "left": 5568696,
+            "top": 1904695,
+            "width": 308153
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 31,
+          "shape_name": "Shape 30",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 308153,
+            "left": 5568696,
+            "top": 1904695,
+            "width": 308153
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 32,
+          "shape_name": "Text 31",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "01"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 776326,
+            "left": 5992978,
+            "top": 1890065,
+            "width": 5700370
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 33,
+          "shape_name": "Text 32",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Redundant sensing reduces single-point blind spots but does not remove calibration drift risk."
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1025957,
+            "left": 5436108,
+            "top": 2916022,
+            "width": 6403543
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 34,
+          "shape_name": "Shape 33",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 308153,
+            "left": 5568696,
+            "top": 3047695,
+            "width": 308153
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 35,
+          "shape_name": "Shape 34",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 308153,
+            "left": 5568696,
+            "top": 3047695,
+            "width": 308153
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 36,
+          "shape_name": "Text 35",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "02"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 790956,
+            "left": 5992978,
+            "top": 3033065,
+            "width": 5700370
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 37,
+          "shape_name": "Text 36",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "A loss of reliable flow telemetry can hide a developing restriction until component temperatures begin to rise."
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 322783,
+            "top": 4219956,
+            "width": 11517782
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 38,
+          "shape_name": "Shape 37",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 410566,
+            "top": 4219956,
+            "width": 11342218
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 39,
+          "shape_name": "Text 38",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "PHASED DECISION PATH"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 630022,
+            "left": 586130,
+            "top": 4732934,
+            "width": 3341218
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 40,
+          "shape_name": "Shape 39",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 630022,
+            "left": 790956,
+            "top": 4732934,
+            "width": 2798978
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 41,
+          "shape_name": "Text 40",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "INSTRUMENT THE BASELINE"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 630022,
+            "left": 4249217,
+            "top": 4732934,
+            "width": 3341218
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 42,
+          "shape_name": "Shape 41",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 630022,
+            "left": 4454957,
+            "top": 4732934,
+            "width": 2798978
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 43,
+          "shape_name": "Text 42",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "COMMISSION AUTOMATED PUMP FAILOVER"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 630022,
+            "left": 7913218,
+            "top": 4732934,
+            "width": 3341218
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 44,
+          "shape_name": "Shape 43",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 630022,
+            "left": 8118043,
+            "top": 4732934,
+            "width": 2798978
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 45,
+          "shape_name": "Text 44",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "TIGHTEN SENSOR CALIBRATION GOVERNANCE"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 160934,
+            "top": 6140196,
+            "width": 11649456
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 46,
+          "shape_name": "Shape 45",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 131674,
+            "left": 160934,
+            "top": 6242609,
+            "width": 131674
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 47,
+          "shape_name": "Shape 46",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 175565,
+            "left": 381305,
+            "top": 6191402,
+            "width": 10623499
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 48,
+          "shape_name": "Text 47",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "AI Data Center Cooling Risk Decision Report, page 3  |  AI Data Center Cooling System Overview, page 2  |  AI Data Center Cooling System Overview, page 2"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 381305,
+            "top": 6381598,
+            "width": 10623499
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 49,
+          "shape_name": "Text 48",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Source notes: page 3, block 2 — AI Data Center Cooling Risk Decision Report; page 2, block 6 — AI Data Center Cooling System Overview; page 2, block 5 — AI Data Center Cooling System Overview"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 204826,
+            "left": 11099902,
+            "top": 6242609,
+            "width": 703174
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 50,
+          "shape_name": "Text 49",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "1 / 6"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 87782,
+            "left": 11722608,
+            "top": 6594653,
+            "width": 87782
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 51,
+          "shape_name": "Shape 50",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        }
+      ],
+      "slide": 1,
+      "table_count": 0
+    },
+    {
+      "chart_count": 0,
+      "max_raster_area_ratio": 0.0,
+      "picture_count": 0,
+      "shape_count": 52,
+      "shapes": [
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1025957,
+            "left": 102413,
+            "top": 117043,
+            "width": 58522
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 1,
+          "shape_name": "Shape 0",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 58522,
+            "left": 160934,
+            "top": 117043,
+            "width": 512978
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 2,
+          "shape_name": "Shape 1",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 454457,
+            "left": 381305,
+            "top": 263347,
+            "width": 9378086
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 3,
+          "shape_name": "Text 2",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "System and operating process"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 204826,
+            "left": 395935,
+            "top": 761695,
+            "width": 7179869
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 4,
+          "shape_name": "Text 3",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Claim origin: documentary fact"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 395935,
+            "left": 10623499,
+            "top": 308153,
+            "width": 1099109
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 5,
+          "shape_name": "Text 4",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "02"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 9671609,
+            "top": 894283,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 6,
+          "shape_name": "Shape 5",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 9876434,
+            "top": 842162,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 7,
+          "shape_name": "Shape 6",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 10081260,
+            "top": 790956,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 8,
+          "shape_name": "Shape 7",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 10287000,
+            "top": 739750,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 9,
+          "shape_name": "Shape 8",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 10491826,
+            "top": 688543,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 10,
+          "shape_name": "Shape 9",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 160934,
+            "top": 1143000,
+            "width": 11649456
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 11,
+          "shape_name": "Shape 10",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 322783,
+            "top": 1391717,
+            "width": 11517782
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 12,
+          "shape_name": "Shape 11",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 410566,
+            "top": 1391717,
+            "width": 11342218
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 13,
+          "shape_name": "Text 12",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "CLOSED-LOOP OPERATING PROCESS"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 3341218,
+            "left": 322783,
+            "top": 1860804,
+            "width": 2593238
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 14,
+          "shape_name": "Shape 13",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 805586,
+            "left": 1216152,
+            "top": 2037283,
+            "width": 805586
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 15,
+          "shape_name": "Shape 14",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 805586,
+            "left": 1216152,
+            "top": 2037283,
+            "width": 805586
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 16,
+          "shape_name": "Text 15",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "1"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 160934,
+            "left": 498348,
+            "top": 3003804,
+            "width": 2242109
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 17,
+          "shape_name": "Text 16",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "STEP 01"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 293522,
+            "left": 498348,
+            "top": 3238805,
+            "width": 2242109
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 18,
+          "shape_name": "Text 17",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "HEAT REJECTION"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 556870,
+            "top": 3633826,
+            "width": 2125066
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 19,
+          "shape_name": "Shape 18",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1157630,
+            "left": 527609,
+            "top": 3781044,
+            "width": 2183587
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 20,
+          "shape_name": "Text 19",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Heat rejection is the transfer of collected thermal energy from the facility loop to an external sink without mixing the two fluids."
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 381305,
+            "left": 2886761,
+            "top": 2945282,
+            "width": 322783
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 21,
+          "shape_name": "Text 20",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "→"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 3341218,
+            "left": 3202229,
+            "top": 1860804,
+            "width": 2593238
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 22,
+          "shape_name": "Shape 21",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 805586,
+            "left": 4095598,
+            "top": 2037283,
+            "width": 805586
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 23,
+          "shape_name": "Shape 22",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 805586,
+            "left": 4095598,
+            "top": 2037283,
+            "width": 805586
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 24,
+          "shape_name": "Text 23",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "2"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 160934,
+            "left": 3377794,
+            "top": 3003804,
+            "width": 2242109
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 25,
+          "shape_name": "Text 24",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "STEP 02"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 293522,
+            "left": 3377794,
+            "top": 3238805,
+            "width": 2242109
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 26,
+          "shape_name": "Text 25",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "PRIMARY LOOP"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 3436315,
+            "top": 3633826,
+            "width": 2125066
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 27,
+          "shape_name": "Shape 26",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1157630,
+            "left": 3407054,
+            "top": 3781044,
+            "width": 2183587
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 28,
+          "shape_name": "Text 27",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "The primary cooling loop is the closed fluid path that carries heat from compute cold plates to a facility heat exchanger."
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 381305,
+            "left": 5766206,
+            "top": 2945282,
+            "width": 322783
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 29,
+          "shape_name": "Text 28",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "→"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 3341218,
+            "left": 6080760,
+            "top": 1860804,
+            "width": 2593238
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 30,
+          "shape_name": "Shape 29",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 805586,
+            "left": 6975043,
+            "top": 2037283,
+            "width": 805586
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 31,
+          "shape_name": "Shape 30",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 805586,
+            "left": 6975043,
+            "top": 2037283,
+            "width": 805586
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 32,
+          "shape_name": "Text 31",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "3"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 160934,
+            "left": 6257239,
+            "top": 3003804,
+            "width": 2242109
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 33,
+          "shape_name": "Text 32",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "STEP 03"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 293522,
+            "left": 6257239,
+            "top": 3238805,
+            "width": 2242109
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 34,
+          "shape_name": "Text 33",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "SENSE & CONTROL"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 6315761,
+            "top": 3633826,
+            "width": 2125066
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 35,
+          "shape_name": "Shape 34",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1157630,
+            "left": 6286500,
+            "top": 3781044,
+            "width": 2183587
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 36,
+          "shape_name": "Text 35",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Temperature, flow, and differential-pressure sensors feed a local controller that adjusts pump speed and valve position every control interval."
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 381305,
+            "left": 8645652,
+            "top": 2945282,
+            "width": 322783
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 37,
+          "shape_name": "Text 36",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "→"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 3341218,
+            "left": 8960206,
+            "top": 1860804,
+            "width": 2593238
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 38,
+          "shape_name": "Shape 37",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 805586,
+            "left": 9854489,
+            "top": 2037283,
+            "width": 805586
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 39,
+          "shape_name": "Shape 38",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 805586,
+            "left": 9854489,
+            "top": 2037283,
+            "width": 805586
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 40,
+          "shape_name": "Text 39",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "4"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 160934,
+            "left": 9136685,
+            "top": 3003804,
+            "width": 2242109
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 41,
+          "shape_name": "Text 40",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "STEP 04"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 293522,
+            "left": 9136685,
+            "top": 3238805,
+            "width": 2242109
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 42,
+          "shape_name": "Text 41",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "COLD-PLATE INTAKE"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 9195206,
+            "top": 3633826,
+            "width": 2125066
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 43,
+          "shape_name": "Shape 42",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1157630,
+            "left": 9165946,
+            "top": 3781044,
+            "width": 2183587
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 44,
+          "shape_name": "Text 43",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Stage 1 moves coolant through cold plates where server heat enters the primary loop."
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 527609,
+            "left": 322783,
+            "top": 5421478,
+            "width": 11517782
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 45,
+          "shape_name": "Shape 44",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 527609,
+            "left": 512978,
+            "top": 5421478,
+            "width": 11136478
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 46,
+          "shape_name": "Text 45",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "PRIMARY LOOP  →  SENSORS  →  CONTROLLER  →  HEAT REJECTION"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 160934,
+            "top": 6140196,
+            "width": 11649456
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 47,
+          "shape_name": "Shape 46",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 131674,
+            "left": 160934,
+            "top": 6242609,
+            "width": 131674
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 48,
+          "shape_name": "Shape 47",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 175565,
+            "left": 381305,
+            "top": 6191402,
+            "width": 10623499
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 49,
+          "shape_name": "Text 48",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "AI Data Center Cooling System Overview, page 1  |  AI Data Center Cooling System Overview, page 1  |  AI Data Center Cooling System Overview, page 2  |  AI Data Center Cooling System Overview, page 1"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 381305,
+            "top": 6381598,
+            "width": 10623499
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 50,
+          "shape_name": "Text 49",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Source notes: page 1, block 3 — AI Data Center Cooling System Overview; page 1, block 2 — AI Data Center Cooling System Overview; page 2, block 2 — AI Data Center Cooling System Overview; page 1, block 4 — AI Data Center Cooling System Overview"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 204826,
+            "left": 11099902,
+            "top": 6242609,
+            "width": 703174
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 51,
+          "shape_name": "Text 50",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "2 / 6"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 87782,
+            "left": 11722608,
+            "top": 6594653,
+            "width": 87782
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 52,
+          "shape_name": "Shape 51",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        }
+      ],
+      "slide": 2,
+      "table_count": 0
+    },
+    {
+      "chart_count": 0,
+      "max_raster_area_ratio": 0.0,
+      "picture_count": 0,
+      "shape_count": 46,
+      "shapes": [
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1025957,
+            "left": 102413,
+            "top": 117043,
+            "width": 58522
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 1,
+          "shape_name": "Shape 0",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 58522,
+            "left": 160934,
+            "top": 117043,
+            "width": 512978
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 2,
+          "shape_name": "Shape 1",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 454457,
+            "left": 381305,
+            "top": 263347,
+            "width": 9378086
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 3,
+          "shape_name": "Text 2",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Evidence-backed risk findings"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 204826,
+            "left": 395935,
+            "top": 761695,
+            "width": 7179869
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 4,
+          "shape_name": "Text 3",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Claim origin: documentary fact"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 395935,
+            "left": 10623499,
+            "top": 308153,
+            "width": 1099109
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 5,
+          "shape_name": "Text 4",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "03"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 9671609,
+            "top": 894283,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 6,
+          "shape_name": "Shape 5",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 9876434,
+            "top": 842162,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 7,
+          "shape_name": "Shape 6",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 10081260,
+            "top": 790956,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 8,
+          "shape_name": "Shape 7",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 10287000,
+            "top": 739750,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 9,
+          "shape_name": "Shape 8",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 10491826,
+            "top": 688543,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 10,
+          "shape_name": "Shape 9",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 160934,
+            "top": 1143000,
+            "width": 11649456
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 11,
+          "shape_name": "Shape 10",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 322783,
+            "top": 1391717,
+            "width": 11517782
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 12,
+          "shape_name": "Shape 11",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 410566,
+            "top": 1391717,
+            "width": 11342218
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 13,
+          "shape_name": "Text 12",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "EVIDENCE-BACKED RISK FIELD"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1612087,
+            "left": 322783,
+            "top": 1802282,
+            "width": 3663086
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 14,
+          "shape_name": "Shape 13",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 308153,
+            "left": 454457,
+            "top": 1933956,
+            "width": 308153
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 15,
+          "shape_name": "Shape 14",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 308153,
+            "left": 454457,
+            "top": 1933956,
+            "width": 308153
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 16,
+          "shape_name": "Text 15",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "01"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1377086,
+            "left": 879653,
+            "top": 1919326,
+            "width": 2959913
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 17,
+          "shape_name": "Text 16",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Redundant sensing reduces single-point blind spots but does not remove calibration drift risk."
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 175565,
+            "left": 894283,
+            "top": 1992478,
+            "width": 2916022
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 18,
+          "shape_name": "Text 17",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "RISK FINDING 01"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1612087,
+            "left": 4146804,
+            "top": 1802282,
+            "width": 3663086
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 19,
+          "shape_name": "Shape 18",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 308153,
+            "left": 4278478,
+            "top": 1933956,
+            "width": 308153
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 20,
+          "shape_name": "Shape 19",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 308153,
+            "left": 4278478,
+            "top": 1933956,
+            "width": 308153
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 21,
+          "shape_name": "Text 20",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "02"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1377086,
+            "left": 4703674,
+            "top": 1919326,
+            "width": 2959913
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 22,
+          "shape_name": "Text 21",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "A loss of reliable flow telemetry can hide a developing restriction until component temperatures begin to rise."
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 175565,
+            "left": 4718304,
+            "top": 1992478,
+            "width": 2916022
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 23,
+          "shape_name": "Text 22",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "RISK FINDING 02"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1612087,
+            "left": 7971739,
+            "top": 1802282,
+            "width": 3868826
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 24,
+          "shape_name": "Shape 23",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 308153,
+            "left": 8103413,
+            "top": 1933956,
+            "width": 308153
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 25,
+          "shape_name": "Shape 24",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 308153,
+            "left": 8103413,
+            "top": 1933956,
+            "width": 308153
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 26,
+          "shape_name": "Text 25",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "03"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1377086,
+            "left": 8528609,
+            "top": 1919326,
+            "width": 3164738
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 27,
+          "shape_name": "Text 26",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Shared heat-rejection saturation can affect multiple compute rows at the same time."
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 175565,
+            "left": 8543239,
+            "top": 1992478,
+            "width": 3120847
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 28,
+          "shape_name": "Text 27",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "RISK FINDING 03"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1612087,
+            "left": 2227478,
+            "top": 3604565,
+            "width": 3663086
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 29,
+          "shape_name": "Shape 28",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 308153,
+            "left": 2359152,
+            "top": 3737153,
+            "width": 308153
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 30,
+          "shape_name": "Shape 29",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 308153,
+            "left": 2359152,
+            "top": 3737153,
+            "width": 308153
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 31,
+          "shape_name": "Text 30",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "04"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1377086,
+            "left": 2784348,
+            "top": 3722522,
+            "width": 2959913
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 32,
+          "shape_name": "Text 31",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "A combined option can address both rapid flow loss and slower sensor degradation without requiring a full plant redesign."
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 175565,
+            "left": 2798978,
+            "top": 3795674,
+            "width": 2916022
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 33,
+          "shape_name": "Text 32",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "RISK FINDING 04"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1612087,
+            "left": 6051499,
+            "top": 3604565,
+            "width": 3663086
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 34,
+          "shape_name": "Shape 33",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 308153,
+            "left": 6184087,
+            "top": 3737153,
+            "width": 308153
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 35,
+          "shape_name": "Shape 34",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 308153,
+            "left": 6184087,
+            "top": 3737153,
+            "width": 308153
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 36,
+          "shape_name": "Text 35",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "05"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1377086,
+            "left": 6608369,
+            "top": 3722522,
+            "width": 2959913
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 37,
+          "shape_name": "Text 36",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Facility heat-rejection capacity remains a shared upstream constraint even when the primary loop is healthy."
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 175565,
+            "left": 6622999,
+            "top": 3795674,
+            "width": 2916022
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 38,
+          "shape_name": "Text 37",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "RISK FINDING 05"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 469087,
+            "left": 322783,
+            "top": 5480914,
+            "width": 11517782
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 39,
+          "shape_name": "Shape 38",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 469087,
+            "left": 512978,
+            "top": 5480914,
+            "width": 11136478
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 40,
+          "shape_name": "Text 39",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "SENSING  ·  FLOW  ·  SHARED HEAT REJECTION  ·  COMBINED RESPONSE"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 160934,
+            "top": 6140196,
+            "width": 11649456
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 41,
+          "shape_name": "Shape 40",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 131674,
+            "left": 160934,
+            "top": 6242609,
+            "width": 131674
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 42,
+          "shape_name": "Shape 41",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 175565,
+            "left": 381305,
+            "top": 6191402,
+            "width": 10623499
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 43,
+          "shape_name": "Text 42",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "AI Data Center Cooling System Overview, page 2  |  AI Data Center Cooling System Overview, page 2  |  AI Data Center Cooling Risk Decision Report, page 1  |  AI Data Center Cooling Risk Decision Report, page 2  |  AI Data Center Cooling System Overview, page 3"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 381305,
+            "top": 6381598,
+            "width": 10623499
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 44,
+          "shape_name": "Text 43",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Source notes: page 2, block 6 — AI Data Center Cooling System Overview; page 2, block 5 — AI Data Center Cooling System Overview; page 1, block 4 — AI Data Center Cooling Risk Decision Report; page 2, block 5 — AI Data Center Cooling Risk Decision Report; page 3, block 4 — AI Data Center Cooling System Overview"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 204826,
+            "left": 11099902,
+            "top": 6242609,
+            "width": 703174
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 45,
+          "shape_name": "Text 44",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "3 / 6"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 87782,
+            "left": 11722608,
+            "top": 6594653,
+            "width": 87782
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 46,
+          "shape_name": "Shape 45",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        }
+      ],
+      "slide": 3,
+      "table_count": 0
+    },
+    {
+      "chart_count": 0,
+      "max_raster_area_ratio": 0.0,
+      "picture_count": 0,
+      "shape_count": 22,
+      "shapes": [
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 3803904,
+            "left": 322783,
+            "top": 1787652,
+            "width": 11517782
+          },
+          "has_chart": false,
+          "has_table": true,
+          "has_text_frame": false,
+          "is_raster": false,
+          "shape_index": 1,
+          "shape_name": "Table 0",
+          "shape_type": "TABLE (19)",
+          "text": "OPTION A\nROW 01\nOption A adds pump-path redundancy and automated failover, giving the strongest interruption protection at the highest implementation effort.\nOPTION B\nROW 02\nOption B increases monitoring and calibration frequency, reducing detection delay at lower effort but leaving pump-path exposure unchanged.\nDECISION RULE\nROW 03\nPrefer an option that protects thermal margin, preserves maintainability, and can be verified through staged commissioning.\nOPERATING GUARDRAIL\nROW 04\nThe synthetic normal supply-temperature target is 27 C with an allowed steady-state band of plus or minus 1 C."
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1025957,
+            "left": 102413,
+            "top": 117043,
+            "width": 58522
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 2,
+          "shape_name": "Shape 0",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 58522,
+            "left": 160934,
+            "top": 117043,
+            "width": 512978
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 3,
+          "shape_name": "Shape 1",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 454457,
+            "left": 381305,
+            "top": 263347,
+            "width": 9378086
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 4,
+          "shape_name": "Text 2",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Response options and trade-offs"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 204826,
+            "left": 395935,
+            "top": 761695,
+            "width": 7179869
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 5,
+          "shape_name": "Text 3",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Claim origin: documentary fact"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 395935,
+            "left": 10623499,
+            "top": 308153,
+            "width": 1099109
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 6,
+          "shape_name": "Text 4",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "04"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 9671609,
+            "top": 894283,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 7,
+          "shape_name": "Shape 5",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 9876434,
+            "top": 842162,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 8,
+          "shape_name": "Shape 6",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 10081260,
+            "top": 790956,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 9,
+          "shape_name": "Shape 7",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 10287000,
+            "top": 739750,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 10,
+          "shape_name": "Shape 8",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 10491826,
+            "top": 688543,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 11,
+          "shape_name": "Shape 9",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 160934,
+            "top": 1143000,
+            "width": 11649456
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 12,
+          "shape_name": "Shape 10",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 322783,
+            "top": 1391717,
+            "width": 11517782
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 13,
+          "shape_name": "Shape 11",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 410566,
+            "top": 1391717,
+            "width": 11342218
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 14,
+          "shape_name": "Text 12",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "EVIDENCE STATEMENT MATRIX"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 248717,
+            "left": 322783,
+            "top": 5773522,
+            "width": 11517782
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 15,
+          "shape_name": "Shape 13",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 248717,
+            "left": 483718,
+            "top": 5773522,
+            "width": 11194999
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 16,
+          "shape_name": "Text 14",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "TABLE  ·  4 ROWS  ·  NATIVE EDITABLE TEXT"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 160934,
+            "top": 6140196,
+            "width": 11649456
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 17,
+          "shape_name": "Shape 15",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 131674,
+            "left": 160934,
+            "top": 6242609,
+            "width": 131674
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 18,
+          "shape_name": "Shape 16",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 175565,
+            "left": 381305,
+            "top": 6191402,
+            "width": 10623499
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 19,
+          "shape_name": "Text 17",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "AI Data Center Cooling Risk Decision Report, page 2  |  AI Data Center Cooling Risk Decision Report, page 2  |  AI Data Center Cooling Risk Decision Report, page 2  |  AI Data Center Cooling System Overview, page 2"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 381305,
+            "top": 6381598,
+            "width": 10623499
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 20,
+          "shape_name": "Text 18",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Source notes: page 2, block 2 — AI Data Center Cooling Risk Decision Report; page 2, block 3 — AI Data Center Cooling Risk Decision Report; page 2, block 4 — AI Data Center Cooling Risk Decision Report; page 2, block 3 — AI Data Center Cooling System Overview"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 204826,
+            "left": 11099902,
+            "top": 6242609,
+            "width": 703174
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 21,
+          "shape_name": "Text 19",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "4 / 6"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 87782,
+            "left": 11722608,
+            "top": 6594653,
+            "width": 87782
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 22,
+          "shape_name": "Shape 20",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        }
+      ],
+      "slide": 4,
+      "table_count": 1
+    },
+    {
+      "chart_count": 0,
+      "max_raster_area_ratio": 0.0,
+      "picture_count": 0,
+      "shape_count": 48,
+      "shapes": [
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1025957,
+            "left": 102413,
+            "top": 117043,
+            "width": 58522
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 1,
+          "shape_name": "Shape 0",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 58522,
+            "left": 160934,
+            "top": 117043,
+            "width": 512978
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 2,
+          "shape_name": "Shape 1",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 454457,
+            "left": 381305,
+            "top": 263347,
+            "width": 9378086
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 3,
+          "shape_name": "Text 2",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Recommendation and rationale"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 204826,
+            "left": 395935,
+            "top": 761695,
+            "width": 7179869
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 4,
+          "shape_name": "Text 3",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Claim origin: documentary fact"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 395935,
+            "left": 10623499,
+            "top": 308153,
+            "width": 1099109
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 5,
+          "shape_name": "Text 4",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "05"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 9671609,
+            "top": 894283,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 6,
+          "shape_name": "Shape 5",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 9876434,
+            "top": 842162,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 7,
+          "shape_name": "Shape 6",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 10081260,
+            "top": 790956,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 8,
+          "shape_name": "Shape 7",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 10287000,
+            "top": 739750,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 9,
+          "shape_name": "Shape 8",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 10491826,
+            "top": 688543,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 10,
+          "shape_name": "Shape 9",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 160934,
+            "top": 1143000,
+            "width": 11649456
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 11,
+          "shape_name": "Shape 10",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1641348,
+            "left": 322783,
+            "top": 1391717,
+            "width": 11517782
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 12,
+          "shape_name": "Shape 11",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 865022,
+            "left": 571500,
+            "top": 1773022,
+            "width": 864108
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 13,
+          "shape_name": "Shape 12",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 865022,
+            "left": 571500,
+            "top": 1773022,
+            "width": 864108
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 14,
+          "shape_name": "Text 13",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "★"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 277978,
+            "left": 1699870,
+            "top": 1612087,
+            "width": 9671609
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 15,
+          "shape_name": "Text 14",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "RECOMMENDATION"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 790956,
+            "left": 1699870,
+            "top": 1977847,
+            "width": 9671609
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 16,
+          "shape_name": "Text 15",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Approve a phased combined response: instrument the baseline, commission automated pump failover, and then tighten sensor calibration governance."
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 322783,
+            "top": 3253435,
+            "width": 11517782
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 17,
+          "shape_name": "Shape 16",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 410566,
+            "top": 3253435,
+            "width": 11342218
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 18,
+          "shape_name": "Text 17",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "RATIONALE"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1831543,
+            "left": 322783,
+            "top": 3604565,
+            "width": 3663086
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 19,
+          "shape_name": "Shape 18",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 322783,
+            "left": 483718,
+            "top": 3781044,
+            "width": 322783
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 20,
+          "shape_name": "Shape 19",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 322783,
+            "left": 483718,
+            "top": 3781044,
+            "width": 322783
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 21,
+          "shape_name": "Text 20",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "1"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 219456,
+            "left": 923544,
+            "top": 3810305,
+            "width": 2842870
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 22,
+          "shape_name": "Text 21",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "RATIONALE 01"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 498348,
+            "top": 4234586,
+            "width": 3311957
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 23,
+          "shape_name": "Shape 22",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 805586,
+            "left": 498348,
+            "top": 4396435,
+            "width": 3311957
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 24,
+          "shape_name": "Text 23",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Prefer an option that protects thermal margin, preserves maintainability, and can be verified through staged commissioning."
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1831543,
+            "left": 4161434,
+            "top": 3604565,
+            "width": 3663086
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 25,
+          "shape_name": "Shape 24",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 322783,
+            "left": 4322369,
+            "top": 3781044,
+            "width": 322783
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 26,
+          "shape_name": "Shape 25",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 322783,
+            "left": 4322369,
+            "top": 3781044,
+            "width": 322783
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 27,
+          "shape_name": "Text 26",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "2"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 219456,
+            "left": 4762195,
+            "top": 3810305,
+            "width": 2842870
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 28,
+          "shape_name": "Text 27",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "RATIONALE 02"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 4336999,
+            "top": 4234586,
+            "width": 3311957
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 29,
+          "shape_name": "Shape 28",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 805586,
+            "left": 4336999,
+            "top": 4396435,
+            "width": 3311957
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 30,
+          "shape_name": "Text 29",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Redundant sensing reduces single-point blind spots but does not remove calibration drift risk."
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1831543,
+            "left": 8001000,
+            "top": 3604565,
+            "width": 3663086
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 31,
+          "shape_name": "Shape 30",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 322783,
+            "left": 8161934,
+            "top": 3781044,
+            "width": 322783
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 32,
+          "shape_name": "Shape 31",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 322783,
+            "left": 8161934,
+            "top": 3781044,
+            "width": 322783
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 33,
+          "shape_name": "Text 32",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "3"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 219456,
+            "left": 8601761,
+            "top": 3810305,
+            "width": 2842870
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 34,
+          "shape_name": "Text 33",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "RATIONALE 03"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 8176565,
+            "top": 4234586,
+            "width": 3311957
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 35,
+          "shape_name": "Shape 34",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 805586,
+            "left": 8176565,
+            "top": 4396435,
+            "width": 3311957
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 36,
+          "shape_name": "Text 35",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "A loss of reliable flow telemetry can hide a developing restriction until component temperatures begin to rise."
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 337414,
+            "left": 2051914,
+            "top": 5641848,
+            "width": 2563978
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 37,
+          "shape_name": "Shape 36",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 337414,
+            "left": 2242109,
+            "top": 5641848,
+            "width": 2095805
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 38,
+          "shape_name": "Text 37",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "BASELINE"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 337414,
+            "left": 4835347,
+            "top": 5641848,
+            "width": 2563978
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 39,
+          "shape_name": "Shape 38",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 337414,
+            "left": 5026457,
+            "top": 5641848,
+            "width": 2095805
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 40,
+          "shape_name": "Text 39",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "FAILOVER"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 337414,
+            "left": 7619695,
+            "top": 5641848,
+            "width": 2563978
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 41,
+          "shape_name": "Shape 40",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 337414,
+            "left": 7809890,
+            "top": 5641848,
+            "width": 2095805
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 42,
+          "shape_name": "Text 41",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "CALIBRATION"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 160934,
+            "top": 6140196,
+            "width": 11649456
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 43,
+          "shape_name": "Shape 42",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 131674,
+            "left": 160934,
+            "top": 6242609,
+            "width": 131674
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 44,
+          "shape_name": "Shape 43",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 175565,
+            "left": 381305,
+            "top": 6191402,
+            "width": 10623499
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 45,
+          "shape_name": "Text 44",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "AI Data Center Cooling Risk Decision Report, page 3  |  AI Data Center Cooling Risk Decision Report, page 2  |  AI Data Center Cooling System Overview, page 2  |  AI Data Center Cooling System Overview, page 2"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 381305,
+            "top": 6381598,
+            "width": 10623499
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 46,
+          "shape_name": "Text 45",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Source notes: page 3, block 2 — AI Data Center Cooling Risk Decision Report; page 2, block 4 — AI Data Center Cooling Risk Decision Report; page 2, block 6 — AI Data Center Cooling System Overview; page 2, block 5 — AI Data Center Cooling System Overview"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 204826,
+            "left": 11099902,
+            "top": 6242609,
+            "width": 703174
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 47,
+          "shape_name": "Text 46",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "5 / 6"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 87782,
+            "left": 11722608,
+            "top": 6594653,
+            "width": 87782
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 48,
+          "shape_name": "Shape 47",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        }
+      ],
+      "slide": 5,
+      "table_count": 0
+    },
+    {
+      "chart_count": 0,
+      "max_raster_area_ratio": 0.0,
+      "picture_count": 0,
+      "shape_count": 56,
+      "shapes": [
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1025957,
+            "left": 102413,
+            "top": 117043,
+            "width": 58522
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 1,
+          "shape_name": "Shape 0",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 58522,
+            "left": 160934,
+            "top": 117043,
+            "width": 512978
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 2,
+          "shape_name": "Shape 1",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 454457,
+            "left": 381305,
+            "top": 263347,
+            "width": 9378086
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 3,
+          "shape_name": "Text 2",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Implementation path and source notes"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 204826,
+            "left": 395935,
+            "top": 761695,
+            "width": 7179869
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 4,
+          "shape_name": "Text 3",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Claim origin: documentary fact"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 395935,
+            "left": 10623499,
+            "top": 308153,
+            "width": 1099109
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 5,
+          "shape_name": "Text 4",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "06"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 9671609,
+            "top": 894283,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 6,
+          "shape_name": "Shape 5",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 9876434,
+            "top": 842162,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 7,
+          "shape_name": "Shape 6",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 10081260,
+            "top": 790956,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 8,
+          "shape_name": "Shape 7",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 10287000,
+            "top": 739750,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 9,
+          "shape_name": "Shape 8",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 10491826,
+            "top": 688543,
+            "width": 1318565
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 10,
+          "shape_name": "Shape 9",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 160934,
+            "top": 1143000,
+            "width": 11649456
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 11,
+          "shape_name": "Shape 10",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 322783,
+            "top": 1391717,
+            "width": 11517782
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 12,
+          "shape_name": "Shape 11",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 410566,
+            "top": 1391717,
+            "width": 11342218
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 13,
+          "shape_name": "Text 12",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "IMPLEMENTATION SEQUENCE"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 673913,
+            "left": 322783,
+            "top": 1816913,
+            "width": 2681935
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 14,
+          "shape_name": "Shape 13",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 352044,
+            "left": 454457,
+            "top": 1970532,
+            "width": 352044
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 15,
+          "shape_name": "Shape 14",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 352044,
+            "left": 454457,
+            "top": 1970532,
+            "width": 352044
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 16,
+          "shape_name": "Text 15",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "1"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 425196,
+            "left": 908914,
+            "top": 1890065,
+            "width": 1773022
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 17,
+          "shape_name": "Text 16",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "CONTROL INPUTS"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 2505456,
+            "left": 322783,
+            "top": 2711196,
+            "width": 2563978
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 18,
+          "shape_name": "Shape 17",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 190195,
+            "left": 498348,
+            "top": 2886761,
+            "width": 2212848
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 19,
+          "shape_name": "Text 18",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "STAGE 01"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 542239,
+            "top": 3209544,
+            "width": 2125066
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 20,
+          "shape_name": "Shape 19",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1538935,
+            "left": 512978,
+            "top": 3414370,
+            "width": 2183587
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 21,
+          "shape_name": "Text 20",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Temperature, flow, and differential-pressure sensors feed a local controller that adjusts pump speed and valve position every control interval."
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 381305,
+            "left": 2886761,
+            "top": 2916022,
+            "width": 322783
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 22,
+          "shape_name": "Text 21",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "→"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 673913,
+            "left": 3202229,
+            "top": 1816913,
+            "width": 2681935
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 23,
+          "shape_name": "Shape 22",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 352044,
+            "left": 3333902,
+            "top": 1970532,
+            "width": 352044
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 24,
+          "shape_name": "Shape 23",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 352044,
+            "left": 3333902,
+            "top": 1970532,
+            "width": 352044
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 25,
+          "shape_name": "Text 24",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "2"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 425196,
+            "left": 3788359,
+            "top": 1890065,
+            "width": 1773022
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 26,
+          "shape_name": "Text 25",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "HEAT CAPTURE"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 2505456,
+            "left": 3202229,
+            "top": 2711196,
+            "width": 2563978
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 27,
+          "shape_name": "Shape 26",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 190195,
+            "left": 3377794,
+            "top": 2886761,
+            "width": 2212848
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 28,
+          "shape_name": "Text 27",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "STAGE 02"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 3421685,
+            "top": 3209544,
+            "width": 2125066
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 29,
+          "shape_name": "Shape 28",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1538935,
+            "left": 3392424,
+            "top": 3414370,
+            "width": 2183587
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 30,
+          "shape_name": "Text 29",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Stage 1 moves coolant through cold plates where server heat enters the primary loop."
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 381305,
+            "left": 5766206,
+            "top": 2916022,
+            "width": 322783
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 31,
+          "shape_name": "Text 30",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "→"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 673913,
+            "left": 6080760,
+            "top": 1816913,
+            "width": 2681935
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 32,
+          "shape_name": "Shape 31",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 352044,
+            "left": 6213348,
+            "top": 1970532,
+            "width": 352044
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 33,
+          "shape_name": "Shape 32",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 352044,
+            "left": 6213348,
+            "top": 1970532,
+            "width": 352044
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 34,
+          "shape_name": "Text 33",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "3"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 425196,
+            "left": 6666890,
+            "top": 1890065,
+            "width": 1773022
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 35,
+          "shape_name": "Text 34",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "PHASED COMMISSIONING"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 2505456,
+            "left": 6080760,
+            "top": 2711196,
+            "width": 2563978
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 36,
+          "shape_name": "Shape 35",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 190195,
+            "left": 6257239,
+            "top": 2886761,
+            "width": 2212848
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 37,
+          "shape_name": "Text 36",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "STAGE 03"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 6301130,
+            "top": 3209544,
+            "width": 2125066
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 38,
+          "shape_name": "Shape 37",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1538935,
+            "left": 6271870,
+            "top": 3414370,
+            "width": 2183587
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 39,
+          "shape_name": "Text 38",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Phase 1 records baseline alarms and flow availability; Phase 2 commissions failover under controlled load; Phase 3 audits sensor drift and operating procedures."
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 381305,
+            "left": 8645652,
+            "top": 2916022,
+            "width": 322783
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 40,
+          "shape_name": "Text 39",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "→"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 673913,
+            "left": 8960206,
+            "top": 1816913,
+            "width": 2681935
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 41,
+          "shape_name": "Shape 40",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 352044,
+            "left": 9092794,
+            "top": 1970532,
+            "width": 352044
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 42,
+          "shape_name": "Shape 41",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 352044,
+            "left": 9092794,
+            "top": 1970532,
+            "width": 352044
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 43,
+          "shape_name": "Text 42",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "4"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 425196,
+            "left": 9546336,
+            "top": 1890065,
+            "width": 1773022
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 44,
+          "shape_name": "Text 43",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "ALARM RESPONSE"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 2505456,
+            "left": 8960206,
+            "top": 2711196,
+            "width": 2563978
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 45,
+          "shape_name": "Shape 44",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 190195,
+            "left": 9136685,
+            "top": 2886761,
+            "width": 2212848
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 46,
+          "shape_name": "Text 45",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "STAGE 04"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 9180576,
+            "top": 3209544,
+            "width": 2125066
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 47,
+          "shape_name": "Shape 46",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1538935,
+            "left": 9151315,
+            "top": 3414370,
+            "width": 2183587
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 48,
+          "shape_name": "Text 47",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "On a high-temperature alarm, the controller verifies sensor agreement, raises pump output, opens the standby path, and requests compute-load reduction if recovery fails."
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 498348,
+            "left": 322783,
+            "top": 5451653,
+            "width": 11517782
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 49,
+          "shape_name": "Shape 48",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 498348,
+            "left": 512978,
+            "top": 5451653,
+            "width": 11136478
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 50,
+          "shape_name": "Text 49",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "OBSERVE  →  COMMISSION  →  AUDIT  →  RESPOND"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 1829,
+            "left": 160934,
+            "top": 6140196,
+            "width": 11649456
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 51,
+          "shape_name": "Shape 50",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 131674,
+            "left": 160934,
+            "top": 6242609,
+            "width": 131674
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 52,
+          "shape_name": "Shape 51",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 175565,
+            "left": 381305,
+            "top": 6191402,
+            "width": 10623499
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 53,
+          "shape_name": "Text 52",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "AI Data Center Cooling System Overview, page 2  |  AI Data Center Cooling System Overview, page 1  |  AI Data Center Cooling Risk Decision Report, page 3  |  AI Data Center Cooling System Overview, page 3"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 263347,
+            "left": 381305,
+            "top": 6381598,
+            "width": 10623499
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 54,
+          "shape_name": "Text 53",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "Source notes: page 2, block 2 — AI Data Center Cooling System Overview; page 1, block 4 — AI Data Center Cooling System Overview; page 3, block 3 — AI Data Center Cooling Risk Decision Report; page 3, block 2 — AI Data Center Cooling System Overview"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 204826,
+            "left": 11099902,
+            "top": 6242609,
+            "width": 703174
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 55,
+          "shape_name": "Text 54",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": "6 / 6"
+        },
+        {
+          "bbox": {
+            "area_ratio": 0.0,
+            "height": 87782,
+            "left": 11722608,
+            "top": 6594653,
+            "width": 87782
+          },
+          "has_chart": false,
+          "has_table": false,
+          "has_text_frame": true,
+          "is_raster": false,
+          "shape_index": 56,
+          "shape_name": "Shape 55",
+          "shape_type": "AUTO_SHAPE (1)",
+          "text": ""
+        }
+      ],
+      "slide": 6,
+      "table_count": 0
+    }
+  ],
+  "totals": {
+    "charts": 0,
+    "pictures": 0,
+    "shapes": 275,
+    "tables": 1
+  }
+}

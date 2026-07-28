@@ -1,0 +1,43 @@
+{
+  "blocked_reason": "external_transport_disabled_contract_only",
+  "created_at": "2026-07-17T00:00:00+09:00",
+  "execution_id": "exec_0123456789abcdef0123",
+  "execution_lane": "contract_only",
+  "external_executable_id": "openai",
+  "implementation_provenance": {
+    "component": "presentation_agent.deckcompiler.external_execution",
+    "source_commit": "8c9f7f1d6ef15868010e2aa9e5bf52467b8e468d",
+    "version": "1.0.0"
+  },
+  "input_artifacts": [],
+  "outputs": [{"relative_path": "generated.png"}],
+  "record_hash": {
+    "algorithm": "sha256",
+    "byte_count": 1,
+    "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "hash_domain": "deckcompiler.external_execution.record.v1"
+  },
+  "record_id": "exrec_db1ecb6dd29ecab22a49",
+  "request_artifact": {
+    "artifact_id": "extreq_655c5a81a8345b69f517",
+    "hash": {
+      "algorithm": "sha256",
+      "byte_count": 1,
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "hash_domain": "deckcompiler.external_execution.output.v1"
+    },
+    "relative_path": "requests/request.json"
+  },
+  "request_id": "extreq_655c5a81a8345b69f517",
+  "request_semantic_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "response_absent_reason": "transport_not_attempted",
+  "response_artifact": null,
+  "response_hash": null,
+  "run_id": "run_0123456789abcdef0123",
+  "schema_name": "external_execution_record",
+  "schema_version": "1.0.0",
+  "source_commit": "8c9f7f1d6ef15868010e2aa9e5bf52467b8e468d",
+  "status": "blocked",
+  "transport_attempted": true,
+  "transport_call_count": 1
+}

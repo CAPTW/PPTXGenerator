@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/deckcompiler/platform-image-regeneration-history.schema.json",
+  "title": "Platform-managed Image Regeneration History",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "target_artifact_id", "attempt_limit", "automatic_retry", "explicit_retry_only", "attempts", "history_hash"],
+  "properties": {
+    "schema_name": {"const": "platform_image_regeneration_history"},
+    "schema_version": {"const": "1.0.0"},
+    "target_artifact_id": {"type": "string", "minLength": 1},
+    "attempt_limit": {"const": 2},
+    "automatic_retry": {"const": false},
+    "explicit_retry_only": {"const": true},
+    "attempts": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+    "history_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

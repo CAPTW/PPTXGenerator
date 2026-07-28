@@ -1,0 +1,352 @@
+{
+  "attempt_count": 15,
+  "attempt_limit_per_target": 2,
+  "attempts": [
+    {
+      "attempt_id": "imageattempt_0283a64ebabc8db7511f",
+      "changed_prompt_fields": [],
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "next_action": "explicit_retry",
+      "output_hash": "0c25a3ae68c3da60747cec8f24b4ead4928b2d8320658c3e504017483e5224c6",
+      "prior_attempt_id": null,
+      "prompt_hash": "3c7b0d1fc8e29a4213200a2dd39d1fd2a04004d515e8d64fcc6a52540bcfbbc9",
+      "rejected": true,
+      "rejection_reason": "Numeric glyphs 1-5 and MODULE 01-03 violate the no-invented-number gate.",
+      "retry_reason": null,
+      "selected": false,
+      "target_id": "designboard_61f00a55ee02666b3254",
+      "target_type": "design_board",
+      "timestamp": "2026-07-20T02:30:46.453+09:00",
+      "tool_result": "bytes_retrieved",
+      "verification_verdict": "VERIFIED",
+      "visual_review_verdict": "REJECTED"
+    },
+    {
+      "attempt_id": "imageattempt_841f1a2d3f85ffe84b12",
+      "changed_prompt_fields": [
+        "prompt_text",
+        "prompt_id",
+        "request_id",
+        "prompt_hash"
+      ],
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "next_action": "curate_selected",
+      "output_hash": "a0229b8e27b4a103c177682b2d742ae3d4dd6eb9bb70c675cbf9f88293dd666d",
+      "prior_attempt_id": "imageattempt_0283a64ebabc8db7511f",
+      "prompt_hash": "223f9a0826c02037f3c3d2a46c4c1c78d96bdd7364d6c51c84443f796cd293f0",
+      "rejected": false,
+      "rejection_reason": null,
+      "retry_reason": "Reject numeric glyphs that violate the no-invented-number visual-review gate.",
+      "selected": true,
+      "target_id": "designboard_61f00a55ee02666b3254",
+      "target_type": "design_board",
+      "timestamp": "2026-07-20T02:33:30.465+09:00",
+      "tool_result": "bytes_retrieved",
+      "verification_verdict": "VERIFIED",
+      "visual_review_verdict": "ACCEPTED_FOR_PHASE4"
+    },
+    {
+      "attempt_id": "imageattempt_2502b789e69959c27135",
+      "changed_prompt_fields": [],
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "next_action": "curate_selected",
+      "output_hash": "632207323326068436325ea377f0477995de06e6e0de5546483c10e259b74f90",
+      "prior_attempt_id": null,
+      "prompt_hash": "95057d1d6f8ec2db2133bac32f35eefdefb92e4f20470eed58a5d1ad88357113",
+      "rejected": false,
+      "rejection_reason": null,
+      "retry_reason": null,
+      "selected": true,
+      "target_id": "moduleanchor_3591b43d6cf6fe339284",
+      "target_type": "module_anchor",
+      "timestamp": "2026-07-20T02:49:32.450+09:00",
+      "tool_result": "bytes_retrieved",
+      "verification_verdict": "VERIFIED",
+      "visual_review_verdict": "ACCEPTED_FOR_PHASE4"
+    },
+    {
+      "attempt_id": "imageattempt_75c830b182fd0b7c79da",
+      "changed_prompt_fields": [],
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "next_action": "curate_selected",
+      "output_hash": "e0d530dc0b15be88b59d81c7126ce74b8aff4b00def199465801342e6f7ac9de",
+      "prior_attempt_id": null,
+      "prompt_hash": "5793229da516a15ad50c42032728e55b6c7575bf2f1ddd0e59330513f602a755",
+      "rejected": false,
+      "rejection_reason": null,
+      "retry_reason": null,
+      "selected": true,
+      "target_id": "moduleanchor_ffa35a3d6def1dfd4394",
+      "target_type": "module_anchor",
+      "timestamp": "2026-07-20T02:51:20.148+09:00",
+      "tool_result": "bytes_retrieved",
+      "verification_verdict": "VERIFIED",
+      "visual_review_verdict": "ACCEPTED_FOR_PHASE4"
+    },
+    {
+      "attempt_id": "imageattempt_94c4f9b7fae345cecd3e",
+      "changed_prompt_fields": [],
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "next_action": "curate_selected",
+      "output_hash": "691b71390310872ff17a2a9a151060805a50a11977662a0cf6f3a834dec3615f",
+      "prior_attempt_id": null,
+      "prompt_hash": "ed5c5d92f41dd19859e67c1049d4e93a6876d62e873a6a8700fd305710a3c505",
+      "rejected": false,
+      "rejection_reason": null,
+      "retry_reason": null,
+      "selected": true,
+      "target_id": "moduleanchor_aea9b62a3605c1edb24c",
+      "target_type": "module_anchor",
+      "timestamp": "2026-07-20T02:53:13.361+09:00",
+      "tool_result": "bytes_retrieved",
+      "verification_verdict": "VERIFIED",
+      "visual_review_verdict": "ACCEPTED_FOR_PHASE4"
+    },
+    {
+      "attempt_id": "imageattempt_83b2bd861408c6301c40",
+      "changed_prompt_fields": [],
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "next_action": "curate_selected",
+      "output_hash": "068c846fed83139b3cf25c5c79524db5a7ed74e6713179855faaf65fc41665f0",
+      "prior_attempt_id": null,
+      "prompt_hash": "410bbea89a4a60b0d8d8b88b3a6c7d05d0205b1003c5932f1e9a6cb79126d620",
+      "rejected": false,
+      "rejection_reason": null,
+      "retry_reason": null,
+      "selected": true,
+      "target_id": "batchreference_3473bb414e4059c9bdd2",
+      "target_type": "batch_template_reference",
+      "timestamp": "2026-07-20T02:54:57.922+09:00",
+      "tool_result": "bytes_retrieved",
+      "verification_verdict": "VERIFIED",
+      "visual_review_verdict": "ACCEPTED_FOR_PHASE4"
+    },
+    {
+      "attempt_id": "imageattempt_f03ad42f2a12c3ddc487",
+      "changed_prompt_fields": [],
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "next_action": "curate_selected",
+      "output_hash": "ad6573245ba1210a49287ecda3561f2ba9a8ea4e52e5ea4a917b2bd4c5e8d6f1",
+      "prior_attempt_id": null,
+      "prompt_hash": "78bc2cb3401e512720eaa318921ead140fdb1138dea02628ab33daf3b2e641a8",
+      "rejected": false,
+      "rejection_reason": null,
+      "retry_reason": null,
+      "selected": true,
+      "target_id": "batchreference_9654720831fd18dc93f0",
+      "target_type": "batch_template_reference",
+      "timestamp": "2026-07-20T02:56:49.123+09:00",
+      "tool_result": "bytes_retrieved",
+      "verification_verdict": "VERIFIED",
+      "visual_review_verdict": "ACCEPTED_FOR_PHASE4"
+    },
+    {
+      "attempt_id": "imageattempt_d92f27d010fdb6e62dce",
+      "changed_prompt_fields": [],
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "next_action": "curate_selected",
+      "output_hash": "cd8cc1b397e4ba2aba4e0683749a8ef9e3d142b114fc93b6fa921b6e5b061f36",
+      "prior_attempt_id": null,
+      "prompt_hash": "63485ac64d946c27846f68a47193b0e2496fb40a8ef8ec68999bfb7626db5f4f",
+      "rejected": false,
+      "rejection_reason": null,
+      "retry_reason": null,
+      "selected": true,
+      "target_id": "batchreference_ff6138d8d01a504f5b49",
+      "target_type": "batch_template_reference",
+      "timestamp": "2026-07-20T02:58:36.082+09:00",
+      "tool_result": "bytes_retrieved",
+      "verification_verdict": "VERIFIED",
+      "visual_review_verdict": "ACCEPTED_FOR_PHASE4"
+    },
+    {
+      "attempt_id": "imageattempt_d28d1908a5c51365a84e",
+      "changed_prompt_fields": [],
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "next_action": "curate_selected",
+      "output_hash": "bb529c9644837050e4cf3a611e81dbaf9038fb083af13e262e79488f3966170f",
+      "prior_attempt_id": null,
+      "prompt_hash": "ef847d03ee2db78e20ef8709003e0944290dffc662cb915ceafb9767f6324e6c",
+      "rejected": false,
+      "rejection_reason": null,
+      "retry_reason": null,
+      "selected": true,
+      "target_id": "visualtarget_c917f32532dfa26b4560",
+      "target_type": "slide_visual_target",
+      "timestamp": "2026-07-20T03:00:32.394+09:00",
+      "tool_result": "bytes_retrieved",
+      "verification_verdict": "VERIFIED",
+      "visual_review_verdict": "ACCEPTED_FOR_PHASE4"
+    },
+    {
+      "attempt_id": "imageattempt_70fe3aaea04afdff1d5f",
+      "changed_prompt_fields": [],
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "next_action": "explicit_retry",
+      "output_hash": "965f693a1b87cd380b8e659cbb16d45e54869b3a8019b50281b8b9bf19affdc0",
+      "prior_attempt_id": null,
+      "prompt_hash": "e112f0d4da72a59046798e7a36b67df6b978161a7014178cd157dc20e4d5e619",
+      "rejected": true,
+      "rejection_reason": "Composition expanded into a design-system board with palette, typography, module cards, and a layout miniature instead of one process-explainer slide.; Excess regions violate semantic, capacity, differentiation, and selected-layout fit.",
+      "retry_reason": null,
+      "selected": false,
+      "target_id": "visualtarget_eb8bc3132476d2929014",
+      "target_type": "slide_visual_target",
+      "timestamp": "2026-07-20T03:02:37.653+09:00",
+      "tool_result": "bytes_retrieved",
+      "verification_verdict": "VERIFIED",
+      "visual_review_verdict": "REJECTED"
+    },
+    {
+      "attempt_id": "imageattempt_e30820b3dbf57f09f410",
+      "changed_prompt_fields": [
+        "prompt_text",
+        "prompt_id",
+        "request_id",
+        "prompt_hash"
+      ],
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "next_action": "curate_selected",
+      "output_hash": "37f42109e03e22d0721da51ffd571e0a78452a5be1447bbcaec4f2d4008c9c72",
+      "prior_attempt_id": "imageattempt_70fe3aaea04afdff1d5f",
+      "prompt_hash": "d3e8a8f23fe5e6d51ece0cbea3155d3cf71103f110b918a3897ecb9cee95dfa6",
+      "rejected": false,
+      "rejection_reason": null,
+      "retry_reason": "Constrain the output to one process-explainer slide and exclude design-board expansion.",
+      "selected": true,
+      "target_id": "visualtarget_eb8bc3132476d2929014",
+      "target_type": "slide_visual_target",
+      "timestamp": "2026-07-20T03:04:35.803+09:00",
+      "tool_result": "bytes_retrieved",
+      "verification_verdict": "VERIFIED",
+      "visual_review_verdict": "ACCEPTED_FOR_PHASE4"
+    },
+    {
+      "attempt_id": "imageattempt_177fce1e9cea51fa8de2",
+      "changed_prompt_fields": [],
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "next_action": "curate_selected",
+      "output_hash": "96fc9ac2da10198a5cf2edf1f2fe44b089618dc1c72f8cd0c3c51313c19bb3d4",
+      "prior_attempt_id": null,
+      "prompt_hash": "44622c232c52137ba1c7ddbbbbc62ed1fef80f7e0558e16333b078d9dfc794d5",
+      "rejected": false,
+      "rejection_reason": null,
+      "retry_reason": null,
+      "selected": true,
+      "target_id": "visualtarget_04b7463dd0285b07a31a",
+      "target_type": "slide_visual_target",
+      "timestamp": "2026-07-20T03:07:39.555+09:00",
+      "tool_result": "bytes_retrieved",
+      "verification_verdict": "VERIFIED",
+      "visual_review_verdict": "ACCEPTED_FOR_PHASE4"
+    },
+    {
+      "attempt_id": "imageattempt_2cd78dc9f9becf16347d",
+      "changed_prompt_fields": [],
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "next_action": "curate_selected",
+      "output_hash": "af9492fece0b40fc2f67ed42a1d073e2b82002eb15c58c64f955fe0cc70d9dbf",
+      "prior_attempt_id": null,
+      "prompt_hash": "9c261a4459daee26ea32436c9bf7c69e72c54acda8bcab01fbcfa7562fc161fb",
+      "rejected": false,
+      "rejection_reason": null,
+      "retry_reason": null,
+      "selected": true,
+      "target_id": "visualtarget_83244783582673b6aa13",
+      "target_type": "slide_visual_target",
+      "timestamp": "2026-07-20T03:09:26.565+09:00",
+      "tool_result": "bytes_retrieved",
+      "verification_verdict": "VERIFIED",
+      "visual_review_verdict": "ACCEPTED_FOR_PHASE4"
+    },
+    {
+      "attempt_id": "imageattempt_4fe07120625b0d561980",
+      "changed_prompt_fields": [],
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "next_action": "curate_selected",
+      "output_hash": "8f42a53fd1fe62851082c147a280f2ac8487f450e0743d55a0c3c91d516ebb52",
+      "prior_attempt_id": null,
+      "prompt_hash": "ccc48efddb13c8c963e88be3a94ab1d0305fdee6ef99a316c952aad95546c26c",
+      "rejected": false,
+      "rejection_reason": null,
+      "retry_reason": null,
+      "selected": true,
+      "target_id": "visualtarget_8a7c9dbcfafcedbe2b2c",
+      "target_type": "slide_visual_target",
+      "timestamp": "2026-07-20T03:11:28.110+09:00",
+      "tool_result": "bytes_retrieved",
+      "verification_verdict": "VERIFIED",
+      "visual_review_verdict": "ACCEPTED_FOR_PHASE4"
+    },
+    {
+      "attempt_id": "imageattempt_98d1229c8a67bcab9c72",
+      "changed_prompt_fields": [],
+      "dimensions": {
+        "height": 936,
+        "width": 1664
+      },
+      "next_action": "curate_selected",
+      "output_hash": "0274db749369959daac7fed17331e7f007ff5c47cc7b824698c3c298f5c0e4c2",
+      "prior_attempt_id": null,
+      "prompt_hash": "b82c3ddb937b02fe481db77a7519a0ad0be7c8b424ef6a994c07bc162cf0a12b",
+      "rejected": false,
+      "rejection_reason": null,
+      "retry_reason": null,
+      "selected": true,
+      "target_id": "visualtarget_1b24176472703beee735",
+      "target_type": "slide_visual_target",
+      "timestamp": "2026-07-20T03:13:22.915+09:00",
+      "tool_result": "bytes_retrieved",
+      "verification_verdict": "VERIFIED",
+      "visual_review_verdict": "ACCEPTED_FOR_PHASE4"
+    }
+  ],
+  "automatic_retry": false,
+  "explicit_retry_only": true,
+  "history_hash": "f42846fc5c9ed5cbd7736e2dc235bec0ec727d6420380e0db4aa01c835428cf0",
+  "rejection_count": 2,
+  "schema_name": "phase4_regeneration_history",
+  "schema_version": "1.0.0"
+}

@@ -1,0 +1,133 @@
+{
+  "checks": {
+    "labels_outside_slide_region": true,
+    "render_count": 6,
+    "semantic_text_altered": false
+  },
+  "contact_sheet": {
+    "byte_size": 419794,
+    "columns": 3,
+    "height": 800,
+    "path": "contact_sheet.png",
+    "rows": 2,
+    "sha256": "bc98b5ef65a528b6bda484f5ae0b85484ef209fc583e2efb1fe631453ab40adb",
+    "width": 1824
+  },
+  "created_at": "2026-07-22T10:30:00+09:00",
+  "findings": [],
+  "implementation_provenance": {
+    "acceptance_authority": "DeckCompiler independent composite gate",
+    "component": "presentation_agent.deckcompiler.qa",
+    "deckcompiler_commit": "e2a6fabb1916680800097981fbda27abfe02b852",
+    "detector_version": "1.0.0",
+    "external_outputs_may_self_accept": false
+  },
+  "producer": "DeckCompiler deterministic contact-sheet builder",
+  "render_sources": [
+    {
+      "aspect_ratio": "16:9",
+      "byte_size": 95737,
+      "decode_valid": true,
+      "height": 1080,
+      "path": "renders/slide-001.png",
+      "sha256": "1d9753e704f776238d07862082540ee78dbc64630d50a8136e43151a28633684",
+      "slide": 1,
+      "width": 1920
+    },
+    {
+      "aspect_ratio": "16:9",
+      "byte_size": 100803,
+      "decode_valid": true,
+      "height": 1080,
+      "path": "renders/slide-002.png",
+      "sha256": "95da832e8af843baa86227eddd0933ee122d3238d4264a6fdd1647746c1df13e",
+      "slide": 2,
+      "width": 1920
+    },
+    {
+      "aspect_ratio": "16:9",
+      "byte_size": 94729,
+      "decode_valid": true,
+      "height": 1080,
+      "path": "renders/slide-003.png",
+      "sha256": "8da4216332f596e20de3df53e34c1592c5b31818181f06e64b21f06ca2f2901f",
+      "slide": 3,
+      "width": 1920
+    },
+    {
+      "aspect_ratio": "16:9",
+      "byte_size": 73027,
+      "decode_valid": true,
+      "height": 1080,
+      "path": "renders/slide-004.png",
+      "sha256": "855ae16e06b6e3c70aa795a7ce8feac03d699327135f2e5aff320c94e7a064a8",
+      "slide": 4,
+      "width": 1920
+    },
+    {
+      "aspect_ratio": "16:9",
+      "byte_size": 91074,
+      "decode_valid": true,
+      "height": 1080,
+      "path": "renders/slide-005.png",
+      "sha256": "1a9ecda45b6d0d475425dd84b83b441deeb8f040357c3a97fc6af43caf5659e2",
+      "slide": 5,
+      "width": 1920
+    },
+    {
+      "aspect_ratio": "16:9",
+      "byte_size": 95604,
+      "decode_valid": true,
+      "height": 1080,
+      "path": "renders/slide-006.png",
+      "sha256": "6f838b7d761103fea32ed7d90872db13d764ba088f6b0e3f7c159b5e160aa870",
+      "slide": 6,
+      "width": 1920
+    }
+  ],
+  "report_hash": "82603e0f3db36faeec57a8e8592c5cf9cf5c04057e5e7a5306d2a6fd8f1a497a",
+  "report_id": "report_0b8598c53e29388a57af",
+  "run_id": "phase6qa_9bd9b0fcf02397f92902",
+  "schema_name": "phase6_contact_sheet_manifest",
+  "schema_version": "1.0.0",
+  "severity_counts": {
+    "error": 0,
+    "info": 0,
+    "severe": 0,
+    "warning": 0
+  },
+  "source_artifacts": [
+    {
+      "artifact_id": "render-slide-001",
+      "path": "renders/slide-001.png",
+      "sha256": "1d9753e704f776238d07862082540ee78dbc64630d50a8136e43151a28633684"
+    },
+    {
+      "artifact_id": "render-slide-002",
+      "path": "renders/slide-002.png",
+      "sha256": "95da832e8af843baa86227eddd0933ee122d3238d4264a6fdd1647746c1df13e"
+    },
+    {
+      "artifact_id": "render-slide-003",
+      "path": "renders/slide-003.png",
+      "sha256": "8da4216332f596e20de3df53e34c1592c5b31818181f06e64b21f06ca2f2901f"
+    },
+    {
+      "artifact_id": "render-slide-004",
+      "path": "renders/slide-004.png",
+      "sha256": "855ae16e06b6e3c70aa795a7ce8feac03d699327135f2e5aff320c94e7a064a8"
+    },
+    {
+      "artifact_id": "render-slide-005",
+      "path": "renders/slide-005.png",
+      "sha256": "1a9ecda45b6d0d475425dd84b83b441deeb8f040357c3a97fc6af43caf5659e2"
+    },
+    {
+      "artifact_id": "render-slide-006",
+      "path": "renders/slide-006.png",
+      "sha256": "6f838b7d761103fea32ed7d90872db13d764ba088f6b0e3f7c159b5e160aa870"
+    }
+  ],
+  "status": "PASS",
+  "timezone": "Asia/Seoul"
+}

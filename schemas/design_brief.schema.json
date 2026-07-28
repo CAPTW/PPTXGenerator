@@ -1,0 +1,223 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/design_brief.schema.json",
+  "title": "DesignBrief",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "topic",
+    "audience",
+    "tone",
+    "visual_keywords",
+    "industry_context",
+    "deck_size",
+    "slide_archetypes_needed",
+    "density_profile",
+    "chart_table_frequency",
+    "photo_needs",
+    "icon_needs",
+    "footer_meta_requirements",
+    "reference_style",
+    "constraints",
+    "forbidden_design_behaviors",
+    "forbidden_outputs"
+  ],
+  "properties": {
+    "schema_name": {
+      "const": "design_brief"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "topic": {
+      "type": "string",
+      "minLength": 1
+    },
+    "audience": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tone": {
+      "type": "string",
+      "minLength": 1
+    },
+    "visual_keywords": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "industry_context": {
+      "type": "string",
+      "minLength": 1
+    },
+    "deck_size": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slide_count_target",
+        "format"
+      ],
+      "properties": {
+        "slide_count_target": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "format": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "slide_archetypes_needed": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "reference_style": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "description",
+        "source"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "density_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "overall",
+        "low_count",
+        "medium_count",
+        "high_count"
+      ],
+      "properties": {
+        "overall": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "low_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "medium_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "high_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "chart_table_frequency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chart_slide_count",
+        "table_slide_count",
+        "total_slide_count"
+      ],
+      "properties": {
+        "chart_slide_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "table_slide_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total_slide_count": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "photo_needs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "icon_needs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "footer_meta_requirements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "editable_text",
+        "editable_tables",
+        "editable_charts",
+        "no_full_slide_image_background",
+        "image_allowed_only_in_photo_frames",
+        "gpt_image_used_as_reference_only"
+      ],
+      "properties": {
+        "editable_text": {
+          "const": true
+        },
+        "editable_tables": {
+          "const": true
+        },
+        "editable_charts": {
+          "const": true
+        },
+        "no_full_slide_image_background": {
+          "const": true
+        },
+        "image_allowed_only_in_photo_frames": {
+          "const": true
+        },
+        "gpt_image_used_as_reference_only": {
+          "const": true
+        }
+      }
+    },
+    "forbidden_design_behaviors": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "forbidden_outputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/pngtopptx-invocation-plan.schema.json",
+  "title": "PNGtoPPTX Invocation Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "created_at", "timezone", "exact_orchestrator_skill", "companion_skills", "official_entrypoints", "exact_official_invocation_mode", "project_root", "input_paths", "output_root", "profile_path", "node_path", "external_skillset_pin", "deckcompiler_commit", "environment_prerequisites", "external_invocation_performed", "preflight_status", "canary_capability", "dry_run_capability", "repair_wave_limit", "prohibited_fallback", "planned_environment", "planned_commands"],
+  "properties": {
+    "schema_name": {"const": "pngtopptx_invocation_plan"}, "schema_version": {"const": "1.0.0"},
+    "created_at": {"type": "string", "minLength": 1}, "timezone": {"type": "string", "minLength": 1},
+    "exact_orchestrator_skill": {"const": "slide-editable-deck-orchestrator"},
+    "companion_skills": {"type": "array", "prefixItems": [{"const": "slide-text-layer-inpaint"}, {"const": "slide-image-dual-render"}, {"const": "slide-visual-polish-qa"}], "items": false, "minItems": 3, "maxItems": 3},
+    "official_entrypoints": {"type": "object", "additionalProperties": false, "required": ["orchestration_plan", "crop_generator", "pipeline", "final_gate", "visual_qa"], "properties": {"orchestration_plan": {"type": "string", "pattern": "plan_deck_workflow\\.js$"}, "crop_generator": {"type": "string", "pattern": "make_crops\\.py$"}, "pipeline": {"type": "string", "pattern": "slide_pipeline\\.js$"}, "final_gate": {"type": "string", "pattern": "final_gate\\.js$"}, "visual_qa": {"type": "string", "pattern": "enforce_visual_qa\\.js$"}}},
+    "exact_official_invocation_mode": {"const": "official_node_cli"}, "project_root": {"const": "project"},
+    "input_paths": {"type": "object", "additionalProperties": false, "required": ["source_png_pattern", "semantic_sidecar_pattern", "crop_plan", "asset_manifest"], "properties": {"source_png_pattern": {"const": "project/src/slideN.png"}, "semantic_sidecar_pattern": {"const": "project/work/slideNN/semantic_sidecar.json"}, "crop_plan": {"const": "project/work/crop_plan.json"}, "asset_manifest": {"const": "project/assets/manifest.json"}}},
+    "output_root": {"const": "project/out"}, "profile_path": {"type": "string", "minLength": 1}, "node_path": {"type": "string", "minLength": 1},
+    "external_skillset_pin": {"type": "object", "additionalProperties": false, "required": ["pin_id", "pin_hash"], "properties": {"pin_id": {"type": "string", "minLength": 1}, "pin_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}},
+    "deckcompiler_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "environment_prerequisites": {"type": "object", "additionalProperties": false, "required": ["node_runtime", "node_dependency_path", "api_credentials", "network"], "properties": {"node_runtime": {"const": "required"}, "node_dependency_path": {"type": "string", "minLength": 1}, "api_credentials": {"const": "not_required_by_official_docs"}, "network": {"const": "not_required_for_execution_with_preinstalled_dependencies"}}},
+    "external_invocation_performed": {"const": false}, "preflight_status": {"const": "PLANNED_NOT_EXECUTED"}, "canary_capability": {"const": "single_slide_canary"}, "dry_run_capability": {"const": true}, "repair_wave_limit": {"const": 3},
+    "prohibited_fallback": {"type": "array", "minItems": 4, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "planned_environment": {"type": "object", "additionalProperties": false, "required": ["crop_preparation"], "properties": {"crop_preparation": {"type": "object", "additionalProperties": false, "required": ["CROP_PLAN", "SRC_DIR", "DECK_ASSETS"], "properties": {"CROP_PLAN": {"type": "string", "pattern": "crop_plan\\.json$"}, "SRC_DIR": {"type": "string", "pattern": "[\\\\/]src$"}, "DECK_ASSETS": {"type": "string", "pattern": "[\\\\/]assets$"}}}}},
+    "planned_commands": {"type": "object", "additionalProperties": false, "required": ["orchestration_plan", "crop_preparation", "dry_run", "canary", "full_reconstruction"], "properties": {"orchestration_plan": {"$ref": "#/$defs/command"}, "crop_preparation": {"$ref": "#/$defs/command"}, "dry_run": {"$ref": "#/$defs/command"}, "canary": {"$ref": "#/$defs/command"}, "full_reconstruction": {"$ref": "#/$defs/command"}}}
+  },
+  "$defs": {"command": {"type": "array", "minItems": 2, "items": {"type": "string", "minLength": 1}}}
+}

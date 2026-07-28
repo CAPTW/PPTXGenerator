@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/external-execution-verification-report.schema.json",
+  "title": "DeckCompiler External Execution Verification Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "verifier_name",
+    "verifier_version",
+    "report_id",
+    "execution_id",
+    "record_id",
+    "verified_artifact_ids",
+    "request_verification_status",
+    "response_verification_status",
+    "output_verification_statuses",
+    "record_verification_status",
+    "provenance_verification_status",
+    "transport_policy_verification_status",
+    "errors",
+    "warnings",
+    "final_status",
+    "created_at",
+    "report_hash"
+  ],
+  "properties": {
+    "schema_name": {"const": "external_execution_verification_report"},
+    "schema_version": {"const": "1.0.0"},
+    "verifier_name": {"const": "deckcompiler-external-execution-verifier"},
+    "verifier_version": {"const": "1.0.0"},
+    "report_id": {"type": "string", "pattern": "^exverify_[0-9a-f]{20}$"},
+    "execution_id": {"type": "string", "pattern": "^exec_[0-9a-f]{20}$"},
+    "record_id": {"type": "string", "pattern": "^exrec_[0-9a-f]{20}$"},
+    "verified_artifact_ids": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "request_verification_status": {"enum": ["valid", "invalid"]},
+    "response_verification_status": {"enum": ["absent_expected", "invalid"]},
+    "output_verification_statuses": {
+      "type": "array",
+      "items": {"enum": ["valid", "invalid"]},
+      "maxItems": 0
+    },
+    "record_verification_status": {"enum": ["valid", "invalid"]},
+    "provenance_verification_status": {"enum": ["valid", "invalid"]},
+    "transport_policy_verification_status": {"enum": ["valid", "invalid"]},
+    "errors": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "warnings": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "final_status": {"enum": ["PASS", "FAIL"]},
+    "created_at": {"type": "string", "minLength": 1},
+    "report_hash": {
+      "allOf": [
+        {"$ref": "external-execution-record.schema.json#/$defs/hashBinding"},
+        {"properties": {"hash_domain": {"const": "deckcompiler.external_execution.verification_report.v1"}}}
+      ]
+    }
+  }
+}

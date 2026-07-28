@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/deckcompiler/phase4-visual-bundle-acceptance.schema.json",
+  "title": "Phase 4 Visual Bundle Acceptance",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "acceptance_id", "bundle_status", "phase4_accepted", "final_release_eligible", "devpost_release_eligible", "pptx_release_eligible", "pngtopptx_executed", "selected_image_count", "semantic_sidecar_count", "blocked_target_count", "acceptance_hash"],
+  "properties": {
+    "schema_name": {"const": "phase4_visual_bundle_acceptance"}, "schema_version": {"const": "1.0.0"}, "acceptance_id": {"type": "string"},
+    "bundle_status": {"enum": ["NOT_ELIGIBLE", "ELIGIBLE_FOR_PNGTOPPTX_HANDOFF", "BLOCKED"]},
+    "phase4_accepted": {"type": "boolean"}, "final_release_eligible": {"const": false}, "devpost_release_eligible": {"const": false}, "pptx_release_eligible": {"const": false}, "pngtopptx_executed": {"const": false},
+    "selected_image_count": {"type": "integer", "minimum": 0, "maximum": 13}, "semantic_sidecar_count": {"type": "integer", "minimum": 0, "maximum": 6}, "blocked_target_count": {"type": "integer", "minimum": 0},
+    "acceptance_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

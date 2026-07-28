@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/dependency-closure-validation-report.schema.json",
+  "title": "DeckCompiler dependency closure validation report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "manifest_id",
+    "dependency_manifest_hash",
+    "lock_sha256",
+    "locked_distribution_count",
+    "missing_count",
+    "version_mismatch_count",
+    "lock_mismatch_count",
+    "unexpected_installed_count",
+    "unknown_dynamic_count",
+    "import_preflight_status",
+    "entrypoint_canary_status",
+    "status",
+    "report_hash"
+  ],
+  "properties": {
+    "schema_name": {"const": "dependency_closure_validation_report"},
+    "schema_version": {"const": "1.0.0"},
+    "manifest_id": {
+      "type": "string",
+      "pattern": "^externalpydeps_[0-9a-f]{20}$"
+    },
+    "dependency_manifest_hash": {"$ref": "#/$defs/sha256"},
+    "lock_sha256": {"$ref": "#/$defs/sha256"},
+    "locked_distribution_count": {"type": "integer", "minimum": 1},
+    "missing_count": {"const": 0},
+    "version_mismatch_count": {"const": 0},
+    "lock_mismatch_count": {"const": 0},
+    "unexpected_installed_count": {"const": 0},
+    "unknown_dynamic_count": {"const": 0},
+    "import_preflight_status": {"const": "PASS"},
+    "entrypoint_canary_status": {"const": "PASS"},
+    "status": {"const": "PASS"},
+    "report_hash": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

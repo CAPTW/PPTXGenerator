@@ -1,0 +1,31 @@
+{
+  "canonical_run_id": "phase7run_4e36616cd03ce7bff6a7",
+  "dependency_manifest_hash": "1f895c6e45ef7fc9e807631566de9edcb403211b9ac9aa9666e6101eef626e07",
+  "devpost_release_eligible": false,
+  "final_release_eligible": false,
+  "gates": {
+    "canonical_pipeline": "PASS",
+    "dependency_closure": "PASS",
+    "external_entrypoint_canary": "PASS",
+    "external_skill_unchanged": "PASS",
+    "historical_behavioral_equivalence": "PASS",
+    "lock_install": "PASS",
+    "package_validation": "PASS",
+    "repeat_pipeline": "PASS",
+    "semantic_reproducibility": "PASS",
+    "source_tree_clean": "PASS"
+  },
+  "lock_sha256": "4fde8f6fd2584f66e2c5f6c0f57f822da19809cb9d12259e35537d3d378a21dc",
+  "phase7c_accepted": true,
+  "phase7d_required": true,
+  "push_performed": false,
+  "repeat_run_id": "phase7run_5f242f8f1eacff54d148",
+  "report_hash": "d23b41592b14479b8476be9e0bf01bd2140f6540518fea49e8b3778cd1c39a57",
+  "runtime_tree_sha256": "a69f5d3f8208ee91694ab9e46d70c81cb0b7ad7e8e3e0e193a63e4d5c7660d91",
+  "schema_name": "phase7c_corrected_acceptance",
+  "schema_version": "1.0.0",
+  "status": "ELIGIBLE_FOR_FRESH_CLONE_PROOF",
+  "submission_performed": false,
+  "tag_created": false,
+  "tested_runtime_commit": "5d845d373ae2255b5d490c45ce4e3435107c3d08"
+}

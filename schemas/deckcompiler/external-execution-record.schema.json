@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/external-execution-record.schema.json",
+  "title": "DeckCompiler Fail-Closed External Execution Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "record_id",
+    "execution_id",
+    "request_id",
+    "run_id",
+    "external_executable_id",
+    "execution_lane",
+    "request_artifact",
+    "request_semantic_sha256",
+    "response_artifact",
+    "response_absent_reason",
+    "response_hash",
+    "outputs",
+    "status",
+    "transport_attempted",
+    "transport_call_count",
+    "blocked_reason",
+    "created_at",
+    "source_commit",
+    "input_artifacts",
+    "implementation_provenance",
+    "record_hash"
+  ],
+  "properties": {
+    "schema_name": {"const": "external_execution_record"},
+    "schema_version": {"const": "1.0.0"},
+    "record_id": {"type": "string", "pattern": "^exrec_[0-9a-f]{20}$"},
+    "execution_id": {"type": "string", "pattern": "^exec_[0-9a-f]{20}$"},
+    "request_id": {"type": "string", "pattern": "^extreq_[0-9a-f]{20}$"},
+    "run_id": {"type": "string", "pattern": "^run_[0-9a-f]{20}$"},
+    "external_executable_id": {
+      "$ref": "external-execution-request.schema.json#/$defs/externalExecutableId"
+    },
+    "execution_lane": {"const": "contract_only"},
+    "request_artifact": {"$ref": "#/$defs/requestArtifact"},
+    "request_semantic_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "response_artifact": {"type": "null"},
+    "response_absent_reason": {"const": "transport_not_attempted"},
+    "response_hash": {"type": "null"},
+    "outputs": {"type": "array", "maxItems": 0},
+    "status": {"const": "blocked"},
+    "transport_attempted": {"const": false},
+    "transport_call_count": {"const": 0},
+    "blocked_reason": {"const": "external_transport_disabled_contract_only"},
+    "created_at": {"type": "string", "minLength": 1},
+    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "input_artifacts": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/inputArtifact"},
+      "uniqueItems": true
+    },
+    "implementation_provenance": {"$ref": "#/$defs/implementationProvenance"},
+    "record_hash": {
+      "allOf": [
+        {"$ref": "#/$defs/hashBinding"},
+        {"properties": {"hash_domain": {"const": "deckcompiler.external_execution.record.v1"}}}
+      ]
+    }
+  },
+  "$defs": {
+    "hashBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "hash_domain", "digest", "byte_count"],
+      "properties": {
+        "algorithm": {"const": "sha256"},
+        "hash_domain": {
+          "enum": [
+            "deckcompiler.external_execution.request.v1",
+            "deckcompiler.external_execution.response.v1",
+            "deckcompiler.external_execution.output.v1",
+            "deckcompiler.external_execution.record.v1",
+            "deckcompiler.external_execution.verification_report.v1",
+            "deckcompiler.external_execution.acceptance.v1"
+          ]
+        },
+        "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "byte_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "requestArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_id", "relative_path", "hash"],
+      "properties": {
+        "artifact_id": {"type": "string", "pattern": "^extreq_[0-9a-f]{20}$"},
+        "relative_path": {"type": "string", "minLength": 1},
+        "hash": {
+          "allOf": [
+            {"$ref": "#/$defs/hashBinding"},
+            {"properties": {"hash_domain": {"const": "deckcompiler.external_execution.request.v1"}}}
+          ]
+        }
+      }
+    },
+    "inputArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_id", "sha256"],
+      "properties": {
+        "artifact_id": {"type": "string", "pattern": "^art_[0-9a-f]{20}$"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "implementationProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["component", "version", "source_commit"],
+      "properties": {
+        "component": {"const": "presentation_agent.deckcompiler.external_execution"},
+        "version": {"const": "1.0.0"},
+        "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    }
+  }
+}

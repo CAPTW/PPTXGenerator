@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "presentation-agent"
+version = "0.1.0"
+description = "Bootstrap repository for a presentation-generation agent system."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "cairosvg>=2.7,<3",
+    "pydantic>=2.12,<3",
+    "Pillow>=10,<12",
+    "PyMuPDF>=1.24,<2",
+    "PyYAML>=6,<7",
+    "jsonschema>=4.20,<5",
+    "python-docx>=1.1,<2",
+    "python-pptx>=1.0,<2",
+    "playwright>=1.61,<1.62",
+    "pywin32>=311,<312; sys_platform == 'win32'",
+]
+
+[project.scripts]
+presentation-agent = "presentation_agent.runtime_cli:main"
+presentation-agent-state = "presentation_agent.state_cli:main"
+presentation-agent-production-gate = "presentation_agent.production_gate:main"
+presentation-agent-validate-generator-contracts = "presentation_agent.generator_contracts_cli:main"
+presentation-agent-generate-template-image-prompts = "presentation_agent.design_pipeline.generate_template_image_prompts:main"
+presentation-agent-generate-template-images = "presentation_agent.design_pipeline.generate_template_images:main"
+presentation-agent-build-editable-template-spec = "presentation_agent.design_pipeline.build_editable_template_spec:main"
+presentation-agent-compile-template-pack = "presentation_agent.compiler.template_compiler:main"
+presentation-agent-match-layouts = "presentation_agent.compiler.layout_matcher:main"
+presentation-agent-build-deck = "presentation_agent.compiler.deck_compiler:main"
+presentation-agent-adapt-image-template-spec = "presentation_agent.creative_frontend.template_spec_adapter:main"
+presentation-agent-build-creative-frontend = "presentation_agent.creative_frontend.pipeline:main"
+presentation-agent-qa-creative-frontend = "presentation_agent.creative_frontend.qa:main"
+presentation-agent-render-preview = "presentation_agent.qa.render_preview:main"
+presentation-agent-diff-template-preview = "presentation_agent.qa.diff_template_preview:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+presentation_agent = ["design_pipeline/*.json"]

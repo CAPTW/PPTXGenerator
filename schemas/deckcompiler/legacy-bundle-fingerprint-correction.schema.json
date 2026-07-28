@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/legacy-bundle-fingerprint-correction.schema.json",
+  "title": "DeckCompiler legacy bundle fingerprint correction",
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "objectOid": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"},
+    "legacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "classification", "reproduced", "matching_commits", "historical_algorithm"],
+      "properties": {
+        "value": {"$ref": "#/$defs/sha256"},
+        "classification": {"enum": ["HISTORICAL_GIT_OBJECT_FINGERPRINT", "HISTORICAL_WORKTREE_MATERIALIZATION_FINGERPRINT", "LEGACY_ALGORITHM_FINGERPRINT", "UNREPRODUCED_LEGACY_FINGERPRINT"]},
+        "reproduced": {"type": "boolean"},
+        "matching_commits": {"type": "array", "items": {"type": "object"}},
+        "historical_algorithm": {"type": "string", "minLength": 1}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority_id", "subtree_tree_oid", "aggregate_sha256"],
+      "properties": {
+        "authority_id": {"type": "string", "pattern": "^bundleauth_[0-9a-f]{20}$"},
+        "subtree_tree_oid": {"$ref": "#/$defs/objectOid"},
+        "aggregate_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "record_type", "correction_id", "phase4_legacy", "phase5_legacy", "current_authorities", "legacy_bytes_modified", "phase4_bytes_modified", "phase5_bytes_modified", "legacy_constants_deleted", "git_attributes_modified", "historical_reports_rewritten", "supersession_scope", "no_overclaim", "correction_hash"],
+  "properties": {
+    "schema_name": {"const": "legacy_bundle_fingerprint_correction"},
+    "schema_version": {"const": "1.0.0"},
+    "record_type": {"const": "current_release_authority_supersession"},
+    "correction_id": {"type": "string", "pattern": "^bundlecorrection_[0-9a-f]{20}$"},
+    "phase4_legacy": {"$ref": "#/$defs/legacy"},
+    "phase5_legacy": {"$ref": "#/$defs/legacy"},
+    "current_authorities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["phase4", "phase5"],
+      "properties": {"phase4": {"$ref": "#/$defs/authority"}, "phase5": {"$ref": "#/$defs/authority"}}
+    },
+    "legacy_bytes_modified": {"const": false},
+    "phase4_bytes_modified": {"const": false},
+    "phase5_bytes_modified": {"const": false},
+    "legacy_constants_deleted": {"const": false},
+    "git_attributes_modified": {"const": false},
+    "historical_reports_rewritten": {"const": false},
+    "supersession_scope": {"const": "current_release_and_fresh_clone_gates_only"},
+    "no_overclaim": {"const": true},
+    "correction_hash": {"$ref": "#/$defs/sha256"}
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/unified-release-gate-report.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DeckCompiler Phase 6 unified packaging eligibility gate",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_name": { "const": "phase6_unified_release_gate_report" },
+    "schema_version": { "const": "1.0.0" },
+    "report_id": { "pattern": "^release_gate_[0-9a-f]{20}$", "type": "string" },
+    "source_commit": { "pattern": "^[0-9a-f]{40}$", "type": "string" },
+    "checks": { "type": "object", "minProperties": 20 },
+    "status": { "const": "ELIGIBLE_FOR_PACKAGING" },
+    "phase6_accepted": { "const": true },
+    "final_release_eligible": { "const": false },
+    "devpost_release_eligible": { "const": false },
+    "phase7_required": { "const": true },
+    "phase7_started": { "const": false },
+    "active_output_set": { "const": "phase5_baseline" },
+    "created_at": { "format": "date-time", "type": "string" },
+    "timezone": { "const": "Asia/Seoul" },
+    "report_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" }
+  },
+  "required": ["schema_name", "schema_version", "report_id", "source_commit", "checks", "status", "phase6_accepted", "final_release_eligible", "devpost_release_eligible", "phase7_required", "phase7_started", "active_output_set", "created_at", "timezone", "report_hash"]
+}

@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "template_usability_contract.schema.json",
+  "title": "Template Usability Contract",
+  "type": "object",
+  "required": [
+    "schema_name",
+    "schema_version",
+    "archetype_id",
+    "presentation_role",
+    "reading_order",
+    "content_capacity",
+    "required_visual_motifs",
+    "optional_visual_motifs",
+    "decorative_budget",
+    "required_editable_objects",
+    "forbidden_patterns",
+    "overflow_policy"
+  ],
+  "properties": {
+    "schema_name": {"const": "template_usability_contract"},
+    "schema_version": {"type": "string"},
+    "archetype_id": {"type": "string", "minLength": 1},
+    "presentation_role": {"type": "string", "minLength": 1},
+    "reading_order": {
+      "type": "array",
+      "items": {"type": "string"},
+      "minItems": 2
+    },
+    "content_capacity": {
+      "type": "object",
+      "required": [
+        "title_max_chars",
+        "subtitle_max_chars",
+        "body_bullet_count",
+        "body_bullet_max_chars",
+        "card_count",
+        "card_title_max_chars",
+        "card_body_max_chars",
+        "table_max_rows",
+        "table_max_columns",
+        "chart_label_max_chars",
+        "takeaway_max_chars"
+      ],
+      "properties": {
+        "title_max_chars": {"type": "integer", "minimum": 12},
+        "subtitle_max_chars": {"type": "integer", "minimum": 0},
+        "body_bullet_count": {"type": "integer", "minimum": 0},
+        "body_bullet_max_chars": {"type": "integer", "minimum": 0},
+        "card_count": {"type": "integer", "minimum": 0},
+        "card_title_max_chars": {"type": "integer", "minimum": 0},
+        "card_body_max_chars": {"type": "integer", "minimum": 0},
+        "table_max_rows": {"type": "integer", "minimum": 0},
+        "table_max_columns": {"type": "integer", "minimum": 0},
+        "chart_label_max_chars": {"type": "integer", "minimum": 0},
+        "takeaway_max_chars": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "required_visual_motifs": {"type": "array", "items": {"type": "string"}},
+    "optional_visual_motifs": {"type": "array", "items": {"type": "string"}},
+    "decorative_budget": {
+      "type": "object",
+      "required": ["max_shape_count_target", "max_ornament_density", "max_background_coverage"],
+      "properties": {
+        "max_shape_count_target": {"type": "integer", "minimum": 10},
+        "max_ornament_density": {"enum": ["low", "medium", "high"]},
+        "max_background_coverage": {"type": "number", "minimum": 0, "maximum": 1}
+      },
+      "additionalProperties": false
+    },
+    "required_editable_objects": {
+      "type": "array",
+      "items": {"enum": ["ppt_text", "ppt_shape", "ppt_table", "ppt_chart", "svg_ornament", "photo_frame_image"]},
+      "minItems": 1
+    },
+    "forbidden_patterns": {
+      "type": "object",
+      "required": ["raw_slot_labels", "debug_text", "long_bullet_dump", "fixture_phrases", "visual_clutter_over_text"],
+      "properties": {
+        "raw_slot_labels": {"type": "array", "items": {"type": "string"}},
+        "debug_text": {"type": "array", "items": {"type": "string"}},
+        "long_bullet_dump": {"type": "boolean"},
+        "fixture_phrases": {"type": "array", "items": {"type": "string"}},
+        "visual_clutter_over_text": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "overflow_policy": {
+      "type": "object",
+      "required": ["compress", "split_slide", "convert_to_cards", "move_to_appendix", "move_to_speaker_notes"],
+      "properties": {
+        "compress": {"type": "boolean"},
+        "split_slide": {"type": "boolean"},
+        "convert_to_cards": {"type": "boolean"},
+        "move_to_appendix": {"type": "boolean"},
+        "move_to_speaker_notes": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": true
+}

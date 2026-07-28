@@ -1,0 +1,40 @@
+{
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/composite-qa-report.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "acceptance_policy": { "type": "object" },
+    "checks": { "type": "object" },
+    "created_at": { "format": "date-time", "type": "string" },
+    "dimension_reports": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "path": { "minLength": 1, "type": "string" },
+          "report_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+          "schema_name": { "minLength": 1, "type": "string" },
+          "status": { "enum": ["PASS", "NEEDS_REPAIR", "BLOCKED"] }
+        },
+        "required": ["schema_name", "path", "report_hash", "status"],
+        "type": "object"
+      },
+      "minItems": 10,
+      "type": "array"
+    },
+    "findings": { "items": { "$ref": "https://pptx-generator.local/schemas/deckcompiler/qa-finding.schema.json" }, "type": "array" },
+    "implementation_provenance": { "type": "object" },
+    "producer": { "const": "DeckCompiler independent composite QA" },
+    "report_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "report_id": { "minLength": 1, "type": "string" },
+    "run_id": { "minLength": 1, "type": "string" },
+    "schema_name": { "const": "phase6_composite_qa_report" },
+    "schema_version": { "const": "1.0.0" },
+    "severity_counts": { "$ref": "https://pptx-generator.local/schemas/deckcompiler/qa-dimension-report.schema.json#/$defs/severityCounts" },
+    "source_artifacts": { "items": { "$ref": "https://pptx-generator.local/schemas/deckcompiler/qa-dimension-report.schema.json#/$defs/sourceArtifact" }, "minItems": 1, "type": "array" },
+    "status": { "enum": ["PASS", "NEEDS_REPAIR", "BLOCKED"] },
+    "timezone": { "const": "Asia/Seoul" }
+  },
+  "required": ["schema_name", "schema_version", "report_id", "run_id", "source_artifacts", "producer", "dimension_reports", "checks", "findings", "severity_counts", "acceptance_policy", "status", "created_at", "timezone", "implementation_provenance", "report_hash"],
+  "title": "DeckCompiler Phase 6 composite QA report",
+  "type": "object"
+}

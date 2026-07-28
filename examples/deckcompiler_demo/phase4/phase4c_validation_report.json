@@ -1,0 +1,32 @@
+{
+  "attempt_count": 2,
+  "credential_lookups": 0,
+  "execution_mode": "platform_managed_tool",
+  "execution_status": "VERIFIED",
+  "external_provider_transport_calls": 0,
+  "final_release_eligible": false,
+  "image_model": "not_exposed_by_tool",
+  "phase3_source_commit": "00fefe71e3b02fa897794f9e9f3d6df5be715cd8",
+  "phase4_bundle_status": "NOT_ELIGIBLE",
+  "phase4_overall_status": "NOT_YET_ELIGIBLE",
+  "phase4b_commit": "00fefe71e3b02fa897794f9e9f3d6df5be715cd8",
+  "phase4c_status": "GO",
+  "platform_tool_id": "image_gen.imagegen",
+  "platform_tool_invocations": 2,
+  "pngtopptx_executed": false,
+  "pngtopptx_handoff_eligible": false,
+  "rejection_count": 1,
+  "report_hash": "2ed0684ba2fb5e5b41da9f5e06d0b5631c8bdaf97ec6745d2b956515c9fb8cae",
+  "repository_network_calls": 0,
+  "schema_name": "phase4c_canary_report",
+  "schema_version": "1.0.0",
+  "selected_attempt_id": "imageattempt_841f1a2d3f85ffe84b12",
+  "selected_design_board_count": 1,
+  "selected_dimensions": {
+    "height": 936,
+    "width": 1664
+  },
+  "selected_sha256": "a0229b8e27b4a103c177682b2d742ae3d4dd6eb9bb70c675cbf9f88293dd666d",
+  "tool_call_id": "not_exposed",
+  "visual_review_status": "ACCEPTED_FOR_PHASE4"
+}

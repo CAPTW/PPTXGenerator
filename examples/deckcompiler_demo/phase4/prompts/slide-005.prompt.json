@@ -1,0 +1,93 @@
+{
+  "artifact_type": "slide_visual_target",
+  "batch_id": "batch-03-01",
+  "composition_goals": [
+    "decisive focal composition",
+    "dominant recommendation region",
+    "rationale hierarchy",
+    "evidence-backed sparse structure",
+    "transition into implementation"
+  ],
+  "credential_lookup": false,
+  "design_system_reference": {
+    "path": "design_system.json",
+    "sha256": "3acc719b089726a34b81083cbbc31a327a696d27918640e318db2341745c7217"
+  },
+  "execution_mode": "platform_managed_tool",
+  "external_provider_id": null,
+  "external_transport_used": false,
+  "fallback_normalization_policy": {
+    "allowed": [
+      "aspect_preserving_crop",
+      "aspect_preserving_pad",
+      "uniform_resize_after_crop_or_pad"
+    ],
+    "forbidden": [
+      "stretch",
+      "nonuniform_resize",
+      "critical_content_clipping"
+    ],
+    "minimum_final_dimensions": {
+      "height": 900,
+      "width": 1600
+    }
+  },
+  "forbidden_elements": [
+    "full-slide raster background",
+    "screenshot slide",
+    "microtext",
+    "invented fact",
+    "invented number",
+    "invented citation",
+    "random logo",
+    "watermark",
+    "pseudo-language"
+  ],
+  "hierarchy_goals": [
+    "State the recommended decision and connect it to the strongest evidence.",
+    "one dominant focal narrative"
+  ],
+  "implementation_provenance": "build_week_new",
+  "module_id": "module-03-section_03_act",
+  "native_raster_intent": {
+    "continuous_tone_art": "bounded_raster_allowed",
+    "full_slide_raster": "forbidden",
+    "semantic_slots": "native_required"
+  },
+  "negative_space_target": "sufficient for native title, semantic objects, and visible source notes",
+  "prior_selected_visual_reference_ids": [
+    "designboard_61f00a55ee02666b3254",
+    "moduleanchor_aea9b62a3605c1edb24c",
+    "batchreference_ff6138d8d01a504f5b49"
+  ],
+  "prompt_hash": "ccc48efddb13c8c963e88be3a94ab1d0305fdee6ef99a316c952aad95546c26c",
+  "prompt_id": "prompt_142401ff66cadaf9e579",
+  "prompt_text": "Create a landscape 16:9 full-slide visual reconstruction target for role recommendation. This is visual truth only, never the final slide surface. Composition requirements: decisive focal composition, dominant recommendation region, rationale hierarchy, evidence-backed sparse structure, transition into implementation. Treat the linked Semantic Sidecar as the sole authority for exact wording, numbers, units, data, citations, accessibility, and native/raster policy. Reserve clean native reconstruction regions for title, subtitle, labels, body, structured data, citations, footer, and page number. Prefer no rendered text beyond large generic semantic labels. No paragraphs, full citations, tiny source notes, dense table text, tiny chart labels, pseudo-language, invented numbers, quotations, logos, watermarks, screenshots, dashboard walls, or full-slide raster background. Do not render digits, numerals, numbered labels, percentages, dates, quantities, or any other numeric characters; use unlabeled geometry or alphabetic placeholders only.",
+  "request_id": "imagerequest_2660a401817af82590bd",
+  "requested_aspect_ratio": "16:9",
+  "requested_dimensions": {
+    "height": 1152,
+    "width": 2048
+  },
+  "requested_orientation": "landscape",
+  "schema_name": "platform_image_request",
+  "schema_version": "1.0.0",
+  "selected_family": "family-recommendation-focus",
+  "selected_layout": "layout-recommendation-focus",
+  "semantic_sidecar_reference": {
+    "path": "semantic_sidecars/slide-005.semantic.json",
+    "sha256": "fd9b005cde95ffe5cf0d85fbb74b4c45d171939302c793319178e8f108979116",
+    "sidecar_id": "sidecar_3259b4d651ab52adc2b3"
+  },
+  "slide_id": "slide-05-recommendation",
+  "target_artifact_id": "visualtarget_8a7c9dbcfafcedbe2b2c",
+  "text_policy": {
+    "ocr_canonical_text": "forbidden",
+    "reference_prompts": "generic_placeholders_only",
+    "slide_prompts": "sidecar_authoritative_native_text_regions"
+  },
+  "visual_dna_reference": {
+    "path": "visual_dna.json",
+    "sha256": "4c25c3d627dc72087d650072b7a4241d5fb74b0508c8dd48f82e0b9b4e8b9241"
+  }
+}

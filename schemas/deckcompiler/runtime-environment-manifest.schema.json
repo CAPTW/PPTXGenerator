@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://pptx-generator.local/schemas/deckcompiler/runtime-environment-manifest.schema.json", "title": "DeckCompiler runtime environment manifest",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "release_profile_id", "supported_os", "architecture", "python_version", "python_lock_path", "python_lock_sha256", "python_interpreter_constraints", "external_python_dependency_manifest", "external_python_interpreter", "node_version", "node_lock", "powershell_version", "powerpoint", "playwright", "chromium", "tesseract_cairo", "external_skill_pin", "environment_variables_required", "environment_variables_prohibited", "credential_requirement", "network_requirement_by_stage", "canonical_timezone", "path_sanitization_policy", "setup_verification_status", "manifest_hash"],
+  "properties": {
+    "schema_name": {"const": "runtime_environment_manifest"}, "schema_version": {"const": "1.1.0"}, "release_profile_id": {"const": "devpost_p0_frozen_visuals"}, "supported_os": {"type": "object"}, "architecture": {"type": "string"},
+    "python_version": {"type": "string"}, "python_lock_path": {"type": "string"}, "python_lock_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"}, "python_interpreter_constraints": {"type": "string"},
+    "external_python_dependency_manifest": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "manifest_hash", "required_distribution_count"],
+      "properties": {
+        "path": {"type": "string"},
+        "manifest_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+        "required_distribution_count": {"type": "integer", "minimum": 1}
+      }
+    },
+    "external_python_interpreter": {
+      "type": "object", "additionalProperties": false,
+      "required": ["owner", "fallback_allowed", "system_site_packages", "user_site_packages"],
+      "properties": {
+        "owner": {"const": "deckcompiler_sys_executable"},
+        "fallback_allowed": {"const": false},
+        "system_site_packages": {"const": false},
+        "user_site_packages": {"const": false}
+      }
+    },
+    "node_version": {"type": "string"}, "node_lock": {"type": "object"}, "powershell_version": {"type": "string"},
+    "powerpoint": {"type": "object"}, "playwright": {"type": "object"}, "chromium": {"type": "object"}, "tesseract_cairo": {"type": "object"}, "external_skill_pin": {"type": "object"}, "environment_variables_required": {"type": "array"}, "environment_variables_prohibited": {"type": "array"},
+    "credential_requirement": {"const": false}, "network_requirement_by_stage": {"type": "object"}, "canonical_timezone": {"const": "Asia/Seoul"}, "path_sanitization_policy": {"type": "string"}, "setup_verification_status": {"const": "PASS"}, "manifest_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"}
+  }
+}

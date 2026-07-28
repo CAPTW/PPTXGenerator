@@ -1,0 +1,118 @@
+{
+  "content_sha256_without_this_field": "0b2b24463439e83ea2068ac58e235e3c9e4bd429f0d7834c54d03b01417fecc8",
+  "deckcompiler_commit": "8c05f69ccee081f838455fced7de3b77dd1baf29",
+  "handoff_id": "pnghandoff_a52abef975f8490a5882",
+  "phase5_1_run_repair_waves_used": 3,
+  "prior_output_is_input": false,
+  "prior_run_is_continuation": false,
+  "repair_budget_reset_reason": "upstream_contract_implementation_change",
+  "repair_status": "completed_at_limit",
+  "repair_waves_allowed": 3,
+  "repair_waves_used": 3,
+  "run_closed": true,
+  "run_id": "phase51run_a52abef975f8490a5882",
+  "runtime_root": "<phase5.1-runtime>",
+  "schema_name": "phase5_1_repair_budget",
+  "schema_version": "1.0.0",
+  "validation_status": "PASS",
+  "waves": [
+    {
+      "action": "Materialized official per-slide reconstruction and hash-bound QA evidence from the fresh PowerPoint/HTML renders; no deck source, crop artifact, Phase 4 asset, or external Skill source was changed.",
+      "downstream_invalidation": "The first full outputs remain diagnostic until the sealed reconstruction command and official final gate pass again.",
+      "findings": [
+        "OFFICIAL_RECONSTRUCTION_EVIDENCE_BUNDLE_MISSING",
+        "OFFICIAL_QA_EVIDENCE_BUNDLE_MISSING",
+        "PHASE6_POLISH_BACKLOG_RECORDED"
+      ],
+      "independent_validation_result": "FAILED_NATIVE_TABLE_REQUIREMENT_SUPERSEDED_BY_WAVE_2",
+      "input_hashes": {
+        "asset_manifest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "crop_plan": "8ca5934c049864fc69b856f0841ccba731980e2f6d756f04905b4086939aa089",
+        "diagnostic_html": "3eab55a489212c135a318f4589a2693db6d4b73aba9017b407fc68839bf8febf",
+        "diagnostic_pptx": "b9470ea77864fc836e14fb1ffacb8f7de9d698dc2a63cc45d1199bc293334d9f",
+        "slides_js": "6bbbace744e1a540762cd6d21604209c91073c9dded423ab963e8b0e1108d1f7"
+      },
+      "official_gate_result": "PASS_SUPERSEDED_BY_WAVE_2",
+      "output_hashes": {
+        "asset_manifest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "crop_plan": "8ca5934c049864fc69b856f0841ccba731980e2f6d756f04905b4086939aa089",
+        "reconstructed_html": "3eab55a489212c135a318f4589a2693db6d4b73aba9017b407fc68839bf8febf",
+        "reconstructed_pptx": "9dcd068c8a50a8c55873619df28325219414dd2eaaf415f79dcab36ea9a4544f",
+        "slides_js": "6bbbace744e1a540762cd6d21604209c91073c9dded423ab963e8b0e1108d1f7"
+      },
+      "owning_artifacts": [
+        "work/slideXX reconstruction records",
+        "work/slideXX/qa_result.json",
+        "work/slideXX/qa_evidence.json"
+      ],
+      "status": "reconstruction_passed_pending_final_gate",
+      "wave": 1
+    },
+    {
+      "action": "Replaced Slide 4's editable row-card approximation with a visible native PowerPoint table and matching native HTML table in the deck-owned runtime source.",
+      "downstream_invalidation": "Wave 1 final-gate evidence and output hashes are superseded; the official pipeline, fresh captures, final gate, and all independent validators must run again.",
+      "findings": [
+        "NATIVE_TABLE_REQUIREMENT_UNSATISFIED",
+        "HTML_NATIVE_TABLE_ABSENT"
+      ],
+      "independent_validation_result": "STRUCTURAL_PASS_VISUAL_INSPECTION_FAIL_SUPERSEDED_BY_WAVE_3",
+      "input_hashes": {
+        "asset_manifest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "crop_plan": "8ca5934c049864fc69b856f0841ccba731980e2f6d756f04905b4086939aa089",
+        "html_package_validation_report": "3865eb7b7ab6f8233ae54a1067659dee93a5ac403a80a49ef5bffbce5cd70e76",
+        "native_object_manifest": "2cbb63e532a67c63fb51f8da6f91d9e977e71cc0c661cc67462db71e9d9e019e",
+        "pre_repair_html": "3eab55a489212c135a318f4589a2693db6d4b73aba9017b407fc68839bf8febf",
+        "pre_repair_pptx": "9dcd068c8a50a8c55873619df28325219414dd2eaaf415f79dcab36ea9a4544f",
+        "pre_repair_slides_js": "6bbbace744e1a540762cd6d21604209c91073c9dded423ab963e8b0e1108d1f7"
+      },
+      "official_gate_result": "PASS_SUPERSEDED_BY_WAVE_3",
+      "output_hashes": {
+        "asset_manifest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "crop_plan": "8ca5934c049864fc69b856f0841ccba731980e2f6d756f04905b4086939aa089",
+        "post_repair_slides_js": "5d4d52fcdfc1fea5fc069bb38b16119391483656a0f013d1aaba491b46bea089",
+        "reconstructed_html": "f73f13923e9df8e739bb92dddf590d2fc081da23fd5f182478df19e1906dfbe3",
+        "reconstructed_pptx": "e080c43c98f33c8dbb94c0192a623560ee9e9d62f02f9ac481e6453a7cf09c89",
+        "slides_js": "e2288d60194411681748be9ce4d1306304ed4653ae171d7eccd71a0d9034e630"
+      },
+      "owning_artifacts": [
+        "handoff/project/lib/slides.js",
+        "work/slide04 reconstruction records",
+        "work/slide04 QA evidence"
+      ],
+      "status": "reconstruction_passed_pending_final_gate",
+      "wave": 2
+    },
+    {
+      "action": "Expanded the long-title header layout and forced the Slide 1 governance label to a single shrinkable line after canonical PowerPoint inspection found a title/subtitle obstruction.",
+      "downstream_invalidation": "Wave 2 final-gate and independent-validation evidence is superseded; the official reconstruction, captures, final gate, and independent validators must run again.",
+      "findings": [
+        "SLIDE01_TITLE_SUBTITLE_UNREADABLE_OBSTRUCTION",
+        "SLIDE01_GOVERNANCE_LABEL_UNINTENTIONAL_WRAP"
+      ],
+      "independent_validation_result": "PASS",
+      "input_hashes": {
+        "pre_repair_contact_sheet": "c11aff4c63a0505b209962c02f4483981db2af5f9ae80818256097312cec709d",
+        "pre_repair_final_gate_stdout": "f8c7769171ad7559329c597ef91f3dc9468c5424347f798826493148a0b43cbc",
+        "pre_repair_html": "f73f13923e9df8e739bb92dddf590d2fc081da23fd5f182478df19e1906dfbe3",
+        "pre_repair_pptx": "e080c43c98f33c8dbb94c0192a623560ee9e9d62f02f9ac481e6453a7cf09c89",
+        "pre_repair_slides_js": "e2288d60194411681748be9ce4d1306304ed4653ae171d7eccd71a0d9034e630"
+      },
+      "official_gate_result": "PASS",
+      "output_hashes": {
+        "asset_manifest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "crop_plan": "8ca5934c049864fc69b856f0841ccba731980e2f6d756f04905b4086939aa089",
+        "post_repair_slides_js": "8130f47caa5decf4e1df5343f405fcc79ff18f6d7c6e1880d7e56733d45ae20b",
+        "reconstructed_html": "b1f161bed4d1dc37be576eceda0cf01d125580df4a767c4722582c8671983085",
+        "reconstructed_pptx": "805eb4aa3d44d90ebe5b78c0247d02e412ebfc9468e57c778516b90de2d27676",
+        "slides_js": "8130f47caa5decf4e1df5343f405fcc79ff18f6d7c6e1880d7e56733d45ae20b"
+      },
+      "owning_artifacts": [
+        "handoff/project/lib/slides.js",
+        "work/slide01 reconstruction records",
+        "work/slide01 QA evidence"
+      ],
+      "status": "accepted",
+      "wave": 3
+    }
+  ]
+}

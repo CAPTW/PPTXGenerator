@@ -1,0 +1,17 @@
+{
+  "dependency_manifest_hash": "1f895c6e45ef7fc9e807631566de9edcb403211b9ac9aa9666e6101eef626e07",
+  "entrypoint_canary_status": "PASS",
+  "import_preflight_status": "PASS",
+  "lock_mismatch_count": 0,
+  "lock_sha256": "4fde8f6fd2584f66e2c5f6c0f57f822da19809cb9d12259e35537d3d378a21dc",
+  "locked_distribution_count": 38,
+  "manifest_id": "externalpydeps_7a122d50f4ffda57606a",
+  "missing_count": 0,
+  "report_hash": "047ff7b0d745ea6406f4e2ee80d9532df54b77a222ccc8ad12188efb876b3715",
+  "schema_name": "dependency_closure_validation_report",
+  "schema_version": "1.0.0",
+  "status": "PASS",
+  "unexpected_installed_count": 0,
+  "unknown_dynamic_count": 0,
+  "version_mismatch_count": 0
+}

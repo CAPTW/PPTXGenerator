@@ -1,0 +1,63 @@
+{
+  "credential_requirement": false,
+  "external_python_runtime": {
+    "dependency_manifest_hash": "1f895c6e45ef7fc9e807631566de9edcb403211b9ac9aa9666e6101eef626e07",
+    "dependency_manifest_path": "examples/deckcompiler_demo/phase7/contract/external_python_runtime_dependency_manifest.json",
+    "external_skill_source_packaged": false,
+    "interpreter_owner": "deckcompiler_sys_executable",
+    "lock_owned": true,
+    "network_required_after_artifact_availability": false,
+    "required_distribution_count": 38
+  },
+  "manifest_hash": "cca041283c80d94a3f213117c0887b286c02367bbfa22789f0e23455ca7c0a19",
+  "microsoft_powerpoint": {
+    "build_observed": "20131",
+    "com_available": true,
+    "fallback_policy": "no_silent_fallback",
+    "libreoffice_policy": "diagnostic_only_when_powerpoint_exists",
+    "platform": "x64",
+    "required": true,
+    "version_observed": "16.0"
+  },
+  "network_credential_requirement": false,
+  "playwright_chromium": {
+    "browser_revision": "1228",
+    "chromium_version": "149.0.7827.55",
+    "download_policy": "no_silent_different_browser",
+    "expected_executable_class": "%PLAYWRIGHT_BROWSERS_PATH%/chromium-1228/chrome-win64/chrome.exe",
+    "fresh_clone_preflight": true,
+    "python_package_version": "1.61.0",
+    "required": true
+  },
+  "pngtopptx_skillset": {
+    "aggregate_sha256": "3dd4541fb0f2f4cf421d2a5c3cf2002390c0b00661a2e4d3a588d4467600022a",
+    "canonical_repository": "CAPTW/pngtopptx",
+    "classification": "external_existing",
+    "file_count": 99,
+    "installed_path_class": "%USERPROFILE%/.codex/skills",
+    "modification_prohibited": true,
+    "node_dependency_path_class": "%DECKCOMPILER_NODE_MODULES%",
+    "node_packages": {
+      "pptxgenjs": "4.0.1",
+      "react": "19.2.7",
+      "react-dom": "19.2.7",
+      "react-icons": "5.6.0",
+      "sharp": "0.35.1"
+    },
+    "package_inclusion": false,
+    "pin_mode": "git_tree_pin",
+    "skill_count": 4,
+    "source_commit_uniquely_claimed": false
+  },
+  "release_profile_id": "devpost_p0_frozen_visuals",
+  "schema_name": "external_prerequisite_manifest",
+  "schema_version": "1.1.0",
+  "tesseract_cairo": {
+    "directory_class": "%PROGRAMFILES%/Tesseract-OCR",
+    "ocr_enabled": false,
+    "purpose": "validated Cairo DLL path only",
+    "scanned_pdf_ocr_supported": false,
+    "tesseract_version": "5.4.0.20240606"
+  },
+  "validation_status": "PASS"
+}

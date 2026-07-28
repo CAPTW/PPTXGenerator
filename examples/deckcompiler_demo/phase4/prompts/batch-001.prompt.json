@@ -1,0 +1,88 @@
+{
+  "artifact_type": "batch_template_reference",
+  "batch_id": "batch-01-01",
+  "composition_goals": [
+    "asymmetric editorial hero with decision frame",
+    "title_band",
+    "hero_field",
+    "proof_panel",
+    "citation_footer"
+  ],
+  "credential_lookup": false,
+  "design_system_reference": {
+    "path": "design_system.json",
+    "sha256": "3acc719b089726a34b81083cbbc31a327a696d27918640e318db2341745c7217"
+  },
+  "execution_mode": "platform_managed_tool",
+  "external_provider_id": null,
+  "external_transport_used": false,
+  "fallback_normalization_policy": {
+    "allowed": [
+      "aspect_preserving_crop",
+      "aspect_preserving_pad",
+      "uniform_resize_after_crop_or_pad"
+    ],
+    "forbidden": [
+      "stretch",
+      "nonuniform_resize",
+      "critical_content_clipping"
+    ],
+    "minimum_final_dimensions": {
+      "height": 900,
+      "width": 1600
+    }
+  },
+  "forbidden_elements": [
+    "full-slide raster background",
+    "screenshot slide",
+    "microtext",
+    "invented fact",
+    "invented number",
+    "invented citation",
+    "random logo",
+    "watermark",
+    "pseudo-language"
+  ],
+  "hierarchy_goals": [
+    "one thesis, one supporting proof cluster, and a visible source footer",
+    "all real text, tables, charts, cards, connectors, and citations remain native"
+  ],
+  "implementation_provenance": "build_week_new",
+  "module_id": "module-01-section_01_understand",
+  "native_raster_intent": {
+    "continuous_tone_art": "bounded_raster_allowed",
+    "full_slide_raster": "forbidden",
+    "semantic_slots": "native_required"
+  },
+  "negative_space_target": "enough open area for native semantic reconstruction",
+  "prior_selected_visual_reference_ids": [
+    "designboard_61f00a55ee02666b3254",
+    "moduleanchor_3591b43d6cf6fe339284"
+  ],
+  "prompt_hash": "410bbea89a4a60b0d8d8b88b3a6c7d05d0205b1003c5932f1e9a6cb79126d620",
+  "prompt_id": "prompt_e07f6cafd112106f1076",
+  "prompt_text": "Create a landscape 16:9 batch template composition reference, not a final slide. Show focal, title-safe, evidence/data, diagram/table/chart, and source-note regions with clear reading direction, native editability, and bounded non-semantic raster intent. Selected family composition archetype: asymmetric editorial hero with decision frame. Capacity intent: one thesis, one supporting proof cluster, and a visible source footer. Expected visual regions: title_band, hero_field, proof_panel, citation_footer. Use only placeholder labels TITLE, PRIMARY VISUAL, PROCESS, EVIDENCE, COMPARISON, RECOMMENDATION, IMPLEMENTATION, SOURCE NOTES. No final factual copy, statistics, citations, dense labels, microtext, logos, watermarks, screenshots, or full-slide raster. Do not render digits, numerals, numbered labels, percentages, dates, quantities, or any other numeric characters; use unlabeled geometry or alphabetic placeholders only.",
+  "request_id": "imagerequest_a6ab4daee1f9caeff7ce",
+  "requested_aspect_ratio": "16:9",
+  "requested_dimensions": {
+    "height": 1152,
+    "width": 2048
+  },
+  "requested_orientation": "landscape",
+  "schema_name": "platform_image_request",
+  "schema_version": "1.0.0",
+  "selected_family": "family-editorial-hero",
+  "selected_layout": "layout-decision-hero",
+  "semantic_sidecar_reference": null,
+  "slide_id": null,
+  "target_artifact_id": "batchreference_3473bb414e4059c9bdd2",
+  "text_policy": {
+    "ocr_canonical_text": "forbidden",
+    "reference_prompts": "generic_placeholders_only",
+    "slide_prompts": "sidecar_authoritative_native_text_regions"
+  },
+  "visual_dna_reference": {
+    "path": "visual_dna.json",
+    "sha256": "4c25c3d627dc72087d650072b7a4241d5fb74b0508c8dd48f82e0b9b4e8b9241"
+  }
+}

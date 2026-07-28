@@ -1,0 +1,378 @@
+"""Minimal command-line validation surface for DeckCompiler contracts."""
+
+from __future__ import annotations
+
+import argparse
+import json
+from datetime import datetime
+from pathlib import Path
+
+from .errors import DeckCompilerError
+from .manifest_io import read_json
+from .manifest_io import write_json
+from .orchestration.phase3_runner import run_phase3
+from .pngtopptx_pinning import (
+    PinningError,
+    build_external_skillset_pin,
+    validate_external_skillset_pin,
+)
+from .pngtopptx_handoff import HandoffError, export_phase4_handoff, validate_handoff
+from .qa import CompositeQAError, run_composite_qa, validate_composite_qa
+from .repair import FaultFixtureError, apply_fault_fixture, evaluate_fault_detection
+from .validation import build_artifact_graph, validate_artifact, validate_run_directory
+from .visuals.preparation import prepare_visuals, validate_visual_preparation
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(prog="deckcompiler", description="Validate PPTX Generator DeckCompiler artifacts.")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    artifact = subparsers.add_parser("validate", help="Validate one JSON artifact.")
+    artifact.add_argument("path", type=Path)
+    artifact.add_argument("--schema", required=False)
+    artifact.add_argument("--format", choices=("human", "json"), default="human")
+
+    run = subparsers.add_parser("validate-run", help="Validate a complete contract fixture/run directory.")
+    run.add_argument("path", type=Path)
+    run.add_argument("--format", choices=("human", "json"), default="human")
+
+    graph = subparsers.add_parser("graph", help="Print the artifact provenance graph.")
+    graph.add_argument("path", type=Path)
+    graph.add_argument("--format", choices=("human", "json"), default="human")
+
+    build = subparsers.add_parser(
+        "build-architecture",
+        help="Build deterministic Phase 3 intake, strict planning, and creative architecture artifacts.",
+    )
+    build.add_argument("--config", type=Path, required=True)
+    build.add_argument("--output-dir", type=Path, required=True)
+
+    prepare = subparsers.add_parser(
+        "prepare-visuals",
+        help="Prepare Phase 4B Sidecars, visual DNA, prompts, and pending manifests without image execution.",
+    )
+    prepare.add_argument("--phase3-run", type=Path, required=True)
+    prepare.add_argument("--output-dir", type=Path, required=True)
+
+    validate_preparation = subparsers.add_parser(
+        "validate-visual-preparation",
+        help="Validate a complete Phase 4B visual-preparation runtime directory.",
+    )
+    validate_preparation.add_argument("--phase4-run", type=Path, required=True)
+
+    pin_skillset = subparsers.add_parser(
+        "pin-pngtopptx-skillset",
+        help="Create a read-only provenance pin for the installed CAPTW/pngtopptx SkillSet.",
+    )
+    pin_skillset.add_argument("--installation-root", type=Path, required=True)
+    pin_skillset.add_argument("--source-repository", type=Path)
+    pin_skillset.add_argument("--deckcompiler-commit", required=True)
+    pin_skillset.add_argument("--output", type=Path, required=True)
+    pin_skillset.add_argument("--created-at")
+    pin_skillset.add_argument("--timezone", default="Asia/Seoul")
+
+    validate_pin = subparsers.add_parser(
+        "validate-pngtopptx-pin",
+        help="Recompute the installed SkillSet fingerprint and validate it against a pin.",
+    )
+    validate_pin.add_argument("--installation-root", type=Path, required=True)
+    validate_pin.add_argument("--pin", type=Path, required=True)
+
+    export_handoff = subparsers.add_parser(
+        "export-pngtopptx-handoff",
+        help="Export a validated Phase 4 bundle to the official PNGtoPPTX project layout.",
+    )
+    export_handoff.add_argument("--phase4-bundle", type=Path, required=True)
+    export_handoff.add_argument("--external-skillset-pin", type=Path, required=True)
+    export_handoff.add_argument("--output-dir", type=Path, required=True)
+    export_handoff.add_argument("--external-skill-root", type=Path, required=True)
+    export_handoff.add_argument("--profile", type=Path, required=True)
+    export_handoff.add_argument("--node-path", type=Path, required=True)
+    export_handoff.add_argument("--deckcompiler-commit", required=True)
+    export_handoff.add_argument("--created-at")
+    export_handoff.add_argument("--timezone", default="Asia/Seoul")
+
+    validate_handoff_parser = subparsers.add_parser(
+        "validate-pngtopptx-handoff",
+        help="Validate a PNGtoPPTX handoff without invoking the external SkillSet.",
+    )
+    validate_handoff_parser.add_argument("--handoff-dir", type=Path, required=True)
+
+    composite_qa = subparsers.add_parser(
+        "qa-composite",
+        help="Independently recompute Phase 6 semantic, creative, editability, visual, package, raster, and parity gates.",
+    )
+    composite_qa.add_argument("--phase4-bundle", type=Path, required=True)
+    composite_qa.add_argument("--phase5-bundle", type=Path, required=True)
+    composite_qa.add_argument("--output-dir", type=Path, required=True)
+    composite_qa.add_argument("--deckcompiler-commit", required=True)
+    composite_qa.add_argument("--renders-dir", type=Path)
+    composite_qa.add_argument("--renderer-version")
+    composite_qa.add_argument("--external-visual-summary", type=Path, required=True)
+    composite_qa.add_argument("--external-visual-exit-code", type=int, required=True)
+    composite_qa.add_argument("--pptx", type=Path)
+    composite_qa.add_argument("--html", type=Path)
+    composite_qa.add_argument("--nonbaseline", action="store_true")
+    composite_qa.add_argument(
+        "--active-output-set",
+        choices=("phase5_baseline", "phase6_repaired_baseline"),
+        default="phase5_baseline",
+    )
+    composite_qa.add_argument("--created-at")
+
+    validate_composite = subparsers.add_parser(
+        "validate-composite-qa", help="Validate hash and schema linkage for a complete Phase 6 composite QA directory."
+    )
+    validate_composite.add_argument("--qa-dir", type=Path, required=True)
+
+    apply_fault = subparsers.add_parser(
+        "apply-fault-fixture",
+        help="Apply one hash-bound deterministic Phase 6 fault to an isolated upstream project copy.",
+    )
+    apply_fault.add_argument("--spec", type=Path, required=True)
+    apply_fault.add_argument("--project", type=Path, required=True)
+    apply_fault.add_argument("--repository-root", type=Path, required=True)
+    apply_fault.add_argument("--output", type=Path, required=True)
+
+    detect_fault = subparsers.add_parser(
+        "evaluate-fault-detection",
+        help="Match an actual failing Composite QA report against the Phase 6 expected-finding contract.",
+    )
+    detect_fault.add_argument("--composite-report", type=Path, required=True)
+    detect_fault.add_argument("--expected-finding", type=Path, required=True)
+    detect_fault.add_argument("--fault-application", type=Path, required=True)
+    detect_fault.add_argument("--evidence-capsule", type=Path, required=True)
+    detect_fault.add_argument("--external-reconciliation", type=Path, required=True)
+    detect_fault.add_argument("--official-final-gate-status", required=True)
+    detect_fault.add_argument("--renderer-status", required=True)
+    detect_fault.add_argument("--deckcompiler-commit", required=True)
+    detect_fault.add_argument("--created-at")
+    detect_fault.add_argument("--canonical-baseline-unchanged", action="store_true")
+    detect_fault.add_argument("--output", type=Path, required=True)
+
+    demo = subparsers.add_parser(
+        "demo",
+        help="Run the canonical fail-closed DeckCompiler demo and assemble a verified delivery package.",
+    )
+    demo.add_argument("--config", type=Path, required=True)
+    demo.add_argument("--output-dir", type=Path, required=True)
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = build_parser().parse_args(argv)
+    if args.command == "demo":
+        from .release.demo import main as demo_main
+
+        return demo_main(["--config", str(args.config), "--output-dir", str(args.output_dir)])
+    if args.command == "validate":
+        try:
+            payload = read_json(args.path)
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
+            print(f"INVALID unknown path={args.path}\n- INVALID_JSON $: {exc}")
+            return 1
+        report = validate_artifact(payload, schema_name=args.schema, artifact_path=args.path)
+        _print_report(report, args.format)
+        return 0 if report.valid else 1
+    if args.command == "validate-run":
+        report = validate_run_directory(args.path)
+        _print_report(report, args.format)
+        return 0 if report.valid else 1
+    if args.command == "build-architecture":
+        try:
+            result = run_phase3(args.config, args.output_dir)
+        except DeckCompilerError as exc:
+            print(
+                "DECKCOMPILER_PHASE3_FAILED "
+                f"code={exc.code} stage={exc.stage} message={exc.message}"
+            )
+            return 1
+        print(
+            "DECKCOMPILER_PHASE3_GO "
+            f"run_id={result.run_id} output_dir={result.output_dir.as_posix()}"
+        )
+        return 0
+    if args.command == "prepare-visuals":
+        try:
+            result = prepare_visuals(args.phase3_run, args.output_dir)
+        except DeckCompilerError as exc:
+            print(
+                "DECKCOMPILER_PHASE4B_FAILED "
+                f"code={exc.code} stage={exc.stage} message={exc.message}"
+            )
+            return 1
+        print(
+            "DECKCOMPILER_PHASE4B_GO "
+            f"sidecars={len(result.sidecar_paths)} prompts={len(result.prompt_paths)} "
+            f"output_dir={result.output_dir.as_posix()}"
+        )
+        return 0
+    if args.command == "validate-visual-preparation":
+        report = validate_visual_preparation(args.phase4_run)
+        if report.valid:
+            print(
+                "DECKCOMPILER_PHASE4B_VALID "
+                f"sidecars={report.checks['semantic_sidecar_count']} "
+                f"prompts={report.checks['prompt_artifact_count']}"
+            )
+            return 0
+        print("DECKCOMPILER_PHASE4B_INVALID")
+        for issue in report.issues:
+            print(f"- {issue}")
+        return 1
+    if args.command == "pin-pngtopptx-skillset":
+        try:
+            payload = build_external_skillset_pin(
+                args.installation_root,
+                source_repository=args.source_repository,
+                deckcompiler_commit=args.deckcompiler_commit,
+                created_at=args.created_at or datetime.now().astimezone().isoformat(),
+                timezone=args.timezone,
+            )
+            write_json(args.output, payload)
+        except (OSError, ValueError, PinningError) as exc:
+            print(f"DECKCOMPILER_PHASE5A_PIN_FAILED {exc}")
+            return 1
+        print(
+            "DECKCOMPILER_PHASE5A_PINNED "
+            f"mode={payload['pinning_mode']} pin_id={payload['pin_id']} "
+            f"aggregate={payload['combined_aggregate_sha256']}"
+        )
+        return 0
+    if args.command == "validate-pngtopptx-pin":
+        try:
+            result = validate_external_skillset_pin(
+                args.installation_root, read_json(args.pin)
+            )
+        except (OSError, ValueError, PinningError) as exc:
+            print(f"DECKCOMPILER_PHASE5A_PIN_INVALID {exc}")
+            return 1
+        print(
+            "DECKCOMPILER_PHASE5A_PIN_VALID "
+            f"pin_id={result['pin_id']} aggregate={result['combined_aggregate_sha256']}"
+        )
+        return 0
+    if args.command == "export-pngtopptx-handoff":
+        try:
+            result = export_phase4_handoff(
+                phase4_bundle=args.phase4_bundle,
+                external_skillset_pin=args.external_skillset_pin,
+                output_dir=args.output_dir,
+                deckcompiler_commit=args.deckcompiler_commit,
+                external_skill_root=args.external_skill_root,
+                profile_path=args.profile,
+                node_path=args.node_path,
+                created_at=args.created_at or datetime.now().astimezone().isoformat(),
+                timezone=args.timezone,
+                repository_root=Path(__file__).resolve().parents[3],
+            )
+        except (OSError, ValueError, HandoffError) as exc:
+            print(f"DECKCOMPILER_PHASE5B_HANDOFF_FAILED {exc}")
+            return 1
+        print(
+            "DECKCOMPILER_PHASE5B_HANDOFF_READY "
+            f"handoff_dir={result.handoff_root} project_dir={result.project_root} "
+            "crop_status=PENDING_OFFICIAL_CROP_PREPARATION"
+        )
+        return 0
+    if args.command == "validate-pngtopptx-handoff":
+        try:
+            report = validate_handoff(args.handoff_dir)
+        except (OSError, ValueError, HandoffError) as exc:
+            print(f"DECKCOMPILER_PHASE5B_HANDOFF_INVALID {exc}")
+            return 1
+        print(
+            "DECKCOMPILER_PHASE5B_HANDOFF_VALID "
+            f"handoff_id={report['handoff_id']} slides={report['slide_count']}"
+        )
+        return 0
+    if args.command == "qa-composite":
+        try:
+            result = run_composite_qa(
+                args.phase4_bundle,
+                args.phase5_bundle,
+                args.output_dir,
+                deckcompiler_commit=args.deckcompiler_commit,
+                renders_dir=args.renders_dir,
+                renderer_version=args.renderer_version,
+                external_visual_summary=args.external_visual_summary,
+                external_visual_exit_code=args.external_visual_exit_code,
+                pptx_path=args.pptx,
+                html_path=args.html,
+                baseline=not args.nonbaseline,
+                active_output_set=args.active_output_set,
+                created_at=args.created_at,
+            )
+        except (CompositeQAError, OSError, ValueError) as exc:
+            print(f"DECKCOMPILER_PHASE6_COMPOSITE_BLOCKED {exc}")
+            return 1
+        print(
+            "DECKCOMPILER_PHASE6_COMPOSITE_"
+            f"{result.status} run_id={result.run_id} renderer=PowerPoint-{result.renderer_version} "
+            f"qa_dir={result.qa_dir.as_posix()}"
+        )
+        return 0 if result.status == "PASS" else 1
+    if args.command == "validate-composite-qa":
+        report = validate_composite_qa(args.qa_dir)
+        print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0 if report["valid"] else 1
+    if args.command == "apply-fault-fixture":
+        try:
+            result = apply_fault_fixture(
+                args.spec,
+                args.project,
+                args.repository_root,
+                output_path=args.output,
+            )
+        except (FaultFixtureError, OSError, ValueError) as exc:
+            print(f"DECKCOMPILER_PHASE6_FAULT_INJECTION_BLOCKED {exc}")
+            return 1
+        print(
+            "DECKCOMPILER_PHASE6_FAULT_INJECTED "
+            f"fixture_id={result.fixture_id} target={result.target_path} "
+            f"before={result.before_sha256} after={result.after_sha256}"
+        )
+        return 0
+    if args.command == "evaluate-fault-detection":
+        try:
+            report = evaluate_fault_detection(
+                read_json(args.composite_report),
+                read_json(args.expected_finding),
+                read_json(args.fault_application),
+                evidence_capsule=read_json(args.evidence_capsule),
+                external_reconciliation=read_json(args.external_reconciliation),
+                official_final_gate_status=args.official_final_gate_status,
+                renderer_status=args.renderer_status,
+                canonical_baseline_unchanged=args.canonical_baseline_unchanged,
+                created_at=args.created_at,
+                deckcompiler_commit=args.deckcompiler_commit,
+            )
+            write_json(args.output, report)
+        except (FaultFixtureError, OSError, ValueError) as exc:
+            print(f"DECKCOMPILER_PHASE6_FAILURE_DETECTION_BLOCKED {exc}")
+            return 1
+        print(
+            "DECKCOMPILER_PHASE6_FAILURE_DETECTED "
+            f"finding_id={report['detected_finding']['finding_id']} severity={report['detected_finding']['severity']} "
+            f"status={report['status']}"
+        )
+        return 0
+    graph = build_artifact_graph(args.path)
+    if args.format == "json":
+        print(json.dumps(graph, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(f"ARTIFACT_GRAPH run_id={graph['run_id']} nodes={len(graph['nodes'])} edges={len(graph['edges'])}")
+        for edge in graph["edges"]:
+            print(f"- {edge['from']} -> {edge['to']} ({edge['relation']})")
+    return 0
+
+
+def _print_report(report, output_format: str) -> None:
+    if output_format == "json":
+        print(json.dumps(report.model_dump(mode="json"), ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        print(report.to_human())
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

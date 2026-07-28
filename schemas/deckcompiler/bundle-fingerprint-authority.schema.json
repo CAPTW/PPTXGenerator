@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/bundle-fingerprint-authority.schema.json",
+  "title": "DeckCompiler bundle fingerprint authority",
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "objectOid": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"},
+    "legacyReference": {
+      "oneOf": [
+        {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["value", "classification"],
+          "properties": {
+            "value": {"$ref": "#/$defs/sha256"},
+            "classification": {"enum": ["HISTORICAL_GIT_OBJECT_FINGERPRINT", "HISTORICAL_WORKTREE_MATERIALIZATION_FINGERPRINT", "LEGACY_ALGORITHM_FINGERPRINT", "UNREPRODUCED_LEGACY_FINGERPRINT"]}
+          }
+        }
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "authority_id", "bundle_id", "bundle_role", "subtree_path", "source_commit", "subtree_tree_oid", "file_count", "total_blob_bytes", "path_set_sha256", "git_object_fingerprint", "json_semantic_aggregate_sha256", "binary_exact_count", "json_semantic_count", "text_clean_filter_count", "exact_runtime_text_count", "unsupported_count", "runtime_compatibility_policy", "legacy_fingerprints", "authority_status", "authority_commit", "created_at", "hash_scope", "implementation_provenance", "manifest_hash"],
+  "properties": {
+    "schema_name": {"const": "bundle_fingerprint_authority"},
+    "schema_version": {"const": "1.0.0"},
+    "authority_id": {"type": "string", "pattern": "^bundleauth_[0-9a-f]{20}$"},
+    "bundle_id": {"type": "string", "minLength": 1},
+    "bundle_role": {"type": "string", "minLength": 1},
+    "subtree_path": {"type": "string", "minLength": 1},
+    "source_commit": {"$ref": "#/$defs/objectOid"},
+    "subtree_tree_oid": {"$ref": "#/$defs/objectOid"},
+    "file_count": {"type": "integer", "minimum": 0},
+    "total_blob_bytes": {"type": "integer", "minimum": 0},
+    "path_set_sha256": {"$ref": "#/$defs/sha256"},
+    "git_object_fingerprint": {"$ref": "https://pptx-generator.local/schemas/deckcompiler/git-object-bundle-fingerprint.schema.json#/$defs/fingerprintPayload"},
+    "json_semantic_aggregate_sha256": {"$ref": "#/$defs/sha256"},
+    "binary_exact_count": {"type": "integer", "minimum": 0},
+    "json_semantic_count": {"type": "integer", "minimum": 0},
+    "text_clean_filter_count": {"type": "integer", "minimum": 0},
+    "exact_runtime_text_count": {"type": "integer", "minimum": 0},
+    "unsupported_count": {"type": "integer", "minimum": 0},
+    "runtime_compatibility_policy": {"$ref": "https://pptx-generator.local/schemas/deckcompiler/runtime-bundle-compatibility.schema.json#/$defs/policy"},
+    "legacy_fingerprints": {"type": "array", "items": {"$ref": "#/$defs/legacyReference"}},
+    "authority_status": {"const": "CANONICAL"},
+    "authority_commit": {"const": "resolved_by_git_metadata"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "hash_scope": {"const": "semantic_payload_excludes_created_at"},
+    "implementation_provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["module", "builder", "git_identity_contract", "runtime_contract"],
+      "properties": {
+        "module": {"const": "presentation_agent.deckcompiler.release.bundle_fingerprint"},
+        "builder": {"const": "build_bundle_authority"},
+        "git_identity_contract": {"const": "git_object_bundle_fingerprint_v1"},
+        "runtime_contract": {"const": "runtime_bundle_compatibility_v1"}
+      }
+    },
+    "manifest_hash": {"$ref": "#/$defs/sha256"}
+  }
+}

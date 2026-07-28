@@ -1,0 +1,85 @@
+{
+  "artifact_type": "module_anchor",
+  "batch_id": null,
+  "composition_goals": [
+    "system map and guided flow 1",
+    "measured, explanatory, and progressively directional",
+    "left-to-right flow with a stable source rail"
+  ],
+  "credential_lookup": false,
+  "design_system_reference": {
+    "path": "design_system.json",
+    "sha256": "3acc719b089726a34b81083cbbc31a327a696d27918640e318db2341745c7217"
+  },
+  "execution_mode": "platform_managed_tool",
+  "external_provider_id": null,
+  "external_transport_used": false,
+  "fallback_normalization_policy": {
+    "allowed": [
+      "aspect_preserving_crop",
+      "aspect_preserving_pad",
+      "uniform_resize_after_crop_or_pad"
+    ],
+    "forbidden": [
+      "stretch",
+      "nonuniform_resize",
+      "critical_content_clipping"
+    ],
+    "minimum_final_dimensions": {
+      "height": 900,
+      "width": 1600
+    }
+  },
+  "forbidden_elements": [
+    "full-slide raster background",
+    "screenshot slide",
+    "microtext",
+    "invented fact",
+    "invented number",
+    "invented citation",
+    "random logo",
+    "watermark",
+    "pseudo-language"
+  ],
+  "hierarchy_goals": [
+    "move from system boundary to operating sequence",
+    "calm field with one high-contrast operational path"
+  ],
+  "implementation_provenance": "build_week_new",
+  "module_id": "module-01-section_01_understand",
+  "native_raster_intent": {
+    "continuous_tone_art": "bounded_raster_allowed",
+    "full_slide_raster": "forbidden",
+    "semantic_slots": "native_required"
+  },
+  "negative_space_target": "compatible with low to medium density",
+  "prior_selected_visual_reference_ids": [
+    "designboard_61f00a55ee02666b3254"
+  ],
+  "prompt_hash": "95057d1d6f8ec2db2133bac32f35eefdefb92e4f20470eed58a5d1ad88357113",
+  "prompt_id": "prompt_c3a48cd8e39b930c5a30",
+  "prompt_text": "Create a landscape 16:9 module art-direction anchor, not a final slide. Preserve the selected design-board language while expressing this module's visual metaphor, composition energy, focal behavior, illustration language, diagram language, density range, and directional movement. Visual metaphor: system map and guided flow. Composition energy: measured, explanatory, and progressively directional. Focal behavior: move from system boundary to operating sequence. Illustration language: technical editorial primitives with replaceable source-figure frames. Diagram language: native nodes, connectors, and labelled stages. Spatial direction: left-to-right flow with a stable source rail. Density: low to medium. Use only generic placeholders TITLE, PRIMARY VISUAL, PROCESS, EVIDENCE, COMPARISON, RECOMMENDATION, IMPLEMENTATION, SOURCE NOTES. No final facts, statistics, citations, paragraphs, microtext, logos, or watermarks. Do not render digits, numerals, numbered labels, percentages, dates, quantities, or any other numeric characters; use unlabeled geometry or alphabetic placeholders only.",
+  "request_id": "imagerequest_936343dec5ef85952ae7",
+  "requested_aspect_ratio": "16:9",
+  "requested_dimensions": {
+    "height": 1152,
+    "width": 2048
+  },
+  "requested_orientation": "landscape",
+  "schema_name": "platform_image_request",
+  "schema_version": "1.0.0",
+  "selected_family": null,
+  "selected_layout": null,
+  "semantic_sidecar_reference": null,
+  "slide_id": null,
+  "target_artifact_id": "moduleanchor_3591b43d6cf6fe339284",
+  "text_policy": {
+    "ocr_canonical_text": "forbidden",
+    "reference_prompts": "generic_placeholders_only",
+    "slide_prompts": "sidecar_authoritative_native_text_regions"
+  },
+  "visual_dna_reference": {
+    "path": "visual_dna.json",
+    "sha256": "4c25c3d627dc72087d650072b7a4241d5fb74b0508c8dd48f82e0b9b4e8b9241"
+  }
+}

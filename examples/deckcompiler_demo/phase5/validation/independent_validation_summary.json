@@ -1,0 +1,17 @@
+{
+  "checks": {
+    "crop_policy": "PASS",
+    "cross_output_parity": "PASS",
+    "html_package": "PASS",
+    "html_semantics": "PASS",
+    "native_trace": "PASS",
+    "official_final_gate": "PASS",
+    "pptx_package": "PASS",
+    "pptx_semantics": "PASS"
+  },
+  "content_sha256_without_this_field": "f638ed9743c75344163e59d496524fcc68051375a6f1f22c9c9c67756d9d5dbf",
+  "failed_checks": [],
+  "schema_name": "phase5_independent_validation_summary",
+  "schema_version": "1.0.0",
+  "status": "PASS"
+}

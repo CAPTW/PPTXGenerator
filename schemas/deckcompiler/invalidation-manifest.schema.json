@@ -1,0 +1,33 @@
+{
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/invalidation-manifest.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DeckCompiler Phase 6 repair invalidation manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_name": { "const": "phase6_invalidation_manifest" },
+    "schema_version": { "const": "1.0.0" },
+    "manifest_id": { "pattern": "^invalidation_[0-9a-f]{20}$", "type": "string" },
+    "repair_plan_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "invalidated_artifact_count": { "const": 27 },
+    "invalidated_artifacts": {
+      "type": "array", "minItems": 27, "maxItems": 27,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "properties": {
+          "artifact_id": { "minLength": 1, "type": "string" },
+          "prior_sha256": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+          "status": { "const": "INVALIDATED" },
+          "reason": { "const": "canonical_upstream_owner_rematerialized" }
+        },
+        "required": ["artifact_id", "prior_sha256", "status", "reason"]
+      }
+    },
+    "stale_artifact_policy": { "const": "reject_all_prior_downstream_evidence" },
+    "regeneration_required": { "const": true },
+    "created_at": { "format": "date-time", "type": "string" },
+    "timezone": { "const": "Asia/Seoul" },
+    "invalidation_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" }
+  },
+  "required": ["schema_name", "schema_version", "manifest_id", "repair_plan_hash", "invalidated_artifact_count", "invalidated_artifacts", "stale_artifact_policy", "regeneration_required", "created_at", "timezone", "invalidation_hash"]
+}

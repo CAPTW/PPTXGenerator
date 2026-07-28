@@ -1,0 +1,51 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+.paddle_venv/
+.region_venv/
+node_modules/
+dist/
+build/
+
+# Generated runs and local evidence
+outputs/
+analysis_runs/
+design_runs/
+audit_runs/
+artifacts/
+repo_state/
+workspaces/
+
+# User-owned or private source material
+inputs/
+source_inputs/
+user_templates/
+
+# Standalone reconstruction corpora and generated working data
+raw/data/
+raw/packaging/
+raw/scratch/
+raw/scratch_crops/
+raw/pipeline/out/
+raw/pipeline/fonts/
+raw/pipeline/scripts/words_alpha.txt
+raw/reasoning_config.json
+raw/analysis/evidence/
+raw/analysis/pdf/
+raw/analysis/pptx_extracted/
+raw/analysis/profiles/
+raw/analysis/rendered/
+raw/analysis/review_queue/
+raw/analysis/smoke/
+
+# Vendored and generated fixtures
+assets/icons/vendor/
+tests/tested/
+examples/state/
+
+# Local delivery bundles and uploaded decks
+*.zip
+*.pptx
+*.pptm

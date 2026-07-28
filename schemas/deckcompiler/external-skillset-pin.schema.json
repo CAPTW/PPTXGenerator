@@ -1,0 +1,235 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/external-skillset-pin.schema.json",
+  "title": "PNGtoPPTX External SkillSet Pin",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "pin_id",
+    "canonical_repository",
+    "expected_orchestrator",
+    "companion_skills",
+    "installation_root",
+    "installed_skill_paths",
+    "skill_names",
+    "skill_file_counts",
+    "skill_aggregate_hashes",
+    "combined_aggregate_sha256",
+    "known_skill_md_hashes",
+    "pinning_mode",
+    "source_repository_url",
+    "source_commit",
+    "source_tree_oids",
+    "source_content_aggregate_sha256",
+    "candidate_commits",
+    "git_revision_verified",
+    "installation_bundle_verified",
+    "unexpected_executable_extras_count",
+    "excluded_cache_files",
+    "created_at",
+    "timezone",
+    "deckcompiler_commit",
+    "external_skill_modified",
+    "execution_allowed",
+    "final_provenance_limitation",
+    "source_comparison_status",
+    "validation_status",
+    "inventory",
+    "pin_hash"
+  ],
+  "properties": {
+    "schema_name": {"const": "external_skillset_pin"},
+    "schema_version": {"const": "1.0.0"},
+    "pin_id": {"type": "string", "pattern": "^pngpin_[0-9a-f]{20}$"},
+    "canonical_repository": {"const": "CAPTW/pngtopptx"},
+    "expected_orchestrator": {"const": "slide-editable-deck-orchestrator"},
+    "companion_skills": {
+      "type": "array",
+      "prefixItems": [
+        {"const": "slide-text-layer-inpaint"},
+        {"const": "slide-image-dual-render"},
+        {"const": "slide-visual-polish-qa"}
+      ],
+      "items": false,
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "installation_root": {"type": "string", "minLength": 1},
+    "installed_skill_paths": {"$ref": "#/$defs/skillStringMap"},
+    "skill_names": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "minItems": 4,
+      "maxItems": 4,
+      "uniqueItems": true
+    },
+    "skill_file_counts": {"$ref": "#/$defs/skillCountMap"},
+    "skill_aggregate_hashes": {"$ref": "#/$defs/skillHashMap"},
+    "combined_aggregate_sha256": {"$ref": "#/$defs/sha256"},
+    "known_skill_md_hashes": {"$ref": "#/$defs/skillHashMap"},
+    "pinning_mode": {
+      "enum": [
+        "git_revision_exact",
+        "git_revision_content_equivalent",
+        "git_tree_pin",
+        "installation_fingerprint_bundle_v1"
+      ]
+    },
+    "source_repository_url": {"type": ["string", "null"]},
+    "source_commit": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"},
+    "source_tree_oids": {
+      "type": "object",
+      "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{40,64}$"}
+    },
+    "source_content_aggregate_sha256": {
+      "oneOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]
+    },
+    "candidate_commits": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+      "uniqueItems": true
+    },
+    "git_revision_verified": {"type": "boolean"},
+    "installation_bundle_verified": {"const": true},
+    "unexpected_executable_extras_count": {"const": 0},
+    "excluded_cache_files": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/excludedFile"}
+    },
+    "created_at": {"type": "string", "format": "date-time"},
+    "timezone": {"type": "string", "minLength": 1},
+    "deckcompiler_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "external_skill_modified": {"const": false},
+    "execution_allowed": {"const": true},
+    "final_provenance_limitation": {"type": "boolean"},
+    "source_comparison_status": {"enum": ["PASS", "not_available"]},
+    "validation_status": {"const": "PASS"},
+    "inventory": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/skillInventory"},
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "pin_hash": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "skillStringMap": {
+      "type": "object",
+      "required": [
+        "slide-editable-deck-orchestrator",
+        "slide-text-layer-inpaint",
+        "slide-image-dual-render",
+        "slide-visual-polish-qa"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "slide-editable-deck-orchestrator": {"type": "string", "minLength": 1},
+        "slide-text-layer-inpaint": {"type": "string", "minLength": 1},
+        "slide-image-dual-render": {"type": "string", "minLength": 1},
+        "slide-visual-polish-qa": {"type": "string", "minLength": 1}
+      }
+    },
+    "skillCountMap": {
+      "type": "object",
+      "required": [
+        "slide-editable-deck-orchestrator",
+        "slide-text-layer-inpaint",
+        "slide-image-dual-render",
+        "slide-visual-polish-qa"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "slide-editable-deck-orchestrator": {"type": "integer", "minimum": 1},
+        "slide-text-layer-inpaint": {"type": "integer", "minimum": 1},
+        "slide-image-dual-render": {"type": "integer", "minimum": 1},
+        "slide-visual-polish-qa": {"type": "integer", "minimum": 1}
+      }
+    },
+    "skillHashMap": {
+      "type": "object",
+      "required": [
+        "slide-editable-deck-orchestrator",
+        "slide-text-layer-inpaint",
+        "slide-image-dual-render",
+        "slide-visual-polish-qa"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "slide-editable-deck-orchestrator": {"$ref": "#/$defs/sha256"},
+        "slide-text-layer-inpaint": {"$ref": "#/$defs/sha256"},
+        "slide-image-dual-render": {"$ref": "#/$defs/sha256"},
+        "slide-visual-polish-qa": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "fileRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "skill_name",
+        "relative_path",
+        "byte_size",
+        "sha256",
+        "file_type",
+        "executable_status",
+        "classification",
+        "canonical_text_linkage_sha256"
+      ],
+      "properties": {
+        "skill_name": {"type": "string", "minLength": 1},
+        "relative_path": {"type": "string", "minLength": 1},
+        "byte_size": {"type": "integer", "minimum": 0},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "file_type": {"type": "string", "minLength": 1},
+        "executable_status": {
+          "enum": ["not_executable", "script", "executable_binary"]
+        },
+        "classification": {"enum": ["text", "binary"]},
+        "canonical_text_linkage_sha256": {
+          "oneOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]
+        }
+      }
+    },
+    "excludedFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skill_name", "relative_path", "byte_size", "sha256", "reason"],
+      "properties": {
+        "skill_name": {"type": "string", "minLength": 1},
+        "relative_path": {"type": "string", "minLength": 1},
+        "byte_size": {"type": "integer", "minimum": 0},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "reason": {
+          "enum": ["cache_directory", "os_cache_file", "temporary_log_or_file"]
+        }
+      }
+    },
+    "skillInventory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "skill_name",
+        "installed_path",
+        "file_count",
+        "aggregate_sha256",
+        "skill_md_sha256",
+        "files",
+        "excluded_files"
+      ],
+      "properties": {
+        "skill_name": {"type": "string", "minLength": 1},
+        "installed_path": {"type": "string", "minLength": 1},
+        "file_count": {"type": "integer", "minimum": 1},
+        "aggregate_sha256": {"$ref": "#/$defs/sha256"},
+        "skill_md_sha256": {"$ref": "#/$defs/sha256"},
+        "files": {"type": "array", "items": {"$ref": "#/$defs/fileRecord"}},
+        "excluded_files": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/excludedFile"}
+        }
+      }
+    }
+  }
+}

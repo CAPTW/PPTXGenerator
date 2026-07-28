@@ -1,0 +1,17 @@
+{
+  "dependency_manifest_hash": "1f895c6e45ef7fc9e807631566de9edcb403211b9ac9aa9666e6101eef626e07",
+  "external_entrypoint_count": 6,
+  "final_release_eligible": true,
+  "focused_tests": "PASS",
+  "full_tests": "PASS",
+  "lock_sha256": "4fde8f6fd2584f66e2c5f6c0f57f822da19809cb9d12259e35537d3d378a21dc",
+  "locked_distribution_count": 38,
+  "phase7c_recertification": "PASS",
+  "phase7d_fresh_clone": "PASS",
+  "report_hash": "3c7dcd7fc9911ade21603bd881874468f8d32c6f56bf95117781aee0e1512ab6",
+  "runtime_tree_sha256": "a69f5d3f8208ee91694ab9e46d70c81cb0b7ad7e8e3e0e193a63e4d5c7660d91",
+  "schema_name": "phase_7_0_3_acceptance",
+  "schema_version": "1.0.0",
+  "status": "ELIGIBLE_FOR_DEVPOST_SUBMISSION",
+  "tested_runtime_commit": "5d845d373ae2255b5d490c45ce4e3435107c3d08"
+}

@@ -1,0 +1,74 @@
+{
+  "actual_generation": true,
+  "attempt_id": "imageattempt_d92f27d010fdb6e62dce",
+  "credential_lookups": 0,
+  "execution_mode": "platform_managed_tool",
+  "external_provider_id": null,
+  "external_transport_used": false,
+  "image_model": "not_exposed_by_tool",
+  "output": {
+    "completion_timestamp": "2026-07-20T02:58:36.082+09:00",
+    "normalized_dimensions": {
+      "height": 936,
+      "width": 1664
+    },
+    "normalized_file_size_bytes": 1036948,
+    "normalized_format": "PNG",
+    "normalized_relative_path": "references/batch-003-template-reference.png",
+    "normalized_sha256": "cd8cc1b397e4ba2aba4e0683749a8ef9e3d142b114fc93b6fa921b6e5b061f36",
+    "original_dimensions": {
+      "height": 941,
+      "width": 1672
+    },
+    "original_file_size_bytes": 1157116,
+    "original_format": "PNG",
+    "original_relative_path": "artifacts/batch_references/imageattempt_d92f27d010fdb6e62dce/original.png",
+    "original_sha256": "46bdeceb2330bbd5f63c906d6fe03ae2baefadc4f17ff0abaeeda8e8e2ac1c7c",
+    "prior_attempt_id": null,
+    "prompt_hash": "63485ac64d946c27846f68a47193b0e2496fb40a8ef8ec68999bfb7626db5f4f",
+    "prompt_id": "prompt_e26fee707f15e3f0b5cb",
+    "prompt_relative_path": "prompts/batch-003.prompt.json",
+    "reference_artifacts": [
+      {
+        "artifact_id": "designboard_61f00a55ee02666b3254",
+        "relative_path": "references/design_board.png",
+        "sha256": "a0229b8e27b4a103c177682b2d742ae3d4dd6eb9bb70c675cbf9f88293dd666d"
+      },
+      {
+        "artifact_id": "moduleanchor_aea9b62a3605c1edb24c",
+        "relative_path": "references/module-003-anchor.png",
+        "sha256": "691b71390310872ff17a2a9a151060805a50a11977662a0cf6f3a834dec3615f"
+      }
+    ],
+    "rejection_reason": null,
+    "request_timestamp": "2026-07-20T02:57:22.444+09:00",
+    "seal_relative_path": "records/attempts/batch-003-attempt-001.seal.json",
+    "selected": true,
+    "target_type": "batch_template_reference",
+    "transformation": {
+      "crop_box": [
+        4,
+        2,
+        1668,
+        938
+      ],
+      "nonuniform_resize_used": false,
+      "stretch_used": false,
+      "type": "aspect_preserving_crop",
+      "uniform_resize_to": null
+    },
+    "verification_status": "VERIFIED",
+    "visual_review_status": "ACCEPTED_FOR_PHASE4"
+  },
+  "platform_tool_channel": "commentary",
+  "platform_tool_id": "image_gen.imagegen",
+  "platform_tool_invocation_count": 1,
+  "record_hash": "159fdda1ea778517476d20957eac6c64ed555ad8e53287a749671e67cc605697",
+  "record_id": "imageexecution_279b6bb292a5fdc1a5fe",
+  "repository_network_calls": 0,
+  "request_id": "imagerequest_17807f4a89634c7c8c76",
+  "schema_name": "platform_image_execution_record",
+  "schema_version": "1.0.0",
+  "target_artifact_id": "batchreference_ff6138d8d01a504f5b49",
+  "tool_call_id": "not_exposed"
+}

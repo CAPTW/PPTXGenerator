@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/slide_title.schema.json",
+  "title": "SlideTitle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["slide_id", "title"],
+  "properties": {
+    "schema_name": {"const": "slide_title"},
+    "schema_version": {"type": "string"},
+    "slide_id": {"type": "string", "minLength": 1},
+    "title": {"type": "string", "minLength": 1, "maxLength": 120}
+  }
+}

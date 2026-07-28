@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/bundle-fingerprint-history-replay.schema.json",
+  "title": "DeckCompiler bundle fingerprint history replay",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "report_id", "repository_source", "working_tree_mutation_performed", "phase4", "phase5", "algorithm_inventory", "no_provenance_invented", "status", "report_hash"],
+  "properties": {
+    "schema_name": {"const": "bundle_fingerprint_history_replay"},
+    "schema_version": {"const": "1.0.0"},
+    "report_id": {"type": "string", "pattern": "^historyreplay_[0-9a-f]{20}$"},
+    "repository_source": {"const": "canonical_release_repository_git_objects"},
+    "working_tree_mutation_performed": {"const": false},
+    "phase4": {"$ref": "#/$defs/phase"},
+    "phase5": {"$ref": "#/$defs/phase"},
+    "algorithm_inventory": {"type": "array", "items": {"$ref": "#/$defs/algorithm"}},
+    "no_provenance_invented": {"const": true},
+    "status": {"const": "PASS"},
+    "report_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "phase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["legacy_value", "first_text_commit", "classification", "current_supported_worktree_diagnostic", "subtree_history", "replays", "matching_commits"],
+      "properties": {
+        "legacy_value": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "first_text_commit": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"},
+        "classification": {"enum": ["HISTORICAL_GIT_OBJECT_FINGERPRINT", "HISTORICAL_WORKTREE_MATERIALIZATION_FINGERPRINT", "LEGACY_ALGORITHM_FINGERPRINT", "UNREPRODUCED_LEGACY_FINGERPRINT"]},
+        "current_supported_worktree_diagnostic": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["algorithm", "aggregate_sha256", "current_authority"],
+          "properties": {
+            "algorithm": {"const": "relative_path_nul_sha256_lf_working_tree"},
+            "aggregate_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "current_authority": {"const": false}
+          }
+        },
+        "subtree_history": {"type": "array", "items": {"type": "object"}},
+        "replays": {"type": "array", "items": {"type": "object"}},
+        "matching_commits": {"type": "array", "items": {"type": "object"}}
+      }
+    },
+    "algorithm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm_id", "implementation_origin", "row_shape", "include_size", "path_normalization", "ordering", "serialization", "encoding", "source_bytes", "file_exclusion_policy"],
+      "properties": {
+        "algorithm_id": {"type": "string", "minLength": 1},
+        "implementation_origin": {"type": "string", "minLength": 1},
+        "row_shape": {"type": "string", "minLength": 1},
+        "include_size": {"type": "boolean"},
+        "path_normalization": {"type": "string", "minLength": 1},
+        "ordering": {"type": "string", "minLength": 1},
+        "serialization": {"type": "string", "minLength": 1},
+        "encoding": {"const": "UTF-8"},
+        "source_bytes": {"enum": ["working_tree", "git_blob"]},
+        "file_exclusion_policy": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/release-contract.schema.json",
+  "title": "DeckCompiler Phase 7 release contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name", "schema_version", "release_profile_id", "public_product", "internal_system",
+    "canonical_config_path", "canonical_input_fixture", "expected_slide_count", "workflow_mode",
+    "bundle_fingerprint_policy_path", "phase4_authority_manifest_path", "phase5_authority_manifest_path",
+    "phase4_runtime_compatibility_report_path", "phase5_runtime_compatibility_report_path",
+    "phase6_authority_bridge_path", "supported_release_checkout",
+    "phase4_frozen_visual_bundle", "phase5_baseline_bundle", "phase6_evidence", "external_skill_pin",
+    "external_python_dependency_manifest_path", "external_python_dependency_manifest_sha256",
+    "external_python_dependency_manifest_hash", "external_python_dependency_policy",
+    "selected_route", "live_image_generation_mode", "output_directory_policy",
+    "real_renderer_requirement", "canonical_browser_requirement", "composite_qa_requirement",
+    "package_content_contract", "reproducibility_policy", "semantic_determinism_policy",
+    "binary_determinism_policy", "final_status_vocabulary", "protected_path_policy",
+    "source_commit_handling", "supported_os", "python_version", "python_lock_path",
+    "python_lock_sha256", "phase4_bundle_path", "phase5_bundle_path", "phase6_evidence_path",
+    "phase6_status", "external_pin_path", "external_pin_sha256", "powerpoint_com_available",
+    "playwright_chromium_available", "credential_requirement", "input_paths", "protected_paths",
+    "final_release_eligible", "devpost_release_eligible", "submission_performed",
+    "push_performed", "tag_created", "validation_status", "contract_hash"
+  ],
+  "properties": {
+    "schema_name": {"const": "release_contract"},
+    "schema_version": {"const": "1.2.0"},
+    "release_profile_id": {"const": "devpost_p0_frozen_visuals"},
+    "public_product": {"const": "PPTX Generator"},
+    "internal_system": {"const": "DeckCompiler"},
+    "canonical_config_path": {"type": "string"},
+    "canonical_input_fixture": {"type": "object"},
+    "expected_slide_count": {"const": 6},
+    "workflow_mode": {"const": "decision_brief"},
+    "bundle_fingerprint_policy_path": {"type": "string"},
+    "phase4_authority_manifest_path": {"type": "string"},
+    "phase5_authority_manifest_path": {"type": "string"},
+    "phase4_runtime_compatibility_report_path": {"type": "string"},
+    "phase5_runtime_compatibility_report_path": {"type": "string"},
+    "phase6_authority_bridge_path": {"type": "string"},
+    "supported_release_checkout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["core_autocrlf", "reason", "exact_runtime_text_path", "exact_runtime_text_sha256"],
+      "properties": {
+        "core_autocrlf": {"const": false},
+        "reason": {"const": "exact_runtime_text_fixture"},
+        "exact_runtime_text_path": {"type": "string"},
+        "exact_runtime_text_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "phase4_frozen_visual_bundle": {"$ref": "#/$defs/phase4Bundle"},
+    "phase5_baseline_bundle": {"$ref": "#/$defs/phase5Bundle"},
+    "phase6_evidence": {"type": "object"},
+    "external_skill_pin": {"type": "object"},
+    "external_python_dependency_manifest_path": {"type": "string"},
+    "external_python_dependency_manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "external_python_dependency_manifest_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "external_python_dependency_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["external_skill_source", "interpreter_owner", "lock_owner", "path_fallback", "system_site_packages", "user_site_packages"],
+      "properties": {
+        "external_skill_source": {"const": "external_read_only"},
+        "interpreter_owner": {"const": "deckcompiler_sys_executable"},
+        "lock_owner": {"const": "requirements/devpost-release.lock.txt"},
+        "path_fallback": {"const": false},
+        "system_site_packages": {"const": false},
+        "user_site_packages": {"const": false}
+      }
+    },
+    "selected_route": {"const": "editable_pngtopptx"},
+    "live_image_generation_mode": {"const": "disabled_frozen_verified_visual_bundle"},
+    "output_directory_policy": {"type": "object"},
+    "real_renderer_requirement": {"const": "Microsoft PowerPoint COM"},
+    "canonical_browser_requirement": {"const": "Playwright Chromium"},
+    "composite_qa_requirement": {"const": "PASS"},
+    "package_content_contract": {"type": "string"},
+    "reproducibility_policy": {"type": "string"},
+    "semantic_determinism_policy": {"type": "string"},
+    "binary_determinism_policy": {"type": "string"},
+    "final_status_vocabulary": {
+      "type": "array",
+      "items": {"enum": ["BLOCKED", "ELIGIBLE_FOR_DEVPOST_SUBMISSION"]},
+      "uniqueItems": true
+    },
+    "protected_path_policy": {"type": "string"},
+    "source_commit_handling": {"type": "string"},
+    "supported_os": {"const": "Windows"},
+    "python_version": {"type": "string"},
+    "python_lock_path": {"type": "string"},
+    "python_lock_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "phase4_bundle_path": {"type": "string"},
+    "phase5_bundle_path": {"type": "string"},
+    "phase6_evidence_path": {"type": "string"},
+    "phase6_status": {"const": "ELIGIBLE_FOR_PACKAGING"},
+    "external_pin_path": {"type": "string"},
+    "external_pin_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "powerpoint_com_available": {"const": true},
+    "playwright_chromium_available": {"const": true},
+    "credential_requirement": {"const": false},
+    "input_paths": {"type": "array", "items": {"type": "string"}},
+    "protected_paths": {"type": "array", "items": {"type": "string"}},
+    "final_release_eligible": {"const": false},
+    "devpost_release_eligible": {"const": false},
+    "submission_performed": {"const": false},
+    "push_performed": {"const": false},
+    "tag_created": {"const": false},
+    "validation_status": {"const": "PASS"},
+    "contract_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "objectOid": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"},
+    "authorityBundleCore": {
+      "type": "object",
+      "required": ["path", "file_count", "subtree_tree_oid", "authority_manifest_path", "authority_id", "git_object_aggregate_sha256", "path_set_sha256", "json_semantic_aggregate_sha256", "runtime_compatibility_report_path", "legacy_recorded_aggregate_sha256"],
+      "properties": {
+        "path": {"type": "string"},
+        "file_count": {"type": "integer", "minimum": 0},
+        "subtree_tree_oid": {"$ref": "#/$defs/objectOid"},
+        "authority_manifest_path": {"type": "string"},
+        "authority_id": {"type": "string", "pattern": "^bundleauth_[0-9a-f]{20}$"},
+        "git_object_aggregate_sha256": {"$ref": "#/$defs/sha256"},
+        "path_set_sha256": {"$ref": "#/$defs/sha256"},
+        "json_semantic_aggregate_sha256": {"$ref": "#/$defs/sha256"},
+        "runtime_compatibility_report_path": {"type": "string"},
+        "legacy_recorded_aggregate_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "phase4Bundle": {
+      "allOf": [
+        {"$ref": "#/$defs/authorityBundleCore"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "file_count", "subtree_tree_oid", "authority_manifest_path", "authority_id", "git_object_aggregate_sha256", "path_set_sha256", "json_semantic_aggregate_sha256", "runtime_compatibility_report_path", "legacy_recorded_aggregate_sha256", "live_image_generation_reexecuted", "generation_provenance_verified"],
+          "properties": {
+            "path": true, "file_count": true, "subtree_tree_oid": true, "authority_manifest_path": true,
+            "authority_id": true, "git_object_aggregate_sha256": true, "path_set_sha256": true,
+            "json_semantic_aggregate_sha256": true, "runtime_compatibility_report_path": true,
+            "legacy_recorded_aggregate_sha256": true,
+            "live_image_generation_reexecuted": {"const": false},
+            "generation_provenance_verified": {"const": true}
+          }
+        }
+      ]
+    },
+    "phase5Bundle": {
+      "allOf": [
+        {"$ref": "#/$defs/authorityBundleCore"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "file_count", "subtree_tree_oid", "authority_manifest_path", "authority_id", "git_object_aggregate_sha256", "path_set_sha256", "json_semantic_aggregate_sha256", "runtime_compatibility_report_path", "legacy_recorded_aggregate_sha256", "reconstruction_input"],
+          "properties": {
+            "path": true, "file_count": true, "subtree_tree_oid": true, "authority_manifest_path": true,
+            "authority_id": true, "git_object_aggregate_sha256": true, "path_set_sha256": true,
+            "json_semantic_aggregate_sha256": true, "runtime_compatibility_report_path": true,
+            "legacy_recorded_aggregate_sha256": true,
+            "reconstruction_input": {"const": false}
+          }
+        }
+      ]
+    }
+  }
+}

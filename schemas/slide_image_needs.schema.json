@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/slide_image_needs.schema.json",
+  "title": "SlideImageNeeds",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["slide_id", "image_needs"],
+  "properties": {
+    "schema_name": {"const": "slide_image_needs"},
+    "schema_version": {"type": "string"},
+    "slide_id": {"type": "string", "minLength": 1},
+    "image_needs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["slot", "purpose"],
+        "properties": {
+          "slot": {"type": "string", "minLength": 1},
+          "purpose": {"type": "string", "minLength": 1},
+          "source_policy": {"type": "string"}
+        }
+      }
+    }
+  }
+}

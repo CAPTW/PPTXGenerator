@@ -1,0 +1,26 @@
+{
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/composite-qa-acceptance.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "active_output_set": { "enum": ["phase5_baseline", "phase6_repaired_baseline"] },
+    "checks": { "type": "object" },
+    "composite_report_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "created_at": { "format": "date-time", "type": "string" },
+    "final_release_eligible": { "const": false },
+    "implementation_provenance": { "type": "object" },
+    "phase7_required": { "const": true },
+    "producer": { "const": "DeckCompiler independent composite acceptance" },
+    "report_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "report_id": { "minLength": 1, "type": "string" },
+    "run_id": { "minLength": 1, "type": "string" },
+    "schema_name": { "const": "phase6_baseline_composite_acceptance" },
+    "schema_version": { "const": "1.0.0" },
+    "source_artifacts": { "minItems": 1, "type": "array" },
+    "status": { "enum": ["PASS", "NEEDS_REPAIR", "BLOCKED"] },
+    "timezone": { "const": "Asia/Seoul" }
+  },
+  "required": ["schema_name", "schema_version", "report_id", "run_id", "source_artifacts", "producer", "checks", "composite_report_hash", "active_output_set", "status", "final_release_eligible", "phase7_required", "created_at", "timezone", "implementation_provenance", "report_hash"],
+  "title": "DeckCompiler Phase 6 baseline composite acceptance",
+  "type": "object"
+}

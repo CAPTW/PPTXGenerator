@@ -1,0 +1,40 @@
+{
+  "schema_name": "evidence_unit_registry",
+  "schema_version": "1.0.0",
+  "artifact": {
+    "artifact_id": "art_20202020202020202020",
+    "artifact_type": "evidence_unit_registry",
+    "artifact_version": "1.0.0",
+    "product": {
+      "product_name": "PPTX Generator",
+      "product_slug": "pptx-generator",
+      "system_name": "DeckCompiler",
+      "system_id": "deckcompiler",
+      "reconstruction_engine": "PNGtoPPTX"
+    },
+    "provenance": {
+      "created_at": "2026-07-15T21:11:01+09:00",
+      "producer": {"tool_name": "invalid-fixture", "tool_version": "1.0.0", "runtime": "test"},
+      "build_baseline": "e0259b7551c381f8c0de4cdd329d5943680fa502",
+      "source_commit": "39b4c104b23d4e09446388db2a8b2fb873a7824b",
+      "input_artifact_ids": []
+    },
+    "content_sha256": "2020202020202020202020202020202020202020202020202020202020202020"
+  },
+  "registry_id": "registry_20202020202020202020",
+  "evidence_units": [
+    {
+      "evidence_id": "ev_20202020202020202020",
+      "source_id": "src_20202020202020202020",
+      "source_locator": {"source_id": "src_20202020202020202020", "locator_type": "pdf_page", "page_number": 0},
+      "evidence_type": "claim",
+      "canonical_content": {"text": "Page zero is intentionally invalid."},
+      "importance": "medium",
+      "confidence": 0.8,
+      "visualizable_as": ["text"],
+      "relations": [],
+      "citation_metadata": {"citation_label": "Invalid page fixture", "repository_authored": true, "display_locator": "p. 0"},
+      "provenance": {"extraction_method": "repository_authored_fixture", "normalization_version": "1.0.0", "content_sha256": "2020202020202020202020202020202020202020202020202020202020202020"}
+    }
+  ]
+}

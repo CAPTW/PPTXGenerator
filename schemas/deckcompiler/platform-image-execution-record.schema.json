@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/deckcompiler/platform-image-execution-record.schema.json",
+  "title": "Platform-managed Image Execution Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "record_id", "attempt_id", "request_id", "target_artifact_id", "execution_mode", "platform_tool_id", "platform_tool_channel", "image_model", "tool_call_id", "external_provider_id", "external_transport_used", "repository_network_calls", "credential_lookups", "platform_tool_invocation_count", "actual_generation", "output", "record_hash"],
+  "properties": {
+    "schema_name": {"const": "platform_image_execution_record"},
+    "schema_version": {"const": "1.0.0"},
+    "record_id": {"type": "string"}, "attempt_id": {"type": "string"}, "request_id": {"type": "string"}, "target_artifact_id": {"type": "string"},
+    "execution_mode": {"const": "platform_managed_tool"},
+    "platform_tool_id": {"type": "string"}, "platform_tool_channel": {"type": "string"}, "image_model": {"type": "string"}, "tool_call_id": {"type": "string"},
+    "external_provider_id": {"type": "null"}, "external_transport_used": {"const": false}, "repository_network_calls": {"const": 0}, "credential_lookups": {"const": 0},
+    "platform_tool_invocation_count": {"type": "integer", "minimum": 1}, "actual_generation": {"const": true},
+    "output": {"type": "object"},
+    "record_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

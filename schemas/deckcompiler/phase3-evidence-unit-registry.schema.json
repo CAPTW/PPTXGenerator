@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/phase3-evidence-unit-registry.schema.json",
+  "title": "DeckCompiler Phase 3 Evidence Unit Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "artifact", "registry_id", "evidence_units", "normalization"],
+  "properties": {
+    "schema_name": {"const": "phase3_evidence_unit_registry"},
+    "schema_version": {"const": "1.0.0"},
+    "artifact": {
+      "allOf": [
+        {"$ref": "artifact-envelope.schema.json"},
+        {"properties": {"artifact_type": {"const": "evidence_unit_registry"}}}
+      ]
+    },
+    "registry_id": {"type": "string", "pattern": "^registry_[0-9a-f]{20}$"},
+    "evidence_units": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidence"}},
+    "normalization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "deduplicated_count", "extraction_is_inference"],
+      "properties": {
+        "version": {"type": "string", "minLength": 1},
+        "deduplicated_count": {"type": "integer", "minimum": 0},
+        "extraction_is_inference": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_id", "source_id", "source_locator_ids", "source_locator", "evidence_type", "canonical_content", "factuality_class", "importance", "confidence", "visualizable_as", "relations", "citation_metadata", "provenance"],
+      "properties": {
+        "evidence_id": {"type": "string", "pattern": "^ev_[0-9a-f]{20}$"},
+        "source_id": {"type": "string", "pattern": "^src_[0-9a-f]{20}$"},
+        "source_locator_ids": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^loc_[0-9a-f]{20}$"}, "uniqueItems": true},
+        "source_locator": {"$ref": "source-locator-registry.schema.json#/$defs/locator"},
+        "evidence_type": {"enum": ["intent", "instruction", "constraint", "definition", "claim", "process", "causal_relation", "comparison", "statistic", "table", "figure", "methodology", "result", "limitation", "recommendation", "decision_criterion", "contradiction"]},
+        "canonical_content": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["text"],
+          "properties": {"text": {"type": "string", "minLength": 1}, "data": {}}
+        },
+        "factuality_class": {"enum": ["instruction", "documentary_fact", "inference"]},
+        "recommendation_origin": {"enum": ["documentary_source", "planner_inference"]},
+        "importance": {"enum": ["low", "medium", "high", "critical"]},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "visualizable_as": {"type": "array", "items": {"enum": ["text", "kpi", "table", "chart", "diagram", "process", "timeline", "comparison", "hero_visual", "citation"]}, "uniqueItems": true},
+        "relations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["relation_type", "target_evidence_id"],
+            "properties": {
+              "relation_type": {"enum": ["supports", "contradicts", "qualifies", "derives_from", "parent", "child", "compares_with"]},
+              "target_evidence_id": {"type": "string", "pattern": "^ev_[0-9a-f]{20}$"}
+            }
+          }
+        },
+        "citation_metadata": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["citation_label", "repository_authored", "documentary", "display_locator", "title"],
+          "properties": {
+            "citation_label": {"type": "string", "minLength": 1},
+            "repository_authored": {"type": "boolean"},
+            "documentary": {"type": "boolean"},
+            "display_locator": {"type": "string", "minLength": 1},
+            "title": {"type": "string", "minLength": 1}
+          }
+        },
+        "provenance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["extraction_method", "normalization_version", "content_sha256"],
+          "properties": {
+            "extraction_method": {"const": "deterministic_label_parser"},
+            "normalization_version": {"type": "string", "minLength": 1},
+            "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
+        }
+      }
+    }
+  }
+}

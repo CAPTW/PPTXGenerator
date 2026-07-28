@@ -1,0 +1,316 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/proof_module_manifest.schema.json",
+  "title": "ProofModuleManifest",
+  "type": "object",
+  "required": [
+    "schema_name",
+    "schema_version",
+    "deck_title",
+    "workflow_option",
+    "workflow_policy_id",
+    "workflow_contract_status",
+    "core_claim_section_id",
+    "proof_section_id",
+    "implication_section_id",
+    "claim_slide_numbers",
+    "implication_slide_numbers",
+    "module_minimum",
+    "module_count",
+    "direct_evidence_module_count",
+    "synthesis_module_count",
+    "modules"
+  ],
+  "properties": {
+    "schema_name": {
+      "const": "proof_module_manifest"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "deck_title": {
+      "type": "string"
+    },
+    "workflow_option": {
+      "const": "evidence-backed-core"
+    },
+    "requested_workflow_option": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "workflow_policy_id": {
+      "type": "string"
+    },
+    "workflow_contract_status": {
+      "type": "string",
+      "enum": [
+        "absent",
+        "honored",
+        "incompatible"
+      ]
+    },
+    "core_claim_section_id": {
+      "type": "string"
+    },
+    "proof_section_id": {
+      "type": "string"
+    },
+    "implication_section_id": {
+      "type": "string"
+    },
+    "claim_slide_numbers": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "implication_slide_numbers": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "module_minimum": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "module_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "direct_evidence_module_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "synthesis_module_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "main_story_budget": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "required": [
+        "start",
+        "end"
+      ],
+      "properties": {
+        "start": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": true
+    },
+    "main_story_actual_slide_count": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "appendix_actual_slide_count": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "modules": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/proofModule"
+      }
+    }
+  },
+  "$defs": {
+    "sourceMaterialRef": {
+      "type": "object",
+      "required": [
+        "source_id",
+        "label",
+        "path"
+      ],
+      "properties": {
+        "source_id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "page": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "slide_range": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "proofModule": {
+      "type": "object",
+      "required": [
+        "module_id",
+        "workflow_option",
+        "parent_section_id",
+        "module_order_index",
+        "slide_number",
+        "blueprint_slide_ref",
+        "slide_title",
+        "slide_role",
+        "layout_pattern_id",
+        "coverage_class",
+        "evidence_origin",
+        "placement",
+        "claim_section_id",
+        "claim_slide_number",
+        "implication_section_id",
+        "implication_slide_number",
+        "claim_link_reason",
+        "implication_link_reason",
+        "required_evidence_assets",
+        "source_material_refs",
+        "workflow_policy_id",
+        "provenance_reason_codes",
+        "status",
+        "status_reason_codes"
+      ],
+      "properties": {
+        "module_id": {
+          "type": "string"
+        },
+        "workflow_option": {
+          "const": "evidence-backed-core"
+        },
+        "parent_section_id": {
+          "type": "string"
+        },
+        "module_order_index": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "slide_number": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "blueprint_slide_ref": {
+          "type": "string"
+        },
+        "slide_title": {
+          "type": "string"
+        },
+        "slide_role": {
+          "type": "string",
+          "enum": [
+            "evidence",
+            "comparison",
+            "analysis"
+          ]
+        },
+        "layout_pattern_id": {
+          "type": "string"
+        },
+        "coverage_class": {
+          "type": "string",
+          "enum": [
+            "direct-evidence",
+            "quantitative-evidence",
+            "comparative-synthesis",
+            "interpretive-synthesis"
+          ]
+        },
+        "evidence_origin": {
+          "type": "string",
+          "enum": [
+            "document",
+            "data",
+            "notes",
+            "mixed",
+            "generated"
+          ]
+        },
+        "placement": {
+          "type": "string",
+          "enum": [
+            "main-story",
+            "appendix",
+            "mixed"
+          ]
+        },
+        "claim_section_id": {
+          "type": "string"
+        },
+        "claim_slide_number": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "implication_section_id": {
+          "type": "string"
+        },
+        "implication_slide_number": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "claim_link_reason": {
+          "type": "string"
+        },
+        "implication_link_reason": {
+          "type": "string"
+        },
+        "required_evidence_assets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_material_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sourceMaterialRef"
+          }
+        },
+        "workflow_policy_id": {
+          "type": "string"
+        },
+        "provenance_reason_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "ready",
+            "incomplete",
+            "invalid"
+          ]
+        },
+        "status_reason_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

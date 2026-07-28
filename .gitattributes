@@ -1,0 +1,21 @@
+# Binary artifacts must remain byte-identical across checkouts.
+*.pdf   -text
+*.png   -text
+*.jpg   -text
+*.jpeg  -text
+*.gif   -text
+*.webp  -text
+*.ico   -text
+*.pptx  -text
+*.docx  -text
+*.xlsx  -text
+*.zip   -text
+
+# Phase 5 acceptance evidence is raw-hash-bound and must not be EOL-normalized.
+examples/deckcompiler_demo/phase5/*.json                    -text whitespace=cr-at-eol
+examples/deckcompiler_demo/phase5/**/*.json                 -text whitespace=cr-at-eol
+examples/deckcompiler_demo/phase5/outputs/html/index.html   -text whitespace=cr-at-eol
+
+# Phase 7 release-lock bytes are SHA-256-bound across Windows checkouts.
+requirements/devpost-release.in                            -text
+requirements/devpost-release.lock.txt                      -text

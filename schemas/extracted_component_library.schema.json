@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/extracted_component_library.schema.json",
+  "title": "ExtractedComponentLibrary",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "prompt_id",
+    "footer_system",
+    "index_navigation",
+    "section_tabs",
+    "cards",
+    "kpi_cards",
+    "quote_blocks",
+    "insight_blocks",
+    "diagram_nodes",
+    "process_arrows",
+    "radial_maps",
+    "timeline_blocks",
+    "table_modules",
+    "chart_modules",
+    "photo_masks",
+    "diagonal_panels",
+    "background_ornaments",
+    "icon_style",
+    "connector_style"
+  ],
+  "properties": {
+    "schema_name": {"const": "extracted_component_library"},
+    "schema_version": {"type": "string"},
+    "prompt_id": {"type": "string", "minLength": 1},
+    "footer_system": {"$ref": "#/$defs/component"},
+    "index_navigation": {"$ref": "#/$defs/component"},
+    "section_tabs": {"$ref": "#/$defs/component"},
+    "cards": {"$ref": "#/$defs/component"},
+    "kpi_cards": {"$ref": "#/$defs/component"},
+    "quote_blocks": {"$ref": "#/$defs/component"},
+    "insight_blocks": {"$ref": "#/$defs/component"},
+    "diagram_nodes": {"$ref": "#/$defs/component"},
+    "process_arrows": {"$ref": "#/$defs/component"},
+    "radial_maps": {"$ref": "#/$defs/component"},
+    "timeline_blocks": {"$ref": "#/$defs/component"},
+    "table_modules": {"$ref": "#/$defs/component"},
+    "chart_modules": {"$ref": "#/$defs/component"},
+    "photo_masks": {"$ref": "#/$defs/component"},
+    "diagonal_panels": {"$ref": "#/$defs/component"},
+    "background_ornaments": {"$ref": "#/$defs/component"},
+    "icon_style": {"$ref": "#/$defs/component"},
+    "connector_style": {"$ref": "#/$defs/component"}
+  },
+  "$defs": {
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "description",
+        "editable_primitives",
+        "style_notes",
+        "usage",
+        "component_geometry_rules",
+        "editable_ppt_translation",
+        "style_tokens_used",
+        "allowed_variants",
+        "forbidden_rasterization"
+      ],
+      "properties": {
+        "description": {"type": "string", "minLength": 1},
+        "editable_primitives": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "style_notes": {"type": "string", "minLength": 1},
+        "usage": {"type": "string", "minLength": 1},
+        "component_geometry_rules": {
+          "type": "object",
+          "minProperties": 1
+        },
+        "editable_ppt_translation": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "style_tokens_used": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "allowed_variants": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "forbidden_rasterization": {"const": true}
+      }
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/pngtopptx-handoff-manifest.schema.json",
+  "title": "PNGtoPPTX Handoff Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "handoff_id", "created_at", "timezone", "deckcompiler_commit", "phase4_source_commit", "phase4_bundle", "external_skillset_pin", "official_project_root", "output_root", "slide_count", "ordered_slide_ids", "slides", "artifact_paths", "implementation_provenance", "phase4_head_status", "source_bundle_unchanged", "external_skillset_unchanged", "external_skill_files_copied", "external_invocation_performed", "validation_status"],
+  "properties": {
+    "schema_name": {"const": "pngtopptx_handoff_manifest"},
+    "schema_version": {"const": "1.0.0"},
+    "handoff_id": {"type": "string", "pattern": "^pnghandoff_[0-9a-f]{20}$"},
+    "created_at": {"type": "string", "minLength": 1},
+    "timezone": {"type": "string", "minLength": 1},
+    "deckcompiler_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "phase4_source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "phase4_bundle": {"$ref": "#/$defs/phase4Bundle"},
+    "external_skillset_pin": {"$ref": "#/$defs/pin"},
+    "official_project_root": {"const": "project"},
+    "output_root": {"const": "."},
+    "slide_count": {"const": 6},
+    "ordered_slide_ids": {"type": "array", "minItems": 6, "maxItems": 6, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "slides": {"type": "array", "minItems": 6, "maxItems": 6, "items": {"$ref": "#/$defs/slide"}},
+    "artifact_paths": {"$ref": "#/$defs/artifactPaths"},
+    "implementation_provenance": {"type": "object", "additionalProperties": false, "required": ["implementation", "external_skill_implementation_copied", "external_skill_implementation_modified", "fallback_converter_present"], "properties": {"implementation": {"const": "DeckCompiler thin handoff adapter"}, "external_skill_implementation_copied": {"const": false}, "external_skill_implementation_modified": {"const": false}, "fallback_converter_present": {"const": false}}},
+    "phase4_head_status": {"enum": ["MATCHES_HEAD", "NOT_APPLICABLE_EXTERNAL_FIXTURE"]},
+    "source_bundle_unchanged": {"const": true},
+    "external_skillset_unchanged": {"const": true},
+    "external_skill_files_copied": {"const": false},
+    "external_invocation_performed": {"const": false},
+    "validation_status": {"const": "PASS"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "phase4Bundle": {"type": "object", "additionalProperties": false, "required": ["path", "manifest_id", "manifest_hash", "aggregate_sha256"], "properties": {"path": {"type": "string", "minLength": 1}, "manifest_id": {"type": "string", "minLength": 1}, "manifest_hash": {"type": "string", "minLength": 1}, "aggregate_sha256": {"$ref": "#/$defs/sha256"}}},
+    "pin": {"type": "object", "additionalProperties": false, "required": ["pin_id", "pin_hash", "combined_aggregate_sha256"], "properties": {"pin_id": {"type": "string", "minLength": 1}, "pin_hash": {"$ref": "#/$defs/sha256"}, "combined_aggregate_sha256": {"$ref": "#/$defs/sha256"}}},
+    "dimensions": {"type": "object", "additionalProperties": false, "required": ["width", "height"], "properties": {"width": {"const": 1664}, "height": {"const": 936}}},
+    "slide": {"type": "object", "additionalProperties": false, "required": ["sequence", "slide_id", "visual_target_id", "sidecar_id", "role", "source_target_relative_path", "content_addressed_target_relative_path", "exported_target_relative_path", "source_target_sha256", "exported_target_sha256", "target_byte_equal", "source_sidecar_relative_path", "content_addressed_sidecar_relative_path", "exported_sidecar_relative_path", "sidecar_semantic_sha256", "exported_sidecar_semantic_sha256", "dimensions"], "properties": {"sequence": {"type": "integer", "minimum": 1, "maximum": 6}, "slide_id": {"type": "string", "minLength": 1}, "visual_target_id": {"type": "string", "minLength": 1}, "sidecar_id": {"type": "string", "minLength": 1}, "role": {"const": "slide_visual_target_design_reference"}, "source_target_relative_path": {"type": "string", "minLength": 1}, "content_addressed_target_relative_path": {"type": "string", "minLength": 1}, "exported_target_relative_path": {"type": "string", "minLength": 1}, "source_target_sha256": {"$ref": "#/$defs/sha256"}, "exported_target_sha256": {"$ref": "#/$defs/sha256"}, "target_byte_equal": {"const": true}, "source_sidecar_relative_path": {"type": "string", "minLength": 1}, "content_addressed_sidecar_relative_path": {"type": "string", "minLength": 1}, "exported_sidecar_relative_path": {"type": "string", "minLength": 1}, "sidecar_semantic_sha256": {"$ref": "#/$defs/sha256"}, "exported_sidecar_semantic_sha256": {"$ref": "#/$defs/sha256"}, "dimensions": {"$ref": "#/$defs/dimensions"}}},
+    "artifactPaths": {"type": "object", "additionalProperties": false, "required": ["constraints", "expected_outputs", "invocation_plan", "crop_plan", "asset_manifest"], "properties": {"constraints": {"type": "string", "minLength": 1}, "expected_outputs": {"type": "string", "minLength": 1}, "invocation_plan": {"type": "string", "minLength": 1}, "crop_plan": {"const": "project/work/crop_plan.json"}, "asset_manifest": {"const": "project/assets/manifest.json"}}}
+  }
+}

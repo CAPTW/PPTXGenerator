@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/expected-output-contract.schema.json",
+  "title": "PNGtoPPTX Expected Output Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "created_at", "timezone", "slide_count", "outputs", "pptx_must_be_editable", "html_required", "protected_outputs_must_remain_untouched", "runtime_root_must_be_repository_external"],
+  "properties": {
+    "schema_name": {"const": "expected_output_contract"}, "schema_version": {"const": "1.0.0"},
+    "created_at": {"type": "string", "minLength": 1}, "timezone": {"type": "string", "minLength": 1}, "slide_count": {"const": 6},
+    "outputs": {"type": "object", "additionalProperties": false, "required": ["pptx", "html", "native_manifest", "reconstruction_manifest", "crop_source_trace_manifest", "visual_qa_summary", "repair_history", "package_openability_report", "orchestrator_execution_record", "execution_record"], "properties": {"pptx": {"type": "string", "pattern": "\\.pptx$"}, "html": {"type": "string", "pattern": "\\.html$"}, "native_manifest": {"type": "string", "minLength": 1}, "reconstruction_manifest": {"type": "string", "minLength": 1}, "crop_source_trace_manifest": {"type": "string", "minLength": 1}, "visual_qa_summary": {"type": "string", "minLength": 1}, "repair_history": {"type": "string", "minLength": 1}, "package_openability_report": {"type": "string", "minLength": 1}, "orchestrator_execution_record": {"type": "string", "minLength": 1}, "execution_record": {"type": "string", "minLength": 1}}},
+    "pptx_must_be_editable": {"const": true}, "html_required": {"const": true}, "protected_outputs_must_remain_untouched": {"const": true}, "runtime_root_must_be_repository_external": {"const": true}
+  }
+}

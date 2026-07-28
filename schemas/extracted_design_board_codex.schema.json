@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/extracted_design_board_codex.schema.json",
+  "title": "ExtractedDesignBoardCodex",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "prompt_id",
+    "board_image_path",
+    "detected_outer_ratio",
+    "detected_internal_slide_ratio",
+    "design_balance",
+    "global_visual_language",
+    "color_palette",
+    "typography_hierarchy",
+    "layout_principles",
+    "density_profile",
+    "motif_system",
+    "editability_translation_policy",
+    "extraction_confidence",
+    "extraction_warnings"
+  ],
+  "properties": {
+    "schema_name": {"const": "extracted_design_board_codex"},
+    "schema_version": {"type": "string"},
+    "prompt_id": {"type": "string", "minLength": 1},
+    "board_image_path": {"type": "string", "minLength": 1},
+    "detected_outer_ratio": {"type": "string", "minLength": 1},
+    "detected_internal_slide_ratio": {"type": "string", "minLength": 1},
+    "design_balance": {
+      "type": "object",
+      "additionalProperties": {"type": "number"},
+      "required": ["academic", "professional", "informative", "creative"]
+    },
+    "global_visual_language": {"$ref": "#/$defs/text_list"},
+    "color_palette": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["token", "hex", "role"],
+        "properties": {
+          "token": {"type": "string", "minLength": 1},
+          "hex": {"type": "string", "pattern": "^#[0-9A-Fa-f]{6}$"},
+          "role": {"type": "string", "minLength": 1},
+          "usage_notes": {"type": "string"}
+        }
+      }
+    },
+    "typography_hierarchy": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["level", "role", "size_guidance", "weight_guidance"],
+        "properties": {
+          "level": {"type": "string", "minLength": 1},
+          "role": {"type": "string", "minLength": 1},
+          "size_guidance": {"type": "string", "minLength": 1},
+          "weight_guidance": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "layout_principles": {"$ref": "#/$defs/text_list"},
+    "density_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["overall", "hero_slides", "content_slides", "data_slides"],
+      "properties": {
+        "overall": {"type": "string", "minLength": 1},
+        "hero_slides": {"type": "string", "minLength": 1},
+        "content_slides": {"type": "string", "minLength": 1},
+        "data_slides": {"type": "string", "minLength": 1}
+      }
+    },
+    "motif_system": {"$ref": "#/$defs/text_list"},
+    "editability_translation_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reference_only",
+        "no_full_slide_raster_backgrounds",
+        "editable_text",
+        "editable_tables",
+        "editable_charts",
+        "photos_only_in_declared_frames"
+      ],
+      "properties": {
+        "reference_only": {"const": true},
+        "no_full_slide_raster_backgrounds": {"const": true},
+        "editable_text": {"const": true},
+        "editable_tables": {"const": true},
+        "editable_charts": {"const": true},
+        "photos_only_in_declared_frames": {"const": true},
+        "notes": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "extraction_confidence": {
+      "type": "object",
+      "additionalProperties": {"type": "number", "minimum": 0, "maximum": 1}
+    },
+    "extraction_warnings": {"type": "array", "items": {"type": "string"}}
+  },
+  "$defs": {
+    "text_list": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    }
+  }
+}

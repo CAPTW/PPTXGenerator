@@ -1,0 +1,625 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/content_plan.schema.json",
+  "title": "ContentPlan",
+  "type": "object",
+  "required": [
+    "stage",
+    "status",
+    "inputs",
+    "outputs",
+    "source_evidence",
+    "created_at"
+  ],
+  "properties": {
+    "stage": {
+      "const": "CONTENT_PLAN"
+    },
+    "status": {
+      "enum": [
+        "APPROVED",
+        "BLOCKED"
+      ]
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "source_evidence": {
+      "$ref": "intake_manifest.schema.json#/$defs/sourceEvidenceList"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "invalidates_downstream_from": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sections": {
+      "type": "array"
+    },
+    "slides": {
+      "type": "array"
+    },
+    "blueprint_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "design_system_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "deck_constitution_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "layout_library_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "slide_ledger_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "batch_manifest_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "state_capsule_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "workflow_plan_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "proof_unit_registry_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "proof_unit_registry_summary": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "workflow_option": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "registry_policy_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "unit_count": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "unit_minimum": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "direct_evidence_unit_count": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "synthesis_unit_count": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "claim_anchor_section_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "proof_section_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "synthesis_anchor_section_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "unit_ids": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "status_codes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "unit_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "reason_codes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "provenance_reason_codes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "unit_id",
+              "status",
+              "reason_codes",
+              "provenance_reason_codes"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "workflow_option",
+        "registry_policy_id",
+        "unit_count",
+        "unit_minimum",
+        "direct_evidence_unit_count",
+        "synthesis_unit_count",
+        "claim_anchor_section_id",
+        "proof_section_id",
+        "synthesis_anchor_section_id",
+        "unit_ids",
+        "status_codes"
+      ],
+      "additionalProperties": false
+    },
+    "proof_artifact_contract": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "contract_version": {
+          "type": "string"
+        },
+        "canonical_artifact": {
+          "type": "string"
+        },
+        "normal_persistence_mode": {
+          "type": "string"
+        },
+        "compat_mode": {
+          "type": "string"
+        },
+        "compat_warning_scope": {
+          "type": "string"
+        },
+        "migration_mode": {
+          "type": "string"
+        },
+        "migration_status": {
+          "type": "string"
+        },
+        "sunset_phase": {
+          "type": "string"
+        },
+        "fingerprint_key": {
+          "type": "string"
+        },
+        "fingerprint_aliases": {
+          "type": "array",
+          "maxItems": 0,
+          "items": {
+            "type": "string"
+          }
+        },
+        "fingerprint_alias_read_scope": {
+          "type": "string"
+        },
+        "proof_unit_registry_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "legacy_manifest_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "doctor_report_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "legacy_manifest_status": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "contract_version",
+        "canonical_artifact",
+        "normal_persistence_mode",
+        "compat_mode",
+        "compat_warning_scope",
+        "migration_mode",
+        "migration_status",
+        "sunset_phase",
+        "fingerprint_key",
+        "fingerprint_aliases",
+        "fingerprint_alias_read_scope",
+        "proof_unit_registry_path",
+        "legacy_manifest_path",
+        "legacy_manifest_status"
+      ],
+      "additionalProperties": false
+    },
+    "proof_module_manifest_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "proof_module_manifest_summary": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "workflow_option": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "module_count": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "module_minimum": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "direct_evidence_module_count": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "synthesis_module_count": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "core_claim_section_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "proof_section_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "implication_section_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "module_ids": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "status_codes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "module_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "reason_codes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "provenance_reason_codes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "module_id",
+              "status",
+              "reason_codes",
+              "provenance_reason_codes"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "workflow_option",
+        "module_count",
+        "module_minimum",
+        "direct_evidence_module_count",
+        "synthesis_module_count",
+        "core_claim_section_id",
+        "proof_section_id",
+        "implication_section_id",
+        "module_ids",
+        "status_codes"
+      ],
+      "additionalProperties": false
+    },
+    "workflow_option": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "requested_workflow_option": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "workflow_option_provenance": {
+      "type": "object",
+      "properties": {
+        "requested_option_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "selected_option_id": {
+          "type": "string"
+        },
+        "selection_mode": {
+          "type": "string",
+          "enum": [
+            "heuristic-recommendation",
+            "requested-contract"
+          ]
+        },
+        "resolution_code": {
+          "type": "string",
+          "enum": [
+            "no-request",
+            "request-honored",
+            "requested-option-not-available",
+            "requested-option-not-contractable"
+          ]
+        },
+        "matrix_reason_code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "next_step_requirements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "contract_status": {
+          "type": "string",
+          "enum": [
+            "absent",
+            "honored",
+            "incompatible"
+          ]
+        },
+        "available_option_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "contractable_option_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "policy_id": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "selected_option_id",
+        "selection_mode",
+        "resolution_code",
+        "contract_status",
+        "available_option_ids",
+        "contractable_option_ids",
+        "policy_id",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "plan_conformance": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail"
+          ]
+        },
+        "requested_option_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "selected_option_id": {
+          "type": "string"
+        },
+        "contract_status": {
+          "type": "string",
+          "enum": [
+            "absent",
+            "honored",
+            "incompatible"
+          ]
+        },
+        "policy_id": {
+          "type": "string"
+        },
+        "required_sections": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "required_main_story_roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "accepted_checks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "failure_reasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "failure_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "accepted_basis": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "selected_option_id",
+        "contract_status",
+        "policy_id",
+        "required_sections",
+        "required_main_story_roles",
+        "accepted_checks",
+        "failure_reasons",
+        "failure_codes",
+        "accepted_basis"
+      ],
+      "additionalProperties": false
+    },
+    "failure_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "slide_count": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/source-item.schema.json",
+  "title": "DeckCompiler Source Item",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "source_id",
+    "source_type",
+    "display_name",
+    "stable_identity",
+    "locator_strategy",
+    "extraction_status",
+    "language",
+    "rights_privacy_note",
+    "child_assets"
+  ],
+  "properties": {
+    "source_id": {"type": "string", "pattern": "^src_[0-9a-f]{20}$"},
+    "source_type": {"enum": ["user_prompt", "structured_brief", "pdf", "image"]},
+    "display_name": {"type": "string", "minLength": 1},
+    "original_filename": {"type": "string", "minLength": 1},
+    "user_brief": {"type": "string", "minLength": 1},
+    "stable_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "value"],
+      "properties": {
+        "algorithm": {"enum": ["sha256", "canonical_text_sha256"]},
+        "value": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "locator_strategy": {
+      "enum": ["prompt_character_range", "document_section", "pdf_page_text_span", "pdf_page_region", "image_region"]
+    },
+    "extraction_status": {"enum": ["not_required", "pending", "extracted", "unsupported", "failed"]},
+    "language": {"type": "string", "pattern": "^[a-z]{2,3}(-[A-Z]{2})?$"},
+    "rights_privacy_note": {"type": "string", "minLength": 1},
+    "child_assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["asset_id", "asset_type", "path", "sha256"],
+        "properties": {
+          "asset_id": {"type": "string", "minLength": 1},
+          "asset_type": {"enum": ["page_image", "embedded_image", "table", "figure", "supporting_image"]},
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"source_type": {"enum": ["user_prompt", "structured_brief"]}}, "required": ["source_type"]},
+      "then": {"required": ["user_brief"]}
+    },
+    {
+      "if": {"properties": {"source_type": {"enum": ["pdf", "image"]}}, "required": ["source_type"]},
+      "then": {"required": ["original_filename"]}
+    }
+  ]
+}

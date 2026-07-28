@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/external-execution-acceptance.schema.json",
+  "title": "DeckCompiler BLOCKED-Only External Execution Acceptance",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "acceptance_id",
+    "execution_id",
+    "record_id",
+    "verifier_report_id",
+    "policy_id",
+    "external_executable_id",
+    "status",
+    "accepted",
+    "release_eligible",
+    "reason_codes",
+    "missing_prerequisites",
+    "created_at",
+    "evaluator_name",
+    "evaluator_version",
+    "acceptance_hash"
+  ],
+  "properties": {
+    "schema_name": {"const": "external_execution_acceptance"},
+    "schema_version": {"const": "1.0.0"},
+    "acceptance_id": {"type": "string", "pattern": "^exaccept_[0-9a-f]{20}$"},
+    "execution_id": {"type": "string", "pattern": "^exec_[0-9a-f]{20}$"},
+    "record_id": {"type": "string", "pattern": "^exrec_[0-9a-f]{20}$"},
+    "verifier_report_id": {"type": "string", "pattern": "^exverify_[0-9a-f]{20}$"},
+    "policy_id": {"const": "phase4-external-execution-acceptance-v1-disabled"},
+    "external_executable_id": {
+      "$ref": "external-execution-request.schema.json#/$defs/externalExecutableId"
+    },
+    "status": {"const": "BLOCKED"},
+    "accepted": {"const": false},
+    "release_eligible": {"const": false},
+    "reason_codes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "missing_prerequisites": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "created_at": {"type": "string", "minLength": 1},
+    "evaluator_name": {"const": "deckcompiler-external-acceptance-evaluator"},
+    "evaluator_version": {"const": "1.0.0"},
+    "acceptance_hash": {
+      "allOf": [
+        {"$ref": "external-execution-record.schema.json#/$defs/hashBinding"},
+        {"properties": {"hash_domain": {"const": "deckcompiler.external_execution.acceptance.v1"}}}
+      ]
+    }
+  }
+}

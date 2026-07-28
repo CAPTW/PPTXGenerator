@@ -1,0 +1,81 @@
+{
+  "creative_degrees_of_freedom": [
+    "composition archetype",
+    "visual metaphor",
+    "asymmetry",
+    "focal point",
+    "negative space",
+    "layering",
+    "depth",
+    "panel geometry",
+    "diagram arrangement",
+    "title placement",
+    "reading direction",
+    "transition energy",
+    "illustration composition"
+  ],
+  "fixed_constraints": {
+    "citation_treatment": "Visible quiet native footer rail with strong contrast and safe margins.",
+    "diagram_grammar": "Native nodes, connectors, matrices, and roadmap stages with explicit reading direction.",
+    "forbidden": [
+      "microtext",
+      "full-slide screenshot",
+      "full-slide raster",
+      "random logo",
+      "watermark",
+      "repetitive dashboard template",
+      "generic corporate card wall",
+      "decorative blob collage"
+    ],
+    "hierarchy": "One dominant focal point with clear title, evidence, and source-note tiers.",
+    "illustration_grammar": "Bounded continuous-tone technical editorial illustration; never a final slide surface.",
+    "native_editability_intent": true,
+    "palette_relationship": "Restrained cool-neutral field with limited risk and action accents.",
+    "readability": "High readability at presentation distance; no microtext.",
+    "safe_areas": [
+      "title",
+      "footer",
+      "source_notes",
+      "page_number"
+    ],
+    "spacing_rhythm": "Generous outer margins, stable baseline gaps, and intentional negative space.",
+    "tone": [
+      "professional",
+      "academic",
+      "authoritative technical",
+      "contemporary editorial"
+    ],
+    "typography_character": "Contemporary editorial sans-serif with technical restraint."
+  },
+  "implementation_provenance": "build_week_new",
+  "module_differentiation": [
+    {
+      "composition_energy": "measured, explanatory, and progressively directional",
+      "density_range": "low to medium",
+      "focal_behavior": "move from system boundary to operating sequence",
+      "module_id": "module-01-section_01_understand",
+      "spatial_direction": "left-to-right flow with a stable source rail",
+      "visual_metaphor": "system map and guided flow 1"
+    },
+    {
+      "composition_energy": "analytical, evidence-led, and tension-aware",
+      "density_range": "medium to high",
+      "focal_behavior": "anchor on the highest-consequence evidence and explicit criteria",
+      "module_id": "module-02-section_02_evaluate",
+      "spatial_direction": "ranked grid moving from risk signal to option trade-off",
+      "visual_metaphor": "evidence field and comparative lens 2"
+    },
+    {
+      "composition_energy": "decisive, operational, and cautiously optimistic",
+      "density_range": "low to medium",
+      "focal_behavior": "hold the decision as the anchor, then reveal implementation gates",
+      "module_id": "module-03-section_03_act",
+      "spatial_direction": "central recommendation moving into phased forward motion",
+      "visual_metaphor": "decision beacon and directional roadmap 3"
+    }
+  ],
+  "schema_name": "visual_dna",
+  "schema_version": "1.0.0",
+  "source_commit": "00fefe71e3b02fa897794f9e9f3d6df5be715cd8",
+  "visual_dna_id": "visualdna_6f9285bca6071b7c0a06"
+}

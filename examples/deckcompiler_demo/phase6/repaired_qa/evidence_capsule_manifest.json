@@ -1,0 +1,20 @@
+{
+  "capsule_status": "COMPOSITE_QA_COMPLETE",
+  "curated_manifest_hash": "f43b6aaaf8971fc0ed50b3122bc6b68ab0763722592a24dc01771517ebd7e8ee",
+  "fault_state": "repaired",
+  "hash_mismatch_count": 0,
+  "html_screenshot_capture_manifest_hash": "cdfda0e0daa73b84d9e47ae1a7d2bbb2287864dc47757ded1bbee69e9672b390",
+  "html_screenshot_count": 6,
+  "html_sha256": "4569882c7153f6e846b350df68322fa820adf7ff34508dc4aac07be2834e19a7",
+  "missing_artifact_count": 0,
+  "objective_evidence_hash": "e45e0b31b7d67636c62a335b2cf3ca92575aa5d97043697f6244f87f8fbb90b6",
+  "official_final_gate": "PASS",
+  "pptx_sha256": "6fd3fa50cab6d56c8fe943b515e93d36dde485a843e34b0ea710890ac8c845a5",
+  "render_count": 6,
+  "run_id": "phase61c-repaired-854def7e99eb40388a724ad8",
+  "schema_name": "phase6_curated_repaired_evidence_capsule",
+  "schema_version": "1.0.0",
+  "source_commit": "21bcd35e5919dc340e01be74ced0a51f23931f08",
+  "source_manifest_hash": "2e51b62976d4b2b26dbe649722bb15bd073d4710a6fa5682d544d6629570f092",
+  "stale_artifact_count": 0
+}

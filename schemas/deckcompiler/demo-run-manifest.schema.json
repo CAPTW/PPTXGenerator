@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/demo-run-manifest.schema.json",
+  "title": "DeckCompiler demo run manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name", "schema_version", "run_id", "release_profile_id", "source_commit",
+    "started_at", "completed_at", "config", "release_contract", "output_root",
+    "output_root_class", "stages", "selected_route", "route_explicit",
+    "legacy_fallback_used", "silent_fallback_used", "live_image_generation_reexecuted",
+    "external_skill_pin", "external_python_dependency_closure", "renderer", "browser", "warnings", "errors", "final_verdict",
+    "delivery_package", "manifest_hash"
+  ],
+  "properties": {
+    "schema_name": {"const": "demo_run_manifest"},
+    "schema_version": {"const": "1.0.0"},
+    "run_id": {"pattern": "^phase7run_[0-9a-f]{20}$", "type": "string"},
+    "release_profile_id": {"const": "devpost_p0_frozen_visuals"},
+    "source_commit": {"pattern": "^[0-9a-f]{40}$", "type": "string"},
+    "started_at": {"type": "string", "minLength": 1},
+    "completed_at": {"type": ["string", "null"]},
+    "config": {"type": "object"},
+    "release_contract": {"type": "object"},
+    "output_root": {"type": "string", "minLength": 1},
+    "output_root_class": {"const": "user_supplied_repository_external"},
+    "stages": {
+      "type": "array", "minItems": 36, "maxItems": 36,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["ordinal", "stage", "status", "started_at", "completed_at", "input_hashes", "output_hashes"],
+        "properties": {
+          "ordinal": {"type": "integer", "minimum": 1, "maximum": 36},
+          "stage": {"type": "string", "minLength": 1},
+          "status": {"enum": ["NOT_STARTED", "PASS", "FAILED", "BLOCKED"]},
+          "started_at": {"type": ["string", "null"]},
+          "completed_at": {"type": ["string", "null"]},
+          "input_hashes": {"type": "object"},
+          "output_hashes": {"type": "object"}
+        }
+      }
+    },
+    "selected_route": {"const": "editable_pngtopptx"},
+    "route_explicit": {"const": true},
+    "legacy_fallback_used": {"const": false},
+    "silent_fallback_used": {"const": false},
+    "live_image_generation_reexecuted": {"const": false},
+    "external_skill_pin": {"type": "object"},
+    "external_python_dependency_closure": {"type": "object"},
+    "renderer": {"type": "object"},
+    "browser": {"type": "object"},
+    "warnings": {"type": "array"},
+    "errors": {"type": "array"},
+    "final_verdict": {"enum": ["BLOCKED", "ELIGIBLE_FOR_FRESH_CLONE_PROOF", "ELIGIBLE_FOR_DEVPOST_SUBMISSION_CANDIDATE"]},
+    "delivery_package": {"type": ["object", "null"]},
+    "manifest_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"}
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/design_reference_report.schema.json",
+  "title": "DesignReferenceReport",
+  "type": "object",
+  "required": [
+    "stage",
+    "status",
+    "inputs",
+    "outputs",
+    "source_evidence",
+    "created_at"
+  ],
+  "properties": {
+    "stage": {
+      "const": "DESIGN_REFERENCE_CHECK"
+    },
+    "status": {
+      "enum": [
+        "APPROVED",
+        "INSUFFICIENT",
+        "BLOCKED"
+      ]
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "source_evidence": {
+      "$ref": "intake_manifest.schema.json#/$defs/sourceEvidenceList"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "invalidates_downstream_from": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "asset_id": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "asset_id"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "brand_constraints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "asset_id": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "asset_id"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "design_tokens": {
+      "type": "object"
+    },
+    "workflow_plan_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reference_dna_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "design_reference_mode": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

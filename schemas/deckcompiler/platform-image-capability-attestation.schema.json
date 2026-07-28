@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/deckcompiler/platform-image-capability-attestation.schema.json",
+  "title": "Platform-managed Image Capability Attestation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "attestation_id", "execution_mode", "tool_available", "platform_tool_id", "platform_tool_channel", "image_model", "result_contract_exposes_bytes", "actual_output_bytes_observed", "reference_image_support", "landscape_generation_support", "requested_dimension_support", "output_format", "tool_call_id_exposure", "platform_managed_credential_status", "external_provider_id", "external_transport_used", "repository_network_calls", "credential_lookups", "platform_tool_invocations", "capability_status"],
+  "properties": {
+    "schema_name": {"const": "platform_image_capability_attestation"},
+    "schema_version": {"const": "1.0.0"},
+    "attestation_id": {"type": "string", "minLength": 1},
+    "execution_mode": {"const": "platform_managed_tool"},
+    "tool_available": {"type": "boolean"},
+    "platform_tool_id": {"type": "string", "minLength": 1},
+    "platform_tool_channel": {"type": "string", "minLength": 1},
+    "image_model": {"type": "string", "minLength": 1},
+    "result_contract_exposes_bytes": {"type": "boolean"},
+    "actual_output_bytes_observed": {"type": "boolean"},
+    "reference_image_support": {"type": "boolean"},
+    "landscape_generation_support": {"type": "boolean"},
+    "requested_dimension_support": {"type": "string", "minLength": 1},
+    "output_format": {"type": "string", "minLength": 1},
+    "tool_call_id_exposure": {"type": "string", "minLength": 1},
+    "platform_managed_credential_status": {"type": "string", "minLength": 1},
+    "external_provider_id": {"type": "null"},
+    "external_transport_used": {"const": false},
+    "repository_network_calls": {"const": 0},
+    "credential_lookups": {"const": 0},
+    "platform_tool_invocations": {"type": "integer", "minimum": 0},
+    "capability_status": {"enum": ["READY_FOR_CANARY", "BLOCKED", "VERIFIED_BY_CANARY"]}
+  }
+}

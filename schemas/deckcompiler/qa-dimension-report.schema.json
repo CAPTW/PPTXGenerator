@@ -1,0 +1,47 @@
+{
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/qa-dimension-report.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "severityCounts": {
+      "additionalProperties": false,
+      "properties": {
+        "error": { "minimum": 0, "type": "integer" },
+        "info": { "minimum": 0, "type": "integer" },
+        "severe": { "minimum": 0, "type": "integer" },
+        "warning": { "minimum": 0, "type": "integer" }
+      },
+      "required": ["info", "warning", "error", "severe"],
+      "type": "object"
+    },
+    "sourceArtifact": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": { "minLength": 1, "type": "string" },
+        "path": { "minLength": 1, "type": "string" },
+        "sha256": { "pattern": "^[0-9a-f]{64}$", "type": "string" }
+      },
+      "required": ["artifact_id", "path", "sha256"],
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "checks": { "type": "object" },
+    "created_at": { "format": "date-time", "type": "string" },
+    "findings": { "items": { "$ref": "https://pptx-generator.local/schemas/deckcompiler/qa-finding.schema.json" }, "type": "array" },
+    "implementation_provenance": { "type": "object" },
+    "producer": { "minLength": 1, "type": "string" },
+    "report_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "report_id": { "minLength": 1, "type": "string" },
+    "run_id": { "minLength": 1, "type": "string" },
+    "schema_name": { "pattern": "^phase6_[a-z0-9_]+$", "type": "string" },
+    "schema_version": { "const": "1.0.0" },
+    "severity_counts": { "$ref": "#/$defs/severityCounts" },
+    "source_artifacts": { "items": { "$ref": "#/$defs/sourceArtifact" }, "minItems": 1, "type": "array" },
+    "status": { "enum": ["PASS", "NEEDS_REPAIR", "BLOCKED"] },
+    "timezone": { "const": "Asia/Seoul" }
+  },
+  "required": ["schema_name", "schema_version", "report_id", "run_id", "source_artifacts", "producer", "checks", "findings", "severity_counts", "status", "created_at", "timezone", "implementation_provenance", "report_hash"],
+  "title": "DeckCompiler Phase 6 QA dimension report",
+  "type": "object"
+}

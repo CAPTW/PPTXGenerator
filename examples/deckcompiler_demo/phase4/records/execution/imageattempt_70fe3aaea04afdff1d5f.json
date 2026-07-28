@@ -1,0 +1,79 @@
+{
+  "actual_generation": true,
+  "attempt_id": "imageattempt_70fe3aaea04afdff1d5f",
+  "credential_lookups": 0,
+  "execution_mode": "platform_managed_tool",
+  "external_provider_id": null,
+  "external_transport_used": false,
+  "image_model": "not_exposed_by_tool",
+  "output": {
+    "completion_timestamp": "2026-07-20T03:02:37.653+09:00",
+    "normalized_dimensions": {
+      "height": 936,
+      "width": 1664
+    },
+    "normalized_file_size_bytes": 1090846,
+    "normalized_format": "PNG",
+    "normalized_relative_path": "artifacts/slide_targets/imageattempt_70fe3aaea04afdff1d5f/normalized.png",
+    "normalized_sha256": "965f693a1b87cd380b8e659cbb16d45e54869b3a8019b50281b8b9bf19affdc0",
+    "original_dimensions": {
+      "height": 941,
+      "width": 1672
+    },
+    "original_file_size_bytes": 1207333,
+    "original_format": "PNG",
+    "original_relative_path": "artifacts/slide_targets/imageattempt_70fe3aaea04afdff1d5f/original.png",
+    "original_sha256": "16f29f65a9c86beee7e997a00fef02dfc264078507e28293d6e502acd0f54ea0",
+    "prior_attempt_id": null,
+    "prompt_hash": "e112f0d4da72a59046798e7a36b67df6b978161a7014178cd157dc20e4d5e619",
+    "prompt_id": "prompt_8432c4afb1f268c3c089",
+    "prompt_relative_path": "records/prompts/slide-002-attempt-001.prompt.json",
+    "reference_artifacts": [
+      {
+        "artifact_id": "designboard_61f00a55ee02666b3254",
+        "relative_path": "references/design_board.png",
+        "sha256": "a0229b8e27b4a103c177682b2d742ae3d4dd6eb9bb70c675cbf9f88293dd666d"
+      },
+      {
+        "artifact_id": "moduleanchor_3591b43d6cf6fe339284",
+        "relative_path": "references/module-001-anchor.png",
+        "sha256": "632207323326068436325ea377f0477995de06e6e0de5546483c10e259b74f90"
+      },
+      {
+        "artifact_id": "batchreference_3473bb414e4059c9bdd2",
+        "relative_path": "references/batch-001-template-reference.png",
+        "sha256": "068c846fed83139b3cf25c5c79524db5a7ed74e6713179855faaf65fc41665f0"
+      }
+    ],
+    "rejection_reason": "Composition expanded into a design-system board with palette, typography, module cards, and a layout miniature instead of one process-explainer slide.; Excess regions violate semantic, capacity, differentiation, and selected-layout fit.",
+    "request_timestamp": "2026-07-20T03:01:08.517+09:00",
+    "seal_relative_path": "records/attempts/slide-002-attempt-001.seal.json",
+    "selected": false,
+    "target_type": "slide_visual_target",
+    "transformation": {
+      "crop_box": [
+        4,
+        2,
+        1668,
+        938
+      ],
+      "nonuniform_resize_used": false,
+      "stretch_used": false,
+      "type": "aspect_preserving_crop",
+      "uniform_resize_to": null
+    },
+    "verification_status": "VERIFIED",
+    "visual_review_status": "REJECTED"
+  },
+  "platform_tool_channel": "commentary",
+  "platform_tool_id": "image_gen.imagegen",
+  "platform_tool_invocation_count": 1,
+  "record_hash": "45381e3cd7a472d27b7bd6ad862ef116352e2a5ae179534511be90a2f6b05f26",
+  "record_id": "imageexecution_51eb6fa562dab2aa325b",
+  "repository_network_calls": 0,
+  "request_id": "imagerequest_a5d74ed0ac93d1c82bbd",
+  "schema_name": "platform_image_execution_record",
+  "schema_version": "1.0.0",
+  "target_artifact_id": "visualtarget_eb8bc3132476d2929014",
+  "tool_call_id": "not_exposed"
+}

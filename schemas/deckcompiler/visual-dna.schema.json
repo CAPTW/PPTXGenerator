@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://presentation-agent.local/schemas/deckcompiler/visual-dna.schema.json",
+  "title": "DeckCompiler Phase 4 Visual DNA",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "visual_dna_id",
+    "source_commit",
+    "fixed_constraints",
+    "creative_degrees_of_freedom",
+    "module_differentiation",
+    "implementation_provenance"
+  ],
+  "properties": {
+    "schema_name": {"const": "visual_dna"},
+    "schema_version": {"const": "1.0.0"},
+    "visual_dna_id": {"type": "string", "minLength": 1},
+    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "fixed_constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tone", "readability", "hierarchy", "palette_relationship", "typography_character", "citation_treatment", "diagram_grammar", "illustration_grammar", "spacing_rhythm", "safe_areas", "native_editability_intent", "forbidden"],
+      "properties": {
+        "tone": {"type": "array", "minItems": 3, "items": {"type": "string"}, "uniqueItems": true},
+        "readability": {"type": "string", "minLength": 1},
+        "hierarchy": {"type": "string", "minLength": 1},
+        "palette_relationship": {"type": "string", "minLength": 1},
+        "typography_character": {"type": "string", "minLength": 1},
+        "citation_treatment": {"type": "string", "minLength": 1},
+        "diagram_grammar": {"type": "string", "minLength": 1},
+        "illustration_grammar": {"type": "string", "minLength": 1},
+        "spacing_rhythm": {"type": "string", "minLength": 1},
+        "safe_areas": {"type": "array", "minItems": 3, "items": {"type": "string"}, "uniqueItems": true},
+        "native_editability_intent": {"const": true},
+        "forbidden": {"type": "array", "minItems": 5, "items": {"type": "string"}, "uniqueItems": true}
+      }
+    },
+    "creative_degrees_of_freedom": {
+      "type": "array",
+      "minItems": 8,
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "module_differentiation": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["module_id", "visual_metaphor", "composition_energy", "focal_behavior", "spatial_direction", "density_range"],
+        "properties": {
+          "module_id": {"type": "string", "minLength": 1},
+          "visual_metaphor": {"type": "string", "minLength": 1},
+          "composition_energy": {"type": "string", "minLength": 1},
+          "focal_behavior": {"type": "string", "minLength": 1},
+          "spatial_direction": {"type": "string", "minLength": 1},
+          "density_range": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "implementation_provenance": {"const": "build_week_new"}
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "acceptance_hash": {
+    "algorithm": "sha256",
+    "byte_count": 971,
+    "digest": "09cc3895ea12e3b7a1d12c7d3b81a9d20edccd597ee4339d6103a92b9c6e26b9",
+    "hash_domain": "deckcompiler.external_execution.acceptance.v1"
+  },
+  "acceptance_id": "exaccept_d71160d106881d2a2873",
+  "accepted": false,
+  "created_at": "2026-07-17T00:00:02+09:00",
+  "evaluator_name": "deckcompiler-external-acceptance-evaluator",
+  "evaluator_version": "1.0.0",
+  "execution_id": "exec_0123456789abcdef0123",
+  "external_executable_id": "openai",
+  "missing_prerequisites": [
+    "explicit_transport_authorization",
+    "canonical_provider_channel_selection",
+    "credential_reference_policy",
+    "actual_provider_canary",
+    "visual_artifact_verification",
+    "future_acceptance_state_decision"
+  ],
+  "policy_id": "phase4-external-execution-acceptance-v1-disabled",
+  "reason_codes": [
+    "EXTERNAL_TRANSPORT_DISABLED_CONTRACT_ONLY",
+    "NO_ACTUAL_PROVIDER_RESPONSE",
+    "NO_ACTUAL_OUTPUT",
+    "NO_LIVE_IMAGE_GENERATION_EVIDENCE",
+    "PHASE4_VISUAL_ARTIFACTS_ABSENT",
+    "ACCEPTANCE_NOT_ENABLED"
+  ],
+  "record_id": "exrec_db1ecb6dd29ecab22a49",
+  "release_eligible": false,
+  "schema_name": "external_execution_acceptance",
+  "schema_version": "1.0.0",
+  "status": "BLOCKED",
+  "verifier_report_id": "exverify_516819bb9aa68a6d510a"
+}

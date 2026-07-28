@@ -1,0 +1,28 @@
+{
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/fault-application-record.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "after_sha256": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "application_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "before_sha256": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "canonical_owner_path": { "const": "src/presentation_agent/deckcompiler/qa/reconstruction_source/slides.js" },
+    "canonical_owner_sha256": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "changed_paths": { "items": { "minLength": 1, "type": "string" }, "maxItems": 1, "minItems": 1, "type": "array" },
+    "evidence_binding_changed": { "const": false },
+    "expected_detector_owner": { "const": "handoff/project/lib/slides.js" },
+    "fixture_id": { "minLength": 1, "type": "string" },
+    "mutation_count": { "const": 1 },
+    "original_occurrence_count": { "const": 1 },
+    "runtime_isolated": { "const": true },
+    "schema_name": { "const": "phase6_fault_application_record" },
+    "schema_version": { "const": "1.0.0" },
+    "semantic_content_changed": { "const": false },
+    "target_field": { "minLength": 1, "type": "string" },
+    "target_path": { "minLength": 1, "type": "string" },
+    "visual_target_changed": { "const": false }
+  },
+  "required": ["schema_name", "schema_version", "fixture_id", "target_path", "target_field", "canonical_owner_path", "canonical_owner_sha256", "expected_detector_owner", "before_sha256", "after_sha256", "changed_paths", "original_occurrence_count", "mutation_count", "semantic_content_changed", "evidence_binding_changed", "visual_target_changed", "runtime_isolated", "application_hash"],
+  "title": "DeckCompiler Phase 6 fault application record",
+  "type": "object"
+}

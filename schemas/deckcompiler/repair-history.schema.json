@@ -1,0 +1,46 @@
+{
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/repair-history.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DeckCompiler Phase 6 bounded repair history",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_name": { "const": "phase6_repair_history" },
+    "schema_version": { "const": "1.0.0" },
+    "history_id": { "pattern": "^repair_history_[0-9a-f]{20}$", "type": "string" },
+    "repair_plan_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "invalidation_manifest_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "waves_used": { "minimum": 1, "maximum": 3, "type": "integer" },
+    "waves_allowed": { "const": 3 },
+    "waves": {
+      "type": "array", "minItems": 1, "maxItems": 3,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "properties": {
+          "wave": { "minimum": 1, "maximum": 3, "type": "integer" },
+          "repair_action": { "const": "rematerialize_canonical_owner" },
+          "canonical_repair_owner": { "minLength": 1, "type": "string" },
+          "before_faulty_sha256": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+          "after_repaired_sha256": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+          "direct_output_patch": { "const": false },
+          "prior_runtime_reused": { "const": false },
+          "run_id": { "minLength": 1, "type": "string" },
+          "source_commit": { "pattern": "^[0-9a-f]{40}$", "type": "string" },
+          "official_final_gate": { "const": "PASS" },
+          "external_reconciliation": { "const": "PASS" },
+          "composite_qa": { "const": "PASS" },
+          "expected_finding_resolved": { "const": true },
+          "new_severe_finding_count": { "const": 0 },
+          "evidence": { "type": "object" },
+          "status": { "const": "CONVERGED" }
+        },
+        "required": ["wave", "repair_action", "canonical_repair_owner", "before_faulty_sha256", "after_repaired_sha256", "direct_output_patch", "prior_runtime_reused", "run_id", "source_commit", "official_final_gate", "external_reconciliation", "composite_qa", "expected_finding_resolved", "new_severe_finding_count", "evidence", "status"]
+      }
+    },
+    "status": { "const": "CONVERGED" },
+    "created_at": { "format": "date-time", "type": "string" },
+    "timezone": { "const": "Asia/Seoul" },
+    "history_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" }
+  },
+  "required": ["schema_name", "schema_version", "history_id", "repair_plan_hash", "invalidation_manifest_hash", "waves_used", "waves_allowed", "waves", "status", "created_at", "timezone", "history_hash"]
+}

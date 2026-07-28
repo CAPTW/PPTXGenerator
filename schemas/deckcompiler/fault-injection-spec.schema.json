@@ -1,0 +1,76 @@
+{
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/fault-injection-spec.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "baseline_output_set": {
+      "additionalProperties": false,
+      "properties": {
+        "active_output_set": { "const": "phase5_baseline" },
+        "descriptor_sha256": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+        "html_sha256": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+        "pptx_sha256": { "pattern": "^[0-9a-f]{64}$", "type": "string" }
+      },
+      "required": ["active_output_set", "descriptor_sha256", "pptx_sha256", "html_sha256"],
+      "type": "object"
+    },
+    "created_at": { "format": "date-time", "type": "string" },
+    "canonical_repair_owner": {
+      "additionalProperties": false,
+      "properties": {
+        "derivative_path": { "const": "lib/slides.js" },
+        "field": { "minLength": 1, "type": "string" },
+        "higher_geometry_source_present": { "const": false },
+        "owner_classification": { "const": "deck_owned_canonical_reconstruction_geometry_source" },
+        "path": { "const": "src/presentation_agent/deckcompiler/qa/reconstruction_source/slides.js" },
+        "producer_function": { "const": "presentation_agent.deckcompiler.qa.reachability._stage_reconstruction_source" },
+        "sha256": { "pattern": "^[0-9a-f]{64}$", "type": "string" }
+      },
+      "required": ["path", "sha256", "field", "producer_function", "derivative_path", "owner_classification", "higher_geometry_source_present"],
+      "type": "object"
+    },
+    "deterministic_seed": { "const": "not_applicable" },
+    "evidence_binding_changed": { "const": false },
+    "expected_finding_id": { "minLength": 1, "type": "string" },
+    "expected_detector_owner": { "const": "handoff/project/lib/slides.js" },
+    "expected_gate": { "const": "visual" },
+    "expected_invalidated_artifacts": { "items": { "minLength": 1, "type": "string" }, "minItems": 1, "type": "array", "uniqueItems": true },
+    "expected_owner": { "minLength": 1, "type": "string" },
+    "expected_repair_action": { "minLength": 1, "type": "string" },
+    "expected_severity": { "const": "severe" },
+    "fixture_hash": { "pattern": "^[0-9a-f]{64}$", "type": "string" },
+    "fixture_id": { "minLength": 1, "type": "string" },
+    "injected_value": { "type": "number" },
+    "injection_type": { "minLength": 1, "type": "string" },
+    "mutation": {
+      "additionalProperties": false,
+      "properties": {
+        "injected_fragment": { "minLength": 1, "type": "string" },
+        "original_fragment": { "minLength": 1, "type": "string" }
+      },
+      "required": ["original_fragment", "injected_fragment"],
+      "type": "object"
+    },
+    "original_value": { "type": "number" },
+    "schema_name": { "const": "phase6_fault_injection_spec" },
+    "schema_version": { "const": "1.0.0" },
+    "semantic_content_changed": { "const": false },
+    "target_field": { "minLength": 1, "type": "string" },
+    "target_upstream_artifact": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": { "minLength": 1, "type": "string" },
+        "artifact_role": { "const": "isolated_handoff_derivative" },
+        "path": { "minLength": 1, "type": "string" },
+        "sha256": { "pattern": "^[0-9a-f]{64}$", "type": "string" }
+      },
+      "required": ["artifact_id", "artifact_role", "path", "sha256"],
+      "type": "object"
+    },
+    "timezone": { "const": "Asia/Seoul" },
+    "visual_target_changed": { "const": false }
+  },
+  "required": ["schema_name", "schema_version", "fixture_id", "baseline_output_set", "target_upstream_artifact", "canonical_repair_owner", "target_field", "injection_type", "original_value", "injected_value", "mutation", "semantic_content_changed", "evidence_binding_changed", "visual_target_changed", "expected_finding_id", "expected_gate", "expected_severity", "expected_owner", "expected_detector_owner", "expected_repair_action", "expected_invalidated_artifacts", "deterministic_seed", "created_at", "timezone", "fixture_hash"],
+  "title": "DeckCompiler Phase 6 deterministic fault-injection specification",
+  "type": "object"
+}

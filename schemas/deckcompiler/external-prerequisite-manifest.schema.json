@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://pptx-generator.local/schemas/deckcompiler/external-prerequisite-manifest.schema.json", "title": "DeckCompiler external prerequisite manifest",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "release_profile_id", "microsoft_powerpoint", "pngtopptx_skillset", "external_python_runtime", "playwright_chromium", "tesseract_cairo", "credential_requirement", "network_credential_requirement", "validation_status", "manifest_hash"],
+  "properties": {
+    "schema_name": {"const": "external_prerequisite_manifest"},
+    "schema_version": {"const": "1.1.0"},
+    "release_profile_id": {"const": "devpost_p0_frozen_visuals"},
+    "microsoft_powerpoint": {"type": "object"},
+    "pngtopptx_skillset": {"type": "object"},
+    "external_python_runtime": {
+      "type": "object", "additionalProperties": false,
+      "required": ["dependency_manifest_path", "dependency_manifest_hash", "interpreter_owner", "lock_owned", "required_distribution_count", "network_required_after_artifact_availability", "external_skill_source_packaged"],
+      "properties": {
+        "dependency_manifest_path": {"type": "string"},
+        "dependency_manifest_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+        "interpreter_owner": {"const": "deckcompiler_sys_executable"},
+        "lock_owned": {"const": true},
+        "required_distribution_count": {"type": "integer", "minimum": 1},
+        "network_required_after_artifact_availability": {"const": false},
+        "external_skill_source_packaged": {"const": false}
+      }
+    },
+    "playwright_chromium": {"type": "object"},
+    "tesseract_cairo": {"type": "object"},
+    "credential_requirement": {"const": false},
+    "network_credential_requirement": {"const": false},
+    "validation_status": {"const": "PASS"},
+    "manifest_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"}
+  }
+}

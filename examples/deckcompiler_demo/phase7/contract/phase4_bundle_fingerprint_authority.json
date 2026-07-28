@@ -5,7 +5,7 @@
   "binary_exact_count": 13,
   "bundle_id": "deckcompiler-phase4-frozen-visual-bundle",
   "bundle_role": "frozen verified visual inputs for editable reconstruction",
-  "created_at": "2026-07-22T13:14:40+09:00",
+  "created_at": "2026-07-28T22:48:44+09:00",
   "exact_runtime_text_count": 0,
   "file_count": 107,
   "git_object_fingerprint": {
@@ -780,7 +780,7 @@
       "value": "4ad86fcc50ed669d57966dd471d50ea791c21499c3c280c8b29f484a49b8473c"
     }
   ],
-  "manifest_hash": "68d24d5f43357a7603491e8fdbd1f814b4aae1aedfa921eb7a2e235b193c267e",
+  "manifest_hash": "b166c5f51e680017bb4cc9eb819fa0bd405f8e811a0ac9c6d826b6429d2fafe1",
   "path_set_sha256": "acb119384dc4fc18e9afa10b93089e0c40132486a62608e53889a99bfec1985d",
   "runtime_compatibility_policy": {
     "binary_exact_count": 13,
@@ -1560,7 +1560,7 @@
   },
   "schema_name": "bundle_fingerprint_authority",
   "schema_version": "1.0.0",
-  "source_commit": "541e4d1627951fd93ef25ef0b260eebead396229",
+  "source_commit": "a5d930bee493f4ac6c333f624f1d997c62ef0bd2",
   "subtree_path": "examples/deckcompiler_demo/phase4",
   "subtree_tree_oid": "bb6a1c07e5844511ebeb63e9bfd8b3947dc4377d",
   "text_clean_filter_count": 1,

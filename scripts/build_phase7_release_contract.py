@@ -45,6 +45,7 @@ from presentation_agent.deckcompiler.schemas import validator_for  # noqa: E402
 BASELINE = "e0259b7551c381f8c0de4cdd329d5943680fa502"
 PHASE6_HEAD = "c3a2202078f3125b3861924ab356b31cf818b4e0"
 SOURCE_COMMIT = "541e4d1627951fd93ef25ef0b260eebead396229"
+AUTHORITY_SOURCE_COMMIT = "HEAD"
 LEGACY_PHASE4_AGGREGATE_UNREPRODUCED = "4ad86fcc50ed669d57966dd471d50ea791c21499c3c280c8b29f484a49b8473c"
 LEGACY_PHASE5_AGGREGATE_HISTORICAL_GIT_OBJECT = "98f88cc940cb0d9171c6b116c7ebb1290b2b51c29547580f13301b15cc74f20c"
 PHASE6_GATE_HASH = "fad95607449de5ebfe1d643d62e77894d9beefe4e8a2b8a36ca49e63b830dd3f"
@@ -243,7 +244,7 @@ def build(output_root: Path) -> None:
     policy = build_bundle_fingerprint_policy()
     phase4_authority = build_bundle_authority(
         ROOT,
-        SOURCE_COMMIT,
+        AUTHORITY_SOURCE_COMMIT,
         phase4_rel,
         bundle_id="deckcompiler-phase4-frozen-visual-bundle",
         bundle_role="frozen verified visual inputs for editable reconstruction",
@@ -256,7 +257,7 @@ def build(output_root: Path) -> None:
     )
     phase5_authority = build_bundle_authority(
         ROOT,
-        SOURCE_COMMIT,
+        AUTHORITY_SOURCE_COMMIT,
         phase5_rel,
         bundle_id="deckcompiler-phase5-baseline-bundle",
         bundle_role="historical editable reconstruction and QA baseline",

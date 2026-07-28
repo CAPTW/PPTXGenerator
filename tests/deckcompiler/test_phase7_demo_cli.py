@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -17,6 +18,9 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from presentation_agent.deckcompiler.cli import build_parser  # noqa: E402
+from presentation_agent.deckcompiler.release.bundle_fingerprint import (  # noqa: E402
+    validate_release_bundle_authorities,
+)
 from presentation_agent.deckcompiler.release.demo import (  # noqa: E402
     DemoError,
     build_demo_run_manifest,
@@ -345,6 +349,74 @@ class Phase7DemoCLITests(unittest.TestCase):
                 skill["installed_path"],
                 f"{expected_root}/{skill['skill_name']}",
             )
+
+    def test_33_public_authorities_validate_from_published_objects(self) -> None:
+        contract_path = (
+            ROOT
+            / "examples"
+            / "deckcompiler_demo"
+            / "phase7"
+            / "contract"
+            / "release_contract.json"
+        )
+        contract = json.loads(contract_path.read_text(encoding="utf-8"))
+        result = validate_release_bundle_authorities(ROOT, contract)
+        self.assertEqual(result["phase4"]["runtime_compatibility_status"], "PASS")
+        self.assertEqual(result["phase5"]["runtime_compatibility_status"], "PASS")
+
+    def test_34_public_authorities_are_current_and_path_portable(self) -> None:
+        contract_root = (
+            ROOT / "examples" / "deckcompiler_demo" / "phase7" / "contract"
+        )
+        for phase in ("phase4", "phase5"):
+            authority = json.loads(
+                (
+                    contract_root / f"{phase}_bundle_fingerprint_authority.json"
+                ).read_text(encoding="utf-8")
+            )
+            source_commit = authority["source_commit"]
+            subtree = authority["subtree_path"]
+            subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    str(ROOT),
+                    "merge-base",
+                    "--is-ancestor",
+                    source_commit,
+                    "HEAD",
+                ],
+                check=True,
+                capture_output=True,
+            )
+            current_tree = subprocess.run(
+                ["git", "-C", str(ROOT), "rev-parse", f"HEAD:{subtree}"],
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout.strip()
+            source_tree = subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    str(ROOT),
+                    "rev-parse",
+                    f"{source_commit}:{subtree}",
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout.strip()
+            self.assertEqual(current_tree, authority["subtree_tree_oid"])
+            self.assertEqual(source_tree, authority["subtree_tree_oid"])
+            self.assertFalse(subtree.startswith(("/", "\\")))
+            self.assertNotIn("\\", subtree)
+            self.assertNotRegex(subtree, r"^[A-Za-z]:")
+            for record in authority["git_object_fingerprint"]["records"]:
+                path = record["path"]
+                self.assertFalse(path.startswith(("/", "\\")))
+                self.assertNotIn("\\", path)
+                self.assertNotRegex(path, r"^[A-Za-z]:")
 
 
 if __name__ == "__main__":

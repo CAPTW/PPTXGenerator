@@ -5,7 +5,7 @@
   "binary_exact_count": 7,
   "bundle_id": "deckcompiler-phase5-baseline-bundle",
   "bundle_role": "historical editable reconstruction and QA baseline",
-  "created_at": "2026-07-22T13:14:40+09:00",
+  "created_at": "2026-07-28T22:48:44+09:00",
   "exact_runtime_text_count": 0,
   "file_count": 38,
   "git_object_fingerprint": {
@@ -297,7 +297,7 @@
       "value": "98f88cc940cb0d9171c6b116c7ebb1290b2b51c29547580f13301b15cc74f20c"
     }
   ],
-  "manifest_hash": "5262908c9b97fdce5f14d7a358d59e0801b266f4b34f0f80ef606df5f146e08f",
+  "manifest_hash": "9555856810f955cf286ae5bcef02b933c3f939992b990c78e7b32d2628fcb36f",
   "path_set_sha256": "7e11658c0d9c811e1676d4d37bf57c56a4e5a6c92557f2a58e81b78c8e5bc784",
   "runtime_compatibility_policy": {
     "binary_exact_count": 7,
@@ -599,7 +599,7 @@
   },
   "schema_name": "bundle_fingerprint_authority",
   "schema_version": "1.0.0",
-  "source_commit": "541e4d1627951fd93ef25ef0b260eebead396229",
+  "source_commit": "a5d930bee493f4ac6c333f624f1d997c62ef0bd2",
   "subtree_path": "examples/deckcompiler_demo/phase5",
   "subtree_tree_oid": "ea490d8f605c40ed25971825cda60387a4453f2e",
   "text_clean_filter_count": 2,

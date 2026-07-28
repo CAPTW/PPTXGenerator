@@ -26,12 +26,12 @@
     ]
   },
   "composite_qa_requirement": "PASS",
-  "contract_hash": "673755b3309657c46211aed673a05fd8f6c4af4387956b3f9ba6b27965c8e422",
+  "contract_hash": "e3a33c58de38f38b604080d2dfcf1d826ee77ec165d1e95f29c2ec2722f8f6fb",
   "credential_requirement": false,
   "devpost_release_eligible": false,
   "expected_slide_count": 6,
   "external_pin_path": "docs/devpost/evidence/pngtopptx_external_skillset_pin.json",
-  "external_pin_sha256": "61b64ca02cb1301c215d1cfa90b1f558ae127d3a19b2d49f2b82746930ef0a84",
+  "external_pin_sha256": "83ac1af4e31dd9772e59f44068803f18c39024e1b945dfd7ba3779ec881cbae3",
   "external_python_dependency_manifest_hash": "1f895c6e45ef7fc9e807631566de9edcb403211b9ac9aa9666e6101eef626e07",
   "external_python_dependency_manifest_path": "examples/deckcompiler_demo/phase7/contract/external_python_runtime_dependency_manifest.json",
   "external_python_dependency_manifest_sha256": "17428a1a37e8824f87882f6877c0d503890910bf5e3c1e390bf16af11de1ddfc",
@@ -45,7 +45,7 @@
   },
   "external_skill_pin": {
     "aggregate_sha256": "3dd4541fb0f2f4cf421d2a5c3cf2002390c0b00661a2e4d3a588d4467600022a",
-    "artifact_sha256": "61b64ca02cb1301c215d1cfa90b1f558ae127d3a19b2d49f2b82746930ef0a84",
+    "artifact_sha256": "83ac1af4e31dd9772e59f44068803f18c39024e1b945dfd7ba3779ec881cbae3",
     "mode": "git_tree_pin",
     "path": "docs/devpost/evidence/pngtopptx_external_skillset_pin.json"
   },

@@ -8,6 +8,8 @@ not the project's complete development history.
 - The source, documentation, schemas, examples, tests, and locked release
   evidence needed to review the public DevPost candidate.
 - The canonical delivery ZIP and its committed verification evidence.
+- The path-neutral external Skill fingerprint pin required by the demo; local
+  installation paths are represented as `<external-skill-root>`.
 - Publication-only metadata: this boundary notice and the root `LICENSE`.
 
 ## Deliberately omitted
@@ -16,10 +18,8 @@ not the project's complete development history.
 - Machine-local paths, credentials, tokens, and authentication material.
 - Repository files outside the reviewed release-minimal publication allowlist,
   including unrelated development assets and tests.
-- The machine-specific external Skill pin record, because its exact evidence
-  contains local installation paths.
-- Nine release-authority tests whose fixtures require omitted Git history,
-  machine-local paths, or the exact machine-specific pin record.
+- Nine release-authority tests whose fixtures require omitted Git history or
+  machine-local paths.
 - External CAPTW/pngtopptx Skill source, Python environments, Node modules,
   browser binaries, font binaries, Microsoft Office binaries, and
   Tesseract/Cairo binaries.

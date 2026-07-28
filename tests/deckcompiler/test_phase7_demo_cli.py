@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import hashlib
 import io
+import json
 import sys
 import tempfile
 import unittest
@@ -277,6 +279,72 @@ class Phase7DemoCLITests(unittest.TestCase):
         payload["input_paths"] = ["outputs/reused.pptx"]
         with self.assertRaisesRegex(DemoError, "DC_GENERATED_OUTPUT_INPUT"):
             validate_demo_prerequisites(payload)
+
+    def test_31_public_release_pin_exists_and_is_hash_bound(self) -> None:
+        contract_path = (
+            ROOT
+            / "examples"
+            / "deckcompiler_demo"
+            / "phase7"
+            / "contract"
+            / "release_contract.json"
+        )
+        contract = json.loads(contract_path.read_text(encoding="utf-8"))
+        contract_without_hash = {
+            key: value for key, value in contract.items() if key != "contract_hash"
+        }
+        contract_canonical = json.dumps(
+            contract_without_hash,
+            ensure_ascii=False,
+            allow_nan=False,
+            separators=(",", ":"),
+            sort_keys=True,
+        ).encode("utf-8")
+        self.assertEqual(
+            hashlib.sha256(contract_canonical).hexdigest(),
+            contract["contract_hash"],
+        )
+
+        pin_path = (ROOT / contract["external_pin_path"]).resolve()
+        self.assertTrue(pin_path.is_relative_to(ROOT.resolve()))
+        self.assertTrue(pin_path.is_file())
+        pin_sha256 = hashlib.sha256(pin_path.read_bytes()).hexdigest()
+        self.assertEqual(pin_sha256, contract["external_pin_sha256"])
+        self.assertEqual(pin_sha256, contract["external_skill_pin"]["artifact_sha256"])
+
+        pin = json.loads(pin_path.read_text(encoding="utf-8"))
+        pin_without_hash = {key: value for key, value in pin.items() if key != "pin_hash"}
+        canonical = json.dumps(
+            pin_without_hash,
+            ensure_ascii=False,
+            allow_nan=False,
+            separators=(",", ":"),
+            sort_keys=True,
+        ).encode("utf-8")
+        self.assertEqual(hashlib.sha256(canonical).hexdigest(), pin["pin_hash"])
+        self.assertEqual(
+            list(validator_for("external_skillset_pin").iter_errors(pin)),
+            [],
+        )
+
+    def test_32_public_release_pin_paths_are_portable(self) -> None:
+        pin_path = (
+            ROOT
+            / "docs"
+            / "devpost"
+            / "evidence"
+            / "pngtopptx_external_skillset_pin.json"
+        )
+        pin = json.loads(pin_path.read_text(encoding="utf-8"))
+        expected_root = "<external-skill-root>"
+        self.assertEqual(pin["installation_root"], expected_root)
+        for skill_name, installed_path in pin["installed_skill_paths"].items():
+            self.assertEqual(installed_path, f"{expected_root}/{skill_name}")
+        for skill in pin["inventory"]:
+            self.assertEqual(
+                skill["installed_path"],
+                f"{expected_root}/{skill['skill_name']}",
+            )
 
 
 if __name__ == "__main__":

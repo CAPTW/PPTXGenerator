@@ -1,7 +1,7 @@
 # Public Snapshot Boundary
 
-This repository is a release-minimal, single-commit public snapshot of PPTX
-Generator. It is not the project's complete development history.
+This repository is a release-minimal public snapshot of PPTX Generator. It is
+not the project's complete development history.
 
 ## Included
 

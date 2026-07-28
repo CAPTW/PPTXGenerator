@@ -19,8 +19,8 @@ fault detection, one-wave upstream repair evidence, and physical fresh-clone
 reproduction are included in the release evidence.
 
 Technical status is `ELIGIBLE_FOR_DEVPOST_SUBMISSION`. This repository is a
-release-minimal, single-commit public snapshot; it is not the full development
-history. No tag, GitHub Release, or DevPost submission is included.
+release-minimal public snapshot; it is not the full development history. No
+tag, GitHub Release, or DevPost submission is included.
 
 See [`PUBLICATION_BOUNDARY.md`](PUBLICATION_BOUNDARY.md) for the exact inclusion,
 omission, external-dependency, and license boundaries of this snapshot.

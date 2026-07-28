@@ -24,7 +24,7 @@ EXPECTED_SKILLS: tuple[str, ...] = (
 KNOWN_SKILL_HASHES: dict[str, str] = {
     "slide-editable-deck-orchestrator": "b8d157acf6179197401b053b52b730c8d605fc877cc8b087d99f2c13a4964b7d",
     "slide-text-layer-inpaint": "e433ca0a9357f9b721866c33021db57d7ebbb6cb53b368b7500496140058720e",
-    "slide-image-dual-render": "473e60838cadf05790b6a7a2e6a9c3a40243a3aefe8eab8f9eb019a480773d65",
+    "slide-image-dual-render": "8b5ae4a3d4624222fc0779014f79be6679e904356777558f1dfde8f72a4c3ba9",
     "slide-visual-polish-qa": "4c3ff087e112ad2742d276b53480b62158852a8c9fbc8ddb487c9dbeec9db50a",
 }
 

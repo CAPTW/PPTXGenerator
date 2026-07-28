@@ -1,7 +1,7 @@
 {
   "credential_requirement": false,
   "external_python_runtime": {
-    "dependency_manifest_hash": "1f895c6e45ef7fc9e807631566de9edcb403211b9ac9aa9666e6101eef626e07",
+    "dependency_manifest_hash": "f0b0aaeeb6407f13359031e10e68b890798897229a9fe7ceed93c5cdba8d3da3",
     "dependency_manifest_path": "examples/deckcompiler_demo/phase7/contract/external_python_runtime_dependency_manifest.json",
     "external_skill_source_packaged": false,
     "interpreter_owner": "deckcompiler_sys_executable",
@@ -9,7 +9,7 @@
     "network_required_after_artifact_availability": false,
     "required_distribution_count": 38
   },
-  "manifest_hash": "cca041283c80d94a3f213117c0887b286c02367bbfa22789f0e23455ca7c0a19",
+  "manifest_hash": "daa8077cd7ffdc35f03c736f628b69f106c2efd52dfc597e4e74482fc0187ff0",
   "microsoft_powerpoint": {
     "build_observed": "20131",
     "com_available": true,
@@ -30,7 +30,7 @@
     "required": true
   },
   "pngtopptx_skillset": {
-    "aggregate_sha256": "3dd4541fb0f2f4cf421d2a5c3cf2002390c0b00661a2e4d3a588d4467600022a",
+    "aggregate_sha256": "027336f1a61641bfb6e891199fe24ab77aee0c31287c7e8d88613a458310e529",
     "canonical_repository": "CAPTW/pngtopptx",
     "classification": "external_existing",
     "file_count": 99,

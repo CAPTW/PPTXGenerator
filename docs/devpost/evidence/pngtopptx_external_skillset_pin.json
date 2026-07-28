@@ -5,142 +5,15 @@
     "921eec900550204f6c8f019f811d65dc0839f8c0"
   ],
   "canonical_repository": "CAPTW/pngtopptx",
-  "combined_aggregate_sha256": "3dd4541fb0f2f4cf421d2a5c3cf2002390c0b00661a2e4d3a588d4467600022a",
+  "combined_aggregate_sha256": "027336f1a61641bfb6e891199fe24ab77aee0c31287c7e8d88613a458310e529",
   "companion_skills": [
     "slide-text-layer-inpaint",
     "slide-image-dual-render",
     "slide-visual-polish-qa"
   ],
-  "created_at": "2026-07-20T06:02:15.934998+09:00",
-  "deckcompiler_commit": "3d3ad0c101a6f2cec390597da2ea52dd5ac55e3d",
-  "excluded_cache_files": [
-    {
-      "byte_size": 3689,
-      "reason": "cache_directory",
-      "relative_path": "assets/codex-hardlock/hooks/__pycache__/slide_post_tool_use_review.cpython-311.pyc",
-      "sha256": "fc9031c397914b9a410e6383f5b41177051d9e68027d34620a44b7fd488c48d6",
-      "skill_name": "slide-image-dual-render"
-    },
-    {
-      "byte_size": 7609,
-      "reason": "cache_directory",
-      "relative_path": "assets/codex-hardlock/hooks/__pycache__/slide_pre_tool_use_policy.cpython-311.pyc",
-      "sha256": "28503db8f38c115990ac5ce52a3a1b74cd2f624e1ca58a917a9ec8c813b19e26",
-      "skill_name": "slide-image-dual-render"
-    },
-    {
-      "byte_size": 19056,
-      "reason": "cache_directory",
-      "relative_path": "scripts/__pycache__/make_crops.cpython-311.pyc",
-      "sha256": "3bc405677d95f08a4b1ffe5dfe43d1cbf6a079736c8484cd4049afaa461787fe",
-      "skill_name": "slide-image-dual-render"
-    },
-    {
-      "byte_size": 9080,
-      "reason": "cache_directory",
-      "relative_path": "scripts/__pycache__/test_crop_metadata_roundtrip.cpython-311.pyc",
-      "sha256": "0adf62e566f6e80cba12819c6948367c2dcc25e42382796de92886ffaa1b892a",
-      "skill_name": "slide-image-dual-render"
-    },
-    {
-      "byte_size": 22150,
-      "reason": "cache_directory",
-      "relative_path": "scripts/__pycache__/validate_pptx_package.cpython-311.pyc",
-      "sha256": "117a3178fa49e25f969b51c41b986e7409f4eb7800fd47693198aac61cf45cc5",
-      "skill_name": "slide-image-dual-render"
-    },
-    {
-      "byte_size": 17491,
-      "reason": "cache_directory",
-      "relative_path": "scripts/__pycache__/classify_background_regions.cpython-311.pyc",
-      "sha256": "9ff82d2271f6bc52f1c198c0654266877cb63c111872f162e86e19d8e7e3743d",
-      "skill_name": "slide-text-layer-inpaint"
-    },
-    {
-      "byte_size": 13816,
-      "reason": "cache_directory",
-      "relative_path": "scripts/__pycache__/detect_residual_text.cpython-311.pyc",
-      "sha256": "ef61cc01d8dcb81364a3ecd90f9ca2a591ff908309b589726c5fbcca1cd716f5",
-      "skill_name": "slide-text-layer-inpaint"
-    },
-    {
-      "byte_size": 22286,
-      "reason": "cache_directory",
-      "relative_path": "scripts/__pycache__/detect_text_regions.cpython-311.pyc",
-      "sha256": "18292ded9315563c40b4b49624bbfe6bd6492765f8dad2c85256fabb77080eb6",
-      "skill_name": "slide-text-layer-inpaint"
-    },
-    {
-      "byte_size": 20137,
-      "reason": "cache_directory",
-      "relative_path": "scripts/__pycache__/inpaint_text_regions.cpython-311.pyc",
-      "sha256": "37905d1529fd47b5376d36118ad633b805f09b12e6e34d9ae8581d8bba2f532b",
-      "skill_name": "slide-text-layer-inpaint"
-    },
-    {
-      "byte_size": 26822,
-      "reason": "cache_directory",
-      "relative_path": "scripts/__pycache__/make_text_masks.cpython-311.pyc",
-      "sha256": "1ce516a392b9b40bde88032d7dfd1659ca18b76f19ef36e09beb20b0f571d383",
-      "skill_name": "slide-text-layer-inpaint"
-    },
-    {
-      "byte_size": 22488,
-      "reason": "cache_directory",
-      "relative_path": "scripts/__pycache__/repair_text_backgrounds.cpython-311.pyc",
-      "sha256": "b54b2b6c2eb5b8a3a9a16ce0eda0eb757a8451357554c389840f3e304b48aebd",
-      "skill_name": "slide-text-layer-inpaint"
-    },
-    {
-      "byte_size": 31496,
-      "reason": "cache_directory",
-      "relative_path": "scripts/__pycache__/capture_html_screenshot.cpython-311.pyc",
-      "sha256": "f1d5e40b4f37b348fcb77ba34c1d84bfb47fea331027dea0a8b5c1a215c704a4",
-      "skill_name": "slide-visual-polish-qa"
-    },
-    {
-      "byte_size": 82752,
-      "reason": "cache_directory",
-      "relative_path": "scripts/__pycache__/compare_slide_images.cpython-311.pyc",
-      "sha256": "5ca63c347d42544882941fc53de7f052969f12cd6e5cdc3db913e3d5034b6b5b",
-      "skill_name": "slide-visual-polish-qa"
-    },
-    {
-      "byte_size": 25095,
-      "reason": "cache_directory",
-      "relative_path": "scripts/__pycache__/rasterize_pptx.cpython-311.pyc",
-      "sha256": "0a27383e6be9368facf54e1be9b177f2c2d15eebaa9d0662e1df537f885e3431",
-      "skill_name": "slide-visual-polish-qa"
-    },
-    {
-      "byte_size": 16962,
-      "reason": "cache_directory",
-      "relative_path": "scripts/__pycache__/slide_mapping.cpython-311.pyc",
-      "sha256": "31f609d0f4adecde53f9b7b0c1c200aaa6ff1c66ac63f12e1011e2a768db1dd7",
-      "skill_name": "slide-visual-polish-qa"
-    },
-    {
-      "byte_size": 9141,
-      "reason": "cache_directory",
-      "relative_path": "scripts/__pycache__/test_html_capture_not_flat.cpython-311.pyc",
-      "sha256": "8bffb6e94e6fdd8e899364086be20ede59565a8ed9a9a8c2e3b5ab65b5233861",
-      "skill_name": "slide-visual-polish-qa"
-    },
-    {
-      "byte_size": 6845,
-      "reason": "cache_directory",
-      "relative_path": "scripts/__pycache__/test_visual_qa_calibration.cpython-311.pyc",
-      "sha256": "84fe7d6f3ac5076d2fc92a79f34e16a7379eec6a2b13a6bc08f68d2f68c5f1f9",
-      "skill_name": "slide-visual-polish-qa"
-    },
-    {
-      "byte_size": 9622,
-      "reason": "cache_directory",
-      "relative_path": "scripts/__pycache__/test_wave_slide_mapping.cpython-311.pyc",
-      "sha256": "356546ad07d36eeeeeb95526b9a7609310ad0cb0393d3b644cc032085f0e28aa",
-      "skill_name": "slide-visual-polish-qa"
-    }
-  ],
+  "created_at": "2026-07-29T05:57:16.876475+09:00",
+  "deckcompiler_commit": "cc344c7843b3343597524f2e0a23d43c4513d051",
+  "excluded_cache_files": [],
   "execution_allowed": true,
   "expected_orchestrator": "slide-editable-deck-orchestrator",
   "external_skill_modified": false,
@@ -336,64 +209,28 @@
       "skill_name": "slide-editable-deck-orchestrator"
     },
     {
-      "aggregate_sha256": "f54a364b19d18df999ddc94b973503a44cb6c66f689b5b15e26a7e851bd46fa2",
-      "excluded_files": [
-        {
-          "byte_size": 3689,
-          "reason": "cache_directory",
-          "relative_path": "assets/codex-hardlock/hooks/__pycache__/slide_post_tool_use_review.cpython-311.pyc",
-          "sha256": "fc9031c397914b9a410e6383f5b41177051d9e68027d34620a44b7fd488c48d6",
-          "skill_name": "slide-image-dual-render"
-        },
-        {
-          "byte_size": 7609,
-          "reason": "cache_directory",
-          "relative_path": "assets/codex-hardlock/hooks/__pycache__/slide_pre_tool_use_policy.cpython-311.pyc",
-          "sha256": "28503db8f38c115990ac5ce52a3a1b74cd2f624e1ca58a917a9ec8c813b19e26",
-          "skill_name": "slide-image-dual-render"
-        },
-        {
-          "byte_size": 19056,
-          "reason": "cache_directory",
-          "relative_path": "scripts/__pycache__/make_crops.cpython-311.pyc",
-          "sha256": "3bc405677d95f08a4b1ffe5dfe43d1cbf6a079736c8484cd4049afaa461787fe",
-          "skill_name": "slide-image-dual-render"
-        },
-        {
-          "byte_size": 9080,
-          "reason": "cache_directory",
-          "relative_path": "scripts/__pycache__/test_crop_metadata_roundtrip.cpython-311.pyc",
-          "sha256": "0adf62e566f6e80cba12819c6948367c2dcc25e42382796de92886ffaa1b892a",
-          "skill_name": "slide-image-dual-render"
-        },
-        {
-          "byte_size": 22150,
-          "reason": "cache_directory",
-          "relative_path": "scripts/__pycache__/validate_pptx_package.cpython-311.pyc",
-          "sha256": "117a3178fa49e25f969b51c41b986e7409f4eb7800fd47693198aac61cf45cc5",
-          "skill_name": "slide-image-dual-render"
-        }
-      ],
+      "aggregate_sha256": "dd68caf73812660ada7a3050268f45c7fa03ff4a5bf1e26426474f944bb5429e",
+      "excluded_files": [],
       "file_count": 48,
       "files": [
         {
-          "byte_size": 31251,
+          "byte_size": 31246,
           "canonical_text_linkage_sha256": "8b5ae4a3d4624222fc0779014f79be6679e904356777558f1dfde8f72a4c3ba9",
           "classification": "text",
           "executable_status": "not_executable",
           "file_type": "skill_manifest",
           "relative_path": "SKILL.md",
-          "sha256": "473e60838cadf05790b6a7a2e6a9c3a40243a3aefe8eab8f9eb019a480773d65",
+          "sha256": "8b5ae4a3d4624222fc0779014f79be6679e904356777558f1dfde8f72a4c3ba9",
           "skill_name": "slide-image-dual-render"
         },
         {
-          "byte_size": 542,
+          "byte_size": 541,
           "canonical_text_linkage_sha256": "46b08a2179eade4372baf3627b68df18ce8205ef210d4041b620b5dee0ce4073",
           "classification": "text",
           "executable_status": "not_executable",
           "file_type": "yaml",
           "relative_path": "agents/openai.yaml",
-          "sha256": "b017e15952051a034f9896e4f63698dddea85b9793d3a48a3dc056181ddab64f",
+          "sha256": "46b08a2179eade4372baf3627b68df18ce8205ef210d4041b620b5dee0ce4073",
           "skill_name": "slide-image-dual-render"
         },
         {
@@ -437,73 +274,73 @@
           "skill_name": "slide-image-dual-render"
         },
         {
-          "byte_size": 8140,
+          "byte_size": 8137,
           "canonical_text_linkage_sha256": "1cb898fe4a25cc588a656fea1c52d7ef033746c76ed120b76f32418279e2b0fa",
           "classification": "text",
           "executable_status": "not_executable",
           "file_type": "md",
           "relative_path": "assets/codex-hardlock/AGENTS.md",
-          "sha256": "72d37fba8e9cb9f17f18a75600d3b3e71a93834436af50799bc4d70bbbd8621a",
+          "sha256": "1cb898fe4a25cc588a656fea1c52d7ef033746c76ed120b76f32418279e2b0fa",
           "skill_name": "slide-image-dual-render"
         },
         {
-          "byte_size": 1395,
+          "byte_size": 1394,
           "canonical_text_linkage_sha256": "bb39745ac775e7f86a9d5af25f4ae9b81c76965ea39fa0c4dc662b4907a1ec40",
           "classification": "text",
           "executable_status": "not_executable",
           "file_type": "example",
           "relative_path": "assets/codex-hardlock/config.toml.example",
-          "sha256": "9f726515af848d513a6c6ea02a69b635076f006257dbffe0b772e753f20e5d1c",
+          "sha256": "bb39745ac775e7f86a9d5af25f4ae9b81c76965ea39fa0c4dc662b4907a1ec40",
           "skill_name": "slide-image-dual-render"
         },
         {
-          "byte_size": 1426,
+          "byte_size": 1425,
           "canonical_text_linkage_sha256": "bb958c0f079aa848267ba39647961dd8fda7257cffa3ae2926b8e5cb8d0e8a08",
           "classification": "text",
           "executable_status": "script",
           "file_type": "py",
           "relative_path": "assets/codex-hardlock/hooks/slide_post_tool_use_review.py",
-          "sha256": "36132379bc9e767fc5a4b7ac8a2383fc43f6b1e48bd593fc66bce3b8e5384f8a",
+          "sha256": "bb958c0f079aa848267ba39647961dd8fda7257cffa3ae2926b8e5cb8d0e8a08",
           "skill_name": "slide-image-dual-render"
         },
         {
-          "byte_size": 4072,
+          "byte_size": 4071,
           "canonical_text_linkage_sha256": "edc7bc00b52686f5980e5fc0ce8031164a44faf3ad2f35a6b64780846cccbe22",
           "classification": "text",
           "executable_status": "script",
           "file_type": "py",
           "relative_path": "assets/codex-hardlock/hooks/slide_pre_tool_use_policy.py",
-          "sha256": "b067d32ad7a0a95ea67f70e60e90b3030a0328d0643a19738e7d1bf781be1ace",
+          "sha256": "edc7bc00b52686f5980e5fc0ce8031164a44faf3ad2f35a6b64780846cccbe22",
           "skill_name": "slide-image-dual-render"
         },
         {
-          "byte_size": 704,
+          "byte_size": 703,
           "canonical_text_linkage_sha256": "ae071ad09bd0c1665cb7dcc1c2f01166b34cc6c5114035c58aee15df9e308ed0",
           "classification": "text",
           "executable_status": "not_executable",
           "file_type": "rules",
           "relative_path": "assets/codex-hardlock/rules/slide.rules",
-          "sha256": "4881c54aa25446d831038d2a5a7434f92a3b902c813a2fee69c11cb05c5ff53e",
+          "sha256": "ae071ad09bd0c1665cb7dcc1c2f01166b34cc6c5114035c58aee15df9e308ed0",
           "skill_name": "slide-image-dual-render"
         },
         {
-          "byte_size": 18318,
+          "byte_size": 18315,
           "canonical_text_linkage_sha256": "41997175b046dc327cfed00b5b51fb1d81427355a0ebbb1e52a6801c5967e037",
           "classification": "text",
           "executable_status": "not_executable",
           "file_type": "md",
           "relative_path": "references/codex-subagents.md",
-          "sha256": "554bd127883c3edf2fc878210b014dc417be9c5d72eaeb37bfb7446cd7ffd727",
+          "sha256": "41997175b046dc327cfed00b5b51fb1d81427355a0ebbb1e52a6801c5967e037",
           "skill_name": "slide-image-dual-render"
         },
         {
-          "byte_size": 16709,
+          "byte_size": 16703,
           "canonical_text_linkage_sha256": "1c94f88d7eae9687b15e8941e4189c2a3eebbb718d148df00e51970291f26c89",
           "classification": "text",
           "executable_status": "not_executable",
           "file_type": "md",
           "relative_path": "references/hardlock-mode.md",
-          "sha256": "3e0e83c8250dc4843924b5ce186037e27ea5d950a6f437871a1cd7860321ee51",
+          "sha256": "1c94f88d7eae9687b15e8941e4189c2a3eebbb718d148df00e51970291f26c89",
           "skill_name": "slide-image-dual-render"
         },
         {
@@ -547,23 +384,23 @@
           "skill_name": "slide-image-dual-render"
         },
         {
-          "byte_size": 23507,
+          "byte_size": 23502,
           "canonical_text_linkage_sha256": "1a6c9025ba40e4fa28b4a61689d6771f9ab7c43e7477cc16cf85f34065044f1a",
           "classification": "text",
           "executable_status": "not_executable",
           "file_type": "md",
           "relative_path": "references/workflow.md",
-          "sha256": "df12e186457d143b04a3c441d3db5b3df1bb4a6356d65abd66470206ccff127c",
+          "sha256": "1a6c9025ba40e4fa28b4a61689d6771f9ab7c43e7477cc16cf85f34065044f1a",
           "skill_name": "slide-image-dual-render"
         },
         {
-          "byte_size": 11331,
+          "byte_size": 11329,
           "canonical_text_linkage_sha256": "83a1f6aa90a7f5c97f710cad9a895fb54366c0349bff90b1d94e4b9a352262d2",
           "classification": "text",
           "executable_status": "script",
           "file_type": "js",
           "relative_path": "scripts/build.js",
-          "sha256": "a5efffca05aebe7d066600a94185124c1f0ef87ac5e9bff70fd11a4f479e221e",
+          "sha256": "83a1f6aa90a7f5c97f710cad9a895fb54366c0349bff90b1d94e4b9a352262d2",
           "skill_name": "slide-image-dual-render"
         },
         {
@@ -577,53 +414,53 @@
           "skill_name": "slide-image-dual-render"
         },
         {
-          "byte_size": 18691,
+          "byte_size": 18685,
           "canonical_text_linkage_sha256": "1c29b3cca1d37156ae02fbedf536053ba34724045874885ddd0860c12aab4681",
           "classification": "text",
           "executable_status": "script",
           "file_type": "js",
           "relative_path": "scripts/enforce_contract.js",
-          "sha256": "734df29487eaa927f0878393bddc21a5c6bb4c8ff572cf26b9c566ab2aef2fbd",
+          "sha256": "1c29b3cca1d37156ae02fbedf536053ba34724045874885ddd0860c12aab4681",
           "skill_name": "slide-image-dual-render"
         },
         {
-          "byte_size": 8514,
+          "byte_size": 8513,
           "canonical_text_linkage_sha256": "a06cf1e81a1e5487df9d88e94bfcbfb165d3c3a6d16be1cddb61f8c41b8c864b",
           "classification": "text",
           "executable_status": "script",
           "file_type": "js",
           "relative_path": "scripts/enforce_qa.js",
-          "sha256": "f55b7962459792588b339f16bbe4ae1c27b3658ad523abfba99fb3fd693dd239",
+          "sha256": "a06cf1e81a1e5487df9d88e94bfcbfb165d3c3a6d16be1cddb61f8c41b8c864b",
           "skill_name": "slide-image-dual-render"
         },
         {
-          "byte_size": 20816,
+          "byte_size": 20815,
           "canonical_text_linkage_sha256": "e82b35b76b1d4e0bf3b470b11e8a92d5b4b3e3b50d57dbf8be778aaa4a2083da",
           "classification": "text",
           "executable_status": "script",
           "file_type": "js",
           "relative_path": "scripts/enforce_reconstruction.js",
-          "sha256": "f51041608bd2d9594b9f3266cace9acc966508aca0cf8ce2f5d5dc60218a92a7",
+          "sha256": "e82b35b76b1d4e0bf3b470b11e8a92d5b4b3e3b50d57dbf8be778aaa4a2083da",
           "skill_name": "slide-image-dual-render"
         },
         {
-          "byte_size": 24326,
+          "byte_size": 24309,
           "canonical_text_linkage_sha256": "9ccd5249c1682f216e10eea6f19a2674c0bfd63523444ef1e1d46b311f03c911",
           "classification": "text",
           "executable_status": "script",
           "file_type": "js",
           "relative_path": "scripts/final_gate.js",
-          "sha256": "cdcc043a837685146db3bc9ed1484127617427ad26bf27672dd4c13f062c4b17",
+          "sha256": "9ccd5249c1682f216e10eea6f19a2674c0bfd63523444ef1e1d46b311f03c911",
           "skill_name": "slide-image-dual-render"
         },
         {
-          "byte_size": 9595,
+          "byte_size": 9594,
           "canonical_text_linkage_sha256": "77989dfa91d1dac9e944ebdc52b726af8bc67a294375e19210508b8b315e272e",
           "classification": "text",
           "executable_status": "script",
           "file_type": "js",
           "relative_path": "scripts/generate_evidence.js",
-          "sha256": "84f8fe7777091ec0133fe529203c83730a39e6b15fd55c0a861fdf83494b8762",
+          "sha256": "77989dfa91d1dac9e944ebdc52b726af8bc67a294375e19210508b8b315e272e",
           "skill_name": "slide-image-dual-render"
         },
         {
@@ -637,13 +474,13 @@
           "skill_name": "slide-image-dual-render"
         },
         {
-          "byte_size": 3527,
+          "byte_size": 3526,
           "canonical_text_linkage_sha256": "dfa1a7c527dc86b0ae552d39055b4cc92e1e68af4103fdadecadbbb27e40d9d4",
           "classification": "text",
           "executable_status": "script",
           "file_type": "js",
           "relative_path": "scripts/install_hardlock.js",
-          "sha256": "ea46c6e069fad8440231addaf02809339891972a636c785716a44d4c71ef9c39",
+          "sha256": "dfa1a7c527dc86b0ae552d39055b4cc92e1e68af4103fdadecadbbb27e40d9d4",
           "skill_name": "slide-image-dual-render"
         },
         {
@@ -657,23 +494,23 @@
           "skill_name": "slide-image-dual-render"
         },
         {
-          "byte_size": 6682,
+          "byte_size": 6681,
           "canonical_text_linkage_sha256": "010d5f6bd20cca723d44e2f02d391ce26d6973ca7072078762639498579e57e4",
           "classification": "text",
           "executable_status": "script",
           "file_type": "js",
           "relative_path": "scripts/lib/atoms_html.js",
-          "sha256": "bdb31586d9fc17189e7efc791d494f6054abad2cbaf5235f10ccdfc8a09844f0",
+          "sha256": "010d5f6bd20cca723d44e2f02d391ce26d6973ca7072078762639498579e57e4",
           "skill_name": "slide-image-dual-render"
         },
         {
-          "byte_size": 3779,
+          "byte_size": 3777,
           "canonical_text_linkage_sha256": "041c24dde2764b83a00c7a2042ea300f9f5db68e16cdf14fb3c8cc51578a3c5f",
           "classification": "text",
           "executable_status": "script",
           "file_type": "js",
           "relative_path": "scripts/lib/atoms_pptx.js",
-          "sha256": "a8e5bb8415cba911407472c4643948fcd3038b4306c917a6a6c0963a3393e820",
+          "sha256": "041c24dde2764b83a00c7a2042ea300f9f5db68e16cdf14fb3c8cc51578a3c5f",
           "skill_name": "slide-image-dual-render"
         },
         {
@@ -687,13 +524,13 @@
           "skill_name": "slide-image-dual-render"
         },
         {
-          "byte_size": 4063,
+          "byte_size": 4062,
           "canonical_text_linkage_sha256": "e8de14fafbc46ff425d028e48448748e2959cb49a787cf6dfa041095b66c349d",
           "classification": "text",
           "executable_status": "script",
           "file_type": "js",
           "relative_path": "scripts/lib/object_manifest.js",
-          "sha256": "bdca6c90bf90378b76734b148d57d7eb6ce8a77b049c987ef936ba9037531213",
+          "sha256": "e8de14fafbc46ff425d028e48448748e2959cb49a787cf6dfa041095b66c349d",
           "skill_name": "slide-image-dual-render"
         },
         {
@@ -727,13 +564,13 @@
           "skill_name": "slide-image-dual-render"
         },
         {
-          "byte_size": 12783,
+          "byte_size": 12781,
           "canonical_text_linkage_sha256": "284c223ce87952f23f169042af428a5d79ade8615fd7c50402ce17575265f19a",
           "classification": "text",
           "executable_status": "script",
           "file_type": "py",
           "relative_path": "scripts/make_crops.py",
-          "sha256": "d1fb348d40d6d98c7cafc8a4c313521fd46cbedddd156c488523d82ebfe7726d",
+          "sha256": "284c223ce87952f23f169042af428a5d79ade8615fd7c50402ce17575265f19a",
           "skill_name": "slide-image-dual-render"
         },
         {
@@ -767,13 +604,13 @@
           "skill_name": "slide-image-dual-render"
         },
         {
-          "byte_size": 26462,
+          "byte_size": 26457,
           "canonical_text_linkage_sha256": "1807a44fe58c850f2bd7fa876bc9b40670a3dc027523d0ce00073ad997a539df",
           "classification": "text",
           "executable_status": "script",
           "file_type": "js",
           "relative_path": "scripts/slide_pipeline.js",
-          "sha256": "464a3f3965a87348a23f8aecfe713456ba520e3205953e9b4d4941e10d92b10b",
+          "sha256": "1807a44fe58c850f2bd7fa876bc9b40670a3dc027523d0ce00073ad997a539df",
           "skill_name": "slide-image-dual-render"
         },
         {
@@ -817,13 +654,13 @@
           "skill_name": "slide-image-dual-render"
         },
         {
-          "byte_size": 12657,
+          "byte_size": 12648,
           "canonical_text_linkage_sha256": "a5f9cad396f12967a353eedb98d6ce9fd79b96ae7704c3839646fd7a361338a7",
           "classification": "text",
           "executable_status": "script",
           "file_type": "py",
           "relative_path": "scripts/validate_pptx_package.py",
-          "sha256": "14f7b0aa24252439f6cb34ab0d86af1a062083b54ddb3b302e74f82e2ee3666a",
+          "sha256": "a5f9cad396f12967a353eedb98d6ce9fd79b96ae7704c3839646fd7a361338a7",
           "skill_name": "slide-image-dual-render"
         },
         {
@@ -858,55 +695,12 @@
         }
       ],
       "installed_path": "<external-skill-root>/slide-image-dual-render",
-      "skill_md_sha256": "473e60838cadf05790b6a7a2e6a9c3a40243a3aefe8eab8f9eb019a480773d65",
+      "skill_md_sha256": "8b5ae4a3d4624222fc0779014f79be6679e904356777558f1dfde8f72a4c3ba9",
       "skill_name": "slide-image-dual-render"
     },
     {
       "aggregate_sha256": "546312a0958c27f6760ff153de60bf972531a80e8d09153aa431d355487d1bdb",
-      "excluded_files": [
-        {
-          "byte_size": 17491,
-          "reason": "cache_directory",
-          "relative_path": "scripts/__pycache__/classify_background_regions.cpython-311.pyc",
-          "sha256": "9ff82d2271f6bc52f1c198c0654266877cb63c111872f162e86e19d8e7e3743d",
-          "skill_name": "slide-text-layer-inpaint"
-        },
-        {
-          "byte_size": 13816,
-          "reason": "cache_directory",
-          "relative_path": "scripts/__pycache__/detect_residual_text.cpython-311.pyc",
-          "sha256": "ef61cc01d8dcb81364a3ecd90f9ca2a591ff908309b589726c5fbcca1cd716f5",
-          "skill_name": "slide-text-layer-inpaint"
-        },
-        {
-          "byte_size": 22286,
-          "reason": "cache_directory",
-          "relative_path": "scripts/__pycache__/detect_text_regions.cpython-311.pyc",
-          "sha256": "18292ded9315563c40b4b49624bbfe6bd6492765f8dad2c85256fabb77080eb6",
-          "skill_name": "slide-text-layer-inpaint"
-        },
-        {
-          "byte_size": 20137,
-          "reason": "cache_directory",
-          "relative_path": "scripts/__pycache__/inpaint_text_regions.cpython-311.pyc",
-          "sha256": "37905d1529fd47b5376d36118ad633b805f09b12e6e34d9ae8581d8bba2f532b",
-          "skill_name": "slide-text-layer-inpaint"
-        },
-        {
-          "byte_size": 26822,
-          "reason": "cache_directory",
-          "relative_path": "scripts/__pycache__/make_text_masks.cpython-311.pyc",
-          "sha256": "1ce516a392b9b40bde88032d7dfd1659ca18b76f19ef36e09beb20b0f571d383",
-          "skill_name": "slide-text-layer-inpaint"
-        },
-        {
-          "byte_size": 22488,
-          "reason": "cache_directory",
-          "relative_path": "scripts/__pycache__/repair_text_backgrounds.cpython-311.pyc",
-          "sha256": "b54b2b6c2eb5b8a3a9a16ce0eda0eb757a8451357554c389840f3e304b48aebd",
-          "skill_name": "slide-text-layer-inpaint"
-        }
-      ],
+      "excluded_files": [],
       "file_count": 14,
       "files": [
         {
@@ -1056,57 +850,7 @@
     },
     {
       "aggregate_sha256": "9ecbc8904a72dd4fd62fd64e0b5d430016c8193c09653fa2330baee940f71161",
-      "excluded_files": [
-        {
-          "byte_size": 31496,
-          "reason": "cache_directory",
-          "relative_path": "scripts/__pycache__/capture_html_screenshot.cpython-311.pyc",
-          "sha256": "f1d5e40b4f37b348fcb77ba34c1d84bfb47fea331027dea0a8b5c1a215c704a4",
-          "skill_name": "slide-visual-polish-qa"
-        },
-        {
-          "byte_size": 82752,
-          "reason": "cache_directory",
-          "relative_path": "scripts/__pycache__/compare_slide_images.cpython-311.pyc",
-          "sha256": "5ca63c347d42544882941fc53de7f052969f12cd6e5cdc3db913e3d5034b6b5b",
-          "skill_name": "slide-visual-polish-qa"
-        },
-        {
-          "byte_size": 25095,
-          "reason": "cache_directory",
-          "relative_path": "scripts/__pycache__/rasterize_pptx.cpython-311.pyc",
-          "sha256": "0a27383e6be9368facf54e1be9b177f2c2d15eebaa9d0662e1df537f885e3431",
-          "skill_name": "slide-visual-polish-qa"
-        },
-        {
-          "byte_size": 16962,
-          "reason": "cache_directory",
-          "relative_path": "scripts/__pycache__/slide_mapping.cpython-311.pyc",
-          "sha256": "31f609d0f4adecde53f9b7b0c1c200aaa6ff1c66ac63f12e1011e2a768db1dd7",
-          "skill_name": "slide-visual-polish-qa"
-        },
-        {
-          "byte_size": 9141,
-          "reason": "cache_directory",
-          "relative_path": "scripts/__pycache__/test_html_capture_not_flat.cpython-311.pyc",
-          "sha256": "8bffb6e94e6fdd8e899364086be20ede59565a8ed9a9a8c2e3b5ab65b5233861",
-          "skill_name": "slide-visual-polish-qa"
-        },
-        {
-          "byte_size": 6845,
-          "reason": "cache_directory",
-          "relative_path": "scripts/__pycache__/test_visual_qa_calibration.cpython-311.pyc",
-          "sha256": "84fe7d6f3ac5076d2fc92a79f34e16a7379eec6a2b13a6bc08f68d2f68c5f1f9",
-          "skill_name": "slide-visual-polish-qa"
-        },
-        {
-          "byte_size": 9622,
-          "reason": "cache_directory",
-          "relative_path": "scripts/__pycache__/test_wave_slide_mapping.cpython-311.pyc",
-          "sha256": "356546ad07d36eeeeeb95526b9a7609310ad0cb0393d3b644cc032085f0e28aa",
-          "skill_name": "slide-visual-polish-qa"
-        }
-      ],
+      "excluded_files": [],
       "file_count": 20,
       "files": [
         {
@@ -1317,18 +1061,18 @@
   ],
   "known_skill_md_hashes": {
     "slide-editable-deck-orchestrator": "b8d157acf6179197401b053b52b730c8d605fc877cc8b087d99f2c13a4964b7d",
-    "slide-image-dual-render": "473e60838cadf05790b6a7a2e6a9c3a40243a3aefe8eab8f9eb019a480773d65",
+    "slide-image-dual-render": "8b5ae4a3d4624222fc0779014f79be6679e904356777558f1dfde8f72a4c3ba9",
     "slide-text-layer-inpaint": "e433ca0a9357f9b721866c33021db57d7ebbb6cb53b368b7500496140058720e",
     "slide-visual-polish-qa": "4c3ff087e112ad2742d276b53480b62158852a8c9fbc8ddb487c9dbeec9db50a"
   },
-  "pin_hash": "c2d05d209c127dde1f94f02f4c4ba2eb529d3f3d9f2d3b8b91f9487216752e7f",
-  "pin_id": "pngpin_1c4af8ad011cc18786d8",
+  "pin_hash": "7abf58eb62f683eb8a922b809cc76f5cce675273b754059622a57d01343a87e4",
+  "pin_id": "pngpin_da5d030faaccdb240e33",
   "pinning_mode": "git_tree_pin",
   "schema_name": "external_skillset_pin",
   "schema_version": "1.0.0",
   "skill_aggregate_hashes": {
     "slide-editable-deck-orchestrator": "6432c1dccd3d3bb15810d71597d62c10778101d7566b0f5190e567b28eb2acde",
-    "slide-image-dual-render": "f54a364b19d18df999ddc94b973503a44cb6c66f689b5b15e26a7e851bd46fa2",
+    "slide-image-dual-render": "dd68caf73812660ada7a3050268f45c7fa03ff4a5bf1e26426474f944bb5429e",
     "slide-text-layer-inpaint": "546312a0958c27f6760ff153de60bf972531a80e8d09153aa431d355487d1bdb",
     "slide-visual-polish-qa": "9ecbc8904a72dd4fd62fd64e0b5d430016c8193c09653fa2330baee940f71161"
   },

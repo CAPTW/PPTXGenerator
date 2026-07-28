@@ -26,15 +26,15 @@
     ]
   },
   "composite_qa_requirement": "PASS",
-  "contract_hash": "e3a33c58de38f38b604080d2dfcf1d826ee77ec165d1e95f29c2ec2722f8f6fb",
+  "contract_hash": "0027d784b0d47d4a99cad57a6b6d17390387172e47376ee6861c6975e663a187",
   "credential_requirement": false,
   "devpost_release_eligible": false,
   "expected_slide_count": 6,
   "external_pin_path": "docs/devpost/evidence/pngtopptx_external_skillset_pin.json",
-  "external_pin_sha256": "83ac1af4e31dd9772e59f44068803f18c39024e1b945dfd7ba3779ec881cbae3",
-  "external_python_dependency_manifest_hash": "1f895c6e45ef7fc9e807631566de9edcb403211b9ac9aa9666e6101eef626e07",
+  "external_pin_sha256": "8f6854cdce1e1ffc13c442e41ceb09919ba77bc4f9e793fd6534d531e57203e2",
+  "external_python_dependency_manifest_hash": "f0b0aaeeb6407f13359031e10e68b890798897229a9fe7ceed93c5cdba8d3da3",
   "external_python_dependency_manifest_path": "examples/deckcompiler_demo/phase7/contract/external_python_runtime_dependency_manifest.json",
-  "external_python_dependency_manifest_sha256": "17428a1a37e8824f87882f6877c0d503890910bf5e3c1e390bf16af11de1ddfc",
+  "external_python_dependency_manifest_sha256": "0512fe7c447547a74124b247f92db9da21aff89fe6716816b8f7be1c5e81c4fc",
   "external_python_dependency_policy": {
     "external_skill_source": "external_read_only",
     "interpreter_owner": "deckcompiler_sys_executable",
@@ -44,8 +44,8 @@
     "user_site_packages": false
   },
   "external_skill_pin": {
-    "aggregate_sha256": "3dd4541fb0f2f4cf421d2a5c3cf2002390c0b00661a2e4d3a588d4467600022a",
-    "artifact_sha256": "83ac1af4e31dd9772e59f44068803f18c39024e1b945dfd7ba3779ec881cbae3",
+    "aggregate_sha256": "027336f1a61641bfb6e891199fe24ab77aee0c31287c7e8d88613a458310e529",
+    "artifact_sha256": "8f6854cdce1e1ffc13c442e41ceb09919ba77bc4f9e793fd6534d531e57203e2",
     "mode": "git_tree_pin",
     "path": "docs/devpost/evidence/pngtopptx_external_skillset_pin.json"
   },

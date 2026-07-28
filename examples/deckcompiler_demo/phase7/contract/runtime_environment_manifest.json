@@ -19,7 +19,7 @@
     "PYTHONNOUSERSITE"
   ],
   "external_python_dependency_manifest": {
-    "manifest_hash": "1f895c6e45ef7fc9e807631566de9edcb403211b9ac9aa9666e6101eef626e07",
+    "manifest_hash": "f0b0aaeeb6407f13359031e10e68b890798897229a9fe7ceed93c5cdba8d3da3",
     "path": "examples/deckcompiler_demo/phase7/contract/external_python_runtime_dependency_manifest.json",
     "required_distribution_count": 38
   },
@@ -30,12 +30,12 @@
     "user_site_packages": false
   },
   "external_skill_pin": {
-    "aggregate_sha256": "3dd4541fb0f2f4cf421d2a5c3cf2002390c0b00661a2e4d3a588d4467600022a",
-    "artifact_sha256": "61b64ca02cb1301c215d1cfa90b1f558ae127d3a19b2d49f2b82746930ef0a84",
+    "aggregate_sha256": "027336f1a61641bfb6e891199fe24ab77aee0c31287c7e8d88613a458310e529",
+    "artifact_sha256": "8f6854cdce1e1ffc13c442e41ceb09919ba77bc4f9e793fd6534d531e57203e2",
     "mode": "git_tree_pin",
     "path": "docs/devpost/evidence/pngtopptx_external_skillset_pin.json"
   },
-  "manifest_hash": "1af3d0763f47d3260f53f0a4307ad67b2d79f54298e8bee872e5ca2754738578",
+  "manifest_hash": "3d831571e8d1f54cd7853e357faf101da4ff110cd30b6d5026af3b544ad9218a",
   "network_requirement_by_stage": {
     "canonical_demo": "not_required",
     "live_image_generation": "forbidden",

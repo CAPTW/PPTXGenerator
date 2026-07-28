@@ -22,9 +22,10 @@ fetching. No API key is required or permitted.
   `4fde8f6fd2584f66e2c5f6c0f57f822da19809cb9d12259e35537d3d378a21dc`.
 - Playwright 1.61.0 and browser revision 1228, Chrome for Testing
   149.0.7827.55.
-- The four installed `CAPTW/pngtopptx` Skills under the prepared user's Codex
-  Skill root. Their combined aggregate must be
-  `3dd4541fb0f2f4cf421d2a5c3cf2002390c0b00661a2e4d3a588d4467600022a`.
+- Git access to the public `CAPTW/pngtopptx` repository during the setup step.
+  The installer provisions four Skills under the prepared user's Codex Skill
+  root. Their combined aggregate must be
+  `027336f1a61641bfb6e891199fe24ab77aee0c31287c7e8d88613a458310e529`.
 - Node 24.13.1 and a prepared external Node dependency directory containing
   `pptxgenjs` 4.0.1, `sharp` 0.35.1, React/React DOM 19.2.7, and React Icons
   5.6.0.
@@ -47,8 +48,9 @@ $env:PATH = 'C:\Program Files\Tesseract-OCR;' + $env:PATH
 
 `PYTHONPATH` points only at this clone's source tree. The Node, browser, and
 Cairo paths are prepared-machine prerequisites; none is copied into the clone
-or delivery package. The external Skill installation is validated in place and
-is never modified.
+or delivery package. The setup wrapper installs a missing pinned external
+SkillSet and the generation stages thereafter validate it in place without
+modification.
 
 ## Exact command
 
@@ -57,10 +59,14 @@ Skill tree, `.codex`, and credential directories. The runner never clears or
 deletes an existing directory.
 
 ```powershell
-python -B -m presentation_agent.deckcompiler demo `
-  --config examples/deckcompiler_demo/demo.yaml `
-  --output-dir <new-empty-directory-outside-repo>
+powershell -ExecutionPolicy Bypass -File scripts\run_demo.ps1 `
+  -Python <locked-venv>\Scripts\python.exe `
+  -OutputDir <new-empty-directory-outside-repo>
 ```
+
+The wrapper performs the networked, pinned Skill installation before invoking
+the canonical offline demo. Existing mismatched Skill directories are not
+overwritten unless `-BackupAndReplaceSkills` is explicitly supplied.
 
 No optional flag, API credential, remote URL, hidden temp path, generated
 `outputs/` artifact, canonical Phase 5 PPTX/HTML, or Phase 6 repaired output is

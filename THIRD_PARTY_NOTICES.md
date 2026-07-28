@@ -11,6 +11,12 @@ continue to apply. The release package contains repository-authored synthetic
 fixture documents and platform-generated visual references whose provenance is
 recorded in `examples/deckcompiler_demo/phase4/generation_provenance.json`.
 
+The setup wrapper downloads the pinned external SkillSet from the canonical
+`CAPTW/pngtopptx` repository into the user's external Skill root. The upstream
+project is licensed under the MIT License; its license and notices continue to
+apply. No external Skill source is committed to this repository or copied into
+the delivery ZIP.
+
 Microsoft PowerPoint is used through an installed COM interface and is not
 redistributed. Playwright controls an installed Chrome for Testing binary; the
 browser binary is not included. The external CAPTW/pngtopptx SkillSet is

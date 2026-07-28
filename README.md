@@ -45,10 +45,16 @@ Create the virtual environment and output directory outside the clone.
 ```powershell
 python -m venv <venv-outside-clone>
 <venv-outside-clone>\Scripts\python.exe -m pip install --require-hashes -r requirements/devpost-release.lock.txt
-<venv-outside-clone>\Scripts\python.exe -B -m presentation_agent.deckcompiler demo `
-  --config examples/deckcompiler_demo/demo.yaml `
-  --output-dir <new-empty-output-directory-outside-repo>
+powershell -ExecutionPolicy Bypass -File scripts\run_demo.ps1 `
+  -Python <venv-outside-clone>\Scripts\python.exe `
+  -OutputDir <new-empty-output-directory-outside-repo>
 ```
+
+`run_demo.ps1` automatically installs the release-pinned four-SkillSet from
+`https://github.com/CAPTW/pngtopptx.git` when it is missing, verifies the exact
+upstream commit, subtree OIDs, and file hashes, then runs the offline demo. An
+existing mismatched Skill is never overwritten silently; use the documented
+backup-and-replace switch only when an explicit migration is intended.
 
 The certified fresh-clone environment used CPython 3.11.9 AMD64, Node.js
 24.13.1, npm 11.11.0, PowerPoint 16.0 build 20131 x64, Playwright 1.61.0,
@@ -72,8 +78,9 @@ evidence. Existing ingestion, planning, creative-planning, editable-template,
 QA, and local-runtime surfaces were used only through documented adaptations.
 
 The external CAPTW/pngtopptx four-SkillSet was not created during Build Week.
-PPTX Generator pins and orchestrates it through a verified handoff and release
-contract. Its source is not vendored or redistributed.
+PPTX Generator installs a verified upstream snapshot during setup, then pins
+and orchestrates it through a verified handoff and release contract. Its source
+is not vendored or redistributed by this repository or its delivery package.
 
 ## Scope limits
 

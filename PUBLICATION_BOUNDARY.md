@@ -8,8 +8,10 @@ not the project's complete development history.
 - The source, documentation, schemas, examples, tests, and locked release
   evidence needed to review the public DevPost candidate.
 - The canonical delivery ZIP and its committed verification evidence.
-- The path-neutral external Skill fingerprint pin required by the demo; local
-  installation paths are represented as `<external-skill-root>`.
+- The path-neutral external Skill fingerprint pin and standard-library
+  installer required by the demo; local installation paths are represented as
+  `<external-skill-root>`. External Skill source is fetched from the canonical
+  upstream repository during setup and is not vendored here.
 - Publication-only metadata: this boundary notice and the root `LICENSE`.
 
 ## Deliberately omitted

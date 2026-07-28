@@ -11,9 +11,11 @@
 - Node.js 24.13.1. The external reconstruction package root must contain
   `pptxgenjs` 4.0.1, `sharp` 0.35.1, `react` 19.2.7, `react-dom` 19.2.7, and
   `react-icons` 5.6.0.
-- The installed CAPTW/pngtopptx SkillSet stays at
-  `%USERPROFILE%\.codex\skills` or an explicitly configured prepared-machine
-  root and must match the committed read-only pin.
+- The CAPTW/pngtopptx SkillSet is installed from the release-pinned upstream
+  commit by `scripts/install_pngtopptx_skillset.py`. It stays at
+  `%CODEX_HOME%\skills` when `CODEX_HOME` is set, otherwise
+  `%USERPROFILE%\.codex\skills`, or an explicitly configured prepared-machine
+  root, and must match the committed read-only pin.
 - `%PROGRAMFILES%\Tesseract-OCR` supplies the existing Cairo DLL search path.
   OCR remains disabled and scanned-PDF OCR is unsupported.
 
@@ -41,6 +43,20 @@ external Skill-local venv, user-site packages, and system-site packages are
 forbidden. The 38 locked distributions include the observed external
 reconstruction closure: NumPy, Pillow, pywin32, Playwright, scikit-image,
 opencv-python-headless, and their required transitives.
+
+Install or validate the external SkillSet. This setup step may access GitHub;
+the later demo remains network-free. Missing Skills are installed
+automatically, an exact existing installation is left untouched, and a
+mismatched installation fails closed:
+
+```powershell
+python scripts\install_pngtopptx_skillset.py
+python scripts\install_pngtopptx_skillset.py --check
+```
+
+To migrate a mismatched installation explicitly, use
+`--backup-and-replace`. Existing Skill directories are moved to a retained
+backup before the pinned version is installed.
 
 Run the dependency-only preflight before the public demo:
 
@@ -81,8 +97,8 @@ $env:PYTHONNOUSERSITE = '1'
 `OPENAI_API_KEY`, access tokens, client secrets, and browser profiles are not
 required and must not be supplied to the release demo. The demo validates the
 frozen Phase 4 generation provenance but never invokes live Image Generation.
-Do not run `npm install`, copy external Skill source, or download a different
-browser silently.
+Do not run `npm install`, manually copy or patch external Skill source, or
+download a different browser silently. Use only the pinned installer above.
 
 ## Verification
 

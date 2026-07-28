@@ -39,7 +39,7 @@
       ],
       "relative_external_path_class": "%DECKCOMPILER_EXTERNAL_SKILLS%/slide-image-dual-render/scripts/make_crops.py",
       "skill_id": "slide-image-dual-render",
-      "source_sha256": "d1fb348d40d6d98c7cafc8a4c313521fd46cbedddd156c488523d82ebfe7726d",
+      "source_sha256": "284c223ce87952f23f169042af428a5d79ade8615fd7c50402ce17575265f19a",
       "validation_status": "PASS"
     },
     {
@@ -81,7 +81,7 @@
       "mapped_distributions": [],
       "relative_external_path_class": "%DECKCOMPILER_EXTERNAL_SKILLS%/slide-image-dual-render/scripts/validate_pptx_package.py",
       "skill_id": "slide-image-dual-render",
-      "source_sha256": "14f7b0aa24252439f6cb34ab0d86af1a062083b54ddb3b302e74f82e2ee3666a",
+      "source_sha256": "a5f9cad396f12967a353eedb98d6ce9fd79b96ae7704c3839646fd7a361338a7",
       "validation_status": "PASS"
     },
     {
@@ -175,7 +175,7 @@
     "path": "requirements/devpost-release.lock.txt",
     "sha256": "4fde8f6fd2584f66e2c5f6c0f57f822da19809cb9d12259e35537d3d378a21dc"
   },
-  "manifest_hash": "1f895c6e45ef7fc9e807631566de9edcb403211b9ac9aa9666e6101eef626e07",
+  "manifest_hash": "f0b0aaeeb6407f13359031e10e68b890798897229a9fe7ceed93c5cdba8d3da3",
   "manifest_id": "externalpydeps_7a122d50f4ffda57606a",
   "module_to_distribution_mappings": [
     {
@@ -1335,7 +1335,7 @@
     "python_version": "3.11.9"
   },
   "tested_external_skill_pin": {
-    "aggregate_sha256": "3dd4541fb0f2f4cf421d2a5c3cf2002390c0b00661a2e4d3a588d4467600022a",
-    "artifact_sha256": "61b64ca02cb1301c215d1cfa90b1f558ae127d3a19b2d49f2b82746930ef0a84"
+    "aggregate_sha256": "027336f1a61641bfb6e891199fe24ab77aee0c31287c7e8d88613a458310e529",
+    "artifact_sha256": "8f6854cdce1e1ffc13c442e41ceb09919ba77bc4f9e793fd6534d531e57203e2"
   }
 }

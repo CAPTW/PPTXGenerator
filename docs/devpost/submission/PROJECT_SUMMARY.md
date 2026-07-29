@@ -31,7 +31,9 @@ The corrected runtime was proved in two environments:
 
 All four runs completed 36 of 36 stages. Canonical-repeat, fresh-repeat, and
 canonical-fresh comparisons found zero unexplained semantic divergence. The
-fresh clone passed 274 focused tests and the full 733-test DeckCompiler suite.
+historical Phase 7 full-workspace fresh clone passed 274 focused tests and the
+full 733-test DeckCompiler suite. The current release-minimal public snapshot
+carries a separately verified, bounded 490-test suite.
 
 The release evidence is collected in
 [`../evidence/phase7_final/`](../evidence/phase7_final/). The final gate is

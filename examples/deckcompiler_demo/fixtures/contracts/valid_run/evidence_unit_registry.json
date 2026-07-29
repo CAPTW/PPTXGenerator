@@ -1,0 +1,249 @@
+{
+  "schema_name": "evidence_unit_registry",
+  "schema_version": "1.0.0",
+  "artifact": {
+    "artifact_id": "art_22222222222222222222",
+    "artifact_type": "evidence_unit_registry",
+    "artifact_version": "1.0.0",
+    "product": {
+      "product_name": "PPTX Generator",
+      "product_slug": "pptx-generator",
+      "system_name": "DeckCompiler",
+      "system_id": "deckcompiler",
+      "reconstruction_engine": "PNGtoPPTX"
+    },
+    "provenance": {
+      "created_at": "2026-07-15T21:00:01+09:00",
+      "producer": {
+        "tool_name": "deckcompiler-contract-fixture",
+        "tool_version": "1.0.0",
+        "runtime": "repository-authored-synthetic"
+      },
+      "build_baseline": "e0259b7551c381f8c0de4cdd329d5943680fa502",
+      "source_commit": "39b4c104b23d4e09446388db2a8b2fb873a7824b",
+      "input_artifact_ids": ["art_11111111111111111111"]
+    },
+    "content_sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+  },
+  "registry_id": "registry_aaaaaaaaaaaaaaaaaaaa",
+  "evidence_units": [
+    {
+      "evidence_id": "ev_306ca2d3dfa626f76c71",
+      "source_id": "src_4629621789ed8474df8f",
+      "source_locator": {
+        "source_id": "src_4629621789ed8474df8f",
+        "locator_type": "user_prompt",
+        "char_range": {"start": 0, "end": 82},
+        "quote": "Explain AI data center cooling risk and recommend a resilient operating strategy."
+      },
+      "evidence_type": "intent",
+      "canonical_content": {"text": "Frame cooling as an operational resilience decision."},
+      "importance": "critical",
+      "confidence": 1.0,
+      "visualizable_as": ["hero_visual", "text"],
+      "relations": [],
+      "citation_metadata": {
+        "citation_label": "Repository-authored prompt",
+        "repository_authored": true,
+        "display_locator": "user prompt"
+      },
+      "provenance": {
+        "extraction_method": "repository_authored_fixture",
+        "normalization_version": "1.0.0",
+        "content_sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+      }
+    },
+    {
+      "evidence_id": "ev_e45744555e33f48d6d81",
+      "source_id": "src_79734df10021cee0d8b4",
+      "source_locator": {
+        "source_id": "src_79734df10021cee0d8b4",
+        "locator_type": "pdf_text_span",
+        "page_number": 1,
+        "char_range": {"start": 0, "end": 90},
+        "quote": "Cooling load rises nonlinearly when rack density exceeds the planned thermal envelope."
+      },
+      "evidence_type": "claim",
+      "canonical_content": {"text": "Rack-density growth can exceed the planned thermal envelope."},
+      "importance": "critical",
+      "confidence": 0.96,
+      "visualizable_as": ["chart", "text"],
+      "relations": [],
+      "citation_metadata": {
+        "citation_label": "Synthetic Cooling Operations, p. 1",
+        "repository_authored": true,
+        "display_locator": "p. 1"
+      },
+      "provenance": {
+        "extraction_method": "repository_authored_fixture",
+        "normalization_version": "1.0.0",
+        "content_sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+      }
+    },
+    {
+      "evidence_id": "ev_87b67a3ddbed702b5ba8",
+      "source_id": "src_79734df10021cee0d8b4",
+      "source_locator": {
+        "source_id": "src_79734df10021cee0d8b4",
+        "locator_type": "pdf_text_span",
+        "page_number": 2,
+        "char_range": {"start": 12, "end": 118},
+        "quote": "A single cooling path turns routine maintenance into a correlated service-availability risk."
+      },
+      "evidence_type": "process",
+      "canonical_content": {"text": "Single-path cooling couples maintenance activity to service availability."},
+      "importance": "high",
+      "confidence": 0.94,
+      "visualizable_as": ["diagram"],
+      "relations": [],
+      "citation_metadata": {
+        "citation_label": "Synthetic Cooling Operations, p. 2",
+        "repository_authored": true,
+        "display_locator": "p. 2"
+      },
+      "provenance": {
+        "extraction_method": "repository_authored_fixture",
+        "normalization_version": "1.0.0",
+        "content_sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+      }
+    },
+    {
+      "evidence_id": "ev_914681be4f414430c57d",
+      "source_id": "src_79734df10021cee0d8b4",
+      "source_locator": {
+        "source_id": "src_79734df10021cee0d8b4",
+        "locator_type": "pdf_text_span",
+        "page_number": 3,
+        "char_range": {"start": 0, "end": 100},
+        "quote": "Redundant cooling paths reduced synthetic outage exposure from 8 hours to 2 hours per event."
+      },
+      "evidence_type": "statistic",
+      "canonical_content": {
+        "text": "Synthetic modeled outage exposure falls from 8 to 2 hours per event with redundancy.",
+        "data": {"single_path_hours": 8, "redundant_path_hours": 2, "unit": "hours_per_event"}
+      },
+      "importance": "high",
+      "confidence": 0.91,
+      "visualizable_as": ["kpi", "comparison"],
+      "relations": [],
+      "citation_metadata": {
+        "citation_label": "Synthetic Cooling Operations, p. 3",
+        "repository_authored": true,
+        "display_locator": "p. 3"
+      },
+      "provenance": {
+        "extraction_method": "repository_authored_fixture",
+        "normalization_version": "1.0.0",
+        "content_sha256": "4444444444444444444444444444444444444444444444444444444444444444"
+      }
+    },
+    {
+      "evidence_id": "ev_13ca589dd53a55744d2b",
+      "source_id": "src_1933caed9cbe11338036",
+      "source_locator": {
+        "source_id": "src_1933caed9cbe11338036",
+        "locator_type": "pdf_text_span",
+        "page_number": 1,
+        "char_range": {"start": 0, "end": 88},
+        "quote": "Water constraints and high ambient temperature can coincide during peak demand."
+      },
+      "evidence_type": "constraint",
+      "canonical_content": {"text": "Water constraints and ambient heat can coincide during peak compute demand."},
+      "importance": "critical",
+      "confidence": 0.97,
+      "visualizable_as": ["diagram", "citation"],
+      "relations": [],
+      "citation_metadata": {
+        "citation_label": "Synthetic Water and Heat Risk, p. 1",
+        "repository_authored": true,
+        "display_locator": "p. 1"
+      },
+      "provenance": {
+        "extraction_method": "repository_authored_fixture",
+        "normalization_version": "1.0.0",
+        "content_sha256": "5555555555555555555555555555555555555555555555555555555555555555"
+      }
+    },
+    {
+      "evidence_id": "ev_5489104f50106e839212",
+      "source_id": "src_1933caed9cbe11338036",
+      "source_locator": {
+        "source_id": "src_1933caed9cbe11338036",
+        "locator_type": "pdf_text_span",
+        "page_number": 2,
+        "char_range": {"start": 10, "end": 118},
+        "quote": "Dry cooling limits water exposure but loses efficiency as ambient temperature approaches the design limit."
+      },
+      "evidence_type": "comparison",
+      "canonical_content": {"text": "Dry cooling trades lower water exposure for weaker hot-weather efficiency."},
+      "importance": "high",
+      "confidence": 0.93,
+      "visualizable_as": ["table", "comparison"],
+      "relations": [],
+      "citation_metadata": {
+        "citation_label": "Synthetic Water and Heat Risk, p. 2",
+        "repository_authored": true,
+        "display_locator": "p. 2"
+      },
+      "provenance": {
+        "extraction_method": "repository_authored_fixture",
+        "normalization_version": "1.0.0",
+        "content_sha256": "6666666666666666666666666666666666666666666666666666666666666666"
+      }
+    },
+    {
+      "evidence_id": "ev_e462e89dfde749e25c0c",
+      "source_id": "src_1933caed9cbe11338036",
+      "source_locator": {
+        "source_id": "src_1933caed9cbe11338036",
+        "locator_type": "pdf_text_span",
+        "page_number": 3,
+        "char_range": {"start": 0, "end": 126},
+        "quote": "A staged hybrid design preserves a water-light mode while retaining evaporative capacity for extreme thermal events."
+      },
+      "evidence_type": "recommendation",
+      "canonical_content": {"text": "Adopt a staged hybrid design with explicit water-light and extreme-heat modes."},
+      "importance": "critical",
+      "confidence": 0.95,
+      "visualizable_as": ["process", "diagram"],
+      "relations": [],
+      "citation_metadata": {
+        "citation_label": "Synthetic Water and Heat Risk, p. 3",
+        "repository_authored": true,
+        "display_locator": "p. 3"
+      },
+      "provenance": {
+        "extraction_method": "repository_authored_fixture",
+        "normalization_version": "1.0.0",
+        "content_sha256": "7777777777777777777777777777777777777777777777777777777777777777"
+      }
+    },
+    {
+      "evidence_id": "ev_eecab6c34cb699db4866",
+      "source_id": "src_1933caed9cbe11338036",
+      "source_locator": {
+        "source_id": "src_1933caed9cbe11338036",
+        "locator_type": "pdf_text_span",
+        "page_number": 4,
+        "char_range": {"start": 0, "end": 112},
+        "quote": "Monitor thermal headroom, water availability, and failover readiness as a combined operating envelope."
+      },
+      "evidence_type": "recommendation",
+      "canonical_content": {"text": "Govern thermal headroom, water availability, and failover readiness as one operating envelope."},
+      "importance": "high",
+      "confidence": 0.92,
+      "visualizable_as": ["table", "kpi"],
+      "relations": [],
+      "citation_metadata": {
+        "citation_label": "Synthetic Water and Heat Risk, p. 4",
+        "repository_authored": true,
+        "display_locator": "p. 4"
+      },
+      "provenance": {
+        "extraction_method": "repository_authored_fixture",
+        "normalization_version": "1.0.0",
+        "content_sha256": "8888888888888888888888888888888888888888888888888888888888888888"
+      }
+    }
+  ]
+}

@@ -1,0 +1,176 @@
+{
+  "schema_name": "visual_target_manifest",
+  "schema_version": "1.0.0",
+  "artifact": {
+    "artifact_id": "art_44444444444444444444",
+    "artifact_type": "visual_target_manifest",
+    "artifact_version": "1.0.0",
+    "product": {
+      "product_name": "PPTX Generator",
+      "product_slug": "pptx-generator",
+      "system_name": "DeckCompiler",
+      "system_id": "deckcompiler",
+      "reconstruction_engine": "PNGtoPPTX"
+    },
+    "provenance": {
+      "created_at": "2026-07-15T21:00:03+09:00",
+      "producer": {
+        "tool_name": "deckcompiler-contract-fixture",
+        "tool_version": "1.0.0",
+        "runtime": "repository-authored-synthetic"
+      },
+      "build_baseline": "e0259b7551c381f8c0de4cdd329d5943680fa502",
+      "source_commit": "39b4c104b23d4e09446388db2a8b2fb873a7824b",
+      "input_artifact_ids": ["art_33333333333333333333"]
+    },
+    "content_sha256": "4444444444444444444444444444444444444444444444444444444444444444"
+  },
+  "manifest_id": "targets_aaaaaaaaaaaaaaaaaaaa",
+  "offline_regression_only": true,
+  "targets": [
+    {
+      "visual_target_id": "vt_11111111111111111111",
+      "slide_id": "s001",
+      "path": "visual_targets/s001.png",
+      "media_type": "image/png",
+      "width": 1920,
+      "height": 1080,
+      "aspect_ratio": "16:9",
+      "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "visual_authority": true,
+      "semantic_authority": false,
+      "final_slide_surface_allowed": false,
+      "generation": {
+        "generation_mode": "locked_fixture",
+        "release_eligible": false,
+        "tool_identity": "offline-contract-fixture",
+        "model_identity": "none",
+        "prompt": "Synthetic editorial hero showing thermal, water, and resilience systems without readable text.",
+        "prompt_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "reference_artifacts": ["art_33333333333333333333"],
+        "attempt_number": 1,
+        "selected": true
+      }
+    },
+    {
+      "visual_target_id": "vt_22222222222222222222",
+      "slide_id": "s002",
+      "path": "visual_targets/s002.png",
+      "media_type": "image/png",
+      "width": 1920,
+      "height": 1080,
+      "aspect_ratio": "16:9",
+      "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "visual_authority": true,
+      "semantic_authority": false,
+      "final_slide_surface_allowed": false,
+      "generation": {
+        "generation_mode": "locked_fixture",
+        "release_eligible": false,
+        "tool_identity": "offline-contract-fixture",
+        "model_identity": "none",
+        "prompt": "Synthetic thermal headroom composition with a native-chart region and no readable text.",
+        "prompt_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "reference_artifacts": ["art_33333333333333333333"],
+        "attempt_number": 1,
+        "selected": true
+      }
+    },
+    {
+      "visual_target_id": "vt_33333333333333333333",
+      "slide_id": "s003",
+      "path": "visual_targets/s003.png",
+      "media_type": "image/png",
+      "width": 1920,
+      "height": 1080,
+      "aspect_ratio": "16:9",
+      "sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+      "visual_authority": true,
+      "semantic_authority": false,
+      "final_slide_surface_allowed": false,
+      "generation": {
+        "generation_mode": "locked_fixture",
+        "release_eligible": false,
+        "tool_identity": "offline-contract-fixture",
+        "model_identity": "none",
+        "prompt": "Synthetic dual-path process diagram composition with editable node regions and no readable text.",
+        "prompt_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "reference_artifacts": ["art_33333333333333333333"],
+        "attempt_number": 1,
+        "selected": true
+      }
+    },
+    {
+      "visual_target_id": "vt_44444444444444444444",
+      "slide_id": "s004",
+      "path": "visual_targets/s004.png",
+      "media_type": "image/png",
+      "width": 1920,
+      "height": 1080,
+      "aspect_ratio": "16:9",
+      "sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+      "visual_authority": true,
+      "semantic_authority": false,
+      "final_slide_surface_allowed": false,
+      "generation": {
+        "generation_mode": "locked_fixture",
+        "release_eligible": false,
+        "tool_identity": "offline-contract-fixture",
+        "model_identity": "none",
+        "prompt": "Synthetic comparison matrix composition with strong row hierarchy and no readable text.",
+        "prompt_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "reference_artifacts": ["art_33333333333333333333"],
+        "attempt_number": 1,
+        "selected": true
+      }
+    },
+    {
+      "visual_target_id": "vt_55555555555555555555",
+      "slide_id": "s005",
+      "path": "visual_targets/s005.png",
+      "media_type": "image/png",
+      "width": 1920,
+      "height": 1080,
+      "aspect_ratio": "16:9",
+      "sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+      "visual_authority": true,
+      "semantic_authority": false,
+      "final_slide_surface_allowed": false,
+      "generation": {
+        "generation_mode": "locked_fixture",
+        "release_eligible": false,
+        "tool_identity": "offline-contract-fixture",
+        "model_identity": "none",
+        "prompt": "Synthetic three-stage hybrid cooling roadmap composition and no readable text.",
+        "prompt_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "reference_artifacts": ["art_33333333333333333333"],
+        "attempt_number": 1,
+        "selected": true
+      }
+    },
+    {
+      "visual_target_id": "vt_66666666666666666666",
+      "slide_id": "s006",
+      "path": "visual_targets/s006.png",
+      "media_type": "image/png",
+      "width": 1920,
+      "height": 1080,
+      "aspect_ratio": "16:9",
+      "sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+      "visual_authority": true,
+      "semantic_authority": false,
+      "final_slide_surface_allowed": false,
+      "generation": {
+        "generation_mode": "locked_fixture",
+        "release_eligible": false,
+        "tool_identity": "offline-contract-fixture",
+        "model_identity": "none",
+        "prompt": "Synthetic operating-envelope KPI composition with three editable card regions and no readable text.",
+        "prompt_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "reference_artifacts": ["art_33333333333333333333"],
+        "attempt_number": 1,
+        "selected": true
+      }
+    }
+  ]
+}

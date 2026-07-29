@@ -1,0 +1,31 @@
+{
+  "schema_name": "phase3_pdf_fixture_manifest",
+  "schema_version": "1.0.0",
+  "generation_method": "PyMuPDF text insertion; Pillow pixels for scanned negative fixture",
+  "pdfs": {
+    "cooling_system_overview.pdf": {
+      "sha256": "b72c5cbe32f36b1311c618e968d075bc6a921b0380085987e7d17d03a6556d68",
+      "page_count": 3,
+      "title_token": "AI Data Center Cooling System Overview",
+      "section_token": "Sensors, Controls, and Operating Band",
+      "normalized_page_text_sha256": [
+        "1d908085e9e55f65de04d60f8cca5a4f3a021da6bc1a670b8610501305819527",
+        "593dd665d59af9349e5d76b3bf1125d7a78c9fd24161201b7e111d3c1dcfc088",
+        "7c1adbab43dd1649d58f062b6eb26c3cca05500afc5dd7046c0b93553ea4a139"
+      ],
+      "rights": "repository-authored synthetic content; no third-party or remote source"
+    },
+    "cooling_risk_decision_report.pdf": {
+      "sha256": "912228a063639e78287499c1490a478f6dad590b10a093274b72a0df301775fc",
+      "page_count": 3,
+      "title_token": "AI Data Center Cooling Risk Decision Report",
+      "section_token": "Response Options and Decision Criteria",
+      "normalized_page_text_sha256": [
+        "c3ae2e4d6fc6c28970324ba1c493fd337ee17e6f67184d640e4fe3753a431167",
+        "bf7642e5e00f0ca152f9b3475b38f4a58ddb77528c886f240846fc51aaed59bf",
+        "07922888457f2e0186a3ca28cf8245c4ea3797d1366d9d5bd92e2836eafd370e"
+      ],
+      "rights": "repository-authored synthetic content; no third-party or remote source"
+    }
+  }
+}

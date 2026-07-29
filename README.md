@@ -56,6 +56,14 @@ upstream commit, subtree OIDs, and file hashes, then runs the offline demo. An
 existing mismatched Skill is never overwritten silently; use the documented
 backup-and-replace switch only when an explicit migration is intended.
 
+## Public snapshot verification
+
+The immutable Phase 7 evidence records 274 focused and 733 full-workspace tests.
+Those counts describe the historical full development workspace, not the
+release-minimal test inventory in this repository. The current public snapshot
+contains a bounded 490-test suite, verified separately from the historical
+evidence.
+
 The certified fresh-clone environment used CPython 3.11.9 AMD64, Node.js
 24.13.1, npm 11.11.0, PowerPoint 16.0 build 20131 x64, Playwright 1.61.0,
 Chromium revision 1228, and Chrome for Testing 149.0.7827.55. A later

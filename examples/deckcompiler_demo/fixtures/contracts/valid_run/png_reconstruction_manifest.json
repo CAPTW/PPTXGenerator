@@ -1,0 +1,97 @@
+{
+  "schema_name": "png_reconstruction_manifest",
+  "schema_version": "1.0.0",
+  "artifact": {
+    "artifact_id": "art_55555555555555555555",
+    "artifact_type": "png_reconstruction_manifest",
+    "artifact_version": "1.0.0",
+    "product": {
+      "product_name": "PPTX Generator",
+      "product_slug": "pptx-generator",
+      "system_name": "DeckCompiler",
+      "system_id": "deckcompiler",
+      "reconstruction_engine": "PNGtoPPTX"
+    },
+    "provenance": {
+      "created_at": "2026-07-15T21:00:04+09:00",
+      "producer": {
+        "tool_name": "deckcompiler-contract-fixture",
+        "tool_version": "1.0.0",
+        "runtime": "repository-authored-synthetic"
+      },
+      "build_baseline": "e0259b7551c381f8c0de4cdd329d5943680fa502",
+      "source_commit": "39b4c104b23d4e09446388db2a8b2fb873a7824b",
+      "input_artifact_ids": ["art_44444444444444444444"]
+    },
+    "content_sha256": "5555555555555555555555555555555555555555555555555555555555555555"
+  },
+  "manifest_id": "recon_aaaaaaaaaaaaaaaaaaaa",
+  "reconstructions": [
+    {
+      "reconstruction_id": "pr_11111111111111111111",
+      "slide_id": "s001",
+      "visual_target_id": "vt_11111111111111111111",
+      "target_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "reconstruction_engine": "PNGtoPPTX",
+      "status": "planned",
+      "geometry_trace": [],
+      "structured_output": null,
+      "safety": {"full_canvas_clean_plate": false, "full_slide_raster": false, "ocr_text_as_canonical": false, "fail_closed": true}
+    },
+    {
+      "reconstruction_id": "pr_22222222222222222222",
+      "slide_id": "s002",
+      "visual_target_id": "vt_22222222222222222222",
+      "target_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "reconstruction_engine": "PNGtoPPTX",
+      "status": "planned",
+      "geometry_trace": [],
+      "structured_output": null,
+      "safety": {"full_canvas_clean_plate": false, "full_slide_raster": false, "ocr_text_as_canonical": false, "fail_closed": true}
+    },
+    {
+      "reconstruction_id": "pr_33333333333333333333",
+      "slide_id": "s003",
+      "visual_target_id": "vt_33333333333333333333",
+      "target_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+      "reconstruction_engine": "PNGtoPPTX",
+      "status": "planned",
+      "geometry_trace": [],
+      "structured_output": null,
+      "safety": {"full_canvas_clean_plate": false, "full_slide_raster": false, "ocr_text_as_canonical": false, "fail_closed": true}
+    },
+    {
+      "reconstruction_id": "pr_44444444444444444444",
+      "slide_id": "s004",
+      "visual_target_id": "vt_44444444444444444444",
+      "target_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+      "reconstruction_engine": "PNGtoPPTX",
+      "status": "planned",
+      "geometry_trace": [],
+      "structured_output": null,
+      "safety": {"full_canvas_clean_plate": false, "full_slide_raster": false, "ocr_text_as_canonical": false, "fail_closed": true}
+    },
+    {
+      "reconstruction_id": "pr_55555555555555555555",
+      "slide_id": "s005",
+      "visual_target_id": "vt_55555555555555555555",
+      "target_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+      "reconstruction_engine": "PNGtoPPTX",
+      "status": "planned",
+      "geometry_trace": [],
+      "structured_output": null,
+      "safety": {"full_canvas_clean_plate": false, "full_slide_raster": false, "ocr_text_as_canonical": false, "fail_closed": true}
+    },
+    {
+      "reconstruction_id": "pr_66666666666666666666",
+      "slide_id": "s006",
+      "visual_target_id": "vt_66666666666666666666",
+      "target_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+      "reconstruction_engine": "PNGtoPPTX",
+      "status": "planned",
+      "geometry_trace": [],
+      "structured_output": null,
+      "safety": {"full_canvas_clean_plate": false, "full_slide_raster": false, "ocr_text_as_canonical": false, "fail_closed": true}
+    }
+  ]
+}

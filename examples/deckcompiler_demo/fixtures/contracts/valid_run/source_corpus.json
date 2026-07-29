@@ -1,0 +1,119 @@
+{
+  "schema_name": "source_corpus",
+  "schema_version": "1.0.0",
+  "artifact": {
+    "artifact_id": "art_11111111111111111111",
+    "artifact_type": "source_corpus",
+    "artifact_version": "1.0.0",
+    "product": {
+      "product_name": "PPTX Generator",
+      "product_slug": "pptx-generator",
+      "system_name": "DeckCompiler",
+      "system_id": "deckcompiler",
+      "reconstruction_engine": "PNGtoPPTX"
+    },
+    "provenance": {
+      "created_at": "2026-07-15T21:00:00+09:00",
+      "producer": {
+        "tool_name": "deckcompiler-contract-fixture",
+        "tool_version": "1.0.0",
+        "runtime": "repository-authored-synthetic"
+      },
+      "build_baseline": "e0259b7551c381f8c0de4cdd329d5943680fa502",
+      "source_commit": "39b4c104b23d4e09446388db2a8b2fb873a7824b",
+      "input_artifact_ids": []
+    },
+    "content_sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+  },
+  "corpus_id": "corpus_aaaaaaaaaaaaaaaaaaaa",
+  "sources": [
+    {
+      "source_id": "src_1933caed9cbe11338036",
+      "source_type": "pdf",
+      "display_name": "Synthetic water and heat risk report",
+      "original_filename": "synthetic-water-heat-risk.pdf",
+      "stable_identity": {
+        "algorithm": "sha256",
+        "value": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      },
+      "locator_strategy": "pdf_page_text_span",
+      "extraction_status": "extracted",
+      "language": "en",
+      "rights_privacy_note": "Repository-authored synthetic PDF record; no third-party claims.",
+      "child_assets": []
+    },
+    {
+      "source_id": "src_4629621789ed8474df8f",
+      "source_type": "user_prompt",
+      "display_name": "Canonical synthetic prompt",
+      "user_brief": "Explain AI data center cooling risk and recommend a resilient operating strategy.",
+      "stable_identity": {
+        "algorithm": "canonical_text_sha256",
+        "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "locator_strategy": "prompt_character_range",
+      "extraction_status": "not_required",
+      "language": "en",
+      "rights_privacy_note": "Repository-authored synthetic prompt; no private or third-party content.",
+      "child_assets": []
+    },
+    {
+      "source_id": "src_79734df10021cee0d8b4",
+      "source_type": "pdf",
+      "display_name": "Synthetic cooling operations report",
+      "original_filename": "synthetic-cooling-operations.pdf",
+      "stable_identity": {
+        "algorithm": "sha256",
+        "value": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "locator_strategy": "pdf_page_text_span",
+      "extraction_status": "extracted",
+      "language": "en",
+      "rights_privacy_note": "Repository-authored synthetic PDF record; no third-party claims.",
+      "child_assets": []
+    }
+  ],
+  "normalized_segments": [
+    {
+      "segment_id": "seg_11111111111111111111",
+      "source_id": "src_4629621789ed8474df8f",
+      "source_locator": {
+        "source_id": "src_4629621789ed8474df8f",
+        "locator_type": "user_prompt",
+        "char_range": {"start": 0, "end": 82},
+        "quote": "Explain AI data center cooling risk and recommend a resilient operating strategy."
+      },
+      "canonical_text": "Explain AI data center cooling risk and recommend a resilient operating strategy.",
+      "language": "en",
+      "content_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+    },
+    {
+      "segment_id": "seg_22222222222222222222",
+      "source_id": "src_79734df10021cee0d8b4",
+      "source_locator": {
+        "source_id": "src_79734df10021cee0d8b4",
+        "locator_type": "pdf_text_span",
+        "page_number": 1,
+        "char_range": {"start": 0, "end": 240},
+        "quote": "Cooling load rises nonlinearly when rack density exceeds the planned thermal envelope."
+      },
+      "canonical_text": "Cooling load rises nonlinearly when rack density exceeds the planned thermal envelope. Redundant cooling paths reduce correlated outage exposure.",
+      "language": "en",
+      "content_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    },
+    {
+      "segment_id": "seg_33333333333333333333",
+      "source_id": "src_1933caed9cbe11338036",
+      "source_locator": {
+        "source_id": "src_1933caed9cbe11338036",
+        "locator_type": "pdf_text_span",
+        "page_number": 1,
+        "char_range": {"start": 0, "end": 260},
+        "quote": "Water constraints and high ambient temperature can coincide during peak demand."
+      },
+      "canonical_text": "Water constraints and high ambient temperature can coincide during peak demand. A staged hybrid cooling strategy lowers dependency on a single resource.",
+      "language": "en",
+      "content_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+    }
+  ]
+}

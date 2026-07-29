@@ -1,0 +1,162 @@
+{
+  "schema_name": "slide_blueprint_collection",
+  "schema_version": "1.0.0",
+  "artifact": {
+    "artifact_id": "art_33333333333333333333",
+    "artifact_type": "slide_blueprint_collection",
+    "artifact_version": "1.0.0",
+    "product": {
+      "product_name": "PPTX Generator",
+      "product_slug": "pptx-generator",
+      "system_name": "DeckCompiler",
+      "system_id": "deckcompiler",
+      "reconstruction_engine": "PNGtoPPTX"
+    },
+    "provenance": {
+      "created_at": "2026-07-15T21:00:02+09:00",
+      "producer": {
+        "tool_name": "deckcompiler-contract-fixture",
+        "tool_version": "1.0.0",
+        "runtime": "repository-authored-synthetic"
+      },
+      "build_baseline": "e0259b7551c381f8c0de4cdd329d5943680fa502",
+      "source_commit": "39b4c104b23d4e09446388db2a8b2fb873a7824b",
+      "input_artifact_ids": ["art_22222222222222222222"]
+    },
+    "content_sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+  },
+  "collection_id": "blueprints_aaaaaaaaaaaaaaaaaaaa",
+  "slides": [
+    {
+      "schema_name": "slide_blueprint",
+      "schema_version": "1.0.0",
+      "slide_id": "s001",
+      "section_id": "sec01",
+      "slide_type": "cover_hero",
+      "title": "Cooling is now a resilience constraint",
+      "subtitle": "AI density, heat, and water risks converge",
+      "content_density": "low",
+      "required_slots": ["title", "subtitle", "hero_visual", "footer"],
+      "content_blocks": [
+        {"block_id": "s001_title", "slot": "title", "type": "text", "content": "Cooling is now a resilience constraint"}
+      ],
+      "chart_data": null,
+      "table_data": null,
+      "image_needs": [{"slot": "hero_visual", "purpose": "Abstract thermal and water resilience metaphor", "source_policy": "generated_visual_target_only"}],
+      "speaker_notes": "Frame the operating decision without adding external claims.",
+      "citations": [{"citation_id": "c001", "label": "Repository-authored prompt", "source": "user prompt"}],
+      "design_intent": "Editorial hero with strong hierarchy and no semantic raster text."
+    },
+    {
+      "schema_name": "slide_blueprint",
+      "schema_version": "1.0.0",
+      "slide_id": "s002",
+      "section_id": "sec01",
+      "slide_type": "evidence_problem",
+      "title": "Rack density compresses thermal headroom",
+      "subtitle": "Nonlinear load turns design margin into outage exposure",
+      "content_density": "medium",
+      "required_slots": ["title", "body", "chart", "footer"],
+      "content_blocks": [
+        {"block_id": "s002_body", "slot": "body", "type": "text", "content": "Higher rack density can exceed the planned thermal envelope."}
+      ],
+      "chart_data": {"series": [{"name": "thermal_load", "values": [40, 58, 83]}]},
+      "table_data": null,
+      "image_needs": [],
+      "speaker_notes": "Use only synthetic evidence allocated to this slide.",
+      "citations": [{"citation_id": "c002", "label": "Synthetic Cooling Operations, p. 1", "source": "synthetic-cooling-operations.pdf"}],
+      "design_intent": "Native line chart with visible capacity threshold."
+    },
+    {
+      "schema_name": "slide_blueprint",
+      "schema_version": "1.0.0",
+      "slide_id": "s003",
+      "section_id": "sec01",
+      "slide_type": "process_risk",
+      "title": "Single-path cooling couples maintenance to uptime",
+      "subtitle": "One failed path propagates directly to service risk",
+      "content_density": "medium",
+      "required_slots": ["title", "diagram", "body", "footer"],
+      "content_blocks": [
+        {"block_id": "s003_body", "slot": "body", "type": "text", "content": "Redundant paths isolate maintenance and failure events."}
+      ],
+      "chart_data": null,
+      "table_data": null,
+      "image_needs": [],
+      "speaker_notes": "Diagram nodes remain editable shapes and connectors.",
+      "citations": [{"citation_id": "c003", "label": "Synthetic Cooling Operations, pp. 2-3", "source": "synthetic-cooling-operations.pdf"}],
+      "design_intent": "Native process diagram contrasting single and redundant paths."
+    },
+    {
+      "schema_name": "slide_blueprint",
+      "schema_version": "1.0.0",
+      "slide_id": "s004",
+      "section_id": "sec02",
+      "slide_type": "comparison_table",
+      "title": "Every cooling mode carries a different constraint",
+      "subtitle": "Efficiency, water exposure, and heat tolerance must be balanced",
+      "content_density": "high",
+      "required_slots": ["title", "table", "footer"],
+      "content_blocks": [
+        {"block_id": "s004_intro", "slot": "title", "type": "text", "content": "Compare modes against the combined operating envelope."}
+      ],
+      "chart_data": null,
+      "table_data": {
+        "columns": ["mode", "water_exposure", "hot_weather_efficiency"],
+        "rows": [["evaporative", "high", "high"], ["dry", "low", "medium"], ["hybrid", "medium", "high"]]
+      },
+      "image_needs": [],
+      "speaker_notes": "The table must remain a native editable table.",
+      "citations": [{"citation_id": "c004", "label": "Synthetic Water and Heat Risk, pp. 1-2", "source": "synthetic-water-heat-risk.pdf"}],
+      "design_intent": "High-legibility native comparison matrix."
+    },
+    {
+      "schema_name": "slide_blueprint",
+      "schema_version": "1.0.0",
+      "slide_id": "s005",
+      "section_id": "sec02",
+      "slide_type": "recommendation",
+      "title": "Adopt a staged hybrid cooling strategy",
+      "subtitle": "Preserve a water-light mode and extreme-heat capacity",
+      "content_density": "medium",
+      "required_slots": ["title", "body", "process", "footer"],
+      "content_blocks": [
+        {"block_id": "s005_body", "slot": "body", "type": "text", "content": "Stage redundancy and hybrid capacity around explicit operating modes."}
+      ],
+      "chart_data": null,
+      "table_data": null,
+      "image_needs": [],
+      "speaker_notes": "Recommendation is bounded to the synthetic source claims.",
+      "citations": [{"citation_id": "c005", "label": "Synthetic Water and Heat Risk, p. 3", "source": "synthetic-water-heat-risk.pdf"}],
+      "design_intent": "Three-step editable roadmap with a clear recommendation callout."
+    },
+    {
+      "schema_name": "slide_blueprint",
+      "schema_version": "1.0.0",
+      "slide_id": "s006",
+      "section_id": "sec02",
+      "slide_type": "operating_model",
+      "title": "Govern one combined operating envelope",
+      "subtitle": "Track thermal headroom, water availability, and failover readiness",
+      "content_density": "medium",
+      "required_slots": ["title", "kpi", "body", "footer"],
+      "content_blocks": [
+        {"block_id": "s006_body", "slot": "body", "type": "text", "content": "Review the three constraints together before increasing compute density."}
+      ],
+      "chart_data": null,
+      "table_data": null,
+      "image_needs": [],
+      "speaker_notes": "Close with decision criteria and source notes.",
+      "citations": [{"citation_id": "c006", "label": "Synthetic Water and Heat Risk, p. 4", "source": "synthetic-water-heat-risk.pdf"}],
+      "design_intent": "Editable KPI cards with a compact source footer."
+    }
+  ],
+  "evidence_bindings": [
+    {"slide_id": "s001", "evidence_ids": ["ev_306ca2d3dfa626f76c71"], "allocation_role": "primary"},
+    {"slide_id": "s002", "evidence_ids": ["ev_e45744555e33f48d6d81"], "allocation_role": "primary"},
+    {"slide_id": "s003", "evidence_ids": ["ev_87b67a3ddbed702b5ba8", "ev_914681be4f414430c57d"], "allocation_role": "primary"},
+    {"slide_id": "s004", "evidence_ids": ["ev_13ca589dd53a55744d2b", "ev_5489104f50106e839212"], "allocation_role": "primary"},
+    {"slide_id": "s005", "evidence_ids": ["ev_e462e89dfde749e25c0c"], "allocation_role": "primary"},
+    {"slide_id": "s006", "evidence_ids": ["ev_eecab6c34cb699db4866"], "allocation_role": "primary"}
+  ]
+}

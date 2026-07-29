@@ -1,0 +1,27 @@
+product:
+  name: PPTX Generator
+  slug: pptx-generator
+system:
+  name: DeckCompiler
+  id: deckcompiler
+mode: prompt_only
+inputs:
+  prompt: inputs/prompt_only.txt
+  pdfs: []
+presentation:
+  slide_count: 6
+  audience: university facilities leaders
+  purpose: decision brief
+  language: English
+  tone:
+    - professional
+    - creative
+  workflow: decision_brief
+policies:
+  remote_sources: forbidden
+  scanned_pdf_ocr: unsupported
+  full_slide_raster: forbidden
+  silent_source_omission: forbidden
+  invented_citations: forbidden
+phase:
+  stop_after: creative_architecture

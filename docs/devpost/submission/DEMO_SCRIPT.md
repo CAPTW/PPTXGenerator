@@ -57,8 +57,10 @@ the fresh output produced in the current recording.
     that the controlled off-canvas fault was rejected and the upstream owner
     converged in one repair wave; the default demo does not reinject the fault.
 11. Show the physical fresh-clone evidence and the canonical delivery ZIP.
-    State that 274 focused and 733 full-suite tests passed and that canonical
-    and fresh runs had zero unexplained divergence.
+    State that the historical Phase 7 full workspace passed 274 focused and 733
+    full-suite tests, while the current release-minimal public snapshot has a
+    bounded 490-test suite. Then state that canonical and fresh Phase 7 runs had
+    zero unexplained divergence.
 12. Close with the known limits: one source-controlled six-slide P0, exactly
     two searchable PDFs, no scanned-PDF OCR, no live Image Generation rerun,
     prepared-machine prerequisites, and no arbitrary cross-platform or

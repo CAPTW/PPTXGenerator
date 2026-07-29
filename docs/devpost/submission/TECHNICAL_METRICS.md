@@ -24,8 +24,9 @@
 | Locked distributions | 38 |
 | Installed distributions | 40, including `pip` and `setuptools` |
 | Unexpected distributions | 0 |
-| Fresh focused tests | 274 PASS |
-| Fresh full suite | 733 PASS |
+| Historical Phase 7 full-workspace focused tests | 274 PASS |
+| Historical Phase 7 full-workspace suite | 733 PASS |
+| Current public minimal-snapshot suite | 490 PASS |
 | Final release prerequisites | 81/81 PASS |
 | Canonical-repeat divergence | 0 |
 | Fresh-repeat divergence | 0 |
@@ -36,6 +37,10 @@
 | Selected Phase 4 reference artifacts | 13 |
 | Slide Visual Targets | 6 |
 | Release CLI live Image Generation calls | 0 |
+
+The 274/733 rows summarize immutable historical evidence from the full Phase 7
+workspace. They are not a claim about the bounded test inventory published in
+this release-minimal snapshot; the current public snapshot contains 490 tests.
 
 The original platform-managed Phase 4 workflow executed Image Generation. Its
 image-model identity was not exposed. The reproducible release CLI uses the

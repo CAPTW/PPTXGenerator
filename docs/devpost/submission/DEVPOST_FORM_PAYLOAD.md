@@ -75,10 +75,12 @@ PPTX bytes were not patched directly.
 ### Reproducibility and results
 
 Four independent demo runs completed 36/36 stages. A physical
-`--no-local --no-checkout` fresh clone passed 274 focused and 733 full-suite
-tests. Canonical-repeat, fresh-repeat, and canonical-fresh comparisons reported
-zero unexplained divergence. PowerPoint rendering and Chromium capture
-completed 6/6. The final gate passed 81/81 prerequisites and reports
+`--no-local --no-checkout` fresh clone of the historical Phase 7 full workspace
+passed 274 focused and 733 full-suite tests. The current release-minimal public
+snapshot carries a separately verified, bounded 490-test suite.
+Canonical-repeat, fresh-repeat, and canonical-fresh comparisons reported zero
+unexplained divergence. PowerPoint rendering and Chromium capture completed
+6/6. The final gate passed 81/81 prerequisites and reports
 `ELIGIBLE_FOR_DEVPOST_SUBMISSION`.
 
 The certified fresh-clone environment used CPython 3.11.9 AMD64, Node.js

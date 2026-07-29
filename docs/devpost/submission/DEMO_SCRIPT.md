@@ -1,84 +1,76 @@
-# Demo Script
+# 🎬 Demo Script
 
-## Setup
+> [Submission hub](README.md) · [Documentation hub](../../README.md) · [Project README](../../../README.md) · [Final evidence](../evidence/phase7_final/)
 
-Use the prepared Windows x64 environment with CPython 3.11.9, Microsoft
-PowerPoint, Playwright Chromium, Node.js, Cairo, and the pinned external
-four-SkillSet. The canonical configuration selects one repository-authored
-prompt and exactly two text-searchable PDFs.
+> **Goal:** demonstrate a real source-to-editable-deck run—not a staged transcript.
 
-Create an isolated virtual environment and a new empty output directory outside
-the clone:
+---
+
+## 0. Setup
+
+Use the certified Windows x64 prepared-machine profile:
+
+- CPython 3.11.9
+- PowerPoint COM
+- Playwright Chromium
+- Node.js + Cairo
+- network access for the first verified external Skill installation
 
 ```powershell
 python -m venv <venv-outside-clone>
-<venv-outside-clone>\Scripts\python.exe -m pip install --require-hashes -r requirements/devpost-release.lock.txt
+<venv-outside-clone>\Scripts\python.exe -m pip install `
+  --require-hashes `
+  -r requirements/devpost-release.lock.txt
 ```
 
-No user-site package, system-site package, global Python import, manual NumPy
-install, API key, or clone-local virtual environment is part of the proof.
+No user-site packages, system-site packages, manual NumPy installation, API key, or clone-local venv is part of the proof.
 
-## Run
+---
+
+## 1. Run
 
 ```powershell
-<venv-outside-clone>\Scripts\python.exe -B -m presentation_agent.deckcompiler demo `
-  --config examples/deckcompiler_demo/demo.yaml `
-  --output-dir <new-empty-output-directory-outside-repo>
+powershell -ExecutionPolicy Bypass -File scripts\run_demo.ps1 `
+  -Python <venv-outside-clone>\Scripts\python.exe `
+  -OutputDir <new-empty-output-directory-outside-repo>
 ```
 
-Do not stage a terminal transcript or simulate success. Show the command and
-the fresh output produced in the current recording.
+The wrapper verifies or installs the pinned `CAPTW/pngtopptx` four-SkillSet
+before starting the offline canonical demo.
 
-## Walkthrough
+---
 
-1. Show `demo.yaml`, the one prompt, and the two searchable PDF inputs.
-2. Run the canonical one-command demo and show the dependency preflight:
-   38 locked distributions, no fallback site, and six external entrypoint
-   canaries.
-3. Open `delivery/source/source_corpus.json` and
-   `delivery/source/evidence_unit_registry.json`; point out three sources and
-   29 Evidence Units.
-4. Open `delivery/architecture/presentation_architecture.json`; explain the
-   three-module, three-batch, six-slide Module–Batch–Slide plan.
-5. Explain that the original platform-managed Phase 4 workflow executed Image
-   Generation, while this release command only validates and consumes the
-   frozen verified visual bundle. It performs no live Image Generation and
-   needs no API key.
-6. Open `delivery/output/pptx_generator_demo.pptx` in PowerPoint. Confirm six
-   slides, then edit one native text object and one cell in the native table.
-   Do not save over the verified artifact.
-7. Open `delivery/output/html/index.html` and show the matching six-slide HTML
-   presentation.
-8. Review `delivery/renders/contact_sheet.png` and the six individual
-   PowerPoint renders.
-9. Review `delivery/qa/composite_qa_report.json` and summarize the semantic,
-   source, editability, raster, visual, and parity gates.
-10. Show `delivery/repair/before_faulty_repaired_contact_sheet.png`. Explain
-    that the controlled off-canvas fault was rejected and the upstream owner
-    converged in one repair wave; the default demo does not reinject the fault.
-11. Show the physical fresh-clone evidence and the canonical delivery ZIP.
-    State that the historical Phase 7 full workspace passed 274 focused and 733
-    full-suite tests, while the current release-minimal public snapshot has a
-    bounded 490-test suite. Then state that canonical and fresh Phase 7 runs had
-    zero unexplained divergence.
-12. Close with the known limits: one source-controlled six-slide P0, exactly
-    two searchable PDFs, no scanned-PDF OCR, no live Image Generation rerun,
-    prepared-machine prerequisites, and no arbitrary cross-platform or
-    PNG-to-perfect-PPTX claim.
-13. State the publication boundary: the technical release is eligible, but no
-    GitHub push, tag, release, or DevPost submission has been performed.
+## 2. Walkthrough — 12 scenes
 
-## Expected result
+| Scene | Show | Explain |
+|---:|---|---|
+| 1 | `demo.yaml`, prompt, two PDFs | exact canonical input |
+| 2 | dependency preflight | 38 locked distributions, six external canaries |
+| 3 | Source Corpus + Evidence Registry | 3 sources, 29 Evidence Units |
+| 4 | Presentation Architecture | 3 modules, 3 batches, 6 slides |
+| 5 | frozen visual bundle | original Image Generation happened earlier; release CLI does not rerun it |
+| 6 | editable PPTX | edit native text and one native table cell without saving over evidence |
+| 7 | companion HTML | matching six-slide presentation |
+| 8 | contact sheet + renders | PowerPoint render 6/6 |
+| 9 | Composite QA | semantic, source, editability, raster, visual, parity gates |
+| 10 | repair proof | controlled off-canvas failure and one-wave upstream repair |
+| 11 | fresh-clone evidence | historical Phase 7: 274 focused + 733 full; current public snapshot: 490 tests |
+| 12 | known limits | bounded P0, no OCR, no arbitrary cross-platform or perfect conversion claim |
 
-- exit code 0
-- 36/36 stages PASS
-- six PowerPoint renders and six Chromium captures
-- Composite QA PASS
-- package validation and ZIP CRC PASS
-- final repository gate `ELIGIBLE_FOR_DEVPOST_SUBMISSION`
+---
 
-The repository-level
-[`final_release_gate.json`](../evidence/phase7_final/final_release_gate.json)
-combines the demo, physical fresh-clone, dependency, package, and publication
-control evidence. These expected values are review checkpoints, not substitutes
-for showing the actual run.
+## 3. Expected result
+
+```text
+exit code: 0
+stages: 36 / 36 PASS
+PowerPoint renders: 6 / 6
+Chromium captures: 6 / 6
+Composite QA: PASS
+ZIP CRC: PASS
+Final gate: ELIGIBLE_FOR_DEVPOST_SUBMISSION
+```
+
+## 4. Publication closing line
+
+> The repository is public on GitHub. A tag, GitHub Release, and DevPost submission have not yet been performed.

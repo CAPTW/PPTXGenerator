@@ -1,60 +1,39 @@
-# Existing, Adapted, and Build Week New
+# 🧱 Existing, Adapted, and Build Week New
 
-## Build Week new
+> [Submission hub](README.md) · [Documentation hub](../../README.md) · [Project README](../../../README.md) · [Final evidence](../evidence/phase7_final/)
 
-- Source Corpus and Evidence Unit contracts
-- multi-source prompt plus exactly two searchable-PDF intake
-- deterministic Presentation Architecture integration
-- Module–Batch–Slide planning
-- design invariants and module art direction
-- Creative Template Architecture
-- Semantic Sidecars
-- Phase 4 visual-bundle orchestration
-- external PNGtoPPTX handoff contract
-- Composite QA
-- controlled fault fixture
-- bounded upstream repair loop
-- release dependency closure, preflight, and canaries
-- one-command demo
-- delivery packager
-- physical fresh-clone verification
-- DevPost release evidence
+---
 
-## Adapted existing
+## Ownership map
 
-- existing source ingestion behind versioned adapters
-- existing workflow planner behind a strict adapter
-- existing Creative Front-End planning surfaces
-- existing editable-template concepts where they were actually reused
-- existing QA concepts integrated into the new Composite QA authority
-- existing local runtime utilities consumed without misrepresentation
+```mermaid
+flowchart LR
+    A["Existing internal assets"] --> B["Adapted through strict interfaces"]
+    C["Build Week additions"] --> D["DeckCompiler release path"]
+    E["External existing SkillSet"] --> D
+    B --> D
+    D --> F["Verified PPTX + HTML delivery"]
+```
 
-The adaptation boundary does not reclassify the underlying third-party
-packages, external Skills, PowerPoint, Chromium, or Node.js as Build Week work.
+| Classification | What belongs here |
+|---|---|
+| **Build Week new** | Source Corpus and Evidence Unit contracts, multi-source intake, Presentation Architecture integration, Module–Batch–Slide planning, design invariants, Semantic Sidecars, visual orchestration, Composite QA, controlled repair, dependency closure, one-command demo, packaging, fresh-clone evidence |
+| **Adapted existing** | source ingestion, workflow planner, Creative Front-End planning, editable-template concepts, QA concepts, local runtime utilities |
+| **External existing** | `CAPTW/pngtopptx` four-SkillSet, PowerPoint, Chromium, Node.js, Python dependencies |
+| **Removed legacy surface** | a superseded repo-local duplicate Skill surface, removed after contract detachment and quarantine |
 
-## External existing
+---
 
-The canonical external SkillSet contains:
+## External canonical SkillSet
 
 - `slide-editable-deck-orchestrator`
 - `slide-text-layer-inpaint`
 - `slide-image-dual-render`
 - `slide-visual-polish-qa`
 
-The external CAPTW/pngtopptx four-SkillSet was not created during Build Week.
-PPTX Generator pins and orchestrates it through a verified handoff and release
-contract.
+The four-SkillSet was **not** created during Build Week. The setup wrapper
+installs its verified upstream snapshot when missing. It is pinned by a 99-file
+installation aggregate, remains outside this repository, and is not packaged
+into the delivery ZIP.
 
-Its 99-file installation is pinned by aggregate hash, remains read-only, and
-is not packaged into the repository delivery ZIP. Microsoft PowerPoint,
-Playwright Chromium, Node.js, Cairo, and public Python distributions are also
-existing prepared-machine or package-index dependencies.
-
-## Removed legacy surface
-
-A superseded repo-local duplicate/legacy Skill surface was removed after
-contract detachment and quarantine. The external canonical CAPTW/pngtopptx
-four-SkillSet was retained, pinned, and verified.
-
-This wording means the duplicate repository surface was removed. It does not
-mean that PNGtoPPTX itself or the external canonical SkillSet was removed.
+> “The duplicate repo-local surface was removed” does **not** mean PNGtoPPTX or the external canonical SkillSet was removed.

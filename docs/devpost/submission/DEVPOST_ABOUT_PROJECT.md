@@ -1,117 +1,169 @@
-# About the Project
+# 🧠 About the Project
 
-## Inspiration and problem
+> [Submission hub](README.md) · [Documentation hub](../../README.md) · [Project README](../../../README.md) · [Final evidence](../evidence/phase7_final/)
 
-Many document-to-slide workflows optimize for appearance and quietly flatten
-the result into screenshots. That makes the final deck difficult to edit and
-separates claims from their sources. We wanted creative planning, native
-PowerPoint editability, evidence linkage, and repeatable release proof in one
-workflow.
+---
 
-## Product approach
+## 💡 Inspiration and problem
 
-PPTX Generator accepts a prompt and local source documents, converts them into
-structured evidence and a presentation plan, and emits an editable PowerPoint
-deck plus a companion HTML presentation. The canonical P0 is deliberately
-bounded: one prompt plus exactly two text-searchable PDFs produces three
-sources, 29 Evidence Units, and one six-slide deck.
+Many document-to-slide workflows optimize for appearance and quietly flatten the result into screenshots. That makes the final deck difficult to edit and separates claims from their sources.
 
-The verified deck contains 131 editable text objects, one native table, zero
-picture objects, and zero full-slide raster violations. Semantic, number/unit,
-citation, source-binding, PowerPoint-render, Chromium-capture, parity, and
-package checks are retained as machine-readable evidence.
+We wanted four things in one workflow:
 
-## Architecture and how it was built
+| Goal | Why it matters |
+|---|---|
+| Creative planning | avoid generic template filling |
+| Native PowerPoint editability | let users revise real objects after generation |
+| Evidence linkage | keep claims traceable to source documents |
+| Reproducible proof | show that the workflow works outside the original development environment |
 
-`DeckCompiler` is the internal deterministic Python pipeline. Versioned JSON
-Schema contracts connect Source Corpus and Evidence Units, Module–Batch–Slide
-Presentation Architecture, design invariants, Creative Template Architecture,
-Semantic Sidecars, Visual Targets, slot binding, editable reconstruction,
-PPTX/HTML compilation, Composite QA, bounded repair, and release packaging.
+---
 
-The original platform-managed Phase 4 workflow executed Image Generation and
-recorded provenance plus hashes for the selected design-reference artifacts.
-The exact image-model identity was not exposed and is not claimed. The release
-CLI validates and consumes that frozen visual bundle, performs no live Image
-Generation, needs no API key, and reconstructs fresh editable PPTX and HTML
-outputs.
+## 🧭 Product approach
 
-The external CAPTW/pngtopptx four-SkillSet was not created during Build Week.
-PPTX Generator pins and orchestrates it through a verified handoff and release
-contract. DeckCompiler owns the exact `sys.executable` and hash-locked Python
-package closure used to invoke the external entrypoints; external Skill source
-remains outside the repository and delivery ZIP.
+PPTX Generator accepts a prompt and local source documents, converts them into structured evidence and a presentation plan, and emits an editable PowerPoint deck plus a companion HTML presentation.
 
-## Technical challenges
+**Canonical P0 scope**
 
-The last fresh-clone dependency blocker was subtle: `pip check` passed, but an
-external script launched with DeckCompiler's interpreter imported NumPy
-directly and NumPy was absent from the lock. Auditing the full external
-execution graph led to a versioned dependency manifest, 38 exact hash-bearing
-distributions, isolated import preflight, and six entrypoint canaries.
+- one prompt;
+- exactly two text-searchable PDFs;
+- three sources;
+- 29 Evidence Units;
+- one six-slide deck.
 
-A second fresh-clone comparison exposed an absolute checkout locator inside a
-legacy structural hash. Canonicalizing that locator to a filename made the
-evidence checkout-independent without changing presentation content.
+**Verified output**
 
-The reliability proof also includes a controlled off-canvas fault. The
-detector rejected it, a bounded upstream repair restored the canonical owner in
-one wave, and the immutable before/faulty/repaired evidence confirms that the
-final PPTX was not patched directly.
+- 131 editable text objects;
+- one native table;
+- zero picture objects;
+- zero full-slide raster violations.
 
-## Reproducibility and results
+---
 
-- Four independent demo runs completed 36/36 stages.
-- A physical `--no-local --no-checkout` fresh clone of the historical Phase 7
-  full workspace passed 274 focused and 733 full-suite tests.
-- The current release-minimal public snapshot carries a separately verified,
-  bounded 490-test suite.
-- Canonical-repeat, fresh-repeat, and canonical-fresh comparisons reported zero
-  unexplained divergence.
-- PowerPoint rendering and Chromium capture completed 6/6.
-- The final release gate passed 81/81 prerequisites and reports
-  `ELIGIBLE_FOR_DEVPOST_SUBMISSION`.
+## 🧩 Architecture
 
-The certified fresh-clone environment used CPython 3.11.9 AMD64, Node.js
-24.13.1, npm 11.11.0, PowerPoint 16.0 build 20131 x64, Playwright 1.61.0,
-Chromium revision 1228, and Chrome for Testing 149.0.7827.55. A later
-prerequisite recheck observed Node.js 24.14.0 and PowerPoint build 20228; those
-later values are not the certified canonical-run environment.
+```mermaid
+flowchart TD
+    A["Prompt + 2 PDFs"] --> B["Source Corpus + Evidence Units"]
+    B --> C["Module–Batch–Slide Architecture"]
+    C --> D["Design invariants + Creative Template Architecture"]
+    D --> E["Semantic Sidecars + Visual Targets"]
+    E --> F["Editable PPTX + HTML"]
+    F --> G["Render + Composite QA"]
+    G --> H["Bounded upstream repair + package"]
+```
 
-## Existing, adapted, and new
+`DeckCompiler` is the internal deterministic Python pipeline. Versioned JSON Schema contracts connect Source Corpus and Evidence Units, Presentation Architecture, design invariants, Semantic Sidecars, Visual Targets, slot binding, editable reconstruction, Composite QA, repair, and release packaging.
 
-Build Week work includes the Source Corpus and Evidence Unit contracts,
-multi-source intake, Presentation Architecture integration, Module–Batch–Slide
-planning, design invariants, Creative Template Architecture, Semantic
-Sidecars, visual-bundle orchestration, the external handoff contract, Composite
-QA, the controlled fault, bounded repair, dependency closure, the one-command
-demo, packaging, physical fresh-clone verification, and DevPost release
-evidence.
+### Image Generation boundary
 
-Existing ingestion, workflow planning, Creative Front-End planning,
-editable-template concepts, QA concepts, and local runtime utilities were
-adapted behind versioned or strict interfaces. The external CAPTW/pngtopptx
-four-SkillSet and third-party runtime dependencies remain existing external
-components.
+The original platform-managed Phase 4 workflow executed Image Generation and recorded provenance plus selected-image hashes. The exact image-model identity was not exposed and is not claimed.
 
-## What we learned
+The release CLI:
 
-Dependency ownership follows the interpreter, not only the repository where a
-script lives. A passing resolver does not prove direct imports are closed.
-Reliable editable-slide generation needs semantic contracts, real renderers,
-independent acceptance authority, immutable evidence, and a repair loop that
-changes the upstream owner rather than patching final bytes.
+- validates and consumes the frozen bundle;
+- performs no live Image Generation;
+- needs no API key;
+- reconstructs fresh editable PPTX and HTML outputs.
 
-## Limitations and status
+### External reconstruction boundary
 
-This release proves one source-controlled six-slide P0, not arbitrary-volume
-document ingestion. Scanned or image-only PDF OCR is unsupported. The prepared
-machine requires Windows x64, PowerPoint, Chromium, and the pinned external
-Skills. No Google Slides fidelity, arbitrary PNG-to-perfect-PPTX conversion,
-arbitrary cross-platform PowerPoint fidelity, or unexposed model identity is
-claimed. The release CLI does not rerun live Image Generation, and DevPost
-submission is manual.
+The external `CAPTW/pngtopptx` four-SkillSet was not created during Build Week.
+PPTX Generator's setup wrapper installs a verified upstream snapshot when it is
+missing, then pins and orchestrates it through a verified handoff and release
+contract. DeckCompiler owns the exact interpreter and hash-locked package
+closure; external Skill source remains outside the repository and delivery ZIP.
 
-The candidate is technically eligible for DevPost submission. GitHub
-publication, push, tag, release creation, and actual DevPost submission remain
-unperformed and unauthorized.
+---
+
+## 🛠️ Technical challenges
+
+### 1. Dependency ownership followed the interpreter
+
+`pip check` passed, but an external script launched with DeckCompiler's interpreter imported NumPy while NumPy was absent from the release lock.
+
+The fix was not a manual install. We audited the full external execution graph and added:
+
+- a versioned dependency manifest;
+- 38 exact hash-bearing distributions;
+- isolated import preflight;
+- six entrypoint canaries.
+
+### 2. Checkout-independent structural evidence
+
+A legacy structural hash contained an absolute checkout locator. Canonicalizing it to a filename made the evidence checkout-independent without changing presentation content.
+
+### 3. Repair without patching final bytes
+
+A controlled off-canvas fault was rejected. A bounded repair restored the upstream owner in one wave, and immutable before/faulty/repaired evidence confirms that the final PPTX was not patched directly.
+
+---
+
+## 📈 Reproducibility and results
+
+| Result | Evidence |
+|---|---:|
+| Full demo runs | 4 |
+| Stages per run | 36 / 36 PASS |
+| Historical Phase 7 focused tests | 274 PASS |
+| Historical Phase 7 full suite | 733 PASS |
+| Current public minimal-snapshot suite | 490 PASS |
+| PowerPoint renders | 6 / 6 |
+| Chromium captures | 6 / 6 |
+| Final release gates | 81 / 81 PASS |
+| Unexplained divergence | 0 |
+
+The 274/733 results belong to the immutable historical Phase 7 full-workspace
+evidence. The bounded test inventory distributed in the public snapshot is the
+separately verified 490-test suite.
+
+### Certified environment
+
+| Component | Certified value |
+|---|---|
+| CPython | 3.11.9 AMD64 |
+| Node.js / npm | 24.13.1 / 11.11.0 |
+| PowerPoint | 16.0 build 20131 x64 |
+| Playwright | 1.61.0 |
+| Chromium | revision 1228 |
+| Chrome for Testing | 149.0.7827.55 |
+
+A later prerequisite recheck observed Node.js 24.14.0 and PowerPoint build 20228; those later values are not the certified canonical-run environment.
+
+---
+
+## 🧱 Existing, adapted, and new
+
+| Classification | Examples |
+|---|---|
+| Build Week new | evidence contracts, multi-source intake, Architecture integration, Sidecars, Composite QA, controlled repair, dependency closure, one-command demo, packaging, fresh-clone proof |
+| Adapted existing | ingestion, workflow planning, creative planning, editable-template concepts, QA concepts, local runtime utilities |
+| External existing | `CAPTW/pngtopptx`, PowerPoint, Chromium, Node.js, public Python dependencies |
+
+---
+
+## 🎓 What we learned
+
+1. Dependency ownership follows the interpreter, not only the repository containing a script.
+2. A passing resolver does not prove direct imports are closed.
+3. Reliable editable-slide generation needs semantic contracts and real renderers.
+4. Acceptance authority must be independent from the producer.
+5. Repair should change the upstream owner, not patch final bytes.
+
+---
+
+## ⚠️ Limitations and status
+
+- one source-controlled six-slide P0;
+- no arbitrary-volume document ingestion;
+- no scanned or image-only PDF OCR;
+- Windows x64 prepared-machine profile;
+- no Google Slides fidelity;
+- no arbitrary PNG-to-perfect-PPTX conversion;
+- no arbitrary cross-platform PowerPoint claim;
+- no unexposed model identity claim;
+- no live Image Generation rerun in the release CLI.
+
+**Technical status:** `ELIGIBLE_FOR_DEVPOST_SUBMISSION`<br>
+**GitHub:** published<br>
+**DevPost:** not yet submitted

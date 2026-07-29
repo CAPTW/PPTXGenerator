@@ -1,47 +1,60 @@
-# Architecture Overview
+# 🧩 Architecture Overview
 
-PPTX Generator is the public product. `DeckCompiler` is its internal,
-contract-driven Python pipeline. Each layer can be validated independently, so
-content, design intent, editable reconstruction, and release evidence do not
-collapse into one opaque generation step.
+> [Submission hub](README.md) · [Documentation hub](../../README.md) · [Project README](../../../README.md) · [Final evidence](../evidence/phase7_final/)
 
-```text
-one prompt + exactly two searchable PDFs
-  -> Source Corpus (3 sources) + Evidence Unit registry (29 units)
-  -> Presentation Architecture (3 modules / 3 batches / 6 slides)
-  -> design invariants + Creative Template Architecture
-  -> platform-generated, frozen design-reference bundle
-  -> 6 Semantic Sidecars + 6 Visual Targets
-  -> slot binding + pinned external editable reconstruction
-  -> editable PPTX + companion HTML
-  -> PowerPoint render + Chromium capture
-  -> semantic, source, editability, raster, parity, and visual QA
-  -> controlled-fault evidence + bounded upstream repair
-  -> deterministic package + final release gate
+> PPTX Generator is the public product. `DeckCompiler` is its contract-driven Python pipeline.
+
+---
+
+## End-to-end pipeline
+
+```mermaid
+flowchart TD
+    A["1 prompt + 2 searchable PDFs"] --> B["Source Corpus<br/>3 sources"]
+    B --> C["Evidence Registry<br/>29 units"]
+    C --> D["Presentation Architecture<br/>3 modules · 3 batches · 6 slides"]
+    D --> E["Design invariants<br/>Creative Template Architecture"]
+    E --> F["Frozen visual bundle<br/>6 Sidecars · 6 Visual Targets"]
+    F --> G["Pinned editable reconstruction"]
+    G --> H["Editable PPTX + HTML"]
+    H --> I["PowerPoint render + Chromium capture"]
+    I --> J["Semantic · source · editability · raster · parity · visual QA"]
+    J --> K["Controlled fault + bounded repair"]
+    K --> L["Deterministic package + final gate"]
 ```
+
+---
+
+## Authority map
+
+| Layer | Owns | Must not do |
+|---|---|---|
+| Source / Evidence | facts, locators, source bindings | invent undocumented facts |
+| Presentation Architecture | narrative order, modules, batches, slide roles | rewrite source meaning |
+| Semantic Sidecar | canonical text/data and editability requirements | defer semantics to image pixels |
+| Visual Target | composition and art direction | become full-slide final output |
+| Reconstructor | native PPTX/HTML objects | silently choose another story |
+| QA | independent acceptance verdict | trust producer self-report alone |
+
+---
 
 ## Key boundaries
 
-- Real slide copy is authored as editable PowerPoint and HTML text, not OCR
-  output from a generated reference image.
-- The native table, cards, panels, dividers, captions, and frames remain
-  editable or vector-based wherever the contract requires it.
-- The original platform-managed Phase 4 workflow executed Image Generation and
-  recorded provenance and selected-image hashes. The image-model identity was
-  not exposed and is not claimed.
-- The release CLI validates and consumes the frozen verified visual bundle. It
-  performs no live Image Generation, needs no API key, and never treats a
-  design reference as a full-slide final screenshot.
-- The external CAPTW/pngtopptx four-SkillSet was not created during Build Week.
-  PPTX Generator pins and orchestrates it through a verified handoff and
-  release contract.
-- DeckCompiler owns the `sys.executable` passed to external Python scripts and
-  therefore owns the exact 38-distribution package closure for that
-  interpreter.
-- JSON Schemas, content hashes, structural fingerprints, real renderers, and a
-  clean-tree final gate make failure and reproducibility reviewable.
+- Real slide copy is editable PowerPoint and HTML text, not OCR output.
+- The native table, cards, panels, dividers, captions, and frames remain editable or vector-based where required.
+- Original Phase 4 Image Generation is provenance-recorded, but the release CLI performs no live Image Generation.
+- The external `CAPTW/pngtopptx` four-SkillSet is auto-installed when missing, pinned, orchestrated, and kept outside the repository.
+- DeckCompiler owns the exact `sys.executable` and 38-distribution package closure used by external Python scripts.
+- JSON Schemas, content hashes, structural fingerprints, real renderers, and a clean-tree final gate make failures reviewable.
 
-The future Local Model path can make bounded JSON decisions against locked
-design assets while deterministic code retains control of compilation and
-validation. It is a compatibility direction, not a claim that the current P0
-is model-agnostic or generally cross-platform.
+---
+
+## Certified P0 boundary
+
+| Proven | Not claimed |
+|---|---|
+| one six-slide source-controlled workflow | arbitrary document volume |
+| one prompt + exactly two searchable PDFs | scanned-PDF OCR |
+| Windows x64 prepared-machine profile | arbitrary cross-platform fidelity |
+| editable PPTX + companion HTML | Google Slides fidelity |
+| frozen visual bundle | live Image Generation in the release CLI |

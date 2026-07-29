@@ -1,7 +1,21 @@
-# DevPost Form Payload
+<div align="center">
+
+# 📝 DevPost Form Payload
+
+**Evidence-backed, copy-ready fields for the manual DevPost submission**
+
+[Submission hub](README.md) · [Documentation hub](../../README.md) ·
+[Project README](../../../README.md) ·
+[Final evidence](../evidence/phase7_final/)
+
+</div>
+
+---
 
 This document contains only fields confirmed by repository evidence. It is
 copy-paste ready but has not been submitted.
+
+> **Status:** `READY_FOR_MANUAL_SUBMISSION — NOT YET SUBMITTED`
 
 ## Project Name
 

@@ -1,42 +1,48 @@
-# Submission Checklist
+# ✅ Submission Checklist
 
-## Release evidence
+> [Submission hub](README.md) · [Documentation hub](../../README.md) · [Project README](../../../README.md) · [Final evidence](../evidence/phase7_final/)
 
-- [x] Exact external Python execution graph audited
-- [x] Six external entrypoints pinned by source hash
-- [x] Thirty-eight exact distributions locked with artifact hashes
-- [x] License and provenance evidence complete
-- [x] Isolated hash-required install passed
-- [x] Import preflight and six entrypoint canaries passed
-- [x] Corrected Phase 7C canonical and repeat runs passed
-- [x] Physical fresh-clone setup and tests passed
-- [x] Fresh canonical and repeat runs passed
-- [x] Canonical-repeat, fresh-repeat, and canonical-fresh equivalence passed
-- [x] Corrected canonical ZIP curated and validated
-- [x] Composite QA and Phase 6 proof passed
-- [x] Package secret, path, license, CRC, and protected-output checks passed
-- [x] Final gate is `ELIGIBLE_FOR_DEVPOST_SUBMISSION`
-- [x] Thirteen original submission documents reviewed claim by claim
-- [x] DevPost confirmed-field payload prepared with URL placeholders
-- [x] GitHub publication plan prepared without remote mutation
-- [x] Manual media order and exact source hashes recorded
+---
 
-## Publication controls
+## Technical release — complete
 
-- [ ] GitHub owner, repository name, visibility, remote, and publication branch
-  explicitly approved
-- [ ] Full selected-history push explicitly approved
-- [ ] Tag, GitHub Release, and canonical ZIP upload explicitly approved
-- [ ] Final DevPost text and media explicitly approved
-- [ ] Demo video URL supplied or intentional pending state approved
-- [ ] Actual DevPost submission explicitly authorized and performed
-- [ ] Codex Session ID recorded from `/feedback`
+- [x] external Python execution graph audited
+- [x] six external entrypoints pinned by source hash
+- [x] 38 exact distributions locked with artifact hashes
+- [x] license and provenance evidence complete
+- [x] isolated hash-required install passed
+- [x] import preflight and six entrypoint canaries passed
+- [x] corrected canonical and repeat runs passed
+- [x] physical fresh-clone proof passed
+- [x] fresh canonical and repeat runs passed
+- [x] canonical-repeat, fresh-repeat, and canonical-fresh equivalence passed
+- [x] canonical ZIP curated and validated
+- [x] Composite QA and repair proof passed
+- [x] secret, path, license, CRC, and protected-output gates passed
+- [x] final gate is `ELIGIBLE_FOR_DEVPOST_SUBMISSION`
 
-Submission status:
+## GitHub publication — complete; Release assets pending
 
-`READY_FOR_MANUAL_SUBMISSION — NOT YET SUBMITTED`
+- [x] public repository created
+- [x] minimal snapshot pushed to `main`
+- [x] Apache-2.0 license included
+- [x] publication boundary documented
+- [x] external Skill auto-installer and path-neutral authority published
+- [x] public regression fixtures and bounded 490-test suite verified
+- [ ] tag created
+- [ ] GitHub Release created
+- [ ] canonical ZIP uploaded as a Release asset
 
-The unchecked items are intentional. No remote, push, tag, GitHub Release,
-asset upload, browser submission, or DevPost submission is authorized by
-technical eligibility. The Session ID remains `PENDING_USER_FEEDBACK` until the
-user supplies the actual `/feedback` value.
+## DevPost — pending
+
+- [x] copy-ready form payload prepared
+- [x] media order and source hashes recorded
+- [ ] final text approved by submitter
+- [ ] final eight-image order approved
+- [ ] demo video URL supplied or pending state accepted
+- [ ] live DevPost fields reviewed
+- [ ] form submitted manually
+- [ ] submission URL and timestamp recorded
+- [ ] `/feedback` Session ID recorded or intentionally left pending
+
+**Status:** `READY_FOR_MANUAL_SUBMISSION — NOT YET SUBMITTED`

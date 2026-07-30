@@ -116,6 +116,11 @@ def build_strict_planning(config: Phase3Config, intake: IntakeArtifacts) -> Stri
     source_gap_report = _build_source_gap_report(config, intake)
     evidence = intake.evidence_unit_registry["evidence_units"]
     source_by_id = {item["source_id"]: item for item in intake.source_corpus["sources"]}
+    coverage_seeds = (
+        _documentary_coverage_seeds(evidence, source_by_id)
+        if config.mode == "prompt_with_pdfs"
+        else {}
+    )
     topic = _topic_label(prompt_text)
     sections = _sections()
     slides: list[dict[str, Any]] = []
@@ -123,7 +128,12 @@ def build_strict_planning(config: Phase3Config, intake: IntakeArtifacts) -> Stri
     allocation_rows: list[dict[str, Any]] = []
 
     for index, role in enumerate(ROLE_SPECS, start=1):
-        selected = _select_evidence(evidence, role["preferred"], role["limit"])
+        selected = _select_evidence(
+            evidence,
+            role["preferred"],
+            role["limit"],
+            required=coverage_seeds.get(index),
+        )
         if not selected:
             raise DeckCompilerError(
                 "DC_PLANNING_FAILED",
@@ -351,8 +361,10 @@ def _select_evidence(
     evidence: list[dict[str, Any]],
     preferred_types: list[str],
     limit: int,
+    *,
+    required: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
-    selected: list[dict[str, Any]] = []
+    selected: list[dict[str, Any]] = [required] if required is not None else []
     for evidence_type in preferred_types:
         for item in evidence:
             if item["evidence_type"] == evidence_type and item not in selected:
@@ -362,6 +374,37 @@ def _select_evidence(
     if not selected:
         selected = [item for item in evidence if item["factuality_class"] != "documentary_fact"][:1]
     return selected
+
+
+def _documentary_coverage_seeds(
+    evidence: list[dict[str, Any]],
+    source_by_id: dict[str, dict[str, Any]],
+) -> dict[int, dict[str, Any]]:
+    pdf_source_ids = sorted(
+        source_id
+        for source_id, source in source_by_id.items()
+        if source["source_type"] == "pdf"
+    )
+    seeds: dict[int, dict[str, Any]] = {}
+    for slide_number, source_id in enumerate(pdf_source_ids, start=1):
+        candidates = sorted(
+            (
+                item
+                for item in evidence
+                if item["source_id"] == source_id
+                and item["factuality_class"] == "documentary_fact"
+            ),
+            key=lambda item: item["evidence_id"],
+        )
+        if not candidates:
+            raise DeckCompilerError(
+                "DC_EVIDENCE_COVERAGE_INCOMPLETE",
+                "strict_planning",
+                f"PDF source has no documentary Evidence Unit: {source_id}",
+                related_ids=(source_id,),
+            )
+        seeds[slide_number] = candidates[0]
+    return seeds
 
 
 def _validate_planning(
@@ -388,7 +431,7 @@ def _validate_planning(
                 "strict_planning",
                 f"blueprint references unknown evidence: {', '.join(sorted(unknown))}",
             )
-    if config.mode == "prompt_plus_two_pdfs":
+    if config.pdf_paths:
         expected_sources = {
             item["source_id"] for item in intake.source_corpus["sources"] if item["source_type"] == "pdf"
         }
@@ -396,7 +439,7 @@ def _validate_planning(
             raise DeckCompilerError(
                 "DC_EVIDENCE_COVERAGE_INCOMPLETE",
                 "strict_planning",
-                "strict planning must represent both documentary PDF sources",
+                "strict planning must represent every documentary PDF source",
             )
     validatePresentationPlan(plan)
     validate_slide_blueprint_collection(collection)
@@ -411,6 +454,8 @@ def _topic_label(prompt_text: str) -> str:
     if explain:
         return _title_case(explain.group(1))
     words = re.findall(r"[A-Za-z0-9-]+", normalized)
+    if not words:
+        words = re.findall(r"[^\W_]+(?:-[^\W_]+)*", normalized, flags=re.UNICODE)
     return _title_case(" ".join(words[:8])) or "Source-Grounded Decision"
 
 
@@ -449,6 +494,12 @@ def _source_summary(config: Phase3Config, intake: IntakeArtifacts) -> str:
     if config.mode == "prompt_only":
         return "One user prompt; no documentary source supplied; factual and quantitative gaps remain explicit."
     count = intake.source_coverage_report["documentary_fact_count"]
+    if config.mode == "prompt_with_pdfs":
+        pdf_count = intake.source_coverage_report["documentary_source_count"]
+        return (
+            f"One user prompt and {pdf_count} user-provided local PDF"
+            f"{'s' if pdf_count != 1 else ''} normalized into {count} documentary Evidence Units."
+        )
     return f"One user prompt and two repository-authored synthetic PDFs normalized into {count} documentary Evidence Units."
 
 
@@ -464,4 +515,9 @@ def _duplicates(values: list[str]) -> list[str]:
     return sorted({value for value in values if values.count(value) > 1})
 
 
-__all__ = ["ADAPTER_VERSION", "StrictPlanningArtifacts", "build_strict_planning"]
+__all__ = [
+    "ADAPTER_VERSION",
+    "StrictPlanningArtifacts",
+    "WORKFLOW_ALIASES",
+    "build_strict_planning",
+]

@@ -10,6 +10,15 @@ from pathlib import Path
 from .errors import DeckCompilerError
 from .manifest_io import read_json
 from .manifest_io import write_json
+from .orchestration.codex_run import (
+    seal_codex_run_manifest,
+    validate_codex_run_manifest,
+)
+from .orchestration.generate import (
+    resume_generate_workflow,
+    start_generate_workflow,
+    validate_generate_workflow,
+)
 from .orchestration.phase3_runner import run_phase3
 from .pngtopptx_pinning import (
     PinningError,
@@ -46,6 +55,54 @@ def build_parser() -> argparse.ArgumentParser:
     )
     build.add_argument("--config", type=Path, required=True)
     build.add_argument("--output-dir", type=Path, required=True)
+
+    generate = subparsers.add_parser(
+        "generate",
+        help=(
+            "Capture a prompt/PDF request for the mandatory Architect-first live "
+            "Codex ImageGen-to-PNGtoPPTX workflow."
+        ),
+    )
+    generate.add_argument("--output-dir", type=Path)
+    generate.add_argument("--resume", type=Path)
+    prompt_group = generate.add_mutually_exclusive_group()
+    prompt_group.add_argument("--prompt")
+    prompt_group.add_argument("--prompt-file", type=Path)
+    generate.add_argument("--pdf", dest="pdfs", type=Path, action="append", default=[])
+    generate.add_argument("--audience", default="general professional audience")
+    generate.add_argument("--purpose", default="source-grounded presentation")
+    generate.add_argument("--language", default="English")
+    generate.add_argument("--tone", action="append")
+    generate.add_argument(
+        "--workflow",
+        default="auto",
+        help="Optional user hint only; pptx-workflow-architect selects the actual workflow.",
+    )
+    generate.add_argument(
+        "--codex-run-manifest",
+        type=Path,
+        help="Sealed live Codex run evidence to register while resuming.",
+    )
+
+    validate_generate = subparsers.add_parser(
+        "validate-generate",
+        help="Validate a resumable general generate workflow manifest.",
+    )
+    validate_generate.add_argument("path", type=Path)
+
+    seal_codex_run = subparsers.add_parser(
+        "seal-codex-run",
+        help="Recompute artifact hashes and seal a live Codex PPTX generation run.",
+    )
+    seal_codex_run.add_argument("--draft", type=Path, required=True)
+    seal_codex_run.add_argument("--output", type=Path, required=True)
+
+    validate_codex_run = subparsers.add_parser(
+        "validate-codex-run",
+        help="Validate live Architect, ImageGen, PNGtoPPTX, and visual-QA evidence.",
+    )
+    validate_codex_run.add_argument("path", type=Path)
+    validate_codex_run.add_argument("--workflow-id")
 
     prepare = subparsers.add_parser(
         "prepare-visuals",
@@ -119,6 +176,12 @@ def build_parser() -> argparse.ArgumentParser:
         default="phase5_baseline",
     )
     composite_qa.add_argument("--created-at")
+    composite_qa.add_argument(
+        "--authority-mode",
+        choices=("canonical", "runtime"),
+        default="canonical",
+        help="Use committed canonical authorities or hash the supplied runtime bundles.",
+    )
 
     validate_composite = subparsers.add_parser(
         "validate-composite-qa", help="Validate hash and schema linkage for a complete Phase 6 composite QA directory."
@@ -161,6 +224,99 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.command == "generate":
+        try:
+            if args.resume is None:
+                if args.output_dir is None:
+                    raise DeckCompilerError(
+                        "DC_GENERATE_INPUT_INVALID",
+                        "general_generate_workflow",
+                        "--output-dir is required when starting a generate workflow.",
+                    )
+                if args.codex_run_manifest is not None:
+                    raise DeckCompilerError(
+                        "DC_GENERATE_INPUT_INVALID",
+                        "general_generate_workflow",
+                        "--codex-run-manifest requires --resume.",
+                    )
+                result = start_generate_workflow(
+                    output_dir=args.output_dir,
+                    prompt=args.prompt,
+                    prompt_file=args.prompt_file,
+                    pdf_paths=args.pdfs,
+                    audience=args.audience,
+                    purpose=args.purpose,
+                    language=args.language,
+                    tone=args.tone or ("professional", "clear"),
+                    workflow=args.workflow,
+                )
+            else:
+                if args.output_dir is not None or args.prompt is not None or args.prompt_file is not None or args.pdfs:
+                    raise DeckCompilerError(
+                        "DC_GENERATE_INPUT_INVALID",
+                        "general_generate_workflow",
+                        "--output-dir, prompt, and PDF inputs cannot be changed while resuming.",
+                    )
+                result = resume_generate_workflow(
+                    resume=args.resume,
+                    codex_run_manifest=args.codex_run_manifest,
+                )
+        except (DeckCompilerError, HandoffError, CompositeQAError, OSError, ValueError) as exc:
+            code = getattr(exc, "code", "DC_GENERATE_FAILED")
+            print(f"DECKCOMPILER_GENERATE_BLOCKED code={code} message={exc}")
+            return 1
+        except Exception as exc:  # pragma: no cover - final CLI containment boundary
+            print(
+                "DECKCOMPILER_GENERATE_BLOCKED "
+                f"code=DC_GENERATE_INTERNAL_ERROR message={type(exc).__name__}: {exc}"
+            )
+            return 1
+        action = result.required_action["code"] if result.required_action else "NONE"
+        marker = (
+            "DECKCOMPILER_GENERATE_COMPLETED"
+            if result.status == "COMPLETED"
+            else "DECKCOMPILER_GENERATE_NEEDS_REPAIR"
+            if result.status == "NEEDS_REPAIR"
+            else "DECKCOMPILER_GENERATE_AWAITING"
+        )
+        print(
+            f"{marker} workflow_id={result.workflow_id} status={result.status} "
+            f"action={action} manifest={result.manifest_path.as_posix()}"
+        )
+        return result.exit_code
+    if args.command == "validate-generate":
+        try:
+            report = validate_generate_workflow(args.path)
+        except (DeckCompilerError, OSError, ValueError, json.JSONDecodeError) as exc:
+            print(f"DECKCOMPILER_GENERATE_MANIFEST_INVALID {exc}")
+            return 1
+        print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0 if report["valid"] else 1
+    if args.command == "seal-codex-run":
+        try:
+            payload = seal_codex_run_manifest(args.draft, args.output)
+        except (DeckCompilerError, OSError, ValueError, json.JSONDecodeError) as exc:
+            code = getattr(exc, "code", "DC_CODEX_RUN_SEAL_FAILED")
+            print(f"DECKCOMPILER_CODEX_RUN_SEAL_BLOCKED code={code} message={exc}")
+            return 1
+        print(
+            "DECKCOMPILER_CODEX_RUN_SEALED "
+            f"workflow_id={payload['workflow_id']} status={payload['status']} "
+            f"manifest={args.output.resolve().as_posix()}"
+        )
+        return 0
+    if args.command == "validate-codex-run":
+        try:
+            report = validate_codex_run_manifest(
+                args.path,
+                expected_workflow_id=args.workflow_id,
+            )
+        except (DeckCompilerError, OSError, ValueError, json.JSONDecodeError) as exc:
+            code = getattr(exc, "code", "DC_CODEX_RUN_INVALID")
+            print(f"DECKCOMPILER_CODEX_RUN_INVALID code={code} message={exc}")
+            return 1
+        print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0 if report["contract_valid"] else 1
     if args.command == "demo":
         from .release.demo import main as demo_main
 
@@ -302,6 +458,7 @@ def main(argv: list[str] | None = None) -> int:
                 baseline=not args.nonbaseline,
                 active_output_set=args.active_output_set,
                 created_at=args.created_at,
+                authority_mode=args.authority_mode,
             )
         except (CompositeQAError, OSError, ValueError) as exc:
             print(f"DECKCOMPILER_PHASE6_COMPOSITE_BLOCKED {exc}")

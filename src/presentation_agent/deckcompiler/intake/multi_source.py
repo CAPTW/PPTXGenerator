@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -18,6 +19,9 @@ from .pdf_text import PdfExtraction, extract_searchable_pdf, normalize_text
 
 
 RIGHTS_NOTE = "Repository-authored synthetic content; local-only; no third-party, private, or remote source."
+USER_PDF_RIGHTS_NOTE = (
+    "User-provided local PDF; rights, privacy, and redistribution authority remain the user's responsibility."
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -31,17 +35,19 @@ class IntakeArtifacts:
 
 def build_intake_artifacts(config: Phase3Config, *, run_id: str | None = None) -> IntakeArtifacts:
     prompt_text = _read_prompt(config.prompt_path)
+    source_language = _source_language(config)
+    pdf_rights_note = USER_PDF_RIGHTS_NOTE if config.mode == "prompt_with_pdfs" else RIGHTS_NOTE
     pdf_fingerprints = [_file_sha256(path) for path in config.pdf_paths]
     if len(pdf_fingerprints) != len(set(pdf_fingerprints)):
         raise DeckCompilerError(
             "DC_SOURCE_DUPLICATE_CONFLICT",
             "source_preflight",
-            "two PDF entries resolve to identical binary content",
-            remediation_hint="Provide two distinct source reports or remove the duplicate input.",
+            "PDF entries resolve to identical binary content",
+            remediation_hint="Provide distinct source documents or remove the duplicate input.",
         )
 
     input_request = _build_input_request(config, prompt_text, pdf_fingerprints, run_id)
-    prompt_source, prompt_locator, prompt_segment = _prompt_records(prompt_text)
+    prompt_source, prompt_locator, prompt_segment = _prompt_records(prompt_text, source_language)
     pdf_records: list[tuple[dict[str, Any], PdfExtraction, str]] = []
     for path, fingerprint in zip(config.pdf_paths, pdf_fingerprints, strict=True):
         stable_identity = {"algorithm": "sha256", "value": fingerprint}
@@ -56,8 +62,8 @@ def build_intake_artifacts(config: Phase3Config, *, run_id: str | None = None) -
             "stable_identity": stable_identity,
             "locator_strategy": "pdf_page_text_span",
             "extraction_status": "extracted",
-            "language": "en",
-            "rights_privacy_note": RIGHTS_NOTE,
+            "language": source_language,
+            "rights_privacy_note": pdf_rights_note,
             "child_assets": [],
         }
         pdf_records.append((source, extraction, _checkout_independent_legacy_hash(legacy_document, path)))
@@ -80,7 +86,7 @@ def build_intake_artifacts(config: Phase3Config, *, run_id: str | None = None) -
                     "quote": block.canonical_text,
                 },
                 "canonical_text": block.canonical_text,
-                "language": "en",
+                "language": source_language,
                 "content_sha256": content_sha256(block.canonical_text),
             }
             segments.append(segment_payload)
@@ -191,7 +197,7 @@ def _build_input_request(
     return seal_artifact(payload, artifact_type="input_request")
 
 
-def _prompt_records(prompt_text: str) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+def _prompt_records(prompt_text: str, language: str) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     canonical = normalize_text(prompt_text)
     stable_identity = {"algorithm": "canonical_text_sha256", "value": content_sha256(canonical)}
     source_id = stable_source_id("user_prompt", stable_identity)
@@ -203,7 +209,7 @@ def _prompt_records(prompt_text: str) -> tuple[dict[str, Any], dict[str, Any], d
         "stable_identity": stable_identity,
         "locator_strategy": "prompt_character_range",
         "extraction_status": "not_required",
-        "language": "en",
+        "language": language,
         "rights_privacy_note": "User-provided local prompt; no documentary factual authority.",
         "child_assets": [],
     }
@@ -228,7 +234,7 @@ def _prompt_records(prompt_text: str) -> tuple[dict[str, Any], dict[str, Any], d
             "quote": canonical,
         },
         "canonical_text": canonical,
-        "language": "en",
+        "language": language,
         "content_sha256": content_sha256(canonical),
     }
     return source, locator_payload, segment
@@ -263,6 +269,33 @@ def _checkout_independent_legacy_hash(document: SourceDocument, source_path: Pat
 def _pdf_title(extraction: PdfExtraction, path: Path) -> str:
     title = extraction.metadata.get("title", "").strip()
     return title or path.stem.replace("_", " ").title()
+
+
+def _source_language(config: Phase3Config) -> str:
+    if config.mode == "prompt_plus_two_pdfs":
+        return "en"
+    normalized = config.language.strip().lower().replace("_", "-")
+    aliases = {
+        "english": "en",
+        "korean": "ko",
+        "한국어": "ko",
+        "japanese": "ja",
+        "chinese": "zh",
+        "french": "fr",
+        "german": "de",
+        "spanish": "es",
+    }
+    candidate = aliases.get(normalized, normalized)
+    parts = candidate.split("-")
+    if len(parts) == 1 and re.fullmatch(r"[a-z]{2,3}", parts[0]):
+        return parts[0]
+    if (
+        len(parts) == 2
+        and re.fullmatch(r"[a-z]{2,3}", parts[0])
+        and re.fullmatch(r"[a-z]{2}", parts[1])
+    ):
+        return f"{parts[0]}-{parts[1].upper()}"
+    return "en"
 
 
 __all__ = ["IntakeArtifacts", "build_intake_artifacts"]

@@ -14,6 +14,7 @@ from typing import Any
 from PIL import Image
 
 from ..manifest_io import read_json, write_json
+from ..platform_image_execution.contracts import verify_hash_bound_payload
 from ..pngtopptx_pinning import PinningError, validate_external_skillset_pin
 from ..schemas import validator_for
 from .crop_contract import (
@@ -258,6 +259,51 @@ def _validate_phase4(phase4_bundle: Path) -> tuple[dict[str, Any], list[dict[str
             }
         )
     return manifest, mappings
+
+
+def validate_phase4_bundle(phase4_bundle: Path) -> dict[str, Any]:
+    """Validate an accepted Phase 4 bundle without creating a Phase 5 handoff."""
+
+    root = phase4_bundle.resolve()
+    manifest, mappings = _validate_phase4(root)
+    schema_files = (
+        ("visual_target_manifest.json", "phase4_visual_target_manifest", "manifest_hash"),
+        ("input_provenance.json", "phase4_input_provenance", None),
+        ("visual_dna.json", "visual_dna", None),
+        ("design_system.json", "phase4_design_system", None),
+        ("editable_template_spec.json", "phase4_editable_template_spec", None),
+        ("generation_provenance.json", "phase4_generation_provenance", "provenance_hash"),
+        ("geometry_fit_report.json", "phase4_geometry_fit_report", "report_hash"),
+        ("regeneration_history.json", "phase4_regeneration_history", "history_hash"),
+        ("phase4_validation_report.json", "phase4_validation_report", "report_hash"),
+        ("phase4_bundle_acceptance.json", "phase4_visual_bundle_acceptance", "acceptance_hash"),
+    )
+    for filename, schema_name, hash_field in schema_files:
+        path = root / filename
+        if not path.is_file():
+            raise HandoffError("INVALID_PHASE4_BUNDLE", f"missing required file: {path}")
+        payload = _require_object(path)
+        errors = sorted(
+            validator_for(schema_name).iter_errors(payload),
+            key=lambda item: list(item.absolute_path),
+        )
+        if errors:
+            location = "/".join(str(item) for item in errors[0].absolute_path) or "$"
+            raise HandoffError(
+                "INVALID_PHASE4_BUNDLE",
+                f"{filename} {location}: {errors[0].message}",
+            )
+        if hash_field and not verify_hash_bound_payload(payload, hash_field):
+            raise HandoffError(
+                "INVALID_PHASE4_BUNDLE",
+                f"{filename} has an invalid {hash_field}",
+            )
+    return {
+        "valid": True,
+        "manifest_id": manifest["manifest_id"],
+        "selected_target_count": manifest["selected_target_count"],
+        "slide_ids": [mapping["slide_id"] for mapping in mappings],
+    }
 
 
 def _constraints(created_at: str, timezone: str) -> dict[str, Any]:

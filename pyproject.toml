@@ -22,6 +22,7 @@ dependencies = [
 ]
 
 [project.scripts]
+deckcompiler = "presentation_agent.deckcompiler.cli:main"
 presentation-agent = "presentation_agent.runtime_cli:main"
 presentation-agent-state = "presentation_agent.state_cli:main"
 presentation-agent-production-gate = "presentation_agent.production_gate:main"

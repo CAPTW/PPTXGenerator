@@ -37,7 +37,7 @@
       "uniqueItems": true,
       "items": {"type": "string", "pattern": "^ev_[0-9a-f]{20}$"}
     },
-    "source_count": {"const": 3},
+    "source_count": {"type": "integer", "minimum": 1, "maximum": 7},
     "evidence_unit_count": {"type": "integer", "minimum": 1},
     "module_count": {"const": 3},
     "batch_count": {"const": 3},

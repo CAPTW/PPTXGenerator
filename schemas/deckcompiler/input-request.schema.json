@@ -16,9 +16,9 @@
     },
     "run_id": {"type": "string", "pattern": "^run_[0-9a-f]{20}$"},
     "request_id": {"type": "string", "pattern": "^request_[0-9a-f]{20}$"},
-    "mode": {"enum": ["prompt_only", "prompt_plus_two_pdfs"]},
+    "mode": {"enum": ["prompt_only", "prompt_plus_two_pdfs", "prompt_with_pdfs"]},
     "prompt": {"$ref": "#/$defs/inputSource"},
-    "pdfs": {"type": "array", "maxItems": 2, "items": {"$ref": "#/$defs/inputSource"}},
+    "pdfs": {"type": "array", "maxItems": 6, "items": {"$ref": "#/$defs/inputSource"}},
     "presentation": {
       "type": "object",
       "additionalProperties": false,
@@ -55,6 +55,10 @@
     {
       "if": {"properties": {"mode": {"const": "prompt_plus_two_pdfs"}}, "required": ["mode"]},
       "then": {"properties": {"pdfs": {"minItems": 2, "maxItems": 2}}}
+    },
+    {
+      "if": {"properties": {"mode": {"const": "prompt_with_pdfs"}}, "required": ["mode"]},
+      "then": {"properties": {"pdfs": {"minItems": 1, "maxItems": 6}}}
     }
   ]
 }

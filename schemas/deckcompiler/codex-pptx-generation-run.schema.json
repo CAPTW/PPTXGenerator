@@ -1,0 +1,353 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/codex-pptx-generation-run.schema.json",
+  "title": "Codex PPTX Generation Run",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "workflow_id",
+    "status",
+    "architect",
+    "image_generation",
+    "reconstruction",
+    "visual_qa",
+    "delivery",
+    "content_hash"
+  ],
+  "properties": {
+    "schema_name": {
+      "const": "codex_pptx_generation_run"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "workflow_id": {
+      "type": "string",
+      "pattern": "^generate_[0-9a-f]{20}$"
+    },
+    "status": {
+      "enum": [
+        "COMPLETED",
+        "NEEDS_REPAIR",
+        "BLOCKED"
+      ]
+    },
+    "architect": {
+      "$ref": "#/$defs/architect"
+    },
+    "image_generation": {
+      "$ref": "#/$defs/imageGeneration"
+    },
+    "reconstruction": {
+      "$ref": "#/$defs/reconstruction"
+    },
+    "visual_qa": {
+      "$ref": "#/$defs/visualQa"
+    },
+    "delivery": {
+      "$ref": "#/$defs/delivery"
+    },
+    "content_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "approval_source"
+      ],
+      "properties": {
+        "status": {
+          "const": "APPROVED"
+        },
+        "approval_source": {
+          "const": "user"
+        }
+      }
+    },
+    "architect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "skill_name",
+        "invocation_order",
+        "first_skill_invoked",
+        "gate1",
+        "gate2",
+        "slide_count",
+        "workflow_design",
+        "blueprint",
+        "design_system",
+        "approval_record"
+      ],
+      "properties": {
+        "skill_name": {
+          "const": "pptx-workflow-architect"
+        },
+        "invocation_order": {
+          "const": 1
+        },
+        "first_skill_invoked": {
+          "const": true
+        },
+        "gate1": {
+          "$ref": "#/$defs/gate"
+        },
+        "gate2": {
+          "$ref": "#/$defs/gate"
+        },
+        "slide_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 400
+        },
+        "workflow_design": {
+          "$ref": "#/$defs/artifact"
+        },
+        "blueprint": {
+          "$ref": "#/$defs/artifact"
+        },
+        "design_system": {
+          "$ref": "#/$defs/artifact"
+        },
+        "approval_record": {
+          "$ref": "#/$defs/artifact"
+        }
+      }
+    },
+    "imageSlide": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slide_number",
+        "prompt",
+        "source_png",
+        "semantic_sidecar",
+        "inspection_report",
+        "inspection_status",
+        "regeneration_count"
+      ],
+      "properties": {
+        "slide_number": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 400
+        },
+        "prompt": {
+          "$ref": "#/$defs/artifact"
+        },
+        "source_png": {
+          "$ref": "#/$defs/artifact"
+        },
+        "semantic_sidecar": {
+          "$ref": "#/$defs/artifact"
+        },
+        "inspection_report": {
+          "$ref": "#/$defs/artifact"
+        },
+        "inspection_status": {
+          "const": "PASS"
+        },
+        "regeneration_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "imageGeneration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "skill_name",
+        "platform_tool_id",
+        "requested_slide_count",
+        "completed_slide_count",
+        "slides"
+      ],
+      "properties": {
+        "skill_name": {
+          "const": "imagegen"
+        },
+        "platform_tool_id": {
+          "const": "image_gen.imagegen"
+        },
+        "requested_slide_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 400
+        },
+        "completed_slide_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 400
+        },
+        "slides": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 400,
+          "items": {
+            "$ref": "#/$defs/imageSlide"
+          }
+        }
+      }
+    },
+    "reconstruction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "skill_name",
+        "quality_level",
+        "route_hardlock",
+        "reconstruction_hardlock",
+        "pptx_openability",
+        "output_pptx",
+        "output_html",
+        "native_object_manifest",
+        "openability_report"
+      ],
+      "properties": {
+        "skill_name": {
+          "const": "slide-editable-deck-orchestrator"
+        },
+        "quality_level": {
+          "enum": [
+            "blocking-zero",
+            "polish",
+            "strict"
+          ]
+        },
+        "route_hardlock": {
+          "const": "PASS"
+        },
+        "reconstruction_hardlock": {
+          "const": "PASS"
+        },
+        "pptx_openability": {
+          "const": "PASS"
+        },
+        "output_pptx": {
+          "$ref": "#/$defs/artifact"
+        },
+        "output_html": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/artifact"
+            }
+          ]
+        },
+        "native_object_manifest": {
+          "$ref": "#/$defs/artifact"
+        },
+        "openability_report": {
+          "$ref": "#/$defs/artifact"
+        }
+      }
+    },
+    "visualQa": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "skill_name",
+        "status",
+        "fail_count",
+        "blocking_count",
+        "needs_polish_count",
+        "repair_iterations",
+        "summary",
+        "contact_sheet"
+      ],
+      "properties": {
+        "skill_name": {
+          "const": "slide-visual-polish-qa"
+        },
+        "status": {
+          "enum": [
+            "PASS",
+            "NEEDS_REPAIR",
+            "BLOCKED"
+          ]
+        },
+        "fail_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "blocking_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "needs_polish_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "repair_iterations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "summary": {
+          "$ref": "#/$defs/artifact"
+        },
+        "contact_sheet": {
+          "$ref": "#/$defs/artifact"
+        }
+      }
+    },
+    "delivery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "pptx",
+        "html",
+        "editability_inventory"
+      ],
+      "properties": {
+        "format": {
+          "const": "editable_pptx"
+        },
+        "pptx": {
+          "$ref": "#/$defs/artifact"
+        },
+        "html": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/artifact"
+            }
+          ]
+        },
+        "editability_inventory": {
+          "$ref": "#/$defs/artifact"
+        }
+      }
+    }
+  }
+}

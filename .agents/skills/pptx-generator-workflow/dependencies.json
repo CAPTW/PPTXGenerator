@@ -1,0 +1,39 @@
+{
+  "schema_name": "pptx_generator_codex_skill_dependencies",
+  "schema_version": "1.0.0",
+  "ordered_dependencies": [
+    {
+      "invocation_order": 1,
+      "skill_name": "pptx-workflow-architect",
+      "skill_path": "${CODEX_HOME}/skills/pptx-workflow-architect/SKILL.md",
+      "required_before": [
+        "repository_planning",
+        "image_generation",
+        "pngtopptx_reconstruction"
+      ]
+    },
+    {
+      "invocation_order": 2,
+      "skill_name": "imagegen",
+      "skill_path": "${CODEX_HOME}/skills/.system/imagegen/SKILL.md",
+      "platform_tool_id": "image_gen.imagegen"
+    },
+    {
+      "invocation_order": 3,
+      "skill_name": "slide-editable-deck-orchestrator",
+      "skill_path": "${CODEX_HOME}/skills/slide-editable-deck-orchestrator/SKILL.md",
+      "minimum_quality_level": "blocking-zero",
+      "default_quality_level": "polish"
+    }
+  ],
+  "completion_requirements": {
+    "architect_gate_1": "APPROVED",
+    "architect_gate_2": "APPROVED",
+    "image_generation_coverage": 1.0,
+    "route_hardlock": "PASS",
+    "reconstruction_hardlock": "PASS",
+    "pptx_openability": "PASS",
+    "visual_qa_fail_count": 0,
+    "visual_qa_blocking_count": 0
+  }
+}

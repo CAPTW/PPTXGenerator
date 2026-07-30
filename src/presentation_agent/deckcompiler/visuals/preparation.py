@@ -16,6 +16,7 @@ from ..schemas import REPO_ROOT, validator_for
 
 
 REQUIRED_PHASE3_FILES = (
+    "input_request.json",
     "source_corpus.json",
     "source_locators.json",
     "evidence_unit_registry.json",
@@ -436,12 +437,27 @@ def _validate_phase3_input(artifacts: dict[str, dict[str, Any]]) -> str:
     evidence_count = len(artifacts["evidence_unit_registry.json"]["evidence_units"])
     modules = artifacts["presentation_architecture.json"]["modules"]
     batch_count = sum(len(item["batches"]) for item in modules)
-    if (source_count, evidence_count, len(modules), batch_count) != (3, 29, 3, 3):
-        raise DeckCompilerError(
-            "DC_PHASE4B_INPUT_INVALID",
-            "visual_preparation_input",
-            "Phase 3 run counts must be sources/evidence/modules/batches = 3/29/3/3",
-        )
+    input_request = artifacts["input_request.json"]
+    if input_request.get("mode") == "prompt_plus_two_pdfs":
+        if (source_count, evidence_count, len(modules), batch_count) != (3, 29, 3, 3):
+            raise DeckCompilerError(
+                "DC_PHASE4B_INPUT_INVALID",
+                "visual_preparation_input",
+                "Canonical Phase 3 run counts must be sources/evidence/modules/batches = 3/29/3/3",
+            )
+    else:
+        expected_source_count = 1 + len(input_request.get("pdfs", []))
+        if (
+            source_count != expected_source_count
+            or evidence_count < 1
+            or len(modules) != 3
+            or batch_count != 3
+        ):
+            raise DeckCompilerError(
+                "DC_PHASE4B_INPUT_INVALID",
+                "visual_preparation_input",
+                "General Phase 3 source/evidence/module/batch counts are inconsistent",
+            )
     if len(blueprints) != 6:
         raise DeckCompilerError("DC_PHASE4B_SLIDE_COUNT", "visual_preparation_input", "Phase 4B requires exactly six slides")
     architecture = sorted(artifacts["presentation_architecture.json"]["slides"], key=lambda item: item["order"])

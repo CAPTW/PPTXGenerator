@@ -16,6 +16,13 @@ examples/deckcompiler_demo/phase5/*.json                    -text whitespace=cr-
 examples/deckcompiler_demo/phase5/**/*.json                 -text whitespace=cr-at-eol
 examples/deckcompiler_demo/phase5/outputs/html/index.html   -text whitespace=cr-at-eol
 
+# Other release authorities compare raw SHA-256 bytes and must survive the
+# certified Windows checkout without core.autocrlf rewriting them.
+examples/deckcompiler_demo/phase4/**                         -text
+examples/deckcompiler_demo/phase5/README.md                  -text
+docs/devpost/evidence/pngtopptx_external_skillset_pin.json   -text
+src/presentation_agent/deckcompiler/qa/reconstruction_source/*.js -text
+
 # Phase 7 release-lock bytes are SHA-256-bound across Windows checkouts.
 requirements/devpost-release.in                            -text
 requirements/devpost-release.lock.txt                      -text

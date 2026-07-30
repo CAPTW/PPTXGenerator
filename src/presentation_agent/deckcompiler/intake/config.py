@@ -11,11 +11,14 @@ from pydantic import BaseModel, ConfigDict, Field
 from ..errors import DeckCompilerError
 
 
+MAX_GENERAL_PDFS = 6
+
+
 class Phase3Config(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, arbitrary_types_allowed=True)
 
     config_path: Path
-    mode: Literal["prompt_only", "prompt_plus_two_pdfs"]
+    mode: Literal["prompt_only", "prompt_plus_two_pdfs", "prompt_with_pdfs"]
     prompt_path: Path
     prompt_reference: str
     pdf_paths: tuple[Path, ...]
@@ -72,9 +75,11 @@ def load_phase3_config(path: str | Path) -> Phase3Config:
         pdf_references = tuple(_local_reference(value, "inputs.pdfs[]") for value in inputs.get("pdfs", []))
         if mode == "prompt_plus_two_pdfs" and len(pdf_references) != 2:
             raise ValueError("prompt_plus_two_pdfs requires exactly two PDFs")
+        if mode == "prompt_with_pdfs" and not 1 <= len(pdf_references) <= MAX_GENERAL_PDFS:
+            raise ValueError(f"prompt_with_pdfs requires between one and {MAX_GENERAL_PDFS} PDFs")
         if mode == "prompt_only" and pdf_references:
             raise ValueError("prompt_only does not accept PDF inputs")
-        if mode not in {"prompt_only", "prompt_plus_two_pdfs"}:
+        if mode not in {"prompt_only", "prompt_plus_two_pdfs", "prompt_with_pdfs"}:
             raise ValueError(f"unsupported mode: {mode}")
         tone = presentation.get("tone") or []
         if not isinstance(tone, list) or not tone:
@@ -130,4 +135,4 @@ def _local_reference(value: Any, field: str) -> str:
     return candidate
 
 
-__all__ = ["Phase3Config", "load_phase3_config"]
+__all__ = ["MAX_GENERAL_PDFS", "Phase3Config", "load_phase3_config"]

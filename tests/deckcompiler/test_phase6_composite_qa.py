@@ -270,6 +270,35 @@ class Phase6CompositeQATests(unittest.TestCase):
             self.assertFalse(acceptance["final_release_eligible"])
             self.assertTrue(acceptance["phase7_required"])
 
+    def test_runtime_bundle_mode_hashes_supplied_inputs_without_canonical_authority_claim(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            renders = root / "renders"
+            shutil.copytree(PHASE5 / "renders", renders)
+            result = run_composite_qa(
+                PHASE4,
+                PHASE5,
+                root / "runtime",
+                deckcompiler_commit="e2a6fabb1916680800097981fbda27abfe02b852",
+                renders_dir=renders,
+                renderer_version="16.0",
+                external_visual_summary=PHASE5 / "validation" / "external_visual_qa_summary.json",
+                external_visual_exit_code=1,
+                baseline=False,
+                authority_mode="runtime",
+                created_at="2026-07-30T00:00:00Z",
+            )
+            self.assertEqual(result.status, "PASS")
+            composite = json.loads(
+                (result.qa_dir / "composite_qa_report.json").read_text(encoding="utf-8")
+            )
+            visual = json.loads(
+                (result.qa_dir / "visual_qa_report.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(composite["checks"]["bundle_authority_mode"], "runtime")
+            self.assertFalse(visual["checks"]["model_assisted_review"]["performed"])
+            self.assertTrue(validate_composite_qa(result.qa_dir)["valid"])
+
     def test_missing_report_blocks_composite_validation(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             result = validate_composite_qa(Path(tmpdir))

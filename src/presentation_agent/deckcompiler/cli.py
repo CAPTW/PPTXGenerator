@@ -10,6 +10,12 @@ from pathlib import Path
 from .errors import DeckCompilerError
 from .manifest_io import read_json
 from .manifest_io import write_json
+from .orchestration.generate import (
+    WORKFLOW_OPTIONS,
+    resume_generate_workflow,
+    start_generate_workflow,
+    validate_generate_workflow,
+)
 from .orchestration.phase3_runner import run_phase3
 from .pngtopptx_pinning import (
     PinningError,
@@ -46,6 +52,41 @@ def build_parser() -> argparse.ArgumentParser:
     )
     build.add_argument("--config", type=Path, required=True)
     build.add_argument("--output-dir", type=Path, required=True)
+
+    generate = subparsers.add_parser(
+        "generate",
+        help="Start or resume the general prompt/PDF workflow across DeckCompiler Phases 3-6.",
+    )
+    generate.add_argument("--output-dir", type=Path)
+    generate.add_argument("--resume", type=Path)
+    prompt_group = generate.add_mutually_exclusive_group()
+    prompt_group.add_argument("--prompt")
+    prompt_group.add_argument("--prompt-file", type=Path)
+    generate.add_argument("--pdf", dest="pdfs", type=Path, action="append", default=[])
+    generate.add_argument("--audience", default="general professional audience")
+    generate.add_argument("--purpose", default="source-grounded presentation")
+    generate.add_argument("--language", default="English")
+    generate.add_argument("--tone", action="append")
+    generate.add_argument("--workflow", choices=WORKFLOW_OPTIONS, default="decision_brief")
+    generate.add_argument("--phase4-bundle", type=Path)
+    generate.add_argument("--external-skillset-pin", type=Path)
+    generate.add_argument("--external-skill-root", type=Path)
+    generate.add_argument("--profile", type=Path)
+    generate.add_argument("--node-path", type=Path)
+    generate.add_argument("--phase5-bundle", type=Path)
+    generate.add_argument("--renders-dir", type=Path)
+    generate.add_argument("--renderer-version")
+    generate.add_argument("--external-visual-summary", type=Path)
+    generate.add_argument("--external-visual-exit-code", type=int)
+    generate.add_argument("--pptx", type=Path)
+    generate.add_argument("--html", type=Path)
+    generate.add_argument("--deckcompiler-commit")
+
+    validate_generate = subparsers.add_parser(
+        "validate-generate",
+        help="Validate a resumable general generate workflow manifest.",
+    )
+    validate_generate.add_argument("path", type=Path)
 
     prepare = subparsers.add_parser(
         "prepare-visuals",
@@ -119,6 +160,12 @@ def build_parser() -> argparse.ArgumentParser:
         default="phase5_baseline",
     )
     composite_qa.add_argument("--created-at")
+    composite_qa.add_argument(
+        "--authority-mode",
+        choices=("canonical", "runtime"),
+        default="canonical",
+        help="Use committed canonical authorities or hash the supplied runtime bundles.",
+    )
 
     validate_composite = subparsers.add_parser(
         "validate-composite-qa", help="Validate hash and schema linkage for a complete Phase 6 composite QA directory."
@@ -161,6 +208,101 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.command == "generate":
+        try:
+            if args.resume is None:
+                if args.output_dir is None:
+                    raise DeckCompilerError(
+                        "DC_GENERATE_INPUT_INVALID",
+                        "general_generate_workflow",
+                        "--output-dir is required when starting a generate workflow.",
+                    )
+                downstream = (
+                    args.phase4_bundle,
+                    args.external_skillset_pin,
+                    args.external_skill_root,
+                    args.profile,
+                    args.node_path,
+                    args.phase5_bundle,
+                    args.renders_dir,
+                    args.renderer_version,
+                    args.external_visual_summary,
+                    args.external_visual_exit_code,
+                    args.pptx,
+                    args.html,
+                    args.deckcompiler_commit,
+                )
+                if any(value is not None for value in downstream):
+                    raise DeckCompilerError(
+                        "DC_GENERATE_INPUT_INVALID",
+                        "general_generate_workflow",
+                        "Downstream Phase 4-6 options require --resume.",
+                    )
+                result = start_generate_workflow(
+                    output_dir=args.output_dir,
+                    prompt=args.prompt,
+                    prompt_file=args.prompt_file,
+                    pdf_paths=args.pdfs,
+                    audience=args.audience,
+                    purpose=args.purpose,
+                    language=args.language,
+                    tone=args.tone or ("professional", "clear"),
+                    workflow=args.workflow,
+                )
+            else:
+                if args.output_dir is not None or args.prompt is not None or args.prompt_file is not None or args.pdfs:
+                    raise DeckCompilerError(
+                        "DC_GENERATE_INPUT_INVALID",
+                        "general_generate_workflow",
+                        "--output-dir, prompt, and PDF inputs cannot be changed while resuming.",
+                    )
+                result = resume_generate_workflow(
+                    resume=args.resume,
+                    phase4_bundle=args.phase4_bundle,
+                    external_skillset_pin=args.external_skillset_pin,
+                    external_skill_root=args.external_skill_root,
+                    profile=args.profile,
+                    node_path=args.node_path,
+                    phase5_bundle=args.phase5_bundle,
+                    renders_dir=args.renders_dir,
+                    renderer_version=args.renderer_version,
+                    external_visual_summary=args.external_visual_summary,
+                    external_visual_exit_code=args.external_visual_exit_code,
+                    pptx=args.pptx,
+                    html=args.html,
+                    deckcompiler_commit=args.deckcompiler_commit,
+                )
+        except (DeckCompilerError, HandoffError, CompositeQAError, OSError, ValueError) as exc:
+            code = getattr(exc, "code", "DC_GENERATE_FAILED")
+            print(f"DECKCOMPILER_GENERATE_BLOCKED code={code} message={exc}")
+            return 1
+        except Exception as exc:  # pragma: no cover - final CLI containment boundary
+            print(
+                "DECKCOMPILER_GENERATE_BLOCKED "
+                f"code=DC_GENERATE_INTERNAL_ERROR message={type(exc).__name__}: {exc}"
+            )
+            return 1
+        action = result.required_action["code"] if result.required_action else "NONE"
+        marker = (
+            "DECKCOMPILER_GENERATE_COMPLETED"
+            if result.status == "COMPLETED"
+            else "DECKCOMPILER_GENERATE_NEEDS_REPAIR"
+            if result.status == "NEEDS_REPAIR"
+            else "DECKCOMPILER_GENERATE_AWAITING"
+        )
+        print(
+            f"{marker} workflow_id={result.workflow_id} status={result.status} "
+            f"action={action} manifest={result.manifest_path.as_posix()}"
+        )
+        return result.exit_code
+    if args.command == "validate-generate":
+        try:
+            report = validate_generate_workflow(args.path)
+        except (DeckCompilerError, OSError, ValueError, json.JSONDecodeError) as exc:
+            print(f"DECKCOMPILER_GENERATE_MANIFEST_INVALID {exc}")
+            return 1
+        print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0 if report["valid"] else 1
     if args.command == "demo":
         from .release.demo import main as demo_main
 
@@ -302,6 +444,7 @@ def main(argv: list[str] | None = None) -> int:
                 baseline=not args.nonbaseline,
                 active_output_set=args.active_output_set,
                 created_at=args.created_at,
+                authority_mode=args.authority_mode,
             )
         except (CompositeQAError, OSError, ValueError) as exc:
             print(f"DECKCOMPILER_PHASE6_COMPOSITE_BLOCKED {exc}")

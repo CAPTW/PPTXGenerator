@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/general-generate-workflow-manifest.schema.json",
+  "title": "DeckCompiler General Generate Workflow Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "workflow_id",
+    "entrypoint",
+    "source_commit",
+    "runtime_root",
+    "created_at",
+    "updated_at",
+    "status",
+    "input_contract",
+    "stages",
+    "artifacts",
+    "history",
+    "errors",
+    "manifest_hash"
+  ],
+  "properties": {
+    "schema_name": {"const": "general_generate_workflow_manifest"},
+    "schema_version": {"const": "1.0.0"},
+    "workflow_id": {"type": "string", "pattern": "^generate_[0-9a-f]{20}$"},
+    "entrypoint": {"const": "deckcompiler generate"},
+    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "runtime_root": {"type": "string", "minLength": 1},
+    "created_at": {"type": "string", "format": "date-time"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "status": {
+      "enum": [
+        "RUNNING",
+        "AWAITING_PHASE4_VISUALS",
+        "AWAITING_PHASE5_CONFIGURATION",
+        "AWAITING_PHASE5_RECONSTRUCTION",
+        "AWAITING_PHASE6_CONFIGURATION",
+        "COMPLETED",
+        "NEEDS_REPAIR",
+        "BLOCKED"
+      ]
+    },
+    "input_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "prompt", "pdfs", "presentation"],
+      "properties": {
+        "mode": {"enum": ["prompt_only", "prompt_with_pdfs"]},
+        "prompt": {"$ref": "#/$defs/artifactReference"},
+        "pdfs": {
+          "type": "array",
+          "maxItems": 6,
+          "items": {"$ref": "#/$defs/artifactReference"}
+        },
+        "presentation": {"type": "object"}
+      }
+    },
+    "stages": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["phase", "status", "artifacts", "required_action", "details"],
+        "properties": {
+          "phase": {"enum": ["phase3", "phase4", "phase5", "phase6"]},
+          "status": {
+            "enum": [
+              "PENDING",
+              "RUNNING",
+              "COMPLETED",
+              "AWAITING_EXTERNAL",
+              "AWAITING_CONFIGURATION",
+              "NEEDS_REPAIR",
+              "BLOCKED"
+            ]
+          },
+          "artifacts": {
+            "type": "array",
+            "items": {"$ref": "#/$defs/artifactReference"}
+          },
+          "required_action": {
+            "oneOf": [
+              {"type": "null"},
+              {
+                "type": "object",
+                "additionalProperties": true,
+                "required": ["code", "message"],
+                "properties": {
+                  "code": {"type": "string", "minLength": 1},
+                  "message": {"type": "string", "minLength": 1}
+                }
+              }
+            ]
+          },
+          "details": {"type": "object"}
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/artifactReference"}
+    },
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["timestamp", "event", "status"],
+        "properties": {
+          "timestamp": {"type": "string", "format": "date-time"},
+          "event": {"type": "string", "minLength": 1},
+          "status": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "errors": {
+      "type": "array",
+      "items": {"type": "object"}
+    },
+    "manifest_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "artifactReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "path", "scope"],
+      "properties": {
+        "kind": {"type": "string", "minLength": 1},
+        "path": {"type": "string", "minLength": 1},
+        "scope": {"enum": ["workflow", "external"]},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "aggregate_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "file_count": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

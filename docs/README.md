@@ -4,7 +4,7 @@
 
 **A visual map for users, reviewers, contributors, and DevPost judges**
 
-[Project README](../README.md) · [Run the demo](devpost/PHASE_07_DEMO_RUNBOOK.md) · [Final evidence](devpost/evidence/phase7_final/) · [Submission hub](devpost/submission/README.md)
+[Project README](../README.md) · [General workflow](GENERAL_GENERATE_WORKFLOW.md) · [Run the demo](devpost/PHASE_07_DEMO_RUNBOOK.md) · [Final evidence](devpost/evidence/phase7_final/) · [Submission hub](devpost/submission/README.md)
 
 </div>
 

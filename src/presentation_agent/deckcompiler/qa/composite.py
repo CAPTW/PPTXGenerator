@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import shutil
 from dataclasses import dataclass
@@ -84,6 +85,37 @@ class CompositeQAResult:
     renderer_version: str
     contact_sheet: Path
     reports: tuple[Path, ...]
+
+
+def _runtime_directory_identity(root: Path) -> dict[str, Any]:
+    """Hash a runtime bundle without claiming committed Git-object authority."""
+
+    if not root.is_dir():
+        raise CompositeQAError(f"BLOCKED_RUNTIME_BUNDLE_MISSING: {root}")
+    records = []
+    for path in sorted(root.rglob("*")):
+        if path.is_symlink():
+            raise CompositeQAError(f"BLOCKED_RUNTIME_BUNDLE_SYMLINK: {path}")
+        if path.is_file():
+            records.append(
+                {
+                    "path": path.relative_to(root).as_posix(),
+                    "byte_size": path.stat().st_size,
+                    "sha256": sha256_file(path),
+                }
+            )
+    encoded = json.dumps(
+        records,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return {
+        "aggregate_sha256": hashlib.sha256(encoded).hexdigest(),
+        "records": records,
+        "file_count": len(records),
+        "authority_mode": "runtime_directory_sha256",
+    }
 
 
 def composite_acceptance_status(dimension_statuses: list[str], reconciliation_status: str | None) -> str:
@@ -377,6 +409,7 @@ def run_composite_qa(
     active_output_set: str = "phase5_baseline",
     created_at: str | None = None,
     external_reconciliation_required: bool = False,
+    authority_mode: str = "canonical",
 ) -> CompositeQAResult:
     phase4_bundle = phase4_bundle.resolve()
     phase5_bundle = phase5_bundle.resolve()
@@ -399,40 +432,50 @@ def run_composite_qa(
     if missing:
         raise CompositeQAError(f"BLOCKED_RELEASE_EVIDENCE_INCOMPLETE: missing {missing}")
 
-    phase4_authority = read_json(
-        PHASE7_CONTRACT_ROOT / "phase4_bundle_fingerprint_authority.json"
-    )
-    phase5_authority = read_json(
-        PHASE7_CONTRACT_ROOT / "phase5_bundle_fingerprint_authority.json"
-    )
-    try:
-        validate_bundle_authority(REPO_ROOT, phase4_authority)
-        validate_bundle_authority(REPO_ROOT, phase5_authority)
-        phase4_runtime = build_runtime_bundle_compatibility(
-            REPO_ROOT, phase4_bundle, phase4_authority
+    if authority_mode == "canonical":
+        phase4_authority = read_json(
+            PHASE7_CONTRACT_ROOT / "phase4_bundle_fingerprint_authority.json"
         )
-        phase5_runtime = build_runtime_bundle_compatibility(
-            REPO_ROOT, phase5_bundle, phase5_authority
+        phase5_authority = read_json(
+            PHASE7_CONTRACT_ROOT / "phase5_bundle_fingerprint_authority.json"
         )
-    except Exception as exc:
-        raise CompositeQAError(
-            f"BLOCKED_CURRENT_BUNDLE_AUTHORITY_MISMATCH: {exc}"
-        ) from exc
-    if phase4_runtime["status"] != "PASS" or phase5_runtime["status"] != "PASS":
-        raise CompositeQAError(
-            "BLOCKED_RUNTIME_BUNDLE_COMPATIBILITY: "
-            f"phase4={phase4_runtime['status']} phase5={phase5_runtime['status']}"
+        try:
+            validate_bundle_authority(REPO_ROOT, phase4_authority)
+            validate_bundle_authority(REPO_ROOT, phase5_authority)
+            phase4_runtime = build_runtime_bundle_compatibility(
+                REPO_ROOT, phase4_bundle, phase4_authority
+            )
+            phase5_runtime = build_runtime_bundle_compatibility(
+                REPO_ROOT, phase5_bundle, phase5_authority
+            )
+        except Exception as exc:
+            raise CompositeQAError(
+                f"BLOCKED_CURRENT_BUNDLE_AUTHORITY_MISMATCH: {exc}"
+            ) from exc
+        if phase4_runtime["status"] != "PASS" or phase5_runtime["status"] != "PASS":
+            raise CompositeQAError(
+                "BLOCKED_RUNTIME_BUNDLE_COMPATIBILITY: "
+                f"phase4={phase4_runtime['status']} phase5={phase5_runtime['status']}"
+            )
+        phase4_identity = build_git_object_bundle_fingerprint(
+            REPO_ROOT,
+            phase4_authority["source_commit"],
+            phase4_authority["subtree_path"],
         )
-    phase4_identity = build_git_object_bundle_fingerprint(
-        REPO_ROOT,
-        phase4_authority["source_commit"],
-        phase4_authority["subtree_path"],
-    )
-    phase5_identity = build_git_object_bundle_fingerprint(
-        REPO_ROOT,
-        phase5_authority["source_commit"],
-        phase5_authority["subtree_path"],
-    )
+        phase5_identity = build_git_object_bundle_fingerprint(
+            REPO_ROOT,
+            phase5_authority["source_commit"],
+            phase5_authority["subtree_path"],
+        )
+        expected_phase4_hash = phase4_authority["git_object_fingerprint"]["aggregate_sha256"]
+        expected_phase5_hash = phase5_authority["git_object_fingerprint"]["aggregate_sha256"]
+    elif authority_mode == "runtime":
+        phase4_identity = _runtime_directory_identity(phase4_bundle)
+        phase5_identity = _runtime_directory_identity(phase5_bundle)
+        expected_phase4_hash = phase4_identity["aggregate_sha256"]
+        expected_phase5_hash = phase5_identity["aggregate_sha256"]
+    else:
+        raise CompositeQAError(f"BLOCKED_UNKNOWN_AUTHORITY_MODE: {authority_mode}")
     phase4_hash = phase4_identity["aggregate_sha256"]
     phase5_hash = phase5_identity["aggregate_sha256"]
     phase4_inventory = phase4_identity["records"]
@@ -446,8 +489,8 @@ def run_composite_qa(
     prerequisite_findings = _base_findings_for_prerequisites(
         phase4_hash=phase4_hash,
         phase5_hash=phase5_hash,
-        expected_phase4_hash=phase4_authority["git_object_fingerprint"]["aggregate_sha256"],
-        expected_phase5_hash=phase5_authority["git_object_fingerprint"]["aggregate_sha256"],
+        expected_phase4_hash=expected_phase4_hash,
+        expected_phase5_hash=expected_phase5_hash,
         pptx_hash=pptx_hash,
         html_hash=html_hash,
         missing=missing,
@@ -579,14 +622,9 @@ def run_composite_qa(
                 owner="handoff project layout geometry", repairable=True,
             )
         )
-    visual_checks = {
-        **geometry,
-        "render_count": len(render_result.slides),
-        "render_dimensions": sorted({f"{row['width']}x{row['height']}" for row in render_result.slides}),
-        "image_decode_failure_count": len(render_failures),
-        "full_slide_raster_count": pptx.package["full_slide_picture_count"],
-        "external_visual_polish": external_evidence,
-        "model_assisted_review": {
+    if authority_mode == "canonical":
+        model_assisted_review = {
+            "performed": True,
             "user_selected_orchestrator_model": "GPT-5.6 Sol Ultra",
             "runtime_model_identity": "not_exposed",
             "reviewer_uncertainty": "low",
@@ -602,7 +640,22 @@ def run_composite_qa(
             "excessive_density": "PASS",
             "spacing_quality": "PASS",
             "visual_target_intent_fidelity": "PASS",
-        },
+        }
+    else:
+        model_assisted_review = {
+            "performed": False,
+            "status": "NOT_CLAIMED",
+            "reason": "General runtime QA uses the supplied official external visual-QA evidence; no additional model review is asserted.",
+            "reviewed_file_hashes": [],
+        }
+    visual_checks = {
+        **geometry,
+        "render_count": len(render_result.slides),
+        "render_dimensions": sorted({f"{row['width']}x{row['height']}" for row in render_result.slides}),
+        "image_decode_failure_count": len(render_failures),
+        "full_slide_raster_count": pptx.package["full_slide_picture_count"],
+        "external_visual_polish": external_evidence,
+        "model_assisted_review": model_assisted_review,
     }
     visual_report = build_report(
         schema_name="phase6_visual_qa_report", run_id=run_id, source_artifacts=source_refs,
@@ -727,6 +780,7 @@ def run_composite_qa(
             "checks": {
                 "phase4_bundle_aggregate": phase4_hash, "phase4_inventory_count": len(phase4_inventory),
                 "phase5_bundle_aggregate": phase5_hash, "phase5_inventory_count": len(phase5_inventory),
+                "bundle_authority_mode": authority_mode,
                 "baseline_pptx_sha256": pptx_hash, "baseline_html_sha256": html_hash,
                 "report_hash_linkage": "PASS", "prerequisite_hash_linkage": "PASS",
                 "dimension_report_count": len(dimension_links),

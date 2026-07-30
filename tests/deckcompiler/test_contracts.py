@@ -56,6 +56,7 @@ EXPECTED_SCHEMA_FILES = {
     "fault-injection-spec.schema.json",
     "fault-run-evidence-capsule-manifest.schema.json",
     "fixture-provenance.schema.json",
+    "general-generate-workflow-manifest.schema.json",
     "input-request.schema.json",
     "git-object-bundle-fingerprint.schema.json",
     "legacy-bundle-fingerprint-correction.schema.json",

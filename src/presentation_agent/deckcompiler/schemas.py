@@ -45,6 +45,7 @@ SCHEMA_FILES: dict[str, str] = {
     "fault_injection_spec": "fault-injection-spec.schema.json",
     "fault_run_evidence_capsule_manifest": "fault-run-evidence-capsule-manifest.schema.json",
     "fixture_provenance": "fixture-provenance.schema.json",
+    "general_generate_workflow_manifest": "general-generate-workflow-manifest.schema.json",
     "input_request": "input-request.schema.json",
     "git_object_bundle_fingerprint": "git-object-bundle-fingerprint.schema.json",
     "legacy_bundle_fingerprint_correction": "legacy-bundle-fingerprint-correction.schema.json",

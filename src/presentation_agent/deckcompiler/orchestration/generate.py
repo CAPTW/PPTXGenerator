@@ -1,4 +1,4 @@
-"""Resumable prompt/PDF entrypoint connecting DeckCompiler Phases 3 through 6."""
+"""Architect-first Codex entrypoint for prompt/PDF-to-editable-PPTX workflows."""
 
 from __future__ import annotations
 
@@ -12,27 +12,19 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
 
-import yaml
-
 from ..errors import DeckCompilerError
 from ..identity import content_sha256, stable_id
-from ..intake.config import MAX_GENERAL_PDFS
 from ..manifest_io import read_json, write_json
-from ..pngtopptx_handoff import (
-    export_phase4_handoff,
-    validate_phase4_bundle,
-)
-from ..planning.strict_adapter import WORKFLOW_ALIASES as PHASE3_WORKFLOW_ALIASES
 from ..provenance import current_source_commit
-from ..qa import run_composite_qa
 from ..schemas import REPO_ROOT, validator_for
-from ..visuals.preparation import prepare_visuals
-from .phase3_runner import run_phase3
+from .codex_run import validate_codex_run_manifest
 
 
 MANIFEST_NAME = "generate_workflow_manifest.json"
+DISPATCH_NAME = "codex_dispatch.json"
+RUNBOOK_NAME = "CODEX_WORKFLOW.md"
 WORKFLOW_SCHEMA = "general_generate_workflow_manifest"
-WORKFLOW_OPTIONS = tuple(PHASE3_WORKFLOW_ALIASES)
+MAX_GENERAL_PDFS = 50
 
 
 @dataclass(frozen=True, slots=True)
@@ -57,7 +49,7 @@ def start_generate_workflow(
     tone: Iterable[str],
     workflow: str,
 ) -> GenerateWorkflowResult:
-    """Collect arbitrary local inputs and execute deterministic Phase 3 and Phase 4 preparation."""
+    """Collect immutable inputs and stop at the mandatory Architect-first gate."""
 
     root = _prepare_runtime_root(output_dir)
     manifest: dict[str, Any] | None = None
@@ -65,13 +57,28 @@ def start_generate_workflow(
         prompt_text = _resolve_prompt(prompt, prompt_file)
         pdf_sources = _resolve_pdfs(pdf_paths)
         tone_values = tuple(value.strip() for value in tone if value.strip())
+        presentation = {
+            "audience": audience.strip(),
+            "purpose": purpose.strip(),
+            "language": language.strip(),
+            "tone": list(tone_values),
+            "workflow_hint": workflow.strip() or "auto",
+        }
         if not tone_values:
-            raise _workflow_error("DC_GENERATE_INPUT_INVALID", "At least one non-empty tone is required.")
-        if workflow not in PHASE3_WORKFLOW_ALIASES:
             raise _workflow_error(
                 "DC_GENERATE_INPUT_INVALID",
-                f"Unsupported workflow alias: {workflow}",
-                remediation_hint=f"Choose one of: {', '.join(WORKFLOW_OPTIONS)}.",
+                "At least one non-empty tone is required.",
+            )
+        if not all(
+            (
+                presentation["audience"],
+                presentation["purpose"],
+                presentation["language"],
+            )
+        ):
+            raise _workflow_error(
+                "DC_GENERATE_INPUT_INVALID",
+                "Audience, purpose, and language must be non-empty.",
             )
 
         inputs_dir = root / "inputs"
@@ -80,26 +87,6 @@ def start_generate_workflow(
         _atomic_write_text(prompt_path, prompt_text.strip() + "\n")
         copied_pdfs = _copy_pdf_inputs(pdf_sources, inputs_dir)
         mode = "prompt_with_pdfs" if copied_pdfs else "prompt_only"
-        presentation = {
-            "slide_count": 6,
-            "audience": audience.strip(),
-            "purpose": purpose.strip(),
-            "language": language.strip(),
-            "tone": list(tone_values),
-            "workflow": workflow,
-        }
-        if not all((presentation["audience"], presentation["purpose"], presentation["language"])):
-            raise _workflow_error(
-                "DC_GENERATE_INPUT_INVALID",
-                "Audience, purpose, and language must be non-empty.",
-            )
-        config_path = inputs_dir / "deckcompiler.yaml"
-        config_payload = _config_payload(mode, copied_pdfs, presentation)
-        _atomic_write_text(
-            config_path,
-            yaml.safe_dump(config_payload, allow_unicode=True, sort_keys=False),
-        )
-        created_at = _now()
         workflow_id = stable_id(
             "generate",
             prompt_text,
@@ -109,59 +96,25 @@ def start_generate_workflow(
         input_contract = {
             "mode": mode,
             "prompt": _artifact_reference(root, prompt_path, "user_prompt"),
-            "pdfs": [_artifact_reference(root, path, "pdf") for path in copied_pdfs],
+            "pdfs": [
+                _artifact_reference(root, path, "user_pdf") for path in copied_pdfs
+            ],
             "presentation": presentation,
         }
-        manifest = _initial_manifest(root, workflow_id, created_at, input_contract, config_path)
-        _write_workflow_manifest(root, manifest)
+        dispatch = _dispatch_payload(workflow_id, input_contract)
+        dispatch_path = write_json(root / DISPATCH_NAME, dispatch)
+        runbook_path = root / RUNBOOK_NAME
+        _atomic_write_text(runbook_path, _dispatch_runbook(workflow_id))
 
-        phase3 = _stage(manifest, "phase3")
-        phase3["status"] = "RUNNING"
-        _record(manifest, "phase3_started", "RUNNING")
-        _write_workflow_manifest(root, manifest)
-        phase3_result = run_phase3(config_path, root / "phase3")
-        phase3["status"] = "COMPLETED"
-        phase3["required_action"] = None
-        phase3["details"] = {
-            "run_id": phase3_result.run_id,
-            "verdict": phase3_result.validation_report["verdict"],
-        }
-        phase3["artifacts"] = [
-            _artifact_reference(root, root / "phase3", "phase3_bundle", directory=True)
-        ]
-        _record(manifest, "phase3_completed", "COMPLETED")
-
-        phase4 = _stage(manifest, "phase4")
-        phase4["status"] = "RUNNING"
-        _record(manifest, "phase4_preparation_started", "RUNNING")
-        _write_workflow_manifest(root, manifest)
-        phase4_result = prepare_visuals(root / "phase3", root / "phase4_preparation")
-        action = {
-            "code": "PROVIDE_PHASE4_BUNDLE",
-            "message": (
-                "Execute the prepared platform image requests, assemble an accepted Phase 4 bundle, "
-                "then resume with --phase4-bundle."
-            ),
-            "prompt_directory": _path_value(root, root / "phase4_preparation" / "preparation" / "prompts"),
-            "expected_slide_visual_count": 6,
-        }
-        phase4["status"] = "AWAITING_EXTERNAL"
-        phase4["required_action"] = action
-        phase4["details"] = {
-            "preparation_status": "COMPLETED",
-            "semantic_sidecar_count": len(phase4_result.sidecar_paths),
-            "prompt_count": len(phase4_result.prompt_paths),
-        }
-        phase4["artifacts"] = [
-            _artifact_reference(
-                root,
-                root / "phase4_preparation",
-                "phase4_visual_preparation",
-                directory=True,
-            )
-        ]
-        manifest["status"] = "AWAITING_PHASE4_VISUALS"
-        _record(manifest, "phase4_preparation_completed", "AWAITING_EXTERNAL")
+        created_at = _now()
+        manifest = _initial_manifest(
+            root,
+            workflow_id,
+            created_at,
+            input_contract,
+            dispatch_path,
+            runbook_path,
+        )
         _sync_artifacts(manifest)
         _write_workflow_manifest(root, manifest)
         return _result(root, manifest, exit_code=2)
@@ -174,208 +127,71 @@ def start_generate_workflow(
 def resume_generate_workflow(
     *,
     resume: Path,
-    phase4_bundle: Path | None = None,
-    external_skillset_pin: Path | None = None,
-    external_skill_root: Path | None = None,
-    profile: Path | None = None,
-    node_path: Path | None = None,
-    phase5_bundle: Path | None = None,
-    renders_dir: Path | None = None,
-    renderer_version: str | None = None,
-    external_visual_summary: Path | None = None,
-    external_visual_exit_code: int | None = None,
-    pptx: Path | None = None,
-    html: Path | None = None,
-    deckcompiler_commit: str | None = None,
+    codex_run_manifest: Path | None = None,
 ) -> GenerateWorkflowResult:
-    """Resume at the next incomplete external boundary and continue through Phase 6."""
+    """Register a sealed live Codex run and accept only quality-gated completion."""
 
     root, manifest = _load_workflow(resume)
     if manifest["status"] == "COMPLETED":
         return _result(root, manifest, exit_code=0)
-    try:
-        commit = deckcompiler_commit or manifest["source_commit"]
-        phase4 = _stage(manifest, "phase4")
-        stored_phase4 = _stored_external_path(phase4, "bundle_path")
-        resolved_phase4 = phase4_bundle.resolve() if phase4_bundle is not None else stored_phase4
-        if phase4["status"] != "COMPLETED":
-            if resolved_phase4 is None:
-                manifest["status"] = "AWAITING_PHASE4_VISUALS"
-                _write_workflow_manifest(root, manifest)
-                return _result(root, manifest, exit_code=2)
-            validation = validate_phase4_bundle(resolved_phase4)
-            _validate_phase4_link(root, manifest, resolved_phase4)
-            phase4["status"] = "COMPLETED"
-            phase4["required_action"] = None
-            phase4["details"] = {
-                **phase4["details"],
-                "bundle_path": resolved_phase4.as_posix(),
-                "manifest_id": validation["manifest_id"],
-                "selected_target_count": validation["selected_target_count"],
-            }
-            phase4["artifacts"].append(
-                _artifact_reference(root, resolved_phase4, "phase4_accepted_bundle", directory=True)
-            )
-            _record(manifest, "phase4_bundle_accepted", "COMPLETED")
-            _sync_artifacts(manifest)
-            _write_workflow_manifest(root, manifest)
-
-        phase5 = _stage(manifest, "phase5")
-        stored_phase5 = _stored_external_path(phase5, "bundle_path")
-        resolved_phase5 = phase5_bundle.resolve() if phase5_bundle is not None else stored_phase5
-        handoff_arguments = {
-            "external_skillset_pin": external_skillset_pin,
-            "external_skill_root": external_skill_root,
-            "profile": profile,
-            "node_path": node_path,
-        }
-        supplied_handoff = {name for name, value in handoff_arguments.items() if value is not None}
-        if supplied_handoff and len(supplied_handoff) != len(handoff_arguments):
-            missing = sorted(set(handoff_arguments) - supplied_handoff)
-            raise _workflow_error(
-                "DC_GENERATE_PHASE5_CONFIGURATION",
-                f"Incomplete Phase 5 handoff configuration; missing: {', '.join(missing)}.",
-            )
-
-        if phase5["status"] in {"PENDING", "AWAITING_CONFIGURATION"} and resolved_phase5 is None:
-            if not supplied_handoff:
-                action = {
-                    "code": "CONFIGURE_PHASE5_HANDOFF",
-                    "message": (
-                        "Resume with the external SkillSet pin/root, profile, and Node dependency path "
-                        "to export the official editable reconstruction handoff."
-                    ),
-                    "required_options": [
-                        "--external-skillset-pin",
-                        "--external-skill-root",
-                        "--profile",
-                        "--node-path",
-                    ],
-                }
-                phase5["status"] = "AWAITING_CONFIGURATION"
-                phase5["required_action"] = action
-                manifest["status"] = "AWAITING_PHASE5_CONFIGURATION"
-                _record(manifest, "phase5_configuration_required", "AWAITING_CONFIGURATION")
-                _write_workflow_manifest(root, manifest)
-                return _result(root, manifest, exit_code=2)
-            phase5["status"] = "RUNNING"
-            _record(manifest, "phase5_handoff_started", "RUNNING")
-            _write_workflow_manifest(root, manifest)
-            handoff = export_phase4_handoff(
-                phase4_bundle=resolved_phase4,
-                external_skillset_pin=external_skillset_pin,
-                output_dir=root / "phase5_handoff",
-                deckcompiler_commit=commit,
-                external_skill_root=external_skill_root,
-                profile_path=profile,
-                node_path=node_path,
-                created_at=_now(),
-                timezone="Asia/Seoul",
-                repository_root=REPO_ROOT,
-            )
-            handoff_manifest = read_json(handoff.handoff_manifest)
-            action = {
-                "code": "EXECUTE_PHASE5_RECONSTRUCTION",
-                "message": (
-                    "Execute the generated PNGtoPPTX invocation plan with the pinned external SkillSet, "
-                    "package its outputs as a Phase 5 bundle, then resume with --phase5-bundle."
-                ),
-                "invocation_plan": _path_value(root, handoff.invocation_plan),
-            }
-            phase5["status"] = "AWAITING_EXTERNAL"
-            phase5["required_action"] = action
-            phase5["details"] = {
-                "handoff_id": handoff_manifest["handoff_id"],
-                "handoff_root": handoff.handoff_root.as_posix(),
-            }
-            phase5["artifacts"] = [
-                _artifact_reference(root, root / "phase5_handoff", "phase5_handoff", directory=True)
-            ]
-            manifest["status"] = "AWAITING_PHASE5_RECONSTRUCTION"
-            _record(manifest, "phase5_handoff_completed", "AWAITING_EXTERNAL")
-            _sync_artifacts(manifest)
-            _write_workflow_manifest(root, manifest)
-            return _result(root, manifest, exit_code=2)
-
-        if resolved_phase5 is None:
-            manifest["status"] = (
-                "AWAITING_PHASE5_CONFIGURATION"
-                if phase5["status"] == "AWAITING_CONFIGURATION"
-                else "AWAITING_PHASE5_RECONSTRUCTION"
-            )
-            _write_workflow_manifest(root, manifest)
-            return _result(root, manifest, exit_code=2)
-
-        if phase5["status"] != "COMPLETED":
-            _validate_phase5_link(root, phase5, resolved_phase5)
-            phase5["status"] = "COMPLETED"
-            phase5["required_action"] = None
-            phase5["details"] = {
-                **phase5["details"],
-                "bundle_path": resolved_phase5.as_posix(),
-            }
-            phase5["artifacts"].append(
-                _artifact_reference(root, resolved_phase5, "phase5_reconstruction_bundle", directory=True)
-            )
-            _record(manifest, "phase5_bundle_accepted", "COMPLETED")
-            _sync_artifacts(manifest)
-            _write_workflow_manifest(root, manifest)
-
-        phase6 = _stage(manifest, "phase6")
-        if external_visual_summary is None or external_visual_exit_code is None:
-            action = {
-                "code": "CONFIGURE_PHASE6_QA",
-                "message": (
-                    "Run the official read-only visual QA and resume with --external-visual-summary "
-                    "and --external-visual-exit-code. Supply --renders-dir when PowerPoint rendering "
-                    "has already been completed."
-                ),
-                "required_options": [
-                    "--external-visual-summary",
-                    "--external-visual-exit-code",
-                ],
-            }
-            phase6["status"] = "AWAITING_CONFIGURATION"
-            phase6["required_action"] = action
-            manifest["status"] = "AWAITING_PHASE6_CONFIGURATION"
-            _record(manifest, "phase6_configuration_required", "AWAITING_CONFIGURATION")
-            _write_workflow_manifest(root, manifest)
-            return _result(root, manifest, exit_code=2)
-
-        phase6["status"] = "RUNNING"
-        phase6["required_action"] = None
-        _record(manifest, "phase6_composite_qa_started", "RUNNING")
-        _write_workflow_manifest(root, manifest)
-        qa = run_composite_qa(
-            resolved_phase4,
-            resolved_phase5,
-            root / "phase6",
-            deckcompiler_commit=commit,
-            renders_dir=renders_dir,
-            renderer_version=renderer_version,
-            external_visual_summary=external_visual_summary,
-            external_visual_exit_code=external_visual_exit_code,
-            pptx_path=pptx,
-            html_path=html,
-            baseline=False,
-            active_output_set="phase5_baseline",
-            created_at=_now(),
-            authority_mode="runtime",
+    if codex_run_manifest is None:
+        return _result(
+            root,
+            manifest,
+            exit_code=1 if manifest["status"] == "NEEDS_REPAIR" else 2,
         )
-        phase6["status"] = "COMPLETED" if qa.status == "PASS" else "NEEDS_REPAIR"
-        phase6["details"] = {
-            "run_id": qa.run_id,
-            "composite_status": qa.status,
-            "renderer_version": qa.renderer_version,
+
+    try:
+        run_path = codex_run_manifest.resolve()
+        report = validate_codex_run_manifest(
+            run_path,
+            expected_workflow_id=manifest["workflow_id"],
+        )
+        if not report["contract_valid"]:
+            raise _workflow_error(
+                "DC_CODEX_RUN_INVALID",
+                "; ".join(report["issues"][:8]),
+                artifact_path=run_path,
+                remediation_hint=(
+                    "Run the live pptx-generator-workflow, preserve real Skill execution "
+                    "artifacts, and reseal codex_run.json."
+                ),
+            )
+
+        payload = read_json(run_path)
+        _bind_codex_run_artifacts(root, manifest, run_path, payload)
+        if report["completion_ready"]:
+            for stage in manifest["stages"]:
+                stage["status"] = "COMPLETED"
+                stage["required_action"] = None
+            manifest["status"] = "COMPLETED"
+            _record(manifest, "codex_live_workflow_accepted", "COMPLETED")
+            _sync_artifacts(manifest)
+            _write_workflow_manifest(root, manifest)
+            return _result(root, manifest, exit_code=0)
+
+        reconstruction = _stage(manifest, "reconstruction")
+        qa = _stage(manifest, "visual_qa")
+        delivery = _stage(manifest, "delivery")
+        reconstruction["status"] = "NEEDS_REPAIR"
+        qa["status"] = "NEEDS_REPAIR"
+        delivery["status"] = "PENDING"
+        action = {
+            "code": "CONTINUE_PNGTOPPTX_REPAIR_WAVES",
+            "message": (
+                "Continue slide-editable-deck-orchestrator repair waves and visual QA "
+                "until fail_count and blocking_count are zero, then reseal the run."
+            ),
+            "completion_issues": report["completion_issues"],
         }
-        phase6["artifacts"] = [
-            _artifact_reference(root, qa.output_dir, "phase6_composite_qa", directory=True)
-        ]
-        manifest["status"] = "COMPLETED" if qa.status == "PASS" else "NEEDS_REPAIR"
-        _record(manifest, "phase6_composite_qa_completed", qa.status)
+        reconstruction["required_action"] = action
+        qa["required_action"] = None
+        delivery["required_action"] = None
+        manifest["status"] = "NEEDS_REPAIR"
+        _record(manifest, "codex_live_workflow_needs_repair", "NEEDS_REPAIR")
         _sync_artifacts(manifest)
         _write_workflow_manifest(root, manifest)
-        return _result(root, manifest, exit_code=0 if qa.status == "PASS" else 1)
+        return _result(root, manifest, exit_code=1)
     except Exception as exc:
         _block_manifest(root, manifest, exc)
         raise
@@ -385,10 +201,18 @@ def validate_generate_workflow(path: Path) -> dict[str, Any]:
     manifest_path = path / MANIFEST_NAME if path.is_dir() else path
     payload = read_json(manifest_path)
     issues = _manifest_issues(payload)
+    if not issues:
+        root = manifest_path.resolve().parent
+        issues.extend(_input_artifact_issues(root, payload))
+        issues.extend(_manifest_artifact_issues(root, payload))
+        issues.extend(_sealed_run_issues(root, payload))
     return {
         "valid": not issues,
         "status": payload.get("status"),
         "workflow_id": payload.get("workflow_id"),
+        "required_first_skill": payload.get("dispatch", {}).get(
+            "required_first_skill"
+        ),
         "issues": issues,
     }
 
@@ -398,83 +222,324 @@ def _initial_manifest(
     workflow_id: str,
     created_at: str,
     input_contract: dict[str, Any],
-    config_path: Path,
+    dispatch_path: Path,
+    runbook_path: Path,
 ) -> dict[str, Any]:
-    phase3_action = {
-        "code": "RUN_PHASE3",
-        "message": "Execute deterministic intake, planning, and creative architecture.",
+    action = {
+        "code": "INVOKE_PPTX_WORKFLOW_ARCHITECT",
+        "message": (
+            "In Codex, read and invoke pptx-workflow-architect before any planning, "
+            "Image Generation, or PNGtoPPTX execution. Complete and approve Gates 1 and 2, "
+            "then follow the repo pptx-generator-workflow Skill."
+        ),
+        "required_first_skill": "pptx-workflow-architect",
+        "required_first_skill_path": (
+            "${CODEX_HOME}/skills/pptx-workflow-architect/SKILL.md"
+        ),
+        "production_skill_path": (
+            ".agents/skills/pptx-generator-workflow/SKILL.md"
+        ),
     }
     return {
         "schema_name": WORKFLOW_SCHEMA,
-        "schema_version": "1.0.0",
+        "schema_version": "2.0.0",
         "workflow_id": workflow_id,
         "entrypoint": "deckcompiler generate",
         "source_commit": current_source_commit(),
         "runtime_root": root.as_posix(),
         "created_at": created_at,
         "updated_at": created_at,
-        "status": "RUNNING",
+        "status": "AWAITING_WORKFLOW_ARCHITECT",
         "input_contract": input_contract,
+        "dispatch": {
+            "required_first_skill": "pptx-workflow-architect",
+            "required_first_skill_path": (
+                "${CODEX_HOME}/skills/pptx-workflow-architect/SKILL.md"
+            ),
+            "production_skill": "pptx-generator-workflow",
+            "image_skill": "imagegen",
+            "image_tool": "image_gen.imagegen",
+            "reconstruction_skill": "slide-editable-deck-orchestrator",
+            "default_quality_level": "polish",
+            "approval_policy": (
+                "architect_gate1_and_gate2_explicit_user_approval"
+            ),
+        },
         "stages": [
             {
-                "phase": "phase3",
-                "status": "PENDING",
-                "artifacts": [_artifact_reference(root, config_path, "phase3_config")],
-                "required_action": phase3_action,
-                "details": {},
+                "stage": "architect",
+                "status": "AWAITING_EXTERNAL",
+                "artifacts": [
+                    _artifact_reference(root, dispatch_path, "codex_dispatch"),
+                    _artifact_reference(root, runbook_path, "codex_workflow_runbook"),
+                ],
+                "required_action": action,
+                "details": {
+                    "gate1": "PENDING",
+                    "gate2": "PENDING",
+                    "fixed_slide_count_forbidden": True,
+                },
             },
-            {
-                "phase": "phase4",
-                "status": "PENDING",
-                "artifacts": [],
-                "required_action": None,
-                "details": {},
-            },
-            {
-                "phase": "phase5",
-                "status": "PENDING",
-                "artifacts": [],
-                "required_action": None,
-                "details": {},
-            },
-            {
-                "phase": "phase6",
-                "status": "PENDING",
-                "artifacts": [],
-                "required_action": None,
-                "details": {},
-            },
+            _pending_stage("image_generation"),
+            _pending_stage("reconstruction"),
+            _pending_stage("visual_qa"),
+            _pending_stage("delivery"),
         ],
         "artifacts": [],
-        "history": [{"timestamp": created_at, "event": "workflow_created", "status": "RUNNING"}],
+        "history": [
+            {
+                "timestamp": created_at,
+                "event": "workflow_created_architect_first",
+                "status": "AWAITING_WORKFLOW_ARCHITECT",
+            }
+        ],
         "errors": [],
         "manifest_hash": "0" * 64,
     }
 
 
-def _config_payload(
-    mode: str,
-    copied_pdfs: tuple[Path, ...],
-    presentation: dict[str, Any],
-) -> dict[str, Any]:
+def _pending_stage(name: str) -> dict[str, Any]:
     return {
-        "product": {"name": "PPTX Generator", "slug": "pptx-generator"},
-        "system": {"name": "DeckCompiler", "id": "deckcompiler"},
-        "mode": mode,
-        "inputs": {
-            "prompt": "prompt.txt",
-            "pdfs": [path.name for path in copied_pdfs],
-        },
-        "presentation": presentation,
-        "policies": {
-            "remote_sources": "forbidden",
-            "scanned_pdf_ocr": "unsupported",
-            "full_slide_raster": "forbidden",
-            "silent_source_omission": "forbidden",
-            "invented_citations": "forbidden",
-        },
-        "phase": {"stop_after": "creative_architecture"},
+        "stage": name,
+        "status": "PENDING",
+        "artifacts": [],
+        "required_action": None,
+        "details": {},
     }
+
+
+def _dispatch_payload(
+    workflow_id: str,
+    input_contract: dict[str, Any],
+) -> dict[str, Any]:
+    payload = {
+        "schema_name": "pptx_generator_codex_dispatch",
+        "schema_version": "1.0.0",
+        "workflow_id": workflow_id,
+        "input_contract": input_contract,
+        "skill_sequence": [
+            {
+                "invocation_order": 1,
+                "skill_name": "pptx-workflow-architect",
+                "skill_path": (
+                    "${CODEX_HOME}/skills/pptx-workflow-architect/SKILL.md"
+                ),
+                "required_outputs": [
+                    "gate1_workflow_design",
+                    "gate2_blueprint",
+                    "gate2_design_system",
+                    "explicit_user_approval",
+                ],
+            },
+            {
+                "invocation_order": 2,
+                "skill_name": "imagegen",
+                "platform_tool_id": "image_gen.imagegen",
+                "required_coverage": "one inspected selected PNG per approved slide",
+            },
+            {
+                "invocation_order": 3,
+                "skill_name": "slide-editable-deck-orchestrator",
+                "minimum_quality_level": "blocking-zero",
+                "default_quality_level": "polish",
+                "required_stop_condition": "zero fail/blocking slides",
+            },
+        ],
+        "slide_count_policy": (
+            "architect_approved_right_sized_count_1_to_400_no_fixed_six_slide_template"
+        ),
+        "finalization": {
+            "seal_command": (
+                "deckcompiler seal-codex-run --draft <draft> --output <codex_run.json>"
+            ),
+            "register_command": (
+                "deckcompiler generate --resume <runtime> "
+                "--codex-run-manifest <codex_run.json>"
+            ),
+        },
+    }
+    payload["dispatch_hash"] = content_sha256(payload)
+    return payload
+
+
+def _dispatch_runbook(workflow_id: str) -> str:
+    return f"""# Codex PPTX Workflow
+
+Workflow ID: `{workflow_id}`
+
+1. Read `${{CODEX_HOME}}/skills/pptx-workflow-architect/SKILL.md` first.
+2. Complete Architect Gate 1 and Gate 2 and obtain explicit user approval.
+3. Read `.agents/skills/pptx-generator-workflow/SKILL.md`.
+4. Call `image_gen.imagegen` for every approved slide; inspect and iterate.
+5. Save selected references as `pngtopptx-project/src/slideN.png`.
+6. Run `slide-editable-deck-orchestrator` at quality level `polish`.
+7. Continue visual-QA repair waves until fail/blocking count is zero.
+8. Seal `codex_run.json` and register it with `deckcompiler generate --resume`.
+
+This runtime is incomplete until the sealed run is accepted. Prompt preparation,
+mocked tools, an invocation plan, or an unreviewed PPTX is not completion.
+"""
+
+
+def _bind_codex_run_artifacts(
+    root: Path,
+    manifest: dict[str, Any],
+    run_path: Path,
+    payload: dict[str, Any],
+) -> None:
+    base = run_path.parent
+    architect = _stage(manifest, "architect")
+    image = _stage(manifest, "image_generation")
+    reconstruction = _stage(manifest, "reconstruction")
+    qa = _stage(manifest, "visual_qa")
+    delivery = _stage(manifest, "delivery")
+
+    architect["status"] = "COMPLETED"
+    architect["required_action"] = None
+    architect["details"] = {
+        "gate1": payload["architect"]["gate1"]["status"],
+        "gate2": payload["architect"]["gate2"]["status"],
+        "slide_count": payload["architect"]["slide_count"],
+        "first_skill_invoked": payload["architect"]["first_skill_invoked"],
+    }
+    control_plane_artifacts = [
+        artifact
+        for artifact in architect["artifacts"]
+        if artifact["kind"] in {"codex_dispatch", "codex_workflow_runbook"}
+    ]
+    architect["artifacts"] = control_plane_artifacts + [
+        _run_artifact_reference(
+            root, base, payload["architect"][key], f"architect_{key}"
+        )
+        for key in (
+            "workflow_design",
+            "blueprint",
+            "design_system",
+            "approval_record",
+        )
+    ]
+
+    image["status"] = "COMPLETED"
+    image["required_action"] = None
+    image["details"] = {
+        "platform_tool_id": payload["image_generation"]["platform_tool_id"],
+        "requested_slide_count": payload["image_generation"][
+            "requested_slide_count"
+        ],
+        "completed_slide_count": payload["image_generation"][
+            "completed_slide_count"
+        ],
+    }
+    image["artifacts"] = [
+        _run_artifact_reference(
+            root,
+            base,
+            row["source_png"],
+            f"imagegen_slide_{row['slide_number']:03d}",
+        )
+        for row in payload["image_generation"]["slides"]
+    ]
+
+    reconstruction["status"] = "COMPLETED"
+    reconstruction["required_action"] = None
+    reconstruction["details"] = {
+        "skill_name": payload["reconstruction"]["skill_name"],
+        "quality_level": payload["reconstruction"]["quality_level"],
+        "route_hardlock": payload["reconstruction"]["route_hardlock"],
+        "reconstruction_hardlock": payload["reconstruction"][
+            "reconstruction_hardlock"
+        ],
+        "pptx_openability": payload["reconstruction"]["pptx_openability"],
+    }
+    reconstruction["artifacts"] = [
+        _run_artifact_reference(
+            root,
+            base,
+            payload["reconstruction"]["output_pptx"],
+            "editable_pptx",
+        ),
+        _run_artifact_reference(
+            root,
+            base,
+            payload["reconstruction"]["native_object_manifest"],
+            "native_object_manifest",
+        ),
+        _run_artifact_reference(
+            root,
+            base,
+            payload["reconstruction"]["openability_report"],
+            "pptx_openability_report",
+        ),
+    ]
+    if payload["reconstruction"]["output_html"] is not None:
+        reconstruction["artifacts"].append(
+            _run_artifact_reference(
+                root,
+                base,
+                payload["reconstruction"]["output_html"],
+                "editable_html",
+            )
+        )
+
+    qa["status"] = (
+        "COMPLETED" if payload["visual_qa"]["status"] == "PASS" else "NEEDS_REPAIR"
+    )
+    qa["required_action"] = None
+    qa["details"] = {
+        "skill_name": payload["visual_qa"]["skill_name"],
+        "status": payload["visual_qa"]["status"],
+        "fail_count": payload["visual_qa"]["fail_count"],
+        "blocking_count": payload["visual_qa"]["blocking_count"],
+        "needs_polish_count": payload["visual_qa"]["needs_polish_count"],
+        "repair_iterations": payload["visual_qa"]["repair_iterations"],
+    }
+    qa["artifacts"] = [
+        _run_artifact_reference(
+            root, base, payload["visual_qa"]["summary"], "visual_qa_summary"
+        ),
+        _run_artifact_reference(
+            root, base, payload["visual_qa"]["contact_sheet"], "contact_sheet"
+        ),
+    ]
+
+    delivery["status"] = (
+        "COMPLETED" if payload["status"] == "COMPLETED" else "PENDING"
+    )
+    delivery["required_action"] = None
+    delivery["details"] = {"format": payload["delivery"]["format"]}
+    delivery["artifacts"] = [
+        _artifact_reference(root, run_path, "sealed_codex_run_manifest"),
+        _run_artifact_reference(
+            root, base, payload["delivery"]["pptx"], "delivered_editable_pptx"
+        ),
+        _run_artifact_reference(
+            root,
+            base,
+            payload["delivery"]["editability_inventory"],
+            "editability_inventory",
+        ),
+    ]
+    if payload["delivery"]["html"] is not None:
+        delivery["artifacts"].append(
+            _run_artifact_reference(
+                root, base, payload["delivery"]["html"], "delivered_editable_html"
+            )
+        )
+
+
+def _run_artifact_reference(
+    root: Path,
+    manifest_base: Path,
+    value: dict[str, Any],
+    kind: str,
+) -> dict[str, Any]:
+    candidate = Path(value["path"])
+    path = (
+        candidate.resolve()
+        if candidate.is_absolute()
+        else (manifest_base / candidate).resolve()
+    )
+    return _artifact_reference(root, path, kind)
 
 
 def _prepare_runtime_root(path: Path) -> Path:
@@ -530,7 +595,7 @@ def _resolve_pdfs(paths: Iterable[Path]) -> tuple[Path, ...]:
     if len(resolved) > MAX_GENERAL_PDFS:
         raise _workflow_error(
             "DC_GENERATE_INPUT_INVALID",
-            f"At most {MAX_GENERAL_PDFS} PDFs may be supplied to the six-slide workflow.",
+            f"At most {MAX_GENERAL_PDFS} PDFs may be supplied to one workflow.",
         )
     for path in resolved:
         if not path.is_file():
@@ -554,78 +619,17 @@ def _resolve_pdfs(paths: Iterable[Path]) -> tuple[Path, ...]:
     return resolved
 
 
-def _copy_pdf_inputs(paths: tuple[Path, ...], inputs_dir: Path) -> tuple[Path, ...]:
+def _copy_pdf_inputs(
+    paths: tuple[Path, ...],
+    inputs_dir: Path,
+) -> tuple[Path, ...]:
     copied: list[Path] = []
     for index, source in enumerate(paths, start=1):
-        stem = re.sub(r"[^A-Za-z0-9._-]+", "-", source.stem).strip("-._") or "source"
-        destination = inputs_dir / f"source-{index:02d}-{stem[:48]}.pdf"
+        stem = re.sub(r"[^A-Za-z0-9._-]+", "-", source.stem).strip("-") or "source"
+        destination = inputs_dir / f"{index:02d}-{stem}.pdf"
         shutil.copy2(source, destination)
         copied.append(destination)
     return tuple(copied)
-
-
-def _validate_phase4_link(root: Path, manifest: dict[str, Any], phase4_bundle: Path) -> None:
-    provenance_path = phase4_bundle / "input_provenance.json"
-    if not provenance_path.is_file():
-        raise _workflow_error(
-            "DC_GENERATE_PHASE4_LINK_MISSING",
-            "Accepted Phase 4 bundle is missing input_provenance.json.",
-            artifact_path=provenance_path,
-        )
-    provenance = read_json(provenance_path)
-    phase3_run = read_json(root / "phase3" / "deckcompiler_run_manifest.json")
-    if provenance.get("phase3_run_id") != phase3_run.get("run_id"):
-        raise _workflow_error(
-            "DC_GENERATE_PHASE4_LINK_MISMATCH",
-            "Phase 4 bundle was not produced from this workflow's Phase 3 run.",
-            artifact_path=provenance_path,
-        )
-    expected_hashes = read_json(root / "phase3" / "phase3_validation_report.json").get(
-        "deterministic_artifact_hashes"
-    )
-    if provenance.get("phase3_artifact_hashes") != expected_hashes:
-        raise _workflow_error(
-            "DC_GENERATE_PHASE4_LINK_MISMATCH",
-            "Phase 4 provenance does not bind the exact Phase 3 artifact hashes.",
-            artifact_path=provenance_path,
-        )
-
-
-def _validate_phase5_link(root: Path, phase5: dict[str, Any], phase5_bundle: Path) -> None:
-    if not phase5_bundle.is_dir():
-        raise _workflow_error(
-            "DC_GENERATE_PHASE5_BUNDLE_MISSING",
-            f"Phase 5 bundle is unavailable: {phase5_bundle}",
-            artifact_path=phase5_bundle,
-        )
-    candidate = phase5_bundle / "handoff" / "pngtopptx_handoff_manifest.json"
-    if not candidate.is_file():
-        raise _workflow_error(
-            "DC_GENERATE_PHASE5_LINK_MISSING",
-            "Phase 5 bundle is missing its handoff manifest.",
-            artifact_path=candidate,
-        )
-    expected_path = root / "phase5_handoff" / "handoff" / "pngtopptx_handoff_manifest.json"
-    if not expected_path.is_file():
-        raise _workflow_error(
-            "DC_GENERATE_PHASE5_LINK_MISSING",
-            "This workflow has no exported Phase 5 handoff to bind.",
-            artifact_path=expected_path,
-        )
-    expected = read_json(expected_path)
-    observed = read_json(candidate)
-    if observed.get("handoff_id") != expected.get("handoff_id"):
-        raise _workflow_error(
-            "DC_GENERATE_PHASE5_LINK_MISMATCH",
-            "Phase 5 reconstruction bundle does not match this workflow's handoff.",
-            artifact_path=candidate,
-        )
-    if phase5.get("details", {}).get("handoff_id") not in {None, observed.get("handoff_id")}:
-        raise _workflow_error(
-            "DC_GENERATE_PHASE5_LINK_MISMATCH",
-            "Stored Phase 5 handoff identity differs from the reconstruction bundle.",
-            artifact_path=candidate,
-        )
 
 
 def _load_workflow(resume: Path) -> tuple[Path, dict[str, Any]]:
@@ -637,45 +641,172 @@ def _load_workflow(resume: Path) -> tuple[Path, dict[str, Any]]:
             f"Generate workflow manifest is missing: {manifest_path}",
             artifact_path=manifest_path,
         )
-    manifest = read_json(manifest_path)
-    issues = _manifest_issues(manifest)
+    root = manifest_path.parent
+    payload = read_json(manifest_path)
+    issues = _manifest_issues(payload)
+    issues.extend(_input_artifact_issues(root, payload) if not issues else [])
+    issues.extend(
+        _manifest_artifact_issues(
+            root,
+            payload,
+            kinds={"codex_dispatch", "codex_workflow_runbook"},
+        )
+        if not issues
+        else []
+    )
     if issues:
         raise _workflow_error(
             "DC_GENERATE_MANIFEST_INVALID",
-            "; ".join(issues[:5]),
+            "; ".join(issues[:8]),
             artifact_path=manifest_path,
         )
-    root = manifest_path.parent
-    if Path(str(manifest["runtime_root"])).resolve() != root:
+    if Path(payload["runtime_root"]).resolve() != root.resolve():
         raise _workflow_error(
-            "DC_GENERATE_MANIFEST_RELOCATED",
-            "Workflow manifest runtime_root does not match its current directory.",
+            "DC_GENERATE_RUNTIME_MISMATCH",
+            "Workflow manifest runtime_root does not match its current location.",
             artifact_path=manifest_path,
         )
-    phases = [stage["phase"] for stage in manifest["stages"]]
-    if phases != ["phase3", "phase4", "phase5", "phase6"]:
-        raise _workflow_error(
-            "DC_GENERATE_MANIFEST_INVALID",
-            f"Unexpected phase order: {phases}",
-            artifact_path=manifest_path,
+    return root, payload
+
+
+def _input_artifact_issues(root: Path, payload: dict[str, Any]) -> list[str]:
+    issues: list[str] = []
+    contract = payload.get("input_contract")
+    if not isinstance(contract, dict):
+        return ["input_contract is missing"]
+    references = [contract.get("prompt"), *contract.get("pdfs", [])]
+    for reference in references:
+        if not isinstance(reference, dict):
+            issues.append("input artifact reference is malformed")
+            continue
+        raw = reference.get("path")
+        if not isinstance(raw, str):
+            issues.append("input artifact path is malformed")
+            continue
+        candidate = Path(raw)
+        path = candidate.resolve() if candidate.is_absolute() else (root / candidate).resolve()
+        if not path.is_file():
+            issues.append(f"input artifact is missing: {path}")
+            continue
+        if reference.get("sha256") != _sha256_file(path):
+            issues.append(f"input artifact hash mismatch: {path}")
+    return issues
+
+
+def _manifest_artifact_issues(
+    root: Path,
+    payload: dict[str, Any],
+    *,
+    kinds: set[str] | None = None,
+) -> list[str]:
+    issues: list[str] = []
+    references = payload.get("artifacts")
+    if not isinstance(references, list):
+        return ["workflow artifacts are missing"]
+    for reference in references:
+        if not isinstance(reference, dict):
+            issues.append("workflow artifact reference is malformed")
+            continue
+        kind = reference.get("kind")
+        if kinds is not None and kind not in kinds:
+            continue
+        raw = reference.get("path")
+        if not isinstance(raw, str) or not raw:
+            issues.append(f"{kind or 'workflow artifact'} path is malformed")
+            continue
+        candidate = Path(raw)
+        unresolved = candidate if candidate.is_absolute() else root / candidate
+        if unresolved.is_symlink():
+            issues.append(f"{kind} must not be a symlink: {unresolved}")
+            continue
+        path = unresolved.resolve()
+        expected_scope = (
+            "workflow"
+            if path == root or path.is_relative_to(root)
+            else "external"
         )
-    return root, manifest
+        if reference.get("scope") != expected_scope:
+            issues.append(f"{kind} scope does not match resolved path: {path}")
+        if "sha256" in reference:
+            if not path.is_file():
+                issues.append(f"{kind} artifact is missing: {path}")
+            elif reference["sha256"] != _sha256_file(path):
+                issues.append(f"{kind} artifact hash mismatch: {path}")
+        elif "aggregate_sha256" in reference:
+            try:
+                fingerprint = _directory_fingerprint(path)
+            except DeckCompilerError as exc:
+                issues.append(exc.message)
+                continue
+            if reference["aggregate_sha256"] != fingerprint["aggregate_sha256"]:
+                issues.append(f"{kind} directory aggregate mismatch: {path}")
+            if reference.get("file_count") != fingerprint["file_count"]:
+                issues.append(f"{kind} directory file count mismatch: {path}")
+        else:
+            issues.append(f"{kind} artifact has no integrity fingerprint")
+    return issues
+
+
+def _sealed_run_issues(root: Path, payload: dict[str, Any]) -> list[str]:
+    if payload.get("status") not in {"COMPLETED", "NEEDS_REPAIR"}:
+        return []
+    references = payload.get("artifacts")
+    if not isinstance(references, list):
+        return ["sealed Codex run reference is missing"]
+    sealed = next(
+        (
+            reference
+            for reference in references
+            if isinstance(reference, dict)
+            and reference.get("kind") == "sealed_codex_run_manifest"
+        ),
+        None,
+    )
+    if sealed is None:
+        return ["sealed Codex run reference is missing"]
+    candidate = Path(str(sealed["path"]))
+    path = candidate.resolve() if candidate.is_absolute() else (root / candidate).resolve()
+    try:
+        report = validate_codex_run_manifest(
+            path,
+            expected_workflow_id=payload["workflow_id"],
+        )
+    except (DeckCompilerError, OSError, ValueError) as exc:
+        return [f"sealed Codex run is invalid: {exc}"]
+    issues = [f"sealed Codex run: {issue}" for issue in report["issues"]]
+    if payload["status"] == "COMPLETED" and not report["completion_ready"]:
+        issues.extend(
+            f"sealed Codex completion: {issue}"
+            for issue in report["completion_issues"]
+        )
+        if not report["completion_issues"]:
+            issues.append("sealed Codex run is not completion-ready")
+    return issues
 
 
 def _manifest_issues(payload: dict[str, Any]) -> list[str]:
-    issues = []
-    for error in validator_for(WORKFLOW_SCHEMA).iter_errors(payload):
-        location = "/".join(str(item) for item in error.absolute_path) or "$"
-        issues.append(f"{location}: {error.message}")
-    expected = payload.get("manifest_hash")
+    validator = validator_for(WORKFLOW_SCHEMA)
+    issues = [
+        f"{'.'.join(str(part) for part in issue.path) or '$'}: {issue.message}"
+        for issue in sorted(
+            validator.iter_errors(payload),
+            key=lambda item: list(item.path),
+        )
+    ]
+    if issues:
+        return issues
     value = dict(payload)
-    value.pop("manifest_hash", None)
-    if expected != content_sha256(value):
-        issues.append("manifest_hash: content hash mismatch")
-    return sorted(issues)
+    expected = value.pop("manifest_hash")
+    actual = content_sha256(value)
+    if expected != actual:
+        issues.append("manifest_hash does not match canonical manifest content")
+    return issues
 
 
-def _write_workflow_manifest(root: Path, manifest: dict[str, Any]) -> None:
+def _write_workflow_manifest(
+    root: Path,
+    manifest: dict[str, Any],
+) -> None:
     manifest["updated_at"] = _now()
     value = dict(manifest)
     value.pop("manifest_hash", None)
@@ -684,13 +815,17 @@ def _write_workflow_manifest(root: Path, manifest: dict[str, Any]) -> None:
     if issues:
         raise _workflow_error(
             "DC_GENERATE_MANIFEST_INVALID",
-            "; ".join(issues[:5]),
+            "; ".join(issues[:8]),
             artifact_path=root / MANIFEST_NAME,
         )
     write_json(root / MANIFEST_NAME, manifest)
 
 
-def _block_manifest(root: Path, manifest: dict[str, Any], exc: Exception) -> None:
+def _block_manifest(
+    root: Path,
+    manifest: dict[str, Any],
+    exc: Exception,
+) -> None:
     error = (
         exc.to_dict()
         if isinstance(exc, DeckCompilerError)
@@ -707,7 +842,7 @@ def _block_manifest(root: Path, manifest: dict[str, Any], exc: Exception) -> Non
         (
             stage
             for stage in manifest["stages"]
-            if stage["status"] == "RUNNING"
+            if stage["status"] in {"RUNNING", "AWAITING_EXTERNAL", "NEEDS_REPAIR"}
         ),
         None,
     )
@@ -726,12 +861,14 @@ def _block_manifest(root: Path, manifest: dict[str, Any], exc: Exception) -> Non
         pass
 
 
-def _stage(manifest: dict[str, Any], phase: str) -> dict[str, Any]:
-    return next(stage for stage in manifest["stages"] if stage["phase"] == phase)
+def _stage(manifest: dict[str, Any], name: str) -> dict[str, Any]:
+    return next(stage for stage in manifest["stages"] if stage["stage"] == name)
 
 
 def _record(manifest: dict[str, Any], event: str, status: str) -> None:
-    manifest["history"].append({"timestamp": _now(), "event": event, "status": status})
+    manifest["history"].append(
+        {"timestamp": _now(), "event": event, "status": status}
+    )
 
 
 def _sync_artifacts(manifest: dict[str, Any]) -> None:
@@ -740,11 +877,6 @@ def _sync_artifacts(manifest: dict[str, Any]) -> None:
         for stage in manifest["stages"]
         for artifact in stage["artifacts"]
     ]
-
-
-def _stored_external_path(stage: dict[str, Any], key: str) -> Path | None:
-    value = stage.get("details", {}).get(key)
-    return Path(value).resolve() if isinstance(value, str) and value else None
 
 
 def _current_action(manifest: dict[str, Any]) -> dict[str, Any] | None:
@@ -758,7 +890,12 @@ def _current_action(manifest: dict[str, Any]) -> dict[str, Any] | None:
     )
 
 
-def _result(root: Path, manifest: dict[str, Any], *, exit_code: int) -> GenerateWorkflowResult:
+def _result(
+    root: Path,
+    manifest: dict[str, Any],
+    *,
+    exit_code: int,
+) -> GenerateWorkflowResult:
     return GenerateWorkflowResult(
         workflow_id=manifest["workflow_id"],
         runtime_root=root,
@@ -777,15 +914,18 @@ def _artifact_reference(
     directory: bool = False,
 ) -> dict[str, Any]:
     resolved = path.resolve()
-    scope = "workflow" if resolved == root or resolved.is_relative_to(root) else "external"
+    scope = (
+        "workflow"
+        if resolved == root or resolved.is_relative_to(root)
+        else "external"
+    )
     reference: dict[str, Any] = {
         "kind": kind,
         "path": _path_value(root, resolved),
         "scope": scope,
     }
     if directory:
-        fingerprint = _directory_fingerprint(resolved)
-        reference.update(fingerprint)
+        reference.update(_directory_fingerprint(resolved))
     elif resolved.is_file():
         reference["sha256"] = _sha256_file(resolved)
     return reference
@@ -823,7 +963,10 @@ def _directory_fingerprint(root: Path) -> dict[str, Any]:
                     "byte_size": path.stat().st_size,
                 }
             )
-    return {"aggregate_sha256": content_sha256(rows), "file_count": len(rows)}
+    return {
+        "aggregate_sha256": content_sha256(rows),
+        "file_count": len(rows),
+    }
 
 
 def _sha256_file(path: Path) -> str:
@@ -859,7 +1002,9 @@ def _workflow_error(
     message: str,
     *,
     artifact_path: Path | None = None,
-    remediation_hint: str = "Correct the workflow input or resume option and try again.",
+    remediation_hint: str = (
+        "Use the Architect-first Codex workflow and preserve its execution evidence."
+    ),
 ) -> DeckCompilerError:
     return DeckCompilerError(
         code,
@@ -875,9 +1020,11 @@ def _now() -> str:
 
 
 __all__ = [
+    "DISPATCH_NAME",
     "GenerateWorkflowResult",
     "MANIFEST_NAME",
-    "WORKFLOW_OPTIONS",
+    "MAX_GENERAL_PDFS",
+    "RUNBOOK_NAME",
     "resume_generate_workflow",
     "start_generate_workflow",
     "validate_generate_workflow",

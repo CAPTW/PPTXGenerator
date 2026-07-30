@@ -10,8 +10,11 @@ from pathlib import Path
 from .errors import DeckCompilerError
 from .manifest_io import read_json
 from .manifest_io import write_json
+from .orchestration.codex_run import (
+    seal_codex_run_manifest,
+    validate_codex_run_manifest,
+)
 from .orchestration.generate import (
-    WORKFLOW_OPTIONS,
     resume_generate_workflow,
     start_generate_workflow,
     validate_generate_workflow,
@@ -55,7 +58,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     generate = subparsers.add_parser(
         "generate",
-        help="Start or resume the general prompt/PDF workflow across DeckCompiler Phases 3-6.",
+        help=(
+            "Capture a prompt/PDF request for the mandatory Architect-first live "
+            "Codex ImageGen-to-PNGtoPPTX workflow."
+        ),
     )
     generate.add_argument("--output-dir", type=Path)
     generate.add_argument("--resume", type=Path)
@@ -67,26 +73,36 @@ def build_parser() -> argparse.ArgumentParser:
     generate.add_argument("--purpose", default="source-grounded presentation")
     generate.add_argument("--language", default="English")
     generate.add_argument("--tone", action="append")
-    generate.add_argument("--workflow", choices=WORKFLOW_OPTIONS, default="decision_brief")
-    generate.add_argument("--phase4-bundle", type=Path)
-    generate.add_argument("--external-skillset-pin", type=Path)
-    generate.add_argument("--external-skill-root", type=Path)
-    generate.add_argument("--profile", type=Path)
-    generate.add_argument("--node-path", type=Path)
-    generate.add_argument("--phase5-bundle", type=Path)
-    generate.add_argument("--renders-dir", type=Path)
-    generate.add_argument("--renderer-version")
-    generate.add_argument("--external-visual-summary", type=Path)
-    generate.add_argument("--external-visual-exit-code", type=int)
-    generate.add_argument("--pptx", type=Path)
-    generate.add_argument("--html", type=Path)
-    generate.add_argument("--deckcompiler-commit")
+    generate.add_argument(
+        "--workflow",
+        default="auto",
+        help="Optional user hint only; pptx-workflow-architect selects the actual workflow.",
+    )
+    generate.add_argument(
+        "--codex-run-manifest",
+        type=Path,
+        help="Sealed live Codex run evidence to register while resuming.",
+    )
 
     validate_generate = subparsers.add_parser(
         "validate-generate",
         help="Validate a resumable general generate workflow manifest.",
     )
     validate_generate.add_argument("path", type=Path)
+
+    seal_codex_run = subparsers.add_parser(
+        "seal-codex-run",
+        help="Recompute artifact hashes and seal a live Codex PPTX generation run.",
+    )
+    seal_codex_run.add_argument("--draft", type=Path, required=True)
+    seal_codex_run.add_argument("--output", type=Path, required=True)
+
+    validate_codex_run = subparsers.add_parser(
+        "validate-codex-run",
+        help="Validate live Architect, ImageGen, PNGtoPPTX, and visual-QA evidence.",
+    )
+    validate_codex_run.add_argument("path", type=Path)
+    validate_codex_run.add_argument("--workflow-id")
 
     prepare = subparsers.add_parser(
         "prepare-visuals",
@@ -217,26 +233,11 @@ def main(argv: list[str] | None = None) -> int:
                         "general_generate_workflow",
                         "--output-dir is required when starting a generate workflow.",
                     )
-                downstream = (
-                    args.phase4_bundle,
-                    args.external_skillset_pin,
-                    args.external_skill_root,
-                    args.profile,
-                    args.node_path,
-                    args.phase5_bundle,
-                    args.renders_dir,
-                    args.renderer_version,
-                    args.external_visual_summary,
-                    args.external_visual_exit_code,
-                    args.pptx,
-                    args.html,
-                    args.deckcompiler_commit,
-                )
-                if any(value is not None for value in downstream):
+                if args.codex_run_manifest is not None:
                     raise DeckCompilerError(
                         "DC_GENERATE_INPUT_INVALID",
                         "general_generate_workflow",
-                        "Downstream Phase 4-6 options require --resume.",
+                        "--codex-run-manifest requires --resume.",
                     )
                 result = start_generate_workflow(
                     output_dir=args.output_dir,
@@ -258,19 +259,7 @@ def main(argv: list[str] | None = None) -> int:
                     )
                 result = resume_generate_workflow(
                     resume=args.resume,
-                    phase4_bundle=args.phase4_bundle,
-                    external_skillset_pin=args.external_skillset_pin,
-                    external_skill_root=args.external_skill_root,
-                    profile=args.profile,
-                    node_path=args.node_path,
-                    phase5_bundle=args.phase5_bundle,
-                    renders_dir=args.renders_dir,
-                    renderer_version=args.renderer_version,
-                    external_visual_summary=args.external_visual_summary,
-                    external_visual_exit_code=args.external_visual_exit_code,
-                    pptx=args.pptx,
-                    html=args.html,
-                    deckcompiler_commit=args.deckcompiler_commit,
+                    codex_run_manifest=args.codex_run_manifest,
                 )
         except (DeckCompilerError, HandoffError, CompositeQAError, OSError, ValueError) as exc:
             code = getattr(exc, "code", "DC_GENERATE_FAILED")
@@ -303,6 +292,31 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
         return 0 if report["valid"] else 1
+    if args.command == "seal-codex-run":
+        try:
+            payload = seal_codex_run_manifest(args.draft, args.output)
+        except (DeckCompilerError, OSError, ValueError, json.JSONDecodeError) as exc:
+            code = getattr(exc, "code", "DC_CODEX_RUN_SEAL_FAILED")
+            print(f"DECKCOMPILER_CODEX_RUN_SEAL_BLOCKED code={code} message={exc}")
+            return 1
+        print(
+            "DECKCOMPILER_CODEX_RUN_SEALED "
+            f"workflow_id={payload['workflow_id']} status={payload['status']} "
+            f"manifest={args.output.resolve().as_posix()}"
+        )
+        return 0
+    if args.command == "validate-codex-run":
+        try:
+            report = validate_codex_run_manifest(
+                args.path,
+                expected_workflow_id=args.workflow_id,
+            )
+        except (DeckCompilerError, OSError, ValueError, json.JSONDecodeError) as exc:
+            code = getattr(exc, "code", "DC_CODEX_RUN_INVALID")
+            print(f"DECKCOMPILER_CODEX_RUN_INVALID code={code} message={exc}")
+            return 1
+        print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0 if report["contract_valid"] else 1
     if args.command == "demo":
         from .release.demo import main as demo_main
 

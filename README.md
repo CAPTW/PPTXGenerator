@@ -84,20 +84,22 @@ python -m pip install -e .
 
 deckcompiler generate `
   --output-dir <new-empty-output-directory-outside-repo> `
-  --prompt "Create a decision brief from these reports." `
-  --pdf <first-searchable.pdf> `
-  --pdf <second-searchable.pdf>
+  --prompt "Create the best presentation for these materials." `
+  --pdf <first.pdf> `
+  --pdf <second.pdf> `
+  --workflow auto
 ```
 
-The general entrypoint accepts zero to six searchable PDFs, executes Phase 3
-and Phase 4 visual preparation, and writes a hash-bound resumable manifest. It
-then exits with code `2` at the declared platform Image Generation boundary.
-Resume the same workflow with an accepted Phase 4 bundle to export the official
-PNGtoPPTX handoff, and later with a Phase 5 reconstruction bundle to run
-runtime-bound Phase 6 Composite QA.
+The entrypoint copies and fingerprints the inputs, writes a hash-bound resumable
+manifest, and exits with code `2` at
+`AWAITING_WORKFLOW_ARCHITECT`. The first production Skill is always
+`pptx-workflow-architect`, regardless of prompt wording or input channel.
+After approved Gates 1 and 2, the repo-owned Codex workflow calls
+`image_gen.imagegen` for every approved slide, runs the installed PNGtoPPTX
+orchestrator, and iterates visual-QA repair waves to zero blocking slides.
 
 See the [general workflow runbook](docs/GENERAL_GENERATE_WORKFLOW.md) for the
-Phase 4–6 resume commands and status contract.
+Skill order, approval gates, run sealing, and completion contract.
 
 ### Run the canonical demo
 
@@ -142,7 +144,7 @@ See the [demo runbook](docs/devpost/PHASE_07_DEMO_RUNBOOK.md) and [runtime guide
 | Full-slide raster violations | 0 |
 | Historical Phase 7 full-workspace focused tests | 274 PASS |
 | Historical Phase 7 full-workspace suite | 733 PASS |
-| Current public minimal-snapshot suite | 494 PASS |
+| Current public minimal-snapshot suite | 501 PASS |
 | Final release prerequisites | 81 / 81 PASS |
 | Canonical / repeat / fresh unexplained divergence | 0 |
 
@@ -150,7 +152,7 @@ See the [demo runbook](docs/devpost/PHASE_07_DEMO_RUNBOOK.md) and [runtime guide
 
 > The 274/733 rows are immutable historical Phase 7 evidence. The test
 > inventory published in this release-minimal repository is the separately
-> verified 494-test suite, including the general generate workflow and runtime
+> verified 501-test suite, including the general generate workflow and runtime
 > Phase 6 authority path.
 
 - [Final release gate](docs/devpost/evidence/phase7_final/final_release_gate.json)
@@ -162,18 +164,19 @@ See the [demo runbook](docs/devpost/PHASE_07_DEMO_RUNBOOK.md) and [runtime guide
 
 ## 🖼️ Image Generation boundary
 
-The general `generate` entrypoint prepares live Phase 4 requests and pauses for
-the approved platform-managed image workflow. Repository code does not claim or
-simulate that external execution. The original certified Phase 4 workflow
-executed Image Generation and recorded provenance plus selected-image hashes.
+The general workflow has two explicit execution surfaces:
 
-The reproducible release CLI:
+- Repository Python captures inputs, emits the mandatory Architect-first Codex
+  dispatch, seals execution evidence, and validates completion. It does not
+  pretend to invoke a platform tool.
+- The live Codex Skill calls `image_gen.imagegen`, inspects and regenerates
+  slide images, runs the installed PNGtoPPTX SkillSet, and executes visual-QA
+  repair waves.
 
-- validates and consumes the frozen visual bundle;
-- does **not** rerun live Image Generation;
-- needs no API key;
-- does not claim an unexposed image-model identity;
-- does not flatten the final slides into generated full-slide images.
+The separate reproducible release demo still validates and consumes its frozen
+visual bundle without rerunning Image Generation. Generated slide PNGs are
+reconstruction references; the delivered semantic surface remains editable
+PowerPoint objects.
 
 ---
 
@@ -201,13 +204,18 @@ The external SkillSet was not created during Build Week and is not vendored into
 
 - The certified proof covers one source-controlled six-slide demo.
 - Canonical certified input is one prompt plus exactly two text-searchable PDFs.
-- The general workflow accepts a prompt plus zero to six text-searchable PDFs;
-  it is runtime-validated but is not part of the immutable canonical demo proof.
-- Scanned or image-only PDF OCR is unsupported.
+- The general live Codex workflow accepts an inline/file prompt plus zero to 50
+  local PDFs and lets the approved Architect blueprint choose 1–400 slides. It
+  is runtime-validated but is not part of the immutable canonical demo proof.
+- PDF extraction/OCR capability depends on the active Codex document tooling;
+  the intake command itself preserves PDF bytes without silently omitting them.
 - Windows x64 is the certified profile.
 - PowerPoint, Chromium, Node.js, Cairo/Tesseract, and the locked Python runtime are prepared-machine prerequisites.
 - The external Skills are verified and installed automatically on first setup; their source is not vendored here.
-- No Google Slides fidelity, arbitrary PNG-to-perfect-PPTX, unbounded-volume ingestion, or arbitrary cross-platform PowerPoint claim is made.
+- No perfect pixel parity, unbounded-volume ingestion, or arbitrary
+  cross-platform PowerPoint claim is made. Live completion requires zero
+  fail/blocking visual-QA slides, while remaining `needs_polish` findings are
+  reported.
 
 See [Known Limitations](docs/devpost/submission/KNOWN_LIMITATIONS.md).
 

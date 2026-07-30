@@ -25,6 +25,7 @@ SCHEMA_FILES: dict[str, str] = {
     "composite_qa_acceptance": "composite-qa-acceptance.schema.json",
     "composite_qa_report": "composite-qa-report.schema.json",
     "contact_sheet_manifest": "contact-sheet-manifest.schema.json",
+    "codex_pptx_generation_run": "codex-pptx-generation-run.schema.json",
     "deckcompiler_run_manifest": "deckcompiler-run-manifest.schema.json",
     "design_invariants": "design-invariants.schema.json",
     "evidence_unit": "evidence-unit.schema.json",

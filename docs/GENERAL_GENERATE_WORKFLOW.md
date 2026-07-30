@@ -1,122 +1,167 @@
-# General Prompt and PDF Workflow
+# Architect-First Prompt and PDF Workflow
 
-`deckcompiler generate` is the resumable entrypoint for a user prompt plus zero
-to six local, text-searchable PDFs. It keeps the existing six-slide editable
-DeckCompiler contract and connects Phase 3 through Phase 6 without pretending
-that repository code can invoke platform-managed Image Generation or the
-external `CAPTW/pngtopptx` SkillSet by itself.
+The general workflow is a live Codex workflow. Repository Python owns immutable
+input capture and evidence validation; Codex owns the platform-managed Skill and
+tool calls.
 
-## 1. Start from a prompt and PDFs
+The mandatory order is:
 
-Install the project into the prepared Python environment, then choose a new
-empty runtime directory outside the repository:
+```text
+pptx-workflow-architect
+  -> approved Gate 1 and Gate 2
+  -> imagegen / image_gen.imagegen for every slide
+  -> slide-editable-deck-orchestrator
+  -> visual QA and repair waves
+  -> sealed editable-PPTX delivery
+```
+
+This order applies regardless of how the presentation request is phrased or
+whether the input is an inline prompt, prompt file, PDF, multiple PDFs, notes,
+outline, or topic.
+
+## 1. Capture the request
+
+Choose a new empty runtime directory outside the repository:
 
 ```powershell
-python -m pip install -e .
-
 deckcompiler generate `
   --output-dir C:\runs\quarterly-risk-deck `
-  --prompt "Create an executive decision brief from the attached reports." `
+  --prompt "Create the best presentation for this material." `
   --pdf C:\sources\operations.pdf `
   --pdf C:\sources\risk-review.pdf `
   --audience "executive leadership" `
   --purpose "investment decision" `
   --language English `
-  --tone professional `
   --tone concise `
-  --workflow executive_summary
+  --workflow auto
 ```
 
-Use `--prompt-file` instead of `--prompt` for a UTF-8 text file. PDF inputs are
-copied into the isolated runtime and fingerprinted. Duplicate bytes, missing
-files, scanned/image-only PDFs, unsafe workflow aliases, and more than six PDFs
-fail closed.
+Use `--prompt-file` instead of `--prompt` for UTF-8 text. `--workflow` is only a
+user hint; it does not select a fixed narrative template.
 
-The first call executes:
-
-1. input collection and immutable local copies;
-2. Phase 3 source extraction, Evidence Units, workflow resolution, strict
-   six-slide planning, and Creative Template Architecture;
-3. Phase 4 Semantic Sidecars, editable template specification, visual DNA, and
-   13 platform image-request artifacts.
-
-It then exits with code `2` and status `AWAITING_PHASE4_VISUALS`. Code `2` means
-the workflow is valid and waiting at a declared external boundary, not that the
-completed stages failed.
-
-## 2. Supply the accepted Phase 4 visual bundle
-
-Execute the prepared requests under
-`phase4_preparation/preparation/prompts/` using the approved platform-managed
-image workflow. Assemble the accepted Phase 4 bundle with:
-
-- six 1664×936 PNG slide visual targets;
-- six matching Semantic Sidecars;
-- `input_provenance.json` bound to the exact Phase 3 run and artifact hashes;
-- the design system, editable template spec, visual DNA, geometry report,
-  generation provenance, regeneration history, target manifest, and Phase 4
-  validation and acceptance records.
-
-Resume and export the official PNGtoPPTX handoff:
-
-```powershell
-deckcompiler generate `
-  --resume C:\runs\quarterly-risk-deck `
-  --phase4-bundle C:\runs\quarterly-risk-phase4 `
-  --external-skillset-pin C:\pins\pngtopptx-skillset-pin.json `
-  --external-skill-root C:\skills\pngtopptx `
-  --profile C:\skills\pngtopptx\slide-image-dual-render\styles\corporate-light.json `
-  --node-path C:\runtime\node_modules
-```
-
-DeckCompiler validates target bytes, dimensions, Sidecar linkage, full-slide
-raster prohibitions, and exact Phase 3 provenance before writing
-`phase5_handoff/`. It does not invoke the external SkillSet. The call exits with
-code `2` and records `EXECUTE_PHASE5_RECONSTRUCTION` plus the exact invocation
-plan path in the workflow manifest.
-
-The Phase 4 bundle may be registered first without the four Phase 5 runtime
-options. In that case the status becomes `AWAITING_PHASE5_CONFIGURATION`; resume
-again with the four options to create the handoff.
-
-## 3. Resume with reconstructed outputs and run Phase 6
-
-After the pinned external SkillSet produces the editable PPTX, HTML, object
-manifests, semantic reports, crop evidence, and repair history, package those
-artifacts as the Phase 5 bundle. Run the official read-only visual QA, then
-resume:
-
-```powershell
-deckcompiler generate `
-  --resume C:\runs\quarterly-risk-deck `
-  --phase5-bundle C:\runs\quarterly-risk-phase5 `
-  --external-visual-summary C:\runs\visual-qa\summary.json `
-  --external-visual-exit-code 0 `
-  --renders-dir C:\runs\powerpoint-renders `
-  --renderer-version 16.0
-```
-
-Phase 6 hashes the supplied runtime bundles instead of comparing them to the
-canonical demo Git-object authorities, while retaining the same semantic,
-source-coverage, editability, package, raster, render, and PPTX/HTML parity
-gates. A passing run returns code `0` and status `COMPLETED`; a completed QA run
-that requires repair returns code `1` and status `NEEDS_REPAIR`.
-
-## State and validation
-
-Every transition is written atomically to:
+The command copies and fingerprints inputs, writes `codex_dispatch.json` and
+`CODEX_WORKFLOW.md`, and exits with code `2`:
 
 ```text
-<runtime>\generate_workflow_manifest.json
+status=AWAITING_WORKFLOW_ARCHITECT
+action=INVOKE_PPTX_WORKFLOW_ARCHITECT
 ```
 
-The manifest contains input hashes, phase statuses, artifact directory
-fingerprints, external-boundary instructions, history, and machine-readable
-errors. Validate it at any time:
+It does not run the legacy fixed six-slide planner, generate images, or produce
+a PPTX.
+
+## 2. Run the mandatory Architect gates in Codex
+
+Codex must first read:
+
+```text
+${CODEX_HOME}/skills/pptx-workflow-architect/SKILL.md
+```
+
+Gate 1 diagnoses the presentation and offers workflow options. Gate 2 produces
+the communication blueprint and visual system. Production starts only after the
+approval required by that Skill.
+
+If the user says "just do it," Gates 1 and 2 may be compressed into a concise
+proposal, but approval is still required.
+
+The Architect blueprint chooses a right-sized slide count from 1–400. The
+general workflow does not force six slides or a decision-brief story.
+
+## 3. Generate and inspect the slide images
+
+After approval, Codex reads:
+
+```text
+.agents/skills/pptx-generator-workflow/SKILL.md
+${CODEX_HOME}/skills/.system/imagegen/SKILL.md
+```
+
+Codex calls the built-in `image_gen.imagegen` tool for every approved slide.
+Each selected output is inspected and, when needed, regenerated with a targeted
+change. Selected references are stored as:
+
+```text
+<runtime>\pngtopptx-project\src\slide1.png
+<runtime>\pngtopptx-project\src\slide2.png
+...
+```
+
+The workflow also preserves per-slide prompts, exact-text Semantic Sidecars,
+and inspection reports. The PNG is a visual reconstruction reference, not the
+final slide background or canonical text source.
+
+## 4. Reconstruct, compare, and repair
+
+Codex uses the installed external Skill:
+
+```text
+${CODEX_HOME}/skills/slide-editable-deck-orchestrator/SKILL.md
+```
+
+The default quality level is `polish`; `blocking-zero` is the minimum accepted
+production level. The workflow runs:
+
+1. editable PPTX/HTML reconstruction;
+2. route and reconstruction hardlocks;
+3. PPTX openability validation;
+4. full-deck visual QA against the generated source slides;
+5. repair-wave planning and rebuilding;
+6. source-mapped QA after every wave;
+7. final full-deck build and QA.
+
+Completion requires zero fail/blocking slides. A run that reaches the iteration
+cap remains `NEEDS_REPAIR`.
+
+## 5. Seal and register truthful completion
+
+The Codex Skill writes a draft run manifest containing Architect approvals,
+Image Generation receipts, selected PNGs, reconstruction evidence, and visual
+QA results. Seal it:
+
+```powershell
+deckcompiler seal-codex-run `
+  --draft C:\runs\quarterly-risk-deck\codex_run.draft.json `
+  --output C:\runs\quarterly-risk-deck\codex_run.json
+```
+
+Then register the result:
+
+```powershell
+deckcompiler generate `
+  --resume C:\runs\quarterly-risk-deck `
+  --codex-run-manifest C:\runs\quarterly-risk-deck\codex_run.json
+```
+
+The command returns `COMPLETED` only when:
+
+- `pptx-workflow-architect` is invocation order 1;
+- Gate 1 and Gate 2 have explicit user approval;
+- `image_gen.imagegen` covers every approved slide;
+- every selected reference is a real, consistently sized 16:9 PNG with a
+  passing inspection record;
+- the PPTX is a valid package whose slide count matches the approved blueprint;
+- the native-object manifest comes from actual render-surface calls and records
+  editable text on every slide;
+- PNGtoPPTX hardlocks and PPTX openability pass, with the openability report
+  hash-bound to that PPTX;
+- the external visual-QA summary agrees with the sealed counts and has zero
+  fail/blocking slides;
+- the delivered editable PPTX exists and matches its recorded hash.
+
+Placeholder bytes, a self-declared `PASS`, or a hash-only mock cannot satisfy
+this completion gate.
+
+Validate state at any time:
 
 ```powershell
 deckcompiler validate-generate C:\runs\quarterly-risk-deck
+deckcompiler validate-codex-run C:\runs\quarterly-risk-deck\codex_run.json
 ```
 
-The runtime is intentionally resumable but input-immutable. To change the
-prompt or PDFs, start a new workflow directory.
+## Release-demo boundary
+
+The historical DeckCompiler release demo remains a separate source-controlled
+six-slide reproducibility fixture. Its Phase 3–6 schemas and frozen visual
+bundle are not the general live Codex workflow and are not used to choose the
+story or slide count for arbitrary user requests.

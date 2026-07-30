@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://pptx-generator.local/schemas/deckcompiler/general-generate-workflow-manifest.schema.json",
-  "title": "DeckCompiler General Generate Workflow Manifest",
+  "title": "DeckCompiler Architect-First Generate Workflow Manifest",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -15,6 +15,7 @@
     "updated_at",
     "status",
     "input_contract",
+    "dispatch",
     "stages",
     "artifacts",
     "history",
@@ -22,21 +23,39 @@
     "manifest_hash"
   ],
   "properties": {
-    "schema_name": {"const": "general_generate_workflow_manifest"},
-    "schema_version": {"const": "1.0.0"},
-    "workflow_id": {"type": "string", "pattern": "^generate_[0-9a-f]{20}$"},
-    "entrypoint": {"const": "deckcompiler generate"},
-    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
-    "runtime_root": {"type": "string", "minLength": 1},
-    "created_at": {"type": "string", "format": "date-time"},
-    "updated_at": {"type": "string", "format": "date-time"},
+    "schema_name": {
+      "const": "general_generate_workflow_manifest"
+    },
+    "schema_version": {
+      "const": "2.0.0"
+    },
+    "workflow_id": {
+      "type": "string",
+      "pattern": "^generate_[0-9a-f]{20}$"
+    },
+    "entrypoint": {
+      "const": "deckcompiler generate"
+    },
+    "source_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "runtime_root": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
     "status": {
       "enum": [
-        "RUNNING",
-        "AWAITING_PHASE4_VISUALS",
-        "AWAITING_PHASE5_CONFIGURATION",
-        "AWAITING_PHASE5_RECONSTRUCTION",
-        "AWAITING_PHASE6_CONFIGURATION",
+        "AWAITING_WORKFLOW_ARCHITECT",
+        "RUNNING_CODEX_WORKFLOW",
         "COMPLETED",
         "NEEDS_REPAIR",
         "BLOCKED"
@@ -45,97 +64,344 @@
     "input_contract": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["mode", "prompt", "pdfs", "presentation"],
+      "required": [
+        "mode",
+        "prompt",
+        "pdfs",
+        "presentation"
+      ],
       "properties": {
-        "mode": {"enum": ["prompt_only", "prompt_with_pdfs"]},
-        "prompt": {"$ref": "#/$defs/artifactReference"},
+        "mode": {
+          "enum": [
+            "prompt_only",
+            "prompt_with_pdfs"
+          ]
+        },
+        "prompt": {
+          "$ref": "#/$defs/artifactReference"
+        },
         "pdfs": {
           "type": "array",
-          "maxItems": 6,
-          "items": {"$ref": "#/$defs/artifactReference"}
+          "maxItems": 50,
+          "items": {
+            "$ref": "#/$defs/artifactReference"
+          }
         },
-        "presentation": {"type": "object"}
+        "presentation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "audience",
+            "purpose",
+            "language",
+            "tone",
+            "workflow_hint"
+          ],
+          "properties": {
+            "audience": {
+              "type": "string",
+              "minLength": 1
+            },
+            "purpose": {
+              "type": "string",
+              "minLength": 1
+            },
+            "language": {
+              "type": "string",
+              "minLength": 1
+            },
+            "tone": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "workflow_hint": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "dispatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required_first_skill",
+        "required_first_skill_path",
+        "production_skill",
+        "image_skill",
+        "image_tool",
+        "reconstruction_skill",
+        "default_quality_level",
+        "approval_policy"
+      ],
+      "properties": {
+        "required_first_skill": {
+          "const": "pptx-workflow-architect"
+        },
+        "required_first_skill_path": {
+          "const": "${CODEX_HOME}/skills/pptx-workflow-architect/SKILL.md"
+        },
+        "production_skill": {
+          "const": "pptx-generator-workflow"
+        },
+        "image_skill": {
+          "const": "imagegen"
+        },
+        "image_tool": {
+          "const": "image_gen.imagegen"
+        },
+        "reconstruction_skill": {
+          "const": "slide-editable-deck-orchestrator"
+        },
+        "default_quality_level": {
+          "const": "polish"
+        },
+        "approval_policy": {
+          "const": "architect_gate1_and_gate2_explicit_user_approval"
+        }
       }
     },
     "stages": {
       "type": "array",
-      "minItems": 4,
-      "maxItems": 4,
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["phase", "status", "artifacts", "required_action", "details"],
-        "properties": {
-          "phase": {"enum": ["phase3", "phase4", "phase5", "phase6"]},
-          "status": {
-            "enum": [
-              "PENDING",
-              "RUNNING",
-              "COMPLETED",
-              "AWAITING_EXTERNAL",
-              "AWAITING_CONFIGURATION",
-              "NEEDS_REPAIR",
-              "BLOCKED"
-            ]
-          },
-          "artifacts": {
-            "type": "array",
-            "items": {"$ref": "#/$defs/artifactReference"}
-          },
-          "required_action": {
-            "oneOf": [
-              {"type": "null"},
-              {
-                "type": "object",
-                "additionalProperties": true,
-                "required": ["code", "message"],
-                "properties": {
-                  "code": {"type": "string", "minLength": 1},
-                  "message": {"type": "string", "minLength": 1}
-                }
-              }
-            ]
-          },
-          "details": {"type": "object"}
+      "minItems": 5,
+      "maxItems": 5,
+      "prefixItems": [
+        {
+          "$ref": "#/$defs/architectStage"
+        },
+        {
+          "$ref": "#/$defs/imageStage"
+        },
+        {
+          "$ref": "#/$defs/reconstructionStage"
+        },
+        {
+          "$ref": "#/$defs/qaStage"
+        },
+        {
+          "$ref": "#/$defs/deliveryStage"
         }
-      }
+      ],
+      "items": false
     },
     "artifacts": {
       "type": "array",
-      "items": {"$ref": "#/$defs/artifactReference"}
+      "items": {
+        "$ref": "#/$defs/artifactReference"
+      }
     },
     "history": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["timestamp", "event", "status"],
+        "required": [
+          "timestamp",
+          "event",
+          "status"
+        ],
         "properties": {
-          "timestamp": {"type": "string", "format": "date-time"},
-          "event": {"type": "string", "minLength": 1},
-          "status": {"type": "string", "minLength": 1}
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "event": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       }
     },
     "errors": {
       "type": "array",
-      "items": {"type": "object"}
+      "items": {
+        "type": "object"
+      }
     },
-    "manifest_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+    "manifest_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
   },
   "$defs": {
     "artifactReference": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "path", "scope"],
+      "required": [
+        "kind",
+        "path",
+        "scope"
+      ],
       "properties": {
-        "kind": {"type": "string", "minLength": 1},
-        "path": {"type": "string", "minLength": 1},
-        "scope": {"enum": ["workflow", "external"]},
-        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-        "aggregate_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-        "file_count": {"type": "integer", "minimum": 0}
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "enum": [
+            "workflow",
+            "external"
+          ]
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "aggregate_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "file_count": {
+          "type": "integer",
+          "minimum": 0
+        }
       }
+    },
+    "requiredAction": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": true,
+          "required": [
+            "code",
+            "message"
+          ],
+          "properties": {
+            "code": {
+              "type": "string",
+              "minLength": 1
+            },
+            "message": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "stageBase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stage",
+        "status",
+        "artifacts",
+        "required_action",
+        "details"
+      ],
+      "properties": {
+        "stage": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "PENDING",
+            "AWAITING_EXTERNAL",
+            "RUNNING",
+            "COMPLETED",
+            "NEEDS_REPAIR",
+            "BLOCKED"
+          ]
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifactReference"
+          }
+        },
+        "required_action": {
+          "$ref": "#/$defs/requiredAction"
+        },
+        "details": {
+          "type": "object"
+        }
+      }
+    },
+    "architectStage": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/stageBase"
+        },
+        {
+          "properties": {
+            "stage": {
+              "const": "architect"
+            }
+          }
+        }
+      ]
+    },
+    "imageStage": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/stageBase"
+        },
+        {
+          "properties": {
+            "stage": {
+              "const": "image_generation"
+            }
+          }
+        }
+      ]
+    },
+    "reconstructionStage": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/stageBase"
+        },
+        {
+          "properties": {
+            "stage": {
+              "const": "reconstruction"
+            }
+          }
+        }
+      ]
+    },
+    "qaStage": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/stageBase"
+        },
+        {
+          "properties": {
+            "stage": {
+              "const": "visual_qa"
+            }
+          }
+        }
+      ]
+    },
+    "deliveryStage": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/stageBase"
+        },
+        {
+          "properties": {
+            "stage": {
+              "const": "delivery"
+            }
+          }
+        }
+      ]
     }
   }
 }

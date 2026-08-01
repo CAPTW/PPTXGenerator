@@ -144,7 +144,7 @@
           "const": "pptx-workflow-architect"
         },
         "required_first_skill_path": {
-          "const": "${CODEX_HOME}/skills/pptx-workflow-architect/SKILL.md"
+          "const": ".agents/skills/pptx-workflow-architect/SKILL.md"
         },
         "production_skill": {
           "const": "pptx-generator-workflow"

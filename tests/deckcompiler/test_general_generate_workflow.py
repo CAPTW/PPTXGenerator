@@ -20,11 +20,14 @@ from presentation_agent.deckcompiler.orchestration.generate import (
     validate_generate_workflow,
 )
 from presentation_agent.deckcompiler.orchestration.skillset_plan import (
+    inspect_skillset,
+    required_repository_skillset_paths,
     required_skillset_paths,
 )
 
 
 ZERO_HASH = "0" * 64
+ROOT = Path(__file__).resolve().parents[2]
 
 
 class GeneralGenerateWorkflowTests(unittest.TestCase):
@@ -104,6 +107,19 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 "image_gen.imagegen",
             )
             self.assertEqual(
+                Path(
+                    dispatch["skillset_preflight"]["repository_skill_root"]
+                ).resolve(),
+                (ROOT / ".agents" / "skills" / "pptx-workflow-architect").resolve(),
+            )
+            self.assertEqual(
+                Path(
+                    dispatch["skillset_preflight"]["external_skill_root"]
+                ).resolve(),
+                (base / "skills").resolve(),
+            )
+            self.assertFalse((base / "skills" / "pptx-workflow-architect").exists())
+            self.assertEqual(
                 {artifact["kind"] for artifact in manifest["artifacts"]},
                 {
                     "codex_dispatch",
@@ -117,6 +133,22 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 )
             )
             self.assertEqual(plan["status"], "READY")
+            self.assertEqual(plan["schema_version"], "1.1.0")
+            repository_architect = (
+                ROOT / ".agents" / "skills" / "pptx-workflow-architect"
+            ).resolve()
+            self.assertEqual(
+                Path(plan["repository_skill_root"]).resolve(),
+                repository_architect,
+            )
+            self.assertEqual(
+                set(plan["repository_skill_files"]),
+                {"skill", "design_system", "large_deck", "production_qa"},
+            )
+            self.assertEqual(
+                Path(plan["ordered_skills"][0]["skill_path"]).resolve(),
+                repository_architect / "SKILL.md",
+            )
             self.assertEqual(
                 plan["quality_contract"]["renderer_quality"],
                 "reconstruction",
@@ -174,6 +206,24 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 )
             self.assertEqual(caught.exception.code, "DC_GENERATE_SKILLSET_MISSING")
             self.assertFalse((base / "runtime").exists())
+
+    def test_preflight_fails_when_repository_architect_package_is_incomplete(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            base = Path(tmpdir)
+            repo = base / "repo"
+            required = required_repository_skillset_paths()
+            for relative in required[:-1]:
+                path = repo / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(f"fixture: {relative}\n", encoding="utf-8")
+
+            with self.assertRaises(DeckCompilerError) as caught:
+                inspect_skillset(
+                    self._make_skill_root(base / "skills"),
+                    repo_root=repo,
+                )
+            self.assertEqual(caught.exception.code, "DC_GENERATE_SKILLSET_MISSING")
+            self.assertIn("production-qa.md", caught.exception.message)
 
     def test_prompt_and_multiple_pdfs_are_copied_without_fixed_deck_shape(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

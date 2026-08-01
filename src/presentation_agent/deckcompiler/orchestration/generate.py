@@ -257,7 +257,7 @@ def _initial_manifest(
         ),
         "required_first_skill": "pptx-workflow-architect",
         "required_first_skill_path": (
-            "${CODEX_HOME}/skills/pptx-workflow-architect/SKILL.md"
+            ".agents/skills/pptx-workflow-architect/SKILL.md"
         ),
         "production_skill_path": (
             ".agents/skills/pptx-generator-workflow/SKILL.md"
@@ -277,7 +277,7 @@ def _initial_manifest(
         "dispatch": {
             "required_first_skill": "pptx-workflow-architect",
             "required_first_skill_path": (
-                "${CODEX_HOME}/skills/pptx-workflow-architect/SKILL.md"
+                ".agents/skills/pptx-workflow-architect/SKILL.md"
             ),
             "production_skill": "pptx-generator-workflow",
             "image_skill": "imagegen",
@@ -347,13 +347,14 @@ def _dispatch_payload(
 ) -> dict[str, Any]:
     payload = {
         "schema_name": "pptx_generator_codex_dispatch",
-        "schema_version": "1.0.0",
+        "schema_version": "1.1.0",
         "workflow_id": workflow_id,
         "input_contract": input_contract,
         "skillset_execution_plan": PLAN_NAME,
         "skillset_preflight": {
             "status": skillset["status"],
-            "skill_root": skillset["skill_root"],
+            "repository_skill_root": skillset["repository_skill_root"],
+            "external_skill_root": skillset["skill_root"],
         },
         "skill_sequence": [
             {
@@ -406,7 +407,8 @@ def _dispatch_runbook(workflow_id: str) -> str:
 
 Workflow ID: `{workflow_id}`
 
-1. Read `${{CODEX_HOME}}/skills/pptx-workflow-architect/SKILL.md` first.
+1. Read `.agents/skills/pptx-workflow-architect/SKILL.md` first, including the
+   reference files it requires for the active Gate.
 2. Complete Architect Gate 1 and Gate 2 and obtain explicit user approval.
 3. Read `.agents/skills/pptx-generator-workflow/SKILL.md` and the installed
    ImageGen plus four PNGtoPPTX companion Skills listed in

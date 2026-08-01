@@ -10,6 +10,8 @@
     "workflow_id",
     "status",
     "skill_root",
+    "repository_skill_root",
+    "repository_skill_files",
     "ordered_skills",
     "official_entrypoints",
     "project_layout",
@@ -24,10 +26,25 @@
   ],
   "properties": {
     "schema_name": {"const": "codex_skillset_execution_plan"},
-    "schema_version": {"const": "1.0.0"},
+    "schema_version": {"const": "1.1.0"},
     "workflow_id": {"type": "string", "pattern": "^generate_[0-9a-f]{20}$"},
     "status": {"const": "READY"},
     "skill_root": {"type": "string", "minLength": 1},
+    "repository_skill_root": {
+      "type": "string",
+      "pattern": "[\\\\/]\\.agents[\\\\/]skills[\\\\/]pptx-workflow-architect$"
+    },
+    "repository_skill_files": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skill", "design_system", "large_deck", "production_qa"],
+      "properties": {
+        "skill": {"$ref": "#/$defs/repositorySkillFile"},
+        "design_system": {"$ref": "#/$defs/repositorySkillFile"},
+        "large_deck": {"$ref": "#/$defs/repositorySkillFile"},
+        "production_qa": {"$ref": "#/$defs/repositorySkillFile"}
+      }
+    },
     "ordered_skills": {
       "type": "array",
       "minItems": 6,
@@ -256,6 +273,15 @@
     "textLayerSkill": {"allOf": [{"$ref": "#/$defs/skillBase"}, {"properties": {"invocation_order": {"const": 4}, "skill_name": {"const": "slide-text-layer-inpaint"}, "invocation_policy": {"const": "conditional_preprocessor"}}}]},
     "rendererSkill": {"allOf": [{"$ref": "#/$defs/skillBase"}, {"properties": {"invocation_order": {"const": 5}, "skill_name": {"const": "slide-image-dual-render"}, "invocation_policy": {"const": "required_renderer"}}}]},
     "qaSkill": {"allOf": [{"$ref": "#/$defs/skillBase"}, {"properties": {"invocation_order": {"const": 6}, "skill_name": {"const": "slide-visual-polish-qa"}, "invocation_policy": {"const": "required_visual_qa"}}}]},
+    "repositorySkillFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
     "entrypoint": {
       "type": "object",
       "additionalProperties": false,

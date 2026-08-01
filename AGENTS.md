@@ -3,7 +3,7 @@
 ## Presentation-generation dispatch invariant
 
 For every request whose intended output is a new presentation, slide deck, or
-editable PPTX, the first presentation Skill must be the installed
+editable PPTX, the first presentation Skill must be the repository-owned
 `pptx-workflow-architect` Skill. This applies regardless of:
 
 - whether the user supplies an inline prompt, prompt file, PDF, multiple PDFs,
@@ -16,7 +16,8 @@ Before planning, generating images, running repository production code, or
 invoking PNGtoPPTX:
 
 1. Read and follow
-   `${CODEX_HOME}/skills/pptx-workflow-architect/SKILL.md`.
+   `.agents/skills/pptx-workflow-architect/SKILL.md` and any reference files it
+   requires for the active Gate.
 2. Complete its mandatory Gate 1 workflow design.
 3. Complete its Gate 2 blueprint and visual-system design.
 4. Obtain the approval required by that Skill. A user request such as "just do
@@ -25,7 +26,12 @@ invoking PNGtoPPTX:
    `.agents/skills/pptx-generator-workflow/SKILL.md` for production.
 
 If `pptx-workflow-architect` is unavailable, stop with a missing-dependency
-status. Do not substitute a fixed six-slide template or heuristic planner.
+status because the checkout is incomplete. Do not substitute an external copy,
+a fixed six-slide template, or a heuristic planner.
+
+Within this repository, the production handoff after Architect approval is
+`.agents/skills/pptx-generator-workflow/SKILL.md`; it replaces the Architect
+Skill's generic standard-PPTX handoff while preserving all three approval gates.
 
 Reading, extracting, or reviewing an existing PPTX without producing a new deck
 is outside this dispatch rule.

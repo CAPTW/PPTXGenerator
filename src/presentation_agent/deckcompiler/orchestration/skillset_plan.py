@@ -10,39 +10,53 @@ from typing import Any
 from ..errors import DeckCompilerError
 from ..identity import content_sha256
 from ..manifest_io import read_json, write_json
-from ..schemas import validator_for
+from ..schemas import REPO_ROOT, validator_for
 
 
 PLAN_NAME = "skillset_execution_plan.json"
 PLAN_SCHEMA = "codex_skillset_execution_plan"
 PROJECT_DIRECTORY = "pngtopptx-project"
+REPOSITORY_ARCHITECT_RELATIVE_ROOT = Path(
+    ".agents/skills/pptx-workflow-architect"
+)
+
+_REPOSITORY_SKILL_FILES = (
+    ("skill", "SKILL.md"),
+    ("design_system", "references/design-system.md"),
+    ("large_deck", "references/large-deck.md"),
+    ("production_qa", "references/production-qa.md"),
+)
 
 _SKILLS = (
-    (1, "pptx-workflow-architect", "pptx-workflow-architect/SKILL.md", "required_first"),
-    (2, "imagegen", ".system/imagegen/SKILL.md", "required"),
+    (1, "pptx-workflow-architect", "SKILL.md", "required_first", "repository"),
+    (2, "imagegen", ".system/imagegen/SKILL.md", "required", "external"),
     (
         3,
         "slide-editable-deck-orchestrator",
         "slide-editable-deck-orchestrator/SKILL.md",
         "required_coordinator",
+        "external",
     ),
     (
         4,
         "slide-text-layer-inpaint",
         "slide-text-layer-inpaint/SKILL.md",
         "conditional_preprocessor",
+        "external",
     ),
     (
         5,
         "slide-image-dual-render",
         "slide-image-dual-render/SKILL.md",
         "required_renderer",
+        "external",
     ),
     (
         6,
         "slide-visual-polish-qa",
         "slide-visual-polish-qa/SKILL.md",
         "required_visual_qa",
+        "external",
     ),
 )
 
@@ -133,15 +147,28 @@ NODE_PACKAGES = ("pptxgenjs", "sharp", "react", "react-dom", "react-icons")
 
 
 def required_skillset_paths() -> tuple[str, ...]:
-    """Return the relative files that make an installation execution eligible."""
+    """Return external installation files required beside the Repo Architect."""
 
-    values = [relative for _, _, relative, _ in _SKILLS]
+    values = [
+        relative
+        for _, _, relative, _, distribution in _SKILLS
+        if distribution == "external"
+    ]
     values.extend(relative for _, relative in _ENTRYPOINTS.values())
     return tuple(values)
 
 
+def required_repository_skillset_paths() -> tuple[str, ...]:
+    """Return Repo-relative files that form the Architect Skill package."""
+
+    return tuple(
+        (REPOSITORY_ARCHITECT_RELATIVE_ROOT / relative).as_posix()
+        for _, relative in _REPOSITORY_SKILL_FILES
+    )
+
+
 def resolve_skill_root(explicit: Path | None = None) -> Path:
-    """Resolve the directory that directly contains the installed Skill folders."""
+    """Resolve the external ImageGen and PNGtoPPTX installation root."""
 
     if explicit is not None:
         return explicit.expanduser().resolve()
@@ -155,14 +182,38 @@ def resolve_skill_root(explicit: Path | None = None) -> Path:
     return Path.home().resolve() / ".codex" / "skills"
 
 
-def inspect_skillset(skill_root: Path | None = None) -> dict[str, Any]:
-    """Fail closed unless every Skill and official entrypoint is installed."""
+def resolve_repository_architect_root(repo_root: Path | None = None) -> Path:
+    """Resolve the tracked, repository-owned Architect Skill directory."""
 
-    root = resolve_skill_root(skill_root)
+    root = REPO_ROOT if repo_root is None else repo_root
+    return (root.resolve() / REPOSITORY_ARCHITECT_RELATIVE_ROOT).resolve()
+
+
+def inspect_skillset(
+    skill_root: Path | None = None,
+    *,
+    repo_root: Path | None = None,
+) -> dict[str, Any]:
+    """Fail closed unless the Repo Architect and external companions are complete."""
+
+    external_root = resolve_skill_root(skill_root)
+    repository_root = resolve_repository_architect_root(repo_root)
     skills: list[dict[str, Any]] = []
     missing: list[str] = []
-    for order, name, relative, policy in _SKILLS:
-        path = (root / relative).resolve()
+    repository_files: dict[str, dict[str, str]] = {}
+    for label, relative in _REPOSITORY_SKILL_FILES:
+        path = (repository_root / relative).resolve()
+        if not path.is_file():
+            missing.append(path.as_posix())
+            continue
+        repository_files[label] = {
+            "path": path.as_posix(),
+            "sha256": _sha256_file(path),
+        }
+
+    for order, name, relative, policy, distribution in _SKILLS:
+        base = repository_root if distribution == "repository" else external_root
+        path = (base / relative).resolve()
         if not path.is_file():
             missing.append(path.as_posix())
             continue
@@ -178,7 +229,7 @@ def inspect_skillset(skill_root: Path | None = None) -> dict[str, Any]:
 
     entrypoints: dict[str, dict[str, str]] = {}
     for name, (skill_name, relative) in _ENTRYPOINTS.items():
-        path = (root / relative).resolve()
+        path = (external_root / relative).resolve()
         if not path.is_file():
             missing.append(path.as_posix())
             continue
@@ -189,21 +240,30 @@ def inspect_skillset(skill_root: Path | None = None) -> dict[str, Any]:
         }
 
     if missing:
+        artifact_root = (
+            repository_root
+            if any(Path(item).is_relative_to(repository_root) for item in missing)
+            else external_root
+        )
         raise DeckCompilerError(
             "DC_GENERATE_SKILLSET_MISSING",
             "general_generate_workflow",
-            "The installed Architect/ImageGen/PNGtoPPTX SkillSet is incomplete: "
+            "The repository Architect or installed ImageGen/PNGtoPPTX SkillSet "
+            "is incomplete: "
             + "; ".join(sorted(missing)),
-            root.as_posix(),
+            artifact_root.as_posix(),
             remediation_hint=(
-                "Install the required Skills under CODEX_HOME/skills or pass "
-                "--skill-root with the verified SkillSet installation root."
+                "Restore .agents/skills/pptx-workflow-architect from the Git "
+                "checkout, and install ImageGen/PNGtoPPTX companions under "
+                "CODEX_HOME/skills or pass --skill-root with their verified root."
             ),
         )
 
     return {
         "status": "PASS",
-        "skill_root": root.as_posix(),
+        "skill_root": external_root.as_posix(),
+        "repository_skill_root": repository_root.as_posix(),
+        "repository_skill_files": repository_files,
         "skills": skills,
         "entrypoints": entrypoints,
     }
@@ -498,10 +558,12 @@ def build_skillset_execution_plan(
 
     payload: dict[str, Any] = {
         "schema_name": PLAN_SCHEMA,
-        "schema_version": "1.0.0",
+        "schema_version": "1.1.0",
         "workflow_id": workflow_id,
         "status": "READY",
         "skill_root": inspection["skill_root"],
+        "repository_skill_root": inspection["repository_skill_root"],
+        "repository_skill_files": inspection["repository_skill_files"],
         "ordered_skills": inspection["skills"],
         "official_entrypoints": entrypoints,
         "project_layout": {
@@ -587,7 +649,7 @@ def validate_skillset_execution_plan(
     *,
     expected_workflow_id: str | None = None,
 ) -> list[str]:
-    """Validate schema, content hash, and the exact installed Skill files."""
+    """Validate schema, content hash, Repo Skill, and installed companions."""
 
     try:
         payload = read_json(path)
@@ -602,10 +664,38 @@ def validate_skillset_execution_plan(
     ]
     if issues:
         return issues
-    if expected_workflow_id is not None and payload["workflow_id"] != expected_workflow_id:
+    if (
+        expected_workflow_id is not None
+        and payload["workflow_id"] != expected_workflow_id
+    ):
         issues.append("skillset execution plan workflow_id mismatch")
     if payload["content_hash"] != _plan_content_hash(payload):
         issues.append("skillset execution plan content_hash mismatch")
+
+    expected_repository_root = resolve_repository_architect_root()
+    if Path(payload["repository_skill_root"]).resolve() != expected_repository_root:
+        issues.append("skillset execution plan repository_skill_root mismatch")
+    for label, relative in _REPOSITORY_SKILL_FILES:
+        row = payload["repository_skill_files"][label]
+        expected_path = (expected_repository_root / relative).resolve()
+        if Path(row["path"]).resolve() != expected_path:
+            issues.append(f"repository Architect {label} path mismatch")
+        _validate_bound_file(
+            row["path"],
+            row["sha256"],
+            f"repository Architect {label}",
+            issues,
+        )
+    architect = payload["ordered_skills"][0]
+    architect_file = payload["repository_skill_files"]["skill"]
+    if (
+        Path(architect["skill_path"]).resolve()
+        != Path(architect_file["path"]).resolve()
+        or architect["sha256"] != architect_file["sha256"]
+    ):
+        issues.append(
+            "ordered Architect Skill must match the repository-owned Skill file"
+        )
 
     for row in payload["ordered_skills"]:
         _validate_bound_file(row["skill_path"], row["sha256"], row["skill_name"], issues)
@@ -692,9 +782,12 @@ __all__ = [
     "PLAN_NAME",
     "PLAN_SCHEMA",
     "PROJECT_DIRECTORY",
+    "REPOSITORY_ARCHITECT_RELATIVE_ROOT",
     "build_skillset_execution_plan",
     "inspect_skillset",
+    "required_repository_skillset_paths",
     "resolve_skill_root",
+    "resolve_repository_architect_root",
     "required_skillset_paths",
     "scaffold_runtime_project",
     "validate_skillset_execution_plan",

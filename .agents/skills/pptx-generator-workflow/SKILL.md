@@ -11,15 +11,19 @@ This Skill is never the first presentation Skill.
 
 Before any action in this Skill:
 
-1. Read `${CODEX_HOME}/skills/pptx-workflow-architect/SKILL.md` completely.
+1. Read `.agents/skills/pptx-workflow-architect/SKILL.md` completely and load
+   the reference files it requires for the active Gate.
 2. Follow its Gate 1 workflow-design contract.
 3. Follow its Gate 2 blueprint and visual-system contract.
 4. Confirm that the user approved the blueprint and visual route.
 
-If the dependency is missing or Gate 2 is not approved, stop. Do not create
-images, run PNGtoPPTX, or substitute the legacy fixed six-slide planner.
+If the repository-owned dependency is missing or Gate 2 is not approved, stop.
+Do not use an external Architect substitute, create images, run PNGtoPPTX, or
+substitute the legacy fixed six-slide planner.
 
-The external dependency order is machine-readable in `dependencies.json`.
+The repository/external dependency order is machine-readable in
+`dependencies.json`. This Skill is the repository-specific production handoff
+after Architect approval and replaces the Architect's generic PPTX handoff.
 
 ## Required companion Skills
 
@@ -52,10 +56,10 @@ copies and fingerprints inputs and writes:
 
 The expected status is `AWAITING_WORKFLOW_ARCHITECT`. If the command enters
 image generation or produces a PPTX, treat that as a contract violation.
-The command must fail before intake when the Architect/ImageGen/PNGtoPPTX
-SkillSet or any official required entrypoint is missing. The generated execution
-plan binds the exact installed Skill and entrypoint hashes for the lifetime of
-the run.
+The command must fail before intake when the repository Architect package,
+ImageGen/PNGtoPPTX SkillSet, or any official required entrypoint is missing. The
+generated execution plan binds all four tracked Architect files plus the exact
+installed companion Skill and entrypoint hashes for the lifetime of the run.
 
 ### 2. Persist the approved Architect package
 

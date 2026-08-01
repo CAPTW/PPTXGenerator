@@ -8,6 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 AGENTS = ROOT / "AGENTS.md"
 SKILL_ROOT = ROOT / ".agents" / "skills" / "pptx-generator-workflow"
+ARCHITECT_ROOT = ROOT / ".agents" / "skills" / "pptx-workflow-architect"
 
 
 class CodexWorkflowSkillTests(unittest.TestCase):
@@ -38,6 +39,20 @@ class CodexWorkflowSkillTests(unittest.TestCase):
             ],
         )
         self.assertEqual(ordered[1]["platform_tool_id"], "image_gen.imagegen")
+        self.assertEqual(ordered[0]["distribution"], "repository_owned")
+        self.assertEqual(
+            ordered[0]["skill_path"],
+            ".agents/skills/pptx-workflow-architect/SKILL.md",
+        )
+        self.assertEqual(
+            ordered[0]["package_files"],
+            [
+                "SKILL.md",
+                "references/design-system.md",
+                "references/large-deck.md",
+                "references/production-qa.md",
+            ],
+        )
         self.assertEqual(ordered[2]["default_quality_level"], "polish")
         self.assertEqual(ordered[4]["renderer_quality"], "reconstruction")
         self.assertTrue(ordered[5]["source_slide_mapping_required"])
@@ -56,6 +71,23 @@ class CodexWorkflowSkillTests(unittest.TestCase):
         self.assertIn("--source-slides", text)
         self.assertIn("CONTINUE", text.upper())
         self.assertNotIn("exactly six slides", text.lower())
+
+    def test_repository_contains_complete_workflow_architect_package(self) -> None:
+        expected = {
+            "SKILL.md",
+            "references/design-system.md",
+            "references/large-deck.md",
+            "references/production-qa.md",
+        }
+        actual = {
+            path.relative_to(ARCHITECT_ROOT).as_posix()
+            for path in ARCHITECT_ROOT.rglob("*")
+            if path.is_file()
+        }
+        self.assertEqual(actual, expected)
+        skill = (ARCHITECT_ROOT / "SKILL.md").read_text(encoding="utf-8")
+        for relative in sorted(expected - {"SKILL.md"}):
+            self.assertIn(relative, skill)
 
 
 if __name__ == "__main__":

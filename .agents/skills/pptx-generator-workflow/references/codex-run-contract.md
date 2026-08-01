@@ -26,6 +26,11 @@ Record `pptx-workflow-architect` as `invocation_order: 1`, both Gate statuses as
 - design system;
 - explicit approval record.
 
+The intake execution plan must bind the tracked repository Architect package:
+`SKILL.md`, `references/design-system.md`, `references/large-deck.md`, and
+`references/production-qa.md`. An external Architect path is not accepted as a
+substitute for the Repo-owned first Skill.
+
 Every artifact reference is:
 
 ```json

@@ -42,8 +42,9 @@ deckcompiler generate `
 Use `--prompt-file` instead of `--prompt` for UTF-8 text. `--workflow` is only a
 user hint; it does not select a fixed narrative template.
 
-The command first verifies the installed Architect/ImageGen/PNGtoPPTX Skills
-and their official entrypoints. It then copies and fingerprints inputs, creates
+The command first verifies the tracked repository Architect package, installed
+ImageGen/PNGtoPPTX Skills, and their official entrypoints. It then copies and
+fingerprints inputs, creates
 the isolated `pngtopptx-project` layout with an explicit empty crop plan, writes
 `codex_dispatch.json`, `CODEX_WORKFLOW.md`, and the hash-bound
 `skillset_execution_plan.json`, and exits with code `2`:
@@ -54,16 +55,24 @@ action=INVOKE_PPTX_WORKFLOW_ARCHITECT
 ```
 
 It does not run the legacy fixed six-slide planner, generate images, or produce
-a PPTX. Missing Skills or changed entrypoint hashes fail closed. Pass
-`--skill-root` only to name a verified non-default installation root.
+a PPTX. Missing tracked Architect files, missing external companions, or changed
+hashes fail closed. Pass `--skill-root` only to name a verified non-default
+ImageGen/PNGtoPPTX installation root; it cannot replace the Repo Architect.
 
 ## 2. Run the mandatory Architect gates in Codex
 
 Codex must first read:
 
 ```text
-${CODEX_HOME}/skills/pptx-workflow-architect/SKILL.md
+.agents/skills/pptx-workflow-architect/SKILL.md
 ```
+
+The complete tracked package also contains `references/design-system.md`,
+`references/large-deck.md`, and `references/production-qa.md`. Codex loads each
+reference when the Architect Skill marks it required for the active Gate. After
+Gate 2 approval, this repository hands off to
+`.agents/skills/pptx-generator-workflow/SKILL.md` instead of the Architect's
+generic standard-PPTX production handoff.
 
 Gate 1 diagnoses the presentation and offers workflow options. Gate 2 produces
 the communication blueprint and visual system. Production starts only after the

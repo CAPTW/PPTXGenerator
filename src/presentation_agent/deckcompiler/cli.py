@@ -82,9 +82,9 @@ def build_parser() -> argparse.ArgumentParser:
         "--skill-root",
         type=Path,
         help=(
-            "Installed Skill root containing pptx-workflow-architect and the "
-            "CAPTW/pngtopptx companion Skills. Defaults to CODEX_HOME/skills or "
-            "USERPROFILE/.codex/skills."
+            "Installed Skill root containing ImageGen and the CAPTW/pngtopptx "
+            "companion Skills. The Architect is repository-owned. Defaults to "
+            "CODEX_HOME/skills or USERPROFILE/.codex/skills."
         ),
     )
     generate.add_argument(

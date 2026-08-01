@@ -134,14 +134,18 @@ Codex must execute the paths and command templates recorded in
    per-slide worker artifacts;
 5. keep `work/crop_plan.json` explicit, including for a zero-crop deck, and run
    crop preparation so `assets/manifest.json` exists;
-6. reconstruct waves of at most five slides with renderer quality
-   `reconstruction`, `--require-qa`, `--require-reconstruction`, an explicit
-   `--crop-plan`, and an explicit project-local `--node-path`;
-7. run `final_gate.js` with PPTX openability;
-8. rasterize PPTX and capture HTML, always using `--source-slides` for wave
-   mapping, then compare, summarize, enforce, and plan repairs;
-9. run the final all-slide build with explicit `--allow-large-batch` only after
-   all waves pass.
+6. run the initial all-slide reconstruction with renderer quality
+   `reconstruction`, `--require-qa`, `--require-reconstruction`, explicit crop
+   and Node paths, and `--allow-large-batch`, then run `final_gate.js`;
+7. execute the complete initial full-deck Visual QA chain: PPTX rasterization,
+   HTML capture, comparison, JSON/Markdown summary, and enforcement, all with
+   source-slide mapping;
+8. build the backlog and reconstruct repair waves of at most five slides, then
+   repeat the same source-mapped Visual QA chain for every wave;
+9. after all blocking repairs, run the final all-slide hardlocked build and
+   `final_gate.js`;
+10. execute the complete final full-deck Visual QA chain and bind its raster and
+    capture metadata to the final PPTX/HTML hashes before sealing.
 
 The default quality level is `polish`; `blocking-zero` is the minimum accepted
 production level. The workflow runs:
@@ -152,7 +156,7 @@ production level. The workflow runs:
 4. full-deck visual QA against the generated source slides;
 5. repair-wave planning and rebuilding;
 6. source-mapped QA after every wave;
-7. final full-deck build and QA.
+7. final full-deck build, five-step Visual QA, and evidence-hash validation.
 
 Completion requires zero fail/blocking slides. A run that reaches the iteration
 cap remains `NEEDS_REPAIR`.

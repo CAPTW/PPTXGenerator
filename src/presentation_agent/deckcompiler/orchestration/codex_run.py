@@ -32,7 +32,9 @@ def seal_codex_run_manifest(draft_path: Path, output_path: Path) -> dict[str, An
     draft = draft_path.resolve()
     output = output_path.resolve()
     if not draft.is_file():
-        raise _error("DC_CODEX_RUN_DRAFT_MISSING", f"Codex run draft is missing: {draft}", draft)
+        raise _error(
+            "DC_CODEX_RUN_DRAFT_MISSING", f"Codex run draft is missing: {draft}", draft
+        )
     if draft == output:
         raise _error(
             "DC_CODEX_RUN_OUTPUT_CONFLICT",
@@ -92,7 +94,9 @@ def validate_codex_run_manifest_payload(
     issues: list[str] = []
     completion_issues: list[str] = []
     validator = validator_for(SCHEMA_NAME)
-    for issue in sorted(validator.iter_errors(payload), key=lambda item: list(item.path)):
+    for issue in sorted(
+        validator.iter_errors(payload), key=lambda item: list(item.path)
+    ):
         location = ".".join(str(part) for part in issue.path) or "$"
         issues.append(f"schema:{location}: {issue.message}")
     if issues:
@@ -102,7 +106,10 @@ def validate_codex_run_manifest_payload(
     if payload["content_hash"] != expected_content_hash:
         issues.append("content_hash does not match canonical manifest content")
 
-    if expected_workflow_id is not None and payload["workflow_id"] != expected_workflow_id:
+    if (
+        expected_workflow_id is not None
+        and payload["workflow_id"] != expected_workflow_id
+    ):
         issues.append(
             f"workflow_id mismatch: expected {expected_workflow_id}, got {payload['workflow_id']}"
         )
@@ -129,13 +136,19 @@ def validate_codex_run_manifest_payload(
     ordered = [row["slide_number"] for row in image["slides"]]
 
     if image["requested_slide_count"] != slide_count:
-        issues.append("image requested_slide_count does not match architect slide_count")
+        issues.append(
+            "image requested_slide_count does not match architect slide_count"
+        )
     if image["completed_slide_count"] != slide_count:
-        issues.append("image completed_slide_count does not match architect slide_count")
+        issues.append(
+            "image completed_slide_count does not match architect slide_count"
+        )
     if len(image["slides"]) != slide_count:
         issues.append("image slide record count does not match architect slide_count")
     if ordered != list(range(1, slide_count + 1)):
-        issues.append(f"image slide order must be contiguous 1..{slide_count}, got {ordered}")
+        issues.append(
+            f"image slide order must be contiguous 1..{slide_count}, got {ordered}"
+        )
     if len({row["source_png"]["sha256"] for row in image["slides"]}) != slide_count:
         issues.append("selected source PNG hashes must be unique per slide")
 
@@ -163,7 +176,9 @@ def validate_codex_run_manifest_payload(
         if qa["fail_count"] != 0:
             completion_issues.append("completed run requires visual_qa.fail_count 0")
         if qa["blocking_count"] != 0:
-            completion_issues.append("completed run requires visual_qa.blocking_count 0")
+            completion_issues.append(
+                "completed run requires visual_qa.blocking_count 0"
+            )
         if (
             reconstruction["quality_level"] == "strict"
             and qa["needs_polish_count"] != 0
@@ -184,7 +199,9 @@ def validate_codex_run_manifest_payload(
     return _report(payload, issues, completion_issues)
 
 
-def _artifact_references(payload: dict[str, Any]) -> Iterator[tuple[str, dict[str, Any]]]:
+def _artifact_references(
+    payload: dict[str, Any],
+) -> Iterator[tuple[str, dict[str, Any]]]:
     architect = payload.get("architect")
     if isinstance(architect, dict):
         for key in ("workflow_design", "blueprint", "design_system", "approval_record"):
@@ -230,7 +247,7 @@ def _artifact_references(payload: dict[str, Any]) -> Iterator[tuple[str, dict[st
 
     visual_qa = payload.get("visual_qa")
     if isinstance(visual_qa, dict):
-        for key in ("summary", "contact_sheet"):
+        for key in ("summary", "summary_markdown", "contact_sheet"):
             value = visual_qa.get(key)
             if isinstance(value, dict):
                 yield f"visual_qa.{key}", value
@@ -287,7 +304,9 @@ def _execution_artifact_issues(
     source_dimensions: list[tuple[int, int]] = []
     for index, slide in enumerate(payload["image_generation"]["slides"]):
         prefix = f"image_generation.slides[{index}]"
-        prompt = _json_object(artifacts.get(f"{prefix}.prompt"), f"{prefix}.prompt", issues)
+        prompt = _json_object(
+            artifacts.get(f"{prefix}.prompt"), f"{prefix}.prompt", issues
+        )
         sidecar = _json_object(
             artifacts.get(f"{prefix}.semantic_sidecar"),
             f"{prefix}.semantic_sidecar",
@@ -302,7 +321,10 @@ def _execution_artifact_issues(
             issues.append(f"{prefix}.prompt must contain a real ImageGen request")
         if sidecar is not None and not sidecar:
             issues.append(f"{prefix}.semantic_sidecar must contain editable content")
-        if inspection is not None and str(inspection.get("status", "")).upper() != "PASS":
+        if (
+            inspection is not None
+            and str(inspection.get("status", "")).upper() != "PASS"
+        ):
             issues.append(f"{prefix}.inspection_report must record status PASS")
 
         source_png = artifacts.get(f"{prefix}.source_png")
@@ -320,9 +342,7 @@ def _execution_artifact_issues(
             )
         for width, height in source_dimensions:
             if abs((width / height) - (16 / 9)) > 0.02:
-                issues.append(
-                    f"selected source PNG must be 16:9, got {width}x{height}"
-                )
+                issues.append(f"selected source PNG must be 16:9, got {width}x{height}")
 
     pptx_path = artifacts.get("reconstruction.output_pptx")
     _validate_pptx_package(pptx_path, slide_count, issues)
@@ -439,6 +459,25 @@ def _execution_artifact_issues(
         _validate_qa_summary(
             qa_summary,
             payload["visual_qa"],
+            slide_count,
+            issues,
+        )
+    qa_summary_markdown = artifacts.get("visual_qa.summary_markdown")
+    if qa_summary_markdown is not None:
+        try:
+            markdown_text = qa_summary_markdown.read_text(encoding="utf-8")
+        except (OSError, UnicodeError) as exc:
+            issues.append(f"visual_qa.summary_markdown must be UTF-8 text: {exc}")
+        else:
+            if "# Visual QA Summary" not in markdown_text:
+                issues.append(
+                    "visual_qa.summary_markdown must be the official Visual QA summary"
+                )
+    if payload["status"] == "COMPLETED" and qa_summary is not None:
+        _validate_final_visual_qa_evidence(
+            payload,
+            artifacts,
+            qa_summary,
             slide_count,
             issues,
         )
@@ -639,9 +678,7 @@ def _validate_orchestration_state(
         )
     limits = state.get("limits")
     if isinstance(limits, dict) and limits.get("maxWaveSize") not in (None, 5):
-        issues.append(
-            "reconstruction.orchestration_state.limits.maxWaveSize must be 5"
-        )
+        issues.append("reconstruction.orchestration_state.limits.maxWaveSize must be 5")
 
 
 def _validate_crop_plan(plan: dict[str, Any], issues: list[str]) -> None:
@@ -793,11 +830,20 @@ def _validate_render_trace(
         issues.append("reconstruction.render_trace cropPlanHash mismatch")
     if trace.get("cropManifestHash") != reconstruction["crop_manifest"]["sha256"]:
         issues.append("reconstruction.render_trace cropManifestHash mismatch")
-    if trace.get("nativeObjectManifestHash") != reconstruction["native_object_manifest"]["sha256"]:
+    if (
+        trace.get("nativeObjectManifestHash")
+        != reconstruction["native_object_manifest"]["sha256"]
+    ):
         issues.append("reconstruction.render_trace nativeObjectManifestHash mismatch")
-    if trace.get("cropCoverageSummaryHash") != reconstruction["crop_coverage_summary"]["sha256"]:
+    if (
+        trace.get("cropCoverageSummaryHash")
+        != reconstruction["crop_coverage_summary"]["sha256"]
+    ):
         issues.append("reconstruction.render_trace cropCoverageSummaryHash mismatch")
-    if trace.get("qaEvidenceSummaryHash") != reconstruction["qa_evidence_summary"]["sha256"]:
+    if (
+        trace.get("qaEvidenceSummaryHash")
+        != reconstruction["qa_evidence_summary"]["sha256"]
+    ):
         issues.append("reconstruction.render_trace qaEvidenceSummaryHash mismatch")
 
 
@@ -867,6 +913,220 @@ def _validate_qa_summary(
                 f"visual_qa.summary.{summary_key} does not match "
                 f"visual_qa.{manifest_key}"
             )
+
+
+def _validate_final_visual_qa_evidence(
+    payload: dict[str, Any],
+    artifacts: dict[str, Path],
+    summary: dict[str, Any],
+    slide_count: int,
+    issues: list[str],
+) -> None:
+    """Bind final Visual QA evidence to the delivered PPTX, HTML, and source PNGs."""
+
+    pptx = artifacts.get("reconstruction.output_pptx")
+    html = artifacts.get("reconstruction.output_html")
+    if pptx is None or html is None:
+        issues.append("completed run requires final PPTX and HTML Visual QA inputs")
+        return
+    if pptx.parent.name.lower() != "out" or html.parent != pptx.parent:
+        issues.append(
+            "final PPTX and HTML must share the pngtopptx-project/out directory"
+        )
+        return
+
+    project = pptx.parent.parent.resolve()
+    summary_project = summary.get("project")
+    if (
+        not isinstance(summary_project, str)
+        or Path(summary_project).resolve() != project
+    ):
+        issues.append("visual_qa.summary.project must match the final project root")
+
+    expected_pptx_hash = _sha256_file(pptx)
+    expected_html_hash = _sha256_file(html)
+    actual_statuses: list[str] = []
+    blocking_issues = 0
+    summary_rows = summary.get("slides")
+    if not isinstance(summary_rows, list) or len(summary_rows) != slide_count:
+        issues.append(
+            f"visual_qa.summary.slides must contain {slide_count} official per-slide rows"
+        )
+        summary_rows = []
+    rows_by_slide = {
+        row.get("slide"): row
+        for row in summary_rows
+        if isinstance(row, dict) and isinstance(row.get("slide"), int)
+    }
+
+    for index in range(slide_count):
+        slide_number = index + 1
+        label = f"visual_qa.final.slide{slide_number}"
+        visual_dir = project / "work" / f"slide{slide_number:02d}" / "visual_qa"
+        paths = {
+            "source": visual_dir / "source.png",
+            "pptx_raster": visual_dir / "pptx_raster.png",
+            "html_screenshot": visual_dir / "html_screenshot.png",
+            "pptx_diff": visual_dir / "pptx_diff.png",
+            "html_diff": visual_dir / "html_diff.png",
+            "pptx_edge_diff": visual_dir / "pptx_edge_diff.png",
+            "html_edge_diff": visual_dir / "html_edge_diff.png",
+            "metrics": visual_dir / "visual_metrics.json",
+            "report": visual_dir / "visual_polish_report.md",
+            "fixes": visual_dir / "visual_polish_fixes.json",
+            "pptx_metadata": visual_dir / "pptx_raster_metadata.json",
+            "html_metadata": visual_dir / "html_screenshot_metadata.json",
+        }
+        missing = [name for name, path in paths.items() if not path.is_file()]
+        if missing:
+            issues.append(f"{label} is missing required artifacts: {missing}")
+            continue
+
+        source_artifact = artifacts.get(f"image_generation.slides[{index}].source_png")
+        if source_artifact is None:
+            issues.append(f"{label} cannot resolve its selected source PNG")
+            continue
+        source_hash = _sha256_file(source_artifact)
+        if _sha256_file(paths["source"]) != source_hash:
+            issues.append(
+                f"{label}.source.png does not match the selected ImageGen PNG"
+            )
+
+        pptx_metadata = _json_object(
+            paths["pptx_metadata"], f"{label}.pptx_metadata", issues
+        )
+        html_metadata = _json_object(
+            paths["html_metadata"], f"{label}.html_metadata", issues
+        )
+        metrics = _json_object(paths["metrics"], f"{label}.metrics", issues)
+        fixes = _json_object(paths["fixes"], f"{label}.fixes", issues)
+        if (
+            pptx_metadata is None
+            or html_metadata is None
+            or metrics is None
+            or fixes is None
+        ):
+            continue
+
+        _validate_final_capture_metadata(
+            pptx_metadata,
+            label=f"{label}.pptx_metadata",
+            input_key="pptx",
+            input_hash_key="pptxSha256",
+            expected_input=pptx,
+            expected_input_hash=expected_pptx_hash,
+            expected_output=paths["pptx_raster"],
+            slide_number=slide_number,
+            project=project,
+            issues=issues,
+        )
+        _validate_final_capture_metadata(
+            html_metadata,
+            label=f"{label}.html_metadata",
+            input_key="html",
+            input_hash_key="htmlSha256",
+            expected_input=html,
+            expected_input_hash=expected_html_hash,
+            expected_output=paths["html_screenshot"],
+            slide_number=slide_number,
+            project=project,
+            issues=issues,
+        )
+
+        hashes = metrics.get("hashes")
+        expected_hashes = {
+            "source": source_hash,
+            "visual_qa_source": source_hash,
+            "pptx_raster": _sha256_file(paths["pptx_raster"]),
+            "html_screenshot": _sha256_file(paths["html_screenshot"]),
+        }
+        if not isinstance(hashes, dict):
+            issues.append(f"{label}.metrics.hashes must be an object")
+        else:
+            for key, expected_hash in expected_hashes.items():
+                if hashes.get(key) != expected_hash:
+                    issues.append(f"{label}.metrics.hashes.{key} mismatch")
+        if metrics.get("slide") != slide_number:
+            issues.append(f"{label}.metrics.slide mismatch")
+        if metrics.get("mode") != "qa-polish":
+            issues.append(f"{label}.metrics.mode must be qa-polish")
+        status = metrics.get("overallStatus", metrics.get("status"))
+        if status not in {"pass", "needs_polish", "fail"}:
+            issues.append(f"{label}.metrics has invalid status {status!r}")
+        else:
+            actual_statuses.append(status)
+        metric_issues = metrics.get("issues")
+        if isinstance(metric_issues, list):
+            blocking_issues += sum(
+                1
+                for item in metric_issues
+                if isinstance(item, dict) and item.get("severity") == "blocking"
+            )
+        if fixes.get("slide") != slide_number or fixes.get("status") != status:
+            issues.append(f"{label}.fixes must match the final metrics status")
+
+        summary_row = rows_by_slide.get(slide_number)
+        if not isinstance(summary_row, dict):
+            issues.append(f"{label} is missing from visual_qa.summary.slides")
+        elif (
+            summary_row.get("status") != status
+            or summary_row.get("hasMetrics") is not True
+            or summary_row.get("hasFixes") is not True
+        ):
+            issues.append(f"{label} summary row does not match final metrics/fixes")
+
+    counts = summary.get("counts")
+    if isinstance(counts, dict):
+        expected_counts = {
+            "pass": actual_statuses.count("pass"),
+            "needs_polish": actual_statuses.count("needs_polish"),
+            "fail": actual_statuses.count("fail"),
+            "missing": slide_count - len(actual_statuses),
+        }
+        for key, expected in expected_counts.items():
+            if counts.get(key) != expected:
+                issues.append(f"visual_qa.summary.counts.{key} must be {expected}")
+    else:
+        issues.append("visual_qa.summary.counts must be an object")
+    if summary.get("blockingIssues") != blocking_issues:
+        issues.append(
+            "visual_qa.summary.blockingIssues must match final per-slide metrics"
+        )
+
+
+def _validate_final_capture_metadata(
+    metadata: dict[str, Any],
+    *,
+    label: str,
+    input_key: str,
+    input_hash_key: str,
+    expected_input: Path,
+    expected_input_hash: str,
+    expected_output: Path,
+    slide_number: int,
+    project: Path,
+    issues: list[str],
+) -> None:
+    raw_input = metadata.get(input_key)
+    input_path = Path(raw_input) if isinstance(raw_input, str) else None
+    if input_path is not None and not input_path.is_absolute():
+        input_path = project / input_path
+    if input_path is None or input_path.resolve() != expected_input.resolve():
+        issues.append(f"{label}.{input_key} must reference the final deliverable")
+    if metadata.get(input_hash_key) != expected_input_hash:
+        issues.append(f"{label}.{input_hash_key} must match the final deliverable")
+    if metadata.get("diagnosticOnly") is not True:
+        issues.append(f"{label}.diagnosticOnly must be true")
+    if metadata.get("sourceSlideId") != slide_number:
+        issues.append(f"{label}.sourceSlideId must be {slide_number}")
+    if metadata.get("physicalSlideIndex") != slide_number:
+        issues.append(f"{label}.physicalSlideIndex must be {slide_number}")
+    if metadata.get("htmlSlideIndex") != slide_number:
+        issues.append(f"{label}.htmlSlideIndex must be {slide_number}")
+    if metadata.get("mappingMode") != "source-slides-sequential":
+        issues.append(f"{label}.mappingMode must prove --source-slides execution")
+    if metadata.get("outputSha256") != _sha256_file(expected_output):
+        issues.append(f"{label}.outputSha256 mismatch")
 
 
 def _content_hash(payload: dict[str, Any]) -> str:

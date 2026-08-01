@@ -232,9 +232,7 @@ def validate_generate_workflow(path: Path) -> dict[str, Any]:
         "valid": not issues,
         "status": payload.get("status"),
         "workflow_id": payload.get("workflow_id"),
-        "required_first_skill": payload.get("dispatch", {}).get(
-            "required_first_skill"
-        ),
+        "required_first_skill": payload.get("dispatch", {}).get("required_first_skill"),
         "issues": issues,
     }
 
@@ -259,9 +257,7 @@ def _initial_manifest(
         "required_first_skill_path": (
             ".agents/skills/pptx-workflow-architect/SKILL.md"
         ),
-        "production_skill_path": (
-            ".agents/skills/pptx-generator-workflow/SKILL.md"
-        ),
+        "production_skill_path": (".agents/skills/pptx-generator-workflow/SKILL.md"),
     }
     return {
         "schema_name": WORKFLOW_SCHEMA,
@@ -287,9 +283,7 @@ def _initial_manifest(
             "visual_qa_skill": "slide-visual-polish-qa",
             "skillset_execution_plan": PLAN_NAME,
             "default_quality_level": "polish",
-            "approval_policy": (
-                "architect_gate1_and_gate2_explicit_user_approval"
-            ),
+            "approval_policy": ("architect_gate1_and_gate2_explicit_user_approval"),
         },
         "stages": [
             {
@@ -419,16 +413,22 @@ Workflow ID: `{workflow_id}`
 6. Materialize `styles/active.json`, `lib/slides.js`, and per-slide worker
    artifacts. Record an explicit execute/skip decision for
    `slide-text-layer-inpaint`.
-7. Execute the plan's official entrypoints in order: install project-local Node
-   dependencies, install hardlock, plan orchestration at `polish`, prepare the
-   explicit crop plan/manifest, reconstruct waves of at most five slides with
-   renderer quality `reconstruction`, and run `final_gate.js`.
-8. Run source-mapped PPTX/HTML visual QA for every wave using
-   `--source-slides`, then create backlog and repair-wave plans. Never use a
-   full-slide source PNG as the delivered slide surface.
-9. Repeat repair waves until fail/blocking count is zero, then run the final
-   all-slide hardlocked build, final visual QA, and orchestration-state gate.
-10. Seal `codex_run.json` and register it with `deckcompiler generate --resume`.
+7. Execute the plan's `setup` and `initial_full_deck` sequences exactly: install
+   project-local Node dependencies and hardlock, prepare the explicit crop
+   plan/manifest, build and gate the initial all-slide PPTX/HTML, then run all
+   five `slide-visual-polish-qa` steps with `--source-slides`.
+8. Use the initial full-deck summary to create the backlog. Execute the plan's
+   `repair_wave_loop` in waves of at most five slides, including source-mapped
+   PPTX/HTML QA after every rebuild. Exit code 1 from the initial/wave QA gate
+   means `NEEDS_REPAIR`, not permission to skip the repair loop.
+9. Repeat repair waves until fail/blocking count is zero or the iteration cap
+   is reached. Never use a full-slide source PNG as the delivered slide surface.
+10. Execute the complete `final_full_deck` sequence exactly: all-slide
+   hardlocked reconstruction, final gate, PPTX rasterization, HTML capture,
+   comparison, JSON/Markdown summary, final QA enforcement, and orchestration
+   state enforcement. The final raster/capture metadata must bind to the hashes
+   of `deck-final-editable.pptx` and `deck-final-editable.html`.
+11. Seal `codex_run.json` and register it with `deckcompiler generate --resume`.
 
 `skillset_execution_plan.json` is hash-bound and contains the exact installed
 Skill paths, official script hashes, environment, command templates, artifact
@@ -487,12 +487,8 @@ def _bind_codex_run_artifacts(
     image["required_action"] = None
     image["details"] = {
         "platform_tool_id": payload["image_generation"]["platform_tool_id"],
-        "requested_slide_count": payload["image_generation"][
-            "requested_slide_count"
-        ],
-        "completed_slide_count": payload["image_generation"][
-            "completed_slide_count"
-        ],
+        "requested_slide_count": payload["image_generation"]["requested_slide_count"],
+        "completed_slide_count": payload["image_generation"]["completed_slide_count"],
     }
     image["artifacts"] = [
         _run_artifact_reference(
@@ -515,9 +511,7 @@ def _bind_codex_run_artifacts(
         ],
         "quality_level": payload["reconstruction"]["quality_level"],
         "route_hardlock": payload["reconstruction"]["route_hardlock"],
-        "reconstruction_hardlock": payload["reconstruction"][
-            "reconstruction_hardlock"
-        ],
+        "reconstruction_hardlock": payload["reconstruction"]["reconstruction_hardlock"],
         "pptx_openability": payload["reconstruction"]["pptx_openability"],
     }
     reconstruction["artifacts"] = [
@@ -609,13 +603,17 @@ def _bind_codex_run_artifacts(
             root, base, payload["visual_qa"]["summary"], "visual_qa_summary"
         ),
         _run_artifact_reference(
+            root,
+            base,
+            payload["visual_qa"]["summary_markdown"],
+            "visual_qa_summary_markdown",
+        ),
+        _run_artifact_reference(
             root, base, payload["visual_qa"]["contact_sheet"], "contact_sheet"
         ),
     ]
 
-    delivery["status"] = (
-        "COMPLETED" if payload["status"] == "COMPLETED" else "PENDING"
-    )
+    delivery["status"] = "COMPLETED" if payload["status"] == "COMPLETED" else "PENDING"
     delivery["required_action"] = None
     delivery["details"] = {"format": payload["delivery"]["format"]}
     delivery["artifacts"] = [
@@ -800,7 +798,11 @@ def _input_artifact_issues(root: Path, payload: dict[str, Any]) -> list[str]:
             issues.append("input artifact path is malformed")
             continue
         candidate = Path(raw)
-        path = candidate.resolve() if candidate.is_absolute() else (root / candidate).resolve()
+        path = (
+            candidate.resolve()
+            if candidate.is_absolute()
+            else (root / candidate).resolve()
+        )
         if not path.is_file():
             issues.append(f"input artifact is missing: {path}")
             continue
@@ -837,9 +839,7 @@ def _manifest_artifact_issues(
             continue
         path = unresolved.resolve()
         expected_scope = (
-            "workflow"
-            if path == root or path.is_relative_to(root)
-            else "external"
+            "workflow" if path == root or path.is_relative_to(root) else "external"
         )
         if reference.get("scope") != expected_scope:
             issues.append(f"{kind} scope does not match resolved path: {path}")
@@ -871,8 +871,7 @@ def _skillset_plan_issues(root: Path, payload: dict[str, Any]) -> list[str]:
         (
             row
             for row in references
-            if isinstance(row, dict)
-            and row.get("kind") == "skillset_execution_plan"
+            if isinstance(row, dict) and row.get("kind") == "skillset_execution_plan"
         ),
         None,
     )
@@ -882,7 +881,9 @@ def _skillset_plan_issues(root: Path, payload: dict[str, Any]) -> list[str]:
     if not isinstance(raw_path, str) or not raw_path:
         return ["skillset execution plan path is malformed"]
     candidate = Path(raw_path)
-    path = candidate.resolve() if candidate.is_absolute() else (root / candidate).resolve()
+    path = (
+        candidate.resolve() if candidate.is_absolute() else (root / candidate).resolve()
+    )
     return validate_skillset_execution_plan(
         path,
         expected_workflow_id=payload.get("workflow_id"),
@@ -907,7 +908,9 @@ def _sealed_run_issues(root: Path, payload: dict[str, Any]) -> list[str]:
     if sealed is None:
         return ["sealed Codex run reference is missing"]
     candidate = Path(str(sealed["path"]))
-    path = candidate.resolve() if candidate.is_absolute() else (root / candidate).resolve()
+    path = (
+        candidate.resolve() if candidate.is_absolute() else (root / candidate).resolve()
+    )
     try:
         report = validate_codex_run_manifest(
             path,
@@ -918,8 +921,7 @@ def _sealed_run_issues(root: Path, payload: dict[str, Any]) -> list[str]:
     issues = [f"sealed Codex run: {issue}" for issue in report["issues"]]
     if payload["status"] == "COMPLETED" and not report["completion_ready"]:
         issues.extend(
-            f"sealed Codex completion: {issue}"
-            for issue in report["completion_issues"]
+            f"sealed Codex completion: {issue}" for issue in report["completion_issues"]
         )
         if not report["completion_issues"]:
             issues.append("sealed Codex run is not completion-ready")
@@ -1008,16 +1010,12 @@ def _stage(manifest: dict[str, Any], name: str) -> dict[str, Any]:
 
 
 def _record(manifest: dict[str, Any], event: str, status: str) -> None:
-    manifest["history"].append(
-        {"timestamp": _now(), "event": event, "status": status}
-    )
+    manifest["history"].append({"timestamp": _now(), "event": event, "status": status})
 
 
 def _sync_artifacts(manifest: dict[str, Any]) -> None:
     manifest["artifacts"] = [
-        artifact
-        for stage in manifest["stages"]
-        for artifact in stage["artifacts"]
+        artifact for stage in manifest["stages"] for artifact in stage["artifacts"]
     ]
 
 
@@ -1057,9 +1055,7 @@ def _artifact_reference(
 ) -> dict[str, Any]:
     resolved = path.resolve()
     scope = (
-        "workflow"
-        if resolved == root or resolved.is_relative_to(root)
-        else "external"
+        "workflow" if resolved == root or resolved.is_relative_to(root) else "external"
     )
     reference: dict[str, Any] = {
         "kind": kind,

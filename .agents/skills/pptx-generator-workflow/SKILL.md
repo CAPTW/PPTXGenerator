@@ -135,13 +135,21 @@ sequence and commands in `skillset_execution_plan.json`:
 4. keep `work/crop_plan.json` explicit even when it contains zero crops, run
    crop preparation so `assets/manifest.json` exists, and do not use
    `--skip-crops` for final delivery;
-5. run `slide-image-dual-render/scripts/slide_pipeline.js` with
+5. run the initial all-slide
+   `slide-image-dual-render/scripts/slide_pipeline.js` build with
    `--quality reconstruction --require-qa --require-reconstruction`, an
-   explicit `--crop-plan`, and an explicit project-local `--node-path`;
+   explicit `--crop-plan`, an explicit project-local `--node-path`, and
+   `--allow-large-batch`;
 6. run `slide-image-dual-render/scripts/final_gate.js` with PPTX openability;
-7. run `slide-visual-polish-qa` against both PPTX rasters and HTML screenshots,
-   using `--source-slides` for every selected wave;
-8. create backlog and repair-wave plans through the orchestrator and repeat.
+7. run all five `slide-visual-polish-qa` steps against the initial full-deck
+   PPTX/HTML, using `--source-slides`;
+8. create backlog and repair-wave plans through the orchestrator, rebuild waves
+   of at most five slides, and repeat the source-mapped five-step QA chain;
+9. run the final all-slide hardlocked build and final gate;
+10. rerun rasterization, HTML capture, comparison, JSON/Markdown summary, and
+    QA enforcement for the final all-slide outputs before enforcing the
+    orchestration state. Final capture metadata must name and hash-bind the
+    delivered PPTX/HTML.
 
 Production defaults:
 
@@ -205,7 +213,7 @@ Deliver at least:
 - final editable PPTX;
 - final standalone HTML from the dual renderer;
 - native-object/editability inventory;
-- final visual QA summary;
+- final visual QA JSON and Markdown summaries;
 - contact sheet;
 - sealed `codex_run.json`.
 

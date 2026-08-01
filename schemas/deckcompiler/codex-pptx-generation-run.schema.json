@@ -21,7 +21,7 @@
       "const": "codex_pptx_generation_run"
     },
     "schema_version": {
-      "const": "2.0.0"
+      "const": "2.1.0"
     },
     "workflow_id": {
       "type": "string",
@@ -322,6 +322,7 @@
         "needs_polish_count",
         "repair_iterations",
         "summary",
+        "summary_markdown",
         "contact_sheet"
       ],
       "properties": {
@@ -352,6 +353,9 @@
           "minimum": 0
         },
         "summary": {
+          "$ref": "#/$defs/artifact"
+        },
+        "summary_markdown": {
           "$ref": "#/$defs/artifact"
         },
         "contact_sheet": {

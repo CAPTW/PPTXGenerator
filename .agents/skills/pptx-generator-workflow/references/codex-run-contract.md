@@ -8,7 +8,7 @@ executed. It is not a request plan.
 ```json
 {
   "schema_name": "codex_pptx_generation_run",
-  "schema_version": "2.0.0",
+  "schema_version": "2.1.0",
   "workflow_id": "generate_...",
   "status": "COMPLETED"
 }
@@ -75,9 +75,12 @@ PPTX/HTML path.
 Record:
 
 - `skill_name: slide-visual-polish-qa`;
-- final summary and contact sheet;
+- final JSON summary, Markdown summary, and contact sheet;
 - fail, blocking, and needs-polish counts;
 - repair iteration count;
+- per-slide raster/capture metadata whose input paths and hashes match the final
+  delivered PPTX/HTML, plus metrics hashes matching the selected source PNG and
+  final render images;
 - `status: PASS` only when fail and blocking counts are zero.
 
 ## Draft example

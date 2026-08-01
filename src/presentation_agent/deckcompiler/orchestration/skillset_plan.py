@@ -16,9 +16,7 @@ from ..schemas import REPO_ROOT, validator_for
 PLAN_NAME = "skillset_execution_plan.json"
 PLAN_SCHEMA = "codex_skillset_execution_plan"
 PROJECT_DIRECTORY = "pngtopptx-project"
-REPOSITORY_ARCHITECT_RELATIVE_ROOT = Path(
-    ".agents/skills/pptx-workflow-architect"
-)
+REPOSITORY_ARCHITECT_RELATIVE_ROOT = Path(".agents/skills/pptx-workflow-architect")
 
 _REPOSITORY_SKILL_FILES = (
     ("skill", "SKILL.md"),
@@ -178,7 +176,7 @@ def resolve_skill_root(explicit: Path | None = None) -> Path:
         return candidate if candidate.name.lower() == "skills" else candidate / "skills"
     user_profile = os.environ.get("USERPROFILE", "").strip()
     if user_profile:
-        return (Path(user_profile).expanduser().resolve() / ".codex" / "skills")
+        return Path(user_profile).expanduser().resolve() / ".codex" / "skills"
     return Path.home().resolve() / ".codex" / "skills"
 
 
@@ -249,8 +247,7 @@ def inspect_skillset(
             "DC_GENERATE_SKILLSET_MISSING",
             "general_generate_workflow",
             "The repository Architect or installed ImageGen/PNGtoPPTX SkillSet "
-            "is incomplete: "
-            + "; ".join(sorted(missing)),
+            "is incomplete: " + "; ".join(sorted(missing)),
             artifact_root.as_posix(),
             remediation_hint=(
                 "Restore .agents/skills/pptx-workflow-architect from the Git "
@@ -318,7 +315,12 @@ def build_skillset_execution_plan(
     node_modules = (project / "node_modules").as_posix()
     final_pptx = (project / "out" / "deck-final-editable.pptx").as_posix()
     final_html = (project / "out" / "deck-final-editable.html").as_posix()
+    initial_pptx = (project / "out" / "deck-initial-editable.pptx").as_posix()
+    initial_html = (project / "out" / "deck-initial-editable.html").as_posix()
+    initial_summary = (project / "out" / "visual_qa_summary_initial.json").as_posix()
+    initial_summary_md = (project / "out" / "visual_qa_summary_initial.md").as_posix()
     final_summary = (project / "out" / "visual_qa_summary_final.json").as_posix()
+    final_summary_md = (project / "out" / "visual_qa_summary_final.md").as_posix()
 
     commands = {
         "install_node_dependencies": [
@@ -347,6 +349,118 @@ def build_skillset_execution_plan(
             "10",
         ],
         "prepare_crops": ["python", ep("crop_generator")],
+        "initial_reconstruction": [
+            "node",
+            ep("slide_pipeline"),
+            "--project",
+            project_value,
+            "--slides",
+            "<slides>",
+            "--quality",
+            "reconstruction",
+            "--require-qa",
+            "--require-reconstruction",
+            "--allow-large-batch",
+            "--crop-plan",
+            crop_plan,
+            "--node-path",
+            node_modules,
+            "--target",
+            "both",
+            "--pptx-out",
+            initial_pptx,
+            "--html-out",
+            initial_html,
+        ],
+        "initial_gate": [
+            "node",
+            ep("final_gate"),
+            "--project",
+            project_value,
+            "--slides",
+            "<slides>",
+            "--quality",
+            "reconstruction",
+            "--require-qa",
+            "--require-reconstruction",
+            "--require-pptx-openable",
+            "--target",
+            "both",
+            "--pptx",
+            initial_pptx,
+            "--html",
+            initial_html,
+        ],
+        "rasterize_initial": [
+            "python",
+            ep("rasterize_pptx"),
+            "--project",
+            project_value,
+            "--pptx",
+            initial_pptx,
+            "--source-slides",
+            "<slides>",
+            "--out-dir",
+            work,
+        ],
+        "capture_initial_html": [
+            "python",
+            ep("capture_html_screenshot"),
+            "--project",
+            project_value,
+            "--html",
+            initial_html,
+            "--source-slides",
+            "<slides>",
+            "--out-dir",
+            work,
+            "--width",
+            "<source-width>",
+            "--height",
+            "<source-height>",
+        ],
+        "compare_initial": [
+            "python",
+            ep("compare_slide_images"),
+            "--project",
+            project_value,
+            "--slides",
+            "<slides>",
+            "--mode",
+            "qa-polish",
+            "--source-dir",
+            (project / "src").as_posix(),
+            "--qa-dir",
+            work,
+            "--out-summary",
+            initial_summary,
+        ],
+        "summarize_initial": [
+            "node",
+            ep("generate_visual_qa_summary"),
+            "--project",
+            project_value,
+            "--slides",
+            "<slides>",
+            "--out-json",
+            initial_summary,
+            "--out-md",
+            initial_summary_md,
+        ],
+        "enforce_initial_qa": [
+            "node",
+            ep("enforce_visual_qa"),
+            "--project",
+            project_value,
+            "--slides",
+            "<slides>",
+            "--mode",
+            "qa-polish",
+            "--summary",
+            initial_summary,
+            "--require-pptx",
+            "--require-html",
+        ],
         "reconstruct_wave": [
             "node",
             ep("slide_pipeline"),
@@ -528,6 +642,76 @@ def build_skillset_execution_plan(
             "--html",
             final_html,
         ],
+        "rasterize_final": [
+            "python",
+            ep("rasterize_pptx"),
+            "--project",
+            project_value,
+            "--pptx",
+            final_pptx,
+            "--source-slides",
+            "<slides>",
+            "--out-dir",
+            work,
+        ],
+        "capture_final_html": [
+            "python",
+            ep("capture_html_screenshot"),
+            "--project",
+            project_value,
+            "--html",
+            final_html,
+            "--source-slides",
+            "<slides>",
+            "--out-dir",
+            work,
+            "--width",
+            "<source-width>",
+            "--height",
+            "<source-height>",
+        ],
+        "compare_final": [
+            "python",
+            ep("compare_slide_images"),
+            "--project",
+            project_value,
+            "--slides",
+            "<slides>",
+            "--mode",
+            "qa-polish",
+            "--source-dir",
+            (project / "src").as_posix(),
+            "--qa-dir",
+            work,
+            "--out-summary",
+            final_summary,
+        ],
+        "summarize_final": [
+            "node",
+            ep("generate_visual_qa_summary"),
+            "--project",
+            project_value,
+            "--slides",
+            "<slides>",
+            "--out-json",
+            final_summary,
+            "--out-md",
+            final_summary_md,
+        ],
+        "enforce_final_qa": [
+            "node",
+            ep("enforce_visual_qa"),
+            "--project",
+            project_value,
+            "--slides",
+            "<slides>",
+            "--mode",
+            "qa-polish",
+            "--summary",
+            final_summary,
+            "--require-pptx",
+            "--require-html",
+        ],
         "enforce_orchestration_state": [
             "node",
             ep("enforce_orchestration_state"),
@@ -537,6 +721,7 @@ def build_skillset_execution_plan(
             final_summary,
             "--quality-level",
             "polish",
+            "--require-artifacts",
         ],
         "seal_codex_run": [
             "deckcompiler",
@@ -558,7 +743,7 @@ def build_skillset_execution_plan(
 
     payload: dict[str, Any] = {
         "schema_name": PLAN_SCHEMA,
-        "schema_version": "1.1.0",
+        "schema_version": "1.2.0",
         "workflow_id": workflow_id,
         "status": "READY",
         "skill_root": inspection["skill_root"],
@@ -571,7 +756,9 @@ def build_skillset_execution_plan(
             "source_png_pattern": (project / "src" / "slideN.png").as_posix(),
             "semantic_sidecar_pattern": (
                 runtime_root / "semantic_sidecars" / "slide-NNN.semantic.json"
-            ).resolve().as_posix(),
+            )
+            .resolve()
+            .as_posix(),
             "per_slide_work_pattern": (project / "work" / "slideXX").as_posix(),
             "profile_path": (project / "styles" / "active.json").as_posix(),
             "slides_source_path": (project / "lib" / "slides.js").as_posix(),
@@ -607,6 +794,9 @@ def build_skillset_execution_plan(
             "pptx_openability_required": True,
             "zero_fail_required": True,
             "zero_blocking_required": True,
+            "initial_full_deck_qa_required": True,
+            "final_full_deck_qa_required": True,
+            "source_slide_mapping_required": True,
             "full_slide_source_raster_forbidden": True,
         },
         "crop_contract": {
@@ -616,6 +806,53 @@ def build_skillset_execution_plan(
             "initial_plan": {"schema_version": "1.0.0", "crops": []},
         },
         "command_templates": commands,
+        "execution_contract": {
+            "setup": [
+                "install_node_dependencies",
+                "install_hardlock",
+                "plan_orchestration",
+                "prepare_crops",
+            ],
+            "initial_full_deck": [
+                "initial_reconstruction",
+                "initial_gate",
+                "rasterize_initial",
+                "capture_initial_html",
+                "compare_initial",
+                "summarize_initial",
+                "enforce_initial_qa",
+                "summarize_backlog",
+            ],
+            "repair_wave_loop": [
+                "make_repair_wave_plan",
+                "generate_repair_prompt",
+                "reconstruct_wave",
+                "gate_wave",
+                "rasterize_wave",
+                "capture_wave_html",
+                "compare_wave",
+                "summarize_wave",
+                "enforce_wave_qa",
+                "summarize_backlog",
+            ],
+            "final_full_deck": [
+                "final_reconstruction",
+                "final_gate",
+                "rasterize_final",
+                "capture_final_html",
+                "compare_final",
+                "summarize_final",
+                "enforce_final_qa",
+                "enforce_orchestration_state",
+            ],
+            "completion": ["seal_codex_run", "register_completion"],
+            "repair_exit_codes": {
+                "enforce_initial_qa": [0, 1],
+                "enforce_wave_qa": [0, 1],
+                "enforce_final_qa": [0],
+            },
+            "max_repair_iterations": 10,
+        },
         "required_artifacts": [
             "work/orchestration_state.json",
             "work/crop_plan.json",
@@ -626,6 +863,7 @@ def build_skillset_execution_plan(
             "out/qa_evidence_summary.json",
             "out/pptx_openability_debug/pptx_package_validation.json",
             "out/visual_qa_summary_final.json",
+            "out/visual_qa_summary_final.md",
             "out/qa/contact_sheet.png",
             "out/deck-final-editable.pptx",
             "out/deck-final-editable.html",
@@ -698,11 +936,78 @@ def validate_skillset_execution_plan(
         )
 
     for row in payload["ordered_skills"]:
-        _validate_bound_file(row["skill_path"], row["sha256"], row["skill_name"], issues)
+        _validate_bound_file(
+            row["skill_path"], row["sha256"], row["skill_name"], issues
+        )
     for name, row in payload["official_entrypoints"].items():
         _validate_bound_file(row["path"], row["sha256"], f"entrypoint {name}", issues)
 
     commands = payload["command_templates"]
+    for label in ("initial_reconstruction", "final_reconstruction"):
+        _require_flags(
+            commands[label],
+            (
+                "--quality",
+                "reconstruction",
+                "--require-qa",
+                "--require-reconstruction",
+                "--allow-large-batch",
+                "--crop-plan",
+                "--node-path",
+                "--target",
+                "both",
+            ),
+            label,
+            issues,
+        )
+    for label in ("initial_gate", "final_gate"):
+        _require_flags(
+            commands[label],
+            ("--require-pptx-openable", "--require-qa", "--require-reconstruction"),
+            label,
+            issues,
+        )
+    for label in ("rasterize_initial", "rasterize_final"):
+        _require_flags(
+            commands[label],
+            ("--source-slides",),
+            label,
+            issues,
+        )
+    for label in ("capture_initial_html", "capture_final_html"):
+        _require_flags(
+            commands[label],
+            ("--source-slides", "--width", "--height"),
+            label,
+            issues,
+        )
+    for label in ("compare_initial", "compare_final"):
+        _require_flags(
+            commands[label],
+            ("--mode", "qa-polish", "--out-summary"),
+            label,
+            issues,
+        )
+    for label in ("summarize_initial", "summarize_final"):
+        _require_flags(
+            commands[label],
+            ("--out-json", "--out-md"),
+            label,
+            issues,
+        )
+    for label in ("enforce_initial_qa", "enforce_final_qa"):
+        _require_flags(
+            commands[label],
+            (
+                "--mode",
+                "qa-polish",
+                "--summary",
+                "--require-pptx",
+                "--require-html",
+            ),
+            label,
+            issues,
+        )
     _require_flags(
         commands["reconstruct_wave"],
         (
@@ -734,6 +1039,12 @@ def validate_skillset_execution_plan(
         commands["capture_wave_html"],
         ("--source-slides",),
         "capture_wave_html",
+        issues,
+    )
+    _require_flags(
+        commands["enforce_orchestration_state"],
+        ("--summary", "--quality-level", "polish", "--require-artifacts"),
+        "enforce_orchestration_state",
         issues,
     )
     return issues

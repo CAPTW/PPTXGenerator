@@ -20,13 +20,14 @@
     "quality_contract",
     "crop_contract",
     "command_templates",
+    "execution_contract",
     "required_artifacts",
     "stop_conditions",
     "content_hash"
   ],
   "properties": {
     "schema_name": {"const": "codex_skillset_execution_plan"},
-    "schema_version": {"const": "1.1.0"},
+    "schema_version": {"const": "1.2.0"},
     "workflow_id": {"type": "string", "pattern": "^generate_[0-9a-f]{20}$"},
     "status": {"const": "READY"},
     "skill_root": {"type": "string", "minLength": 1},
@@ -160,6 +161,9 @@
         "pptx_openability_required",
         "zero_fail_required",
         "zero_blocking_required",
+        "initial_full_deck_qa_required",
+        "final_full_deck_qa_required",
+        "source_slide_mapping_required",
         "full_slide_source_raster_forbidden"
       ],
       "properties": {
@@ -172,6 +176,9 @@
         "pptx_openability_required": {"const": true},
         "zero_fail_required": {"const": true},
         "zero_blocking_required": {"const": true},
+        "initial_full_deck_qa_required": {"const": true},
+        "final_full_deck_qa_required": {"const": true},
+        "source_slide_mapping_required": {"const": true},
         "full_slide_source_raster_forbidden": {"const": true}
       }
     },
@@ -202,6 +209,13 @@
         "install_hardlock",
         "plan_orchestration",
         "prepare_crops",
+        "initial_reconstruction",
+        "initial_gate",
+        "rasterize_initial",
+        "capture_initial_html",
+        "compare_initial",
+        "summarize_initial",
+        "enforce_initial_qa",
         "reconstruct_wave",
         "gate_wave",
         "rasterize_wave",
@@ -214,6 +228,11 @@
         "generate_repair_prompt",
         "final_reconstruction",
         "final_gate",
+        "rasterize_final",
+        "capture_final_html",
+        "compare_final",
+        "summarize_final",
+        "enforce_final_qa",
         "enforce_orchestration_state",
         "seal_codex_run",
         "register_completion"
@@ -223,6 +242,13 @@
         "install_hardlock": {"$ref": "#/$defs/command"},
         "plan_orchestration": {"$ref": "#/$defs/command"},
         "prepare_crops": {"$ref": "#/$defs/command"},
+        "initial_reconstruction": {"$ref": "#/$defs/command"},
+        "initial_gate": {"$ref": "#/$defs/command"},
+        "rasterize_initial": {"$ref": "#/$defs/command"},
+        "capture_initial_html": {"$ref": "#/$defs/command"},
+        "compare_initial": {"$ref": "#/$defs/command"},
+        "summarize_initial": {"$ref": "#/$defs/command"},
+        "enforce_initial_qa": {"$ref": "#/$defs/command"},
         "reconstruct_wave": {"$ref": "#/$defs/command"},
         "gate_wave": {"$ref": "#/$defs/command"},
         "rasterize_wave": {"$ref": "#/$defs/command"},
@@ -235,9 +261,87 @@
         "generate_repair_prompt": {"$ref": "#/$defs/command"},
         "final_reconstruction": {"$ref": "#/$defs/command"},
         "final_gate": {"$ref": "#/$defs/command"},
+        "rasterize_final": {"$ref": "#/$defs/command"},
+        "capture_final_html": {"$ref": "#/$defs/command"},
+        "compare_final": {"$ref": "#/$defs/command"},
+        "summarize_final": {"$ref": "#/$defs/command"},
+        "enforce_final_qa": {"$ref": "#/$defs/command"},
         "enforce_orchestration_state": {"$ref": "#/$defs/command"},
         "seal_codex_run": {"$ref": "#/$defs/command"},
         "register_completion": {"$ref": "#/$defs/command"}
+      }
+    },
+    "execution_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "setup",
+        "initial_full_deck",
+        "repair_wave_loop",
+        "final_full_deck",
+        "completion",
+        "repair_exit_codes",
+        "max_repair_iterations"
+      ],
+      "properties": {
+        "setup": {
+          "const": [
+            "install_node_dependencies",
+            "install_hardlock",
+            "plan_orchestration",
+            "prepare_crops"
+          ]
+        },
+        "initial_full_deck": {
+          "const": [
+            "initial_reconstruction",
+            "initial_gate",
+            "rasterize_initial",
+            "capture_initial_html",
+            "compare_initial",
+            "summarize_initial",
+            "enforce_initial_qa",
+            "summarize_backlog"
+          ]
+        },
+        "repair_wave_loop": {
+          "const": [
+            "make_repair_wave_plan",
+            "generate_repair_prompt",
+            "reconstruct_wave",
+            "gate_wave",
+            "rasterize_wave",
+            "capture_wave_html",
+            "compare_wave",
+            "summarize_wave",
+            "enforce_wave_qa",
+            "summarize_backlog"
+          ]
+        },
+        "final_full_deck": {
+          "const": [
+            "final_reconstruction",
+            "final_gate",
+            "rasterize_final",
+            "capture_final_html",
+            "compare_final",
+            "summarize_final",
+            "enforce_final_qa",
+            "enforce_orchestration_state"
+          ]
+        },
+        "completion": {"const": ["seal_codex_run", "register_completion"]},
+        "repair_exit_codes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enforce_initial_qa", "enforce_wave_qa", "enforce_final_qa"],
+          "properties": {
+            "enforce_initial_qa": {"const": [0, 1]},
+            "enforce_wave_qa": {"const": [0, 1]},
+            "enforce_final_qa": {"const": [0]}
+          }
+        },
+        "max_repair_iterations": {"const": 10}
       }
     },
     "required_artifacts": {"type": "array", "minItems": 12, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},

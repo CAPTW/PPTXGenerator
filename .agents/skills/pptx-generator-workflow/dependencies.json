@@ -1,6 +1,6 @@
 {
   "schema_name": "pptx_generator_codex_skill_dependencies",
-  "schema_version": "1.1.0",
+  "schema_version": "1.2.0",
   "ordered_dependencies": [
     {
       "invocation_order": 1,
@@ -63,7 +63,10 @@
     "pptx_openability": "PASS",
     "exact_skillset_execution_plan": "PASS",
     "explicit_crop_plan_and_manifest": "PASS",
+    "initial_full_deck_visual_qa": "PASS",
     "source_mapped_visual_qa": "PASS",
+    "final_full_deck_visual_qa": "PASS",
+    "final_visual_qa_output_hash_binding": "PASS",
     "visual_qa_fail_count": 0,
     "visual_qa_blocking_count": 0
   }

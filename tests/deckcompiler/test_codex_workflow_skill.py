@@ -60,6 +60,16 @@ class CodexWorkflowSkillTests(unittest.TestCase):
             dependencies["completion_requirements"]["visual_qa_blocking_count"],
             0,
         )
+        self.assertEqual(
+            dependencies["completion_requirements"]["initial_full_deck_visual_qa"],
+            "PASS",
+        )
+        self.assertEqual(
+            dependencies["completion_requirements"][
+                "final_visual_qa_output_hash_binding"
+            ],
+            "PASS",
+        )
 
     def test_live_skill_requires_real_generation_and_repair_loop(self) -> None:
         text = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
@@ -69,6 +79,8 @@ class CodexWorkflowSkillTests(unittest.TestCase):
         self.assertIn("skillset_execution_plan.json", text)
         self.assertIn("--quality reconstruction", text)
         self.assertIn("--source-slides", text)
+        self.assertIn("initial full-deck", text)
+        self.assertIn("final all-slide", text)
         self.assertIn("CONTINUE", text.upper())
         self.assertNotIn("exactly six slides", text.lower())
 

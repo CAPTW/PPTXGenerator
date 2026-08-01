@@ -24,6 +24,27 @@
       "skill_path": "${CODEX_HOME}/skills/slide-editable-deck-orchestrator/SKILL.md",
       "minimum_quality_level": "blocking-zero",
       "default_quality_level": "polish"
+    },
+    {
+      "invocation_order": 4,
+      "skill_name": "slide-text-layer-inpaint",
+      "skill_path": "${CODEX_HOME}/skills/slide-text-layer-inpaint/SKILL.md",
+      "invocation_policy": "conditional_with_recorded_execute_or_skip_decision"
+    },
+    {
+      "invocation_order": 5,
+      "skill_name": "slide-image-dual-render",
+      "skill_path": "${CODEX_HOME}/skills/slide-image-dual-render/SKILL.md",
+      "renderer_quality": "reconstruction",
+      "official_entrypoint": "scripts/slide_pipeline.js",
+      "final_gate": "scripts/final_gate.js"
+    },
+    {
+      "invocation_order": 6,
+      "skill_name": "slide-visual-polish-qa",
+      "skill_path": "${CODEX_HOME}/skills/slide-visual-polish-qa/SKILL.md",
+      "qa_mode": "qa-polish",
+      "source_slide_mapping_required": true
     }
   ],
   "completion_requirements": {
@@ -33,6 +54,9 @@
     "route_hardlock": "PASS",
     "reconstruction_hardlock": "PASS",
     "pptx_openability": "PASS",
+    "exact_skillset_execution_plan": "PASS",
+    "explicit_crop_plan_and_manifest": "PASS",
+    "source_mapped_visual_qa": "PASS",
     "visual_qa_fail_count": 0,
     "visual_qa_blocking_count": 0
   }

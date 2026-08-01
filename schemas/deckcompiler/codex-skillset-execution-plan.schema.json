@@ -1,0 +1,271 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/codex-skillset-execution-plan.schema.json",
+  "title": "Codex SkillSet Execution Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "workflow_id",
+    "status",
+    "skill_root",
+    "ordered_skills",
+    "official_entrypoints",
+    "project_layout",
+    "environment_template",
+    "dependency_contract",
+    "quality_contract",
+    "crop_contract",
+    "command_templates",
+    "required_artifacts",
+    "stop_conditions",
+    "content_hash"
+  ],
+  "properties": {
+    "schema_name": {"const": "codex_skillset_execution_plan"},
+    "schema_version": {"const": "1.0.0"},
+    "workflow_id": {"type": "string", "pattern": "^generate_[0-9a-f]{20}$"},
+    "status": {"const": "READY"},
+    "skill_root": {"type": "string", "minLength": 1},
+    "ordered_skills": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "prefixItems": [
+        {"$ref": "#/$defs/architectSkill"},
+        {"$ref": "#/$defs/imageSkill"},
+        {"$ref": "#/$defs/orchestratorSkill"},
+        {"$ref": "#/$defs/textLayerSkill"},
+        {"$ref": "#/$defs/rendererSkill"},
+        {"$ref": "#/$defs/qaSkill"}
+      ],
+      "items": false
+    },
+    "official_entrypoints": {
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/entrypoint"},
+      "required": [
+        "orchestration_plan",
+        "summarize_visual_backlog",
+        "make_repair_wave_plan",
+        "generate_repair_prompt",
+        "enforce_orchestration_state",
+        "detect_text_regions",
+        "make_text_masks",
+        "classify_background_regions",
+        "repair_text_backgrounds",
+        "detect_residual_text",
+        "enforce_text_layer",
+        "install_hardlock",
+        "crop_generator",
+        "slide_pipeline",
+        "final_gate",
+        "rasterize_pptx",
+        "capture_html_screenshot",
+        "compare_slide_images",
+        "generate_visual_qa_summary",
+        "enforce_visual_qa"
+      ]
+    },
+    "project_layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "project_root",
+        "source_png_pattern",
+        "semantic_sidecar_pattern",
+        "per_slide_work_pattern",
+        "profile_path",
+        "slides_source_path",
+        "crop_plan_path",
+        "crop_manifest_path",
+        "output_root"
+      ],
+      "properties": {
+        "project_root": {"type": "string", "minLength": 1},
+        "source_png_pattern": {"type": "string", "pattern": "slideN\\.png$"},
+        "semantic_sidecar_pattern": {"type": "string", "pattern": "slide-NNN\\.semantic\\.json$"},
+        "per_slide_work_pattern": {"type": "string", "pattern": "slideXX$"},
+        "profile_path": {"type": "string", "pattern": "active\\.json$"},
+        "slides_source_path": {"type": "string", "pattern": "slides\\.js$"},
+        "crop_plan_path": {"type": "string", "pattern": "crop_plan\\.json$"},
+        "crop_manifest_path": {"type": "string", "pattern": "manifest\\.json$"},
+        "output_root": {"type": "string", "minLength": 1}
+      }
+    },
+    "environment_template": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["SLIDE_PIPELINE_STRICT", "DECK_PROFILE", "DECK_ASSETS", "DECK_PXW", "DECK_PXH", "CROP_PLAN", "SRC_DIR"],
+      "properties": {
+        "SLIDE_PIPELINE_STRICT": {"const": "1"},
+        "DECK_PROFILE": {"type": "string", "minLength": 1},
+        "DECK_ASSETS": {"type": "string", "minLength": 1},
+        "DECK_PXW": {"const": "<source-width>"},
+        "DECK_PXH": {"const": "<source-height>"},
+        "CROP_PLAN": {"type": "string", "pattern": "crop_plan\\.json$"},
+        "SRC_DIR": {"type": "string", "minLength": 1}
+      }
+    },
+    "dependency_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_packages", "resolution_order", "hidden_node_path_forbidden"],
+      "properties": {
+        "node_packages": {
+          "type": "array",
+          "prefixItems": [
+            {"const": "pptxgenjs"},
+            {"const": "sharp"},
+            {"const": "react"},
+            {"const": "react-dom"},
+            {"const": "react-icons"}
+          ],
+          "items": false,
+          "minItems": 5,
+          "maxItems": 5
+        },
+        "resolution_order": {"type": "array", "minItems": 3, "items": {"type": "string", "minLength": 1}},
+        "hidden_node_path_forbidden": {"const": true}
+      }
+    },
+    "quality_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "orchestrator_quality_level",
+        "renderer_quality",
+        "visual_qa_mode",
+        "max_wave_size",
+        "route_hardlock_required",
+        "reconstruction_hardlock_required",
+        "pptx_openability_required",
+        "zero_fail_required",
+        "zero_blocking_required",
+        "full_slide_source_raster_forbidden"
+      ],
+      "properties": {
+        "orchestrator_quality_level": {"const": "polish"},
+        "renderer_quality": {"const": "reconstruction"},
+        "visual_qa_mode": {"const": "qa-polish"},
+        "max_wave_size": {"const": 5},
+        "route_hardlock_required": {"const": true},
+        "reconstruction_hardlock_required": {"const": true},
+        "pptx_openability_required": {"const": true},
+        "zero_fail_required": {"const": true},
+        "zero_blocking_required": {"const": true},
+        "full_slide_source_raster_forbidden": {"const": true}
+      }
+    },
+    "crop_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["explicit_crop_plan_required", "empty_plan_is_valid", "skip_crops_flag_forbidden_for_final_delivery", "initial_plan"],
+      "properties": {
+        "explicit_crop_plan_required": {"const": true},
+        "empty_plan_is_valid": {"const": true},
+        "skip_crops_flag_forbidden_for_final_delivery": {"const": true},
+        "initial_plan": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["schema_version", "crops"],
+          "properties": {
+            "schema_version": {"const": "1.0.0"},
+            "crops": {"type": "array", "maxItems": 0}
+          }
+        }
+      }
+    },
+    "command_templates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "install_node_dependencies",
+        "install_hardlock",
+        "plan_orchestration",
+        "prepare_crops",
+        "reconstruct_wave",
+        "gate_wave",
+        "rasterize_wave",
+        "capture_wave_html",
+        "compare_wave",
+        "summarize_wave",
+        "enforce_wave_qa",
+        "summarize_backlog",
+        "make_repair_wave_plan",
+        "generate_repair_prompt",
+        "final_reconstruction",
+        "final_gate",
+        "enforce_orchestration_state",
+        "seal_codex_run",
+        "register_completion"
+      ],
+      "properties": {
+        "install_node_dependencies": {"$ref": "#/$defs/command"},
+        "install_hardlock": {"$ref": "#/$defs/command"},
+        "plan_orchestration": {"$ref": "#/$defs/command"},
+        "prepare_crops": {"$ref": "#/$defs/command"},
+        "reconstruct_wave": {"$ref": "#/$defs/command"},
+        "gate_wave": {"$ref": "#/$defs/command"},
+        "rasterize_wave": {"$ref": "#/$defs/command"},
+        "capture_wave_html": {"$ref": "#/$defs/command"},
+        "compare_wave": {"$ref": "#/$defs/command"},
+        "summarize_wave": {"$ref": "#/$defs/command"},
+        "enforce_wave_qa": {"$ref": "#/$defs/command"},
+        "summarize_backlog": {"$ref": "#/$defs/command"},
+        "make_repair_wave_plan": {"$ref": "#/$defs/command"},
+        "generate_repair_prompt": {"$ref": "#/$defs/command"},
+        "final_reconstruction": {"$ref": "#/$defs/command"},
+        "final_gate": {"$ref": "#/$defs/command"},
+        "enforce_orchestration_state": {"$ref": "#/$defs/command"},
+        "seal_codex_run": {"$ref": "#/$defs/command"},
+        "register_completion": {"$ref": "#/$defs/command"}
+      }
+    },
+    "required_artifacts": {"type": "array", "minItems": 12, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "stop_conditions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["complete", "needs_repair", "blocked"],
+      "properties": {
+        "complete": {"type": "string", "minLength": 1},
+        "needs_repair": {"type": "string", "minLength": 1},
+        "blocked": {"type": "string", "minLength": 1}
+      }
+    },
+    "content_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "skillBase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["invocation_order", "skill_name", "invocation_policy", "skill_path", "sha256"],
+      "properties": {
+        "invocation_order": {"type": "integer", "minimum": 1, "maximum": 6},
+        "skill_name": {"type": "string", "minLength": 1},
+        "invocation_policy": {"type": "string", "minLength": 1},
+        "skill_path": {"type": "string", "pattern": "SKILL\\.md$"},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "architectSkill": {"allOf": [{"$ref": "#/$defs/skillBase"}, {"properties": {"invocation_order": {"const": 1}, "skill_name": {"const": "pptx-workflow-architect"}, "invocation_policy": {"const": "required_first"}}}]},
+    "imageSkill": {"allOf": [{"$ref": "#/$defs/skillBase"}, {"properties": {"invocation_order": {"const": 2}, "skill_name": {"const": "imagegen"}, "invocation_policy": {"const": "required"}}}]},
+    "orchestratorSkill": {"allOf": [{"$ref": "#/$defs/skillBase"}, {"properties": {"invocation_order": {"const": 3}, "skill_name": {"const": "slide-editable-deck-orchestrator"}, "invocation_policy": {"const": "required_coordinator"}}}]},
+    "textLayerSkill": {"allOf": [{"$ref": "#/$defs/skillBase"}, {"properties": {"invocation_order": {"const": 4}, "skill_name": {"const": "slide-text-layer-inpaint"}, "invocation_policy": {"const": "conditional_preprocessor"}}}]},
+    "rendererSkill": {"allOf": [{"$ref": "#/$defs/skillBase"}, {"properties": {"invocation_order": {"const": 5}, "skill_name": {"const": "slide-image-dual-render"}, "invocation_policy": {"const": "required_renderer"}}}]},
+    "qaSkill": {"allOf": [{"$ref": "#/$defs/skillBase"}, {"properties": {"invocation_order": {"const": 6}, "skill_name": {"const": "slide-visual-polish-qa"}, "invocation_policy": {"const": "required_visual_qa"}}}]},
+    "entrypoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skill_name", "path", "sha256"],
+      "properties": {
+        "skill_name": {"type": "string", "minLength": 1},
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "command": {"type": "array", "minItems": 2, "items": {"type": "string", "minLength": 1}}
+  }
+}

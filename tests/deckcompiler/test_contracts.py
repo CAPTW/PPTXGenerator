@@ -34,6 +34,7 @@ EXPECTED_SCHEMA_FILES = {
     "composite-qa-acceptance.schema.json",
     "composite-qa-report.schema.json",
     "contact-sheet-manifest.schema.json",
+    "codex-skillset-execution-plan.schema.json",
     "codex-pptx-generation-run.schema.json",
     "design-invariants.schema.json",
     "evidence-allocation-report.schema.json",

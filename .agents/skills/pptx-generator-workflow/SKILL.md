@@ -28,6 +28,9 @@ them:
 
 1. `${CODEX_HOME}/skills/.system/imagegen/SKILL.md`
 2. `${CODEX_HOME}/skills/slide-editable-deck-orchestrator/SKILL.md`
+3. `${CODEX_HOME}/skills/slide-text-layer-inpaint/SKILL.md`
+4. `${CODEX_HOME}/skills/slide-image-dual-render/SKILL.md`
+5. `${CODEX_HOME}/skills/slide-visual-polish-qa/SKILL.md`
 
 Follow any references those Skills mark as required for the active action.
 Never copy or modify the external PNGtoPPTX Skill implementation in this
@@ -43,9 +46,16 @@ copies and fingerprints inputs and writes:
 - `generate_workflow_manifest.json`
 - `codex_dispatch.json`
 - `CODEX_WORKFLOW.md`
+- `skillset_execution_plan.json`
+- an isolated `pngtopptx-project/` scaffold with an explicit empty
+  `work/crop_plan.json`
 
 The expected status is `AWAITING_WORKFLOW_ARCHITECT`. If the command enters
 image generation or produces a PPTX, treat that as a contract violation.
+The command must fail before intake when the Architect/ImageGen/PNGtoPPTX
+SkillSet or any official required entrypoint is missing. The generated execution
+plan binds the exact installed Skill and entrypoint hashes for the lifetime of
+the run.
 
 ### 2. Persist the approved Architect package
 
@@ -110,6 +120,25 @@ matching Semantic Sidecar.
 Use the installed `slide-editable-deck-orchestrator` Skill against
 `<runtime>/pngtopptx-project`.
 
+Do not treat the meta Skill name as the renderer. Follow the exact companion
+sequence and commands in `skillset_execution_plan.json`:
+
+1. record whether `slide-text-layer-inpaint` is executed or skipped with a
+   concrete reason;
+2. install project-local Node dependencies and install hardlock templates;
+3. create `styles/active.json`, `lib/slides.js`, and isolated per-slide worker
+   artifacts;
+4. keep `work/crop_plan.json` explicit even when it contains zero crops, run
+   crop preparation so `assets/manifest.json` exists, and do not use
+   `--skip-crops` for final delivery;
+5. run `slide-image-dual-render/scripts/slide_pipeline.js` with
+   `--quality reconstruction --require-qa --require-reconstruction`, an
+   explicit `--crop-plan`, and an explicit project-local `--node-path`;
+6. run `slide-image-dual-render/scripts/final_gate.js` with PPTX openability;
+7. run `slide-visual-polish-qa` against both PPTX rasters and HTML screenshots,
+   using `--source-slides` for every selected wave;
+8. create backlog and repair-wave plans through the orchestrator and repeat.
+
 Production defaults:
 
 - quality level: `polish`;
@@ -118,6 +147,9 @@ Production defaults:
 - native editable semantic text and structured objects;
 - route and reconstruction hardlocks enabled;
 - PPTX openability required.
+- exact official `slide-image-dual-render` render trace required;
+- wave size at most 5 until the final `--allow-large-batch` assembly;
+- project-local Node dependencies and explicit crop plan required.
 
 Run the initial reconstruction, full-deck visual QA, backlog summary, repair
 wave planning, repair builds, and source-mapped QA. Repeat until there are zero
@@ -152,6 +184,9 @@ completion only when:
 - selected slide references are real, consistently sized 16:9 PNGs rather than
   placeholder bytes;
 - reconstruction hardlocks and PPTX openability pass;
+- `skillset_execution_plan.json`, orchestration state, the official
+  `slide-image-dual-render` render trace, crop plan/manifest, crop coverage, and
+  objective QA evidence are all hash-bound to the run;
 - the PPTX package slide count and actual-render native-object manifest match
   the approved blueprint, with editable text on every slide;
 - the external visual-QA summary agrees with the sealed fail, blocking, and
@@ -164,7 +199,7 @@ completion only when:
 Deliver at least:
 
 - final editable PPTX;
-- final HTML when produced by the external Skill;
+- final standalone HTML from the dual renderer;
 - native-object/editability inventory;
 - final visual QA summary;
 - contact sheet;

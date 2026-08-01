@@ -21,7 +21,7 @@
       "const": "codex_pptx_generation_run"
     },
     "schema_version": {
-      "const": "1.0.0"
+      "const": "2.0.0"
     },
     "workflow_id": {
       "type": "string",
@@ -220,10 +220,20 @@
       "additionalProperties": false,
       "required": [
         "skill_name",
+        "renderer_skill",
+        "companion_skills",
+        "text_layer_preprocessing",
         "quality_level",
         "route_hardlock",
         "reconstruction_hardlock",
         "pptx_openability",
+        "execution_plan",
+        "orchestration_state",
+        "render_trace",
+        "crop_plan",
+        "crop_manifest",
+        "crop_coverage_summary",
+        "qa_evidence_summary",
         "output_pptx",
         "output_html",
         "native_object_manifest",
@@ -232,6 +242,23 @@
       "properties": {
         "skill_name": {
           "const": "slide-editable-deck-orchestrator"
+        },
+        "renderer_skill": {
+          "const": "slide-image-dual-render"
+        },
+        "companion_skills": {
+          "type": "array",
+          "prefixItems": [
+            {"const": "slide-text-layer-inpaint"},
+            {"const": "slide-image-dual-render"},
+            {"const": "slide-visual-polish-qa"}
+          ],
+          "items": false,
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "text_layer_preprocessing": {
+          "$ref": "#/$defs/textLayerPreprocessing"
         },
         "quality_level": {
           "enum": [
@@ -249,18 +276,32 @@
         "pptx_openability": {
           "const": "PASS"
         },
+        "execution_plan": {
+          "$ref": "#/$defs/artifact"
+        },
+        "orchestration_state": {
+          "$ref": "#/$defs/artifact"
+        },
+        "render_trace": {
+          "$ref": "#/$defs/artifact"
+        },
+        "crop_plan": {
+          "$ref": "#/$defs/artifact"
+        },
+        "crop_manifest": {
+          "$ref": "#/$defs/artifact"
+        },
+        "crop_coverage_summary": {
+          "$ref": "#/$defs/artifact"
+        },
+        "qa_evidence_summary": {
+          "$ref": "#/$defs/artifact"
+        },
         "output_pptx": {
           "$ref": "#/$defs/artifact"
         },
         "output_html": {
-          "oneOf": [
-            {
-              "type": "null"
-            },
-            {
-              "$ref": "#/$defs/artifact"
-            }
-          ]
+          "$ref": "#/$defs/artifact"
         },
         "native_object_manifest": {
           "$ref": "#/$defs/artifact"
@@ -335,18 +376,21 @@
           "$ref": "#/$defs/artifact"
         },
         "html": {
-          "oneOf": [
-            {
-              "type": "null"
-            },
-            {
-              "$ref": "#/$defs/artifact"
-            }
-          ]
+          "$ref": "#/$defs/artifact"
         },
         "editability_inventory": {
           "$ref": "#/$defs/artifact"
         }
+      }
+    },
+    "textLayerPreprocessing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skill_name", "decision", "reason"],
+      "properties": {
+        "skill_name": {"const": "slide-text-layer-inpaint"},
+        "decision": {"enum": ["EXECUTED", "SKIPPED_WITH_REASON"]},
+        "reason": {"type": "string", "minLength": 1}
       }
     }
   }

@@ -11,7 +11,10 @@ pptx-workflow-architect
   -> approved Gate 1 and Gate 2
   -> imagegen / image_gen.imagegen for every slide
   -> slide-editable-deck-orchestrator
-  -> visual QA and repair waves
+  -> slide-text-layer-inpaint decision (execute or skip with reason)
+  -> slide-image-dual-render hardlocked reconstruction
+  -> slide-visual-polish-qa with source-slide mapping
+  -> orchestrated repair waves
   -> sealed editable-PPTX delivery
 ```
 
@@ -39,8 +42,11 @@ deckcompiler generate `
 Use `--prompt-file` instead of `--prompt` for UTF-8 text. `--workflow` is only a
 user hint; it does not select a fixed narrative template.
 
-The command copies and fingerprints inputs, writes `codex_dispatch.json` and
-`CODEX_WORKFLOW.md`, and exits with code `2`:
+The command first verifies the installed Architect/ImageGen/PNGtoPPTX Skills
+and their official entrypoints. It then copies and fingerprints inputs, creates
+the isolated `pngtopptx-project` layout with an explicit empty crop plan, writes
+`codex_dispatch.json`, `CODEX_WORKFLOW.md`, and the hash-bound
+`skillset_execution_plan.json`, and exits with code `2`:
 
 ```text
 status=AWAITING_WORKFLOW_ARCHITECT
@@ -48,7 +54,8 @@ action=INVOKE_PPTX_WORKFLOW_ARCHITECT
 ```
 
 It does not run the legacy fixed six-slide planner, generate images, or produce
-a PPTX.
+a PPTX. Missing Skills or changed entrypoint hashes fail closed. Pass
+`--skill-root` only to name a verified non-default installation root.
 
 ## 2. Run the mandatory Architect gates in Codex
 
@@ -99,6 +106,34 @@ Codex uses the installed external Skill:
 ${CODEX_HOME}/skills/slide-editable-deck-orchestrator/SKILL.md
 ```
 
+The meta Skill coordinates, but does not replace, these companions:
+
+```text
+slide-text-layer-inpaint     conditional preprocessing
+slide-image-dual-render     only approved PPTX/HTML renderer and final gate
+slide-visual-polish-qa      source/PPTX/HTML comparison and fix plans
+```
+
+Codex must execute the paths and command templates recorded in
+`skillset_execution_plan.json`. That plan matches the verified live workflow:
+
+1. install project-local `pptxgenjs`, `sharp`, `react`, `react-dom`, and
+   `react-icons`;
+2. install project hardlocks;
+3. run the orchestrator planner at quality level `polish`;
+4. materialize a project-local design profile, `lib/slides.js`, and isolated
+   per-slide worker artifacts;
+5. keep `work/crop_plan.json` explicit, including for a zero-crop deck, and run
+   crop preparation so `assets/manifest.json` exists;
+6. reconstruct waves of at most five slides with renderer quality
+   `reconstruction`, `--require-qa`, `--require-reconstruction`, an explicit
+   `--crop-plan`, and an explicit project-local `--node-path`;
+7. run `final_gate.js` with PPTX openability;
+8. rasterize PPTX and capture HTML, always using `--source-slides` for wave
+   mapping, then compare, summarize, enforce, and plan repairs;
+9. run the final all-slide build with explicit `--allow-large-batch` only after
+   all waves pass.
+
 The default quality level is `polish`; `blocking-zero` is the minimum accepted
 production level. The workflow runs:
 
@@ -145,6 +180,11 @@ The command returns `COMPLETED` only when:
   editable text on every slide;
 - PNGtoPPTX hardlocks and PPTX openability pass, with the openability report
   hash-bound to that PPTX;
+- the exact execution plan, orchestrator state, official dual-render trace,
+  explicit crop plan/manifest, crop coverage, and objective per-slide QA
+  evidence are hash-bound and internally consistent;
+- the exact generated source PNG bytes are not embedded in the PPTX as a
+  full-slide raster shortcut;
 - the external visual-QA summary agrees with the sealed counts and has zero
   fail/blocking slides;
 - the delivered editable PPTX exists and matches its recorded hash.

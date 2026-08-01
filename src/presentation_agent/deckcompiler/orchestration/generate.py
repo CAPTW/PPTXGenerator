@@ -18,6 +18,13 @@ from ..manifest_io import read_json, write_json
 from ..provenance import current_source_commit
 from ..schemas import REPO_ROOT, validator_for
 from .codex_run import validate_codex_run_manifest
+from .skillset_plan import (
+    PLAN_NAME,
+    build_skillset_execution_plan,
+    inspect_skillset,
+    scaffold_runtime_project,
+    validate_skillset_execution_plan,
+)
 
 
 MANIFEST_NAME = "generate_workflow_manifest.json"
@@ -48,9 +55,11 @@ def start_generate_workflow(
     language: str,
     tone: Iterable[str],
     workflow: str,
+    skill_root: Path | None = None,
 ) -> GenerateWorkflowResult:
     """Collect immutable inputs and stop at the mandatory Architect-first gate."""
 
+    skillset = inspect_skillset(skill_root)
     root = _prepare_runtime_root(output_dir)
     manifest: dict[str, Any] | None = None
     try:
@@ -101,7 +110,18 @@ def start_generate_workflow(
             ],
             "presentation": presentation,
         }
-        dispatch = _dispatch_payload(workflow_id, input_contract)
+        scaffold_runtime_project(root)
+        execution_plan = build_skillset_execution_plan(
+            workflow_id=workflow_id,
+            runtime_root=root,
+            inspection=skillset,
+        )
+        execution_plan_path = write_json(root / PLAN_NAME, execution_plan)
+        dispatch = _dispatch_payload(
+            workflow_id,
+            input_contract,
+            skillset=skillset,
+        )
         dispatch_path = write_json(root / DISPATCH_NAME, dispatch)
         runbook_path = root / RUNBOOK_NAME
         _atomic_write_text(runbook_path, _dispatch_runbook(workflow_id))
@@ -114,6 +134,7 @@ def start_generate_workflow(
             input_contract,
             dispatch_path,
             runbook_path,
+            execution_plan_path,
         )
         _sync_artifacts(manifest)
         _write_workflow_manifest(root, manifest)
@@ -205,6 +226,7 @@ def validate_generate_workflow(path: Path) -> dict[str, Any]:
         root = manifest_path.resolve().parent
         issues.extend(_input_artifact_issues(root, payload))
         issues.extend(_manifest_artifact_issues(root, payload))
+        issues.extend(_skillset_plan_issues(root, payload))
         issues.extend(_sealed_run_issues(root, payload))
     return {
         "valid": not issues,
@@ -224,6 +246,7 @@ def _initial_manifest(
     input_contract: dict[str, Any],
     dispatch_path: Path,
     runbook_path: Path,
+    execution_plan_path: Path,
 ) -> dict[str, Any]:
     action = {
         "code": "INVOKE_PPTX_WORKFLOW_ARCHITECT",
@@ -260,6 +283,9 @@ def _initial_manifest(
             "image_skill": "imagegen",
             "image_tool": "image_gen.imagegen",
             "reconstruction_skill": "slide-editable-deck-orchestrator",
+            "renderer_skill": "slide-image-dual-render",
+            "visual_qa_skill": "slide-visual-polish-qa",
+            "skillset_execution_plan": PLAN_NAME,
             "default_quality_level": "polish",
             "approval_policy": (
                 "architect_gate1_and_gate2_explicit_user_approval"
@@ -272,6 +298,11 @@ def _initial_manifest(
                 "artifacts": [
                     _artifact_reference(root, dispatch_path, "codex_dispatch"),
                     _artifact_reference(root, runbook_path, "codex_workflow_runbook"),
+                    _artifact_reference(
+                        root,
+                        execution_plan_path,
+                        "skillset_execution_plan",
+                    ),
                 ],
                 "required_action": action,
                 "details": {
@@ -311,39 +342,47 @@ def _pending_stage(name: str) -> dict[str, Any]:
 def _dispatch_payload(
     workflow_id: str,
     input_contract: dict[str, Any],
+    *,
+    skillset: dict[str, Any],
 ) -> dict[str, Any]:
     payload = {
         "schema_name": "pptx_generator_codex_dispatch",
         "schema_version": "1.0.0",
         "workflow_id": workflow_id,
         "input_contract": input_contract,
+        "skillset_execution_plan": PLAN_NAME,
+        "skillset_preflight": {
+            "status": skillset["status"],
+            "skill_root": skillset["skill_root"],
+        },
         "skill_sequence": [
             {
-                "invocation_order": 1,
-                "skill_name": "pptx-workflow-architect",
-                "skill_path": (
-                    "${CODEX_HOME}/skills/pptx-workflow-architect/SKILL.md"
+                **row,
+                **(
+                    {
+                        "required_outputs": [
+                            "gate1_workflow_design",
+                            "gate2_blueprint",
+                            "gate2_design_system",
+                            "explicit_user_approval",
+                        ]
+                    }
+                    if row["skill_name"] == "pptx-workflow-architect"
+                    else {
+                        "platform_tool_id": "image_gen.imagegen",
+                        "required_coverage": (
+                            "one inspected selected PNG per approved slide"
+                        ),
+                    }
+                    if row["skill_name"] == "imagegen"
+                    else {
+                        "execution_contract": (
+                            "follow skillset_execution_plan.json official entrypoints"
+                        )
+                    }
                 ),
-                "required_outputs": [
-                    "gate1_workflow_design",
-                    "gate2_blueprint",
-                    "gate2_design_system",
-                    "explicit_user_approval",
-                ],
-            },
-            {
-                "invocation_order": 2,
-                "skill_name": "imagegen",
-                "platform_tool_id": "image_gen.imagegen",
-                "required_coverage": "one inspected selected PNG per approved slide",
-            },
-            {
-                "invocation_order": 3,
-                "skill_name": "slide-editable-deck-orchestrator",
-                "minimum_quality_level": "blocking-zero",
-                "default_quality_level": "polish",
-                "required_stop_condition": "zero fail/blocking slides",
-            },
+            }
+            for row in skillset["skills"]
         ],
         "slide_count_policy": (
             "architect_approved_right_sized_count_1_to_400_no_fixed_six_slide_template"
@@ -369,12 +408,30 @@ Workflow ID: `{workflow_id}`
 
 1. Read `${{CODEX_HOME}}/skills/pptx-workflow-architect/SKILL.md` first.
 2. Complete Architect Gate 1 and Gate 2 and obtain explicit user approval.
-3. Read `.agents/skills/pptx-generator-workflow/SKILL.md`.
+3. Read `.agents/skills/pptx-generator-workflow/SKILL.md` and the installed
+   ImageGen plus four PNGtoPPTX companion Skills listed in
+   `skillset_execution_plan.json`.
 4. Call `image_gen.imagegen` for every approved slide; inspect and iterate.
-5. Save selected references as `pngtopptx-project/src/slideN.png`.
-6. Run `slide-editable-deck-orchestrator` at quality level `polish`.
-7. Continue visual-QA repair waves until fail/blocking count is zero.
-8. Seal `codex_run.json` and register it with `deckcompiler generate --resume`.
+5. Save selected references as `pngtopptx-project/src/slideN.png` and preserve
+   exact editable copy in the matching Semantic Sidecar.
+6. Materialize `styles/active.json`, `lib/slides.js`, and per-slide worker
+   artifacts. Record an explicit execute/skip decision for
+   `slide-text-layer-inpaint`.
+7. Execute the plan's official entrypoints in order: install project-local Node
+   dependencies, install hardlock, plan orchestration at `polish`, prepare the
+   explicit crop plan/manifest, reconstruct waves of at most five slides with
+   renderer quality `reconstruction`, and run `final_gate.js`.
+8. Run source-mapped PPTX/HTML visual QA for every wave using
+   `--source-slides`, then create backlog and repair-wave plans. Never use a
+   full-slide source PNG as the delivered slide surface.
+9. Repeat repair waves until fail/blocking count is zero, then run the final
+   all-slide hardlocked build, final visual QA, and orchestration-state gate.
+10. Seal `codex_run.json` and register it with `deckcompiler generate --resume`.
+
+`skillset_execution_plan.json` is hash-bound and contains the exact installed
+Skill paths, official script hashes, environment, command templates, artifact
+contract, crop policy, and stop conditions. Do not replace it with a repo-local
+renderer or an improvised command path.
 
 This runtime is incomplete until the sealed run is accepted. Prompt preparation,
 mocked tools, an invocation plan, or an unreviewed PPTX is not completion.
@@ -405,7 +462,12 @@ def _bind_codex_run_artifacts(
     control_plane_artifacts = [
         artifact
         for artifact in architect["artifacts"]
-        if artifact["kind"] in {"codex_dispatch", "codex_workflow_runbook"}
+        if artifact["kind"]
+        in {
+            "codex_dispatch",
+            "codex_workflow_runbook",
+            "skillset_execution_plan",
+        }
     ]
     architect["artifacts"] = control_plane_artifacts + [
         _run_artifact_reference(
@@ -444,6 +506,11 @@ def _bind_codex_run_artifacts(
     reconstruction["required_action"] = None
     reconstruction["details"] = {
         "skill_name": payload["reconstruction"]["skill_name"],
+        "renderer_skill": payload["reconstruction"]["renderer_skill"],
+        "companion_skills": payload["reconstruction"]["companion_skills"],
+        "text_layer_preprocessing": payload["reconstruction"][
+            "text_layer_preprocessing"
+        ],
         "quality_level": payload["reconstruction"]["quality_level"],
         "route_hardlock": payload["reconstruction"]["route_hardlock"],
         "reconstruction_hardlock": payload["reconstruction"][
@@ -452,6 +519,48 @@ def _bind_codex_run_artifacts(
         "pptx_openability": payload["reconstruction"]["pptx_openability"],
     }
     reconstruction["artifacts"] = [
+        _run_artifact_reference(
+            root,
+            base,
+            payload["reconstruction"]["execution_plan"],
+            "skillset_execution_plan",
+        ),
+        _run_artifact_reference(
+            root,
+            base,
+            payload["reconstruction"]["orchestration_state"],
+            "pngtopptx_orchestration_state",
+        ),
+        _run_artifact_reference(
+            root,
+            base,
+            payload["reconstruction"]["render_trace"],
+            "pngtopptx_render_trace",
+        ),
+        _run_artifact_reference(
+            root,
+            base,
+            payload["reconstruction"]["crop_plan"],
+            "pngtopptx_crop_plan",
+        ),
+        _run_artifact_reference(
+            root,
+            base,
+            payload["reconstruction"]["crop_manifest"],
+            "pngtopptx_crop_manifest",
+        ),
+        _run_artifact_reference(
+            root,
+            base,
+            payload["reconstruction"]["crop_coverage_summary"],
+            "pngtopptx_crop_coverage_summary",
+        ),
+        _run_artifact_reference(
+            root,
+            base,
+            payload["reconstruction"]["qa_evidence_summary"],
+            "pngtopptx_qa_evidence_summary",
+        ),
         _run_artifact_reference(
             root,
             base,
@@ -649,11 +758,16 @@ def _load_workflow(resume: Path) -> tuple[Path, dict[str, Any]]:
         _manifest_artifact_issues(
             root,
             payload,
-            kinds={"codex_dispatch", "codex_workflow_runbook"},
+            kinds={
+                "codex_dispatch",
+                "codex_workflow_runbook",
+                "skillset_execution_plan",
+            },
         )
         if not issues
         else []
     )
+    issues.extend(_skillset_plan_issues(root, payload) if not issues else [])
     if issues:
         raise _workflow_error(
             "DC_GENERATE_MANIFEST_INVALID",
@@ -745,6 +859,32 @@ def _manifest_artifact_issues(
         else:
             issues.append(f"{kind} artifact has no integrity fingerprint")
     return issues
+
+
+def _skillset_plan_issues(root: Path, payload: dict[str, Any]) -> list[str]:
+    references = payload.get("artifacts")
+    if not isinstance(references, list):
+        return ["skillset execution plan reference is missing"]
+    reference = next(
+        (
+            row
+            for row in references
+            if isinstance(row, dict)
+            and row.get("kind") == "skillset_execution_plan"
+        ),
+        None,
+    )
+    if reference is None:
+        return ["skillset execution plan reference is missing"]
+    raw_path = reference.get("path")
+    if not isinstance(raw_path, str) or not raw_path:
+        return ["skillset execution plan path is malformed"]
+    candidate = Path(raw_path)
+    path = candidate.resolve() if candidate.is_absolute() else (root / candidate).resolve()
+    return validate_skillset_execution_plan(
+        path,
+        expected_workflow_id=payload.get("workflow_id"),
+    )
 
 
 def _sealed_run_issues(root: Path, payload: dict[str, Any]) -> list[str]:
@@ -1024,6 +1164,7 @@ __all__ = [
     "GenerateWorkflowResult",
     "MANIFEST_NAME",
     "MAX_GENERAL_PDFS",
+    "PLAN_NAME",
     "RUNBOOK_NAME",
     "resume_generate_workflow",
     "start_generate_workflow",

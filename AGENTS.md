@@ -39,6 +39,15 @@ is outside this dispatch rule.
   slide visual for every planned slide.
 - The live reconstruction path must use the installed
   `slide-editable-deck-orchestrator` and its companion Skills.
+- The companion path is explicit: record the conditional
+  `slide-text-layer-inpaint` decision, render only through
+  `slide-image-dual-render/scripts/slide_pipeline.js`, gate with its
+  `final_gate.js`, and run `slide-visual-polish-qa` with source-slide mapping.
+- Follow the hash-bound `skillset_execution_plan.json`; use project-local Node
+  dependencies, an explicit crop plan and generated asset manifest, waves of at
+  most five slides, renderer quality `reconstruction`, and QA mode `qa-polish`.
+- Do not use `--skip-crops` for final delivery. A zero-crop deck still carries
+  `work/crop_plan.json` and `assets/manifest.json`.
 - Production acceptance requires route hardlock, reconstruction hardlock, PPTX
   openability, and zero fail/blocking slides in visual QA.
 - Preserve editable native text, tables, charts, diagrams, and shapes. A

@@ -79,6 +79,15 @@ def build_parser() -> argparse.ArgumentParser:
         help="Optional user hint only; pptx-workflow-architect selects the actual workflow.",
     )
     generate.add_argument(
+        "--skill-root",
+        type=Path,
+        help=(
+            "Installed Skill root containing pptx-workflow-architect and the "
+            "CAPTW/pngtopptx companion Skills. Defaults to CODEX_HOME/skills or "
+            "USERPROFILE/.codex/skills."
+        ),
+    )
+    generate.add_argument(
         "--codex-run-manifest",
         type=Path,
         help="Sealed live Codex run evidence to register while resuming.",
@@ -249,13 +258,20 @@ def main(argv: list[str] | None = None) -> int:
                     language=args.language,
                     tone=args.tone or ("professional", "clear"),
                     workflow=args.workflow,
+                    skill_root=args.skill_root,
                 )
             else:
-                if args.output_dir is not None or args.prompt is not None or args.prompt_file is not None or args.pdfs:
+                if (
+                    args.output_dir is not None
+                    or args.prompt is not None
+                    or args.prompt_file is not None
+                    or args.pdfs
+                    or args.skill_root is not None
+                ):
                     raise DeckCompilerError(
                         "DC_GENERATE_INPUT_INVALID",
                         "general_generate_workflow",
-                        "--output-dir, prompt, and PDF inputs cannot be changed while resuming.",
+                        "--output-dir, prompt, PDF, and Skill-root inputs cannot be changed while resuming.",
                     )
                 result = resume_generate_workflow(
                     resume=args.resume,

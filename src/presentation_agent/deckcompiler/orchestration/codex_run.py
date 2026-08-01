@@ -14,6 +14,7 @@ from ..errors import DeckCompilerError
 from ..identity import content_sha256
 from ..manifest_io import read_json, write_json
 from ..schemas import validator_for
+from .skillset_plan import validate_skillset_execution_plan
 
 
 SCHEMA_NAME = "codex_pptx_generation_run"
@@ -21,6 +22,7 @@ ARCHITECT_SKILL = "pptx-workflow-architect"
 IMAGE_SKILL = "imagegen"
 IMAGE_TOOL = "image_gen.imagegen"
 RECONSTRUCTION_SKILL = "slide-editable-deck-orchestrator"
+RENDERER_SKILL = "slide-image-dual-render"
 VISUAL_QA_SKILL = "slide-visual-polish-qa"
 
 
@@ -210,6 +212,13 @@ def _artifact_references(payload: dict[str, Any]) -> Iterator[tuple[str, dict[st
     reconstruction = payload.get("reconstruction")
     if isinstance(reconstruction, dict):
         for key in (
+            "execution_plan",
+            "orchestration_state",
+            "render_trace",
+            "crop_plan",
+            "crop_manifest",
+            "crop_coverage_summary",
+            "qa_evidence_summary",
             "output_pptx",
             "output_html",
             "native_object_manifest",
@@ -317,6 +326,14 @@ def _execution_artifact_issues(
 
     pptx_path = artifacts.get("reconstruction.output_pptx")
     _validate_pptx_package(pptx_path, slide_count, issues)
+    _validate_no_source_slide_embedding(
+        pptx_path,
+        [
+            artifacts.get(f"image_generation.slides[{index}].source_png")
+            for index in range(slide_count)
+        ],
+        issues,
+    )
     _validate_html(
         artifacts.get("reconstruction.output_html"),
         "reconstruction.output_html",
@@ -330,6 +347,76 @@ def _execution_artifact_issues(
     )
     if native is not None:
         _validate_native_manifest(native, slide_count, issues)
+
+    execution_plan_path = artifacts.get("reconstruction.execution_plan")
+    if execution_plan_path is not None:
+        issues.extend(
+            validate_skillset_execution_plan(
+                execution_plan_path,
+                expected_workflow_id=payload["workflow_id"],
+            )
+        )
+
+    orchestration_state = _json_object(
+        artifacts.get("reconstruction.orchestration_state"),
+        "reconstruction.orchestration_state",
+        issues,
+    )
+    if orchestration_state is not None:
+        _validate_orchestration_state(
+            orchestration_state,
+            payload["reconstruction"]["quality_level"],
+            slide_count,
+            issues,
+        )
+
+    crop_plan = _json_object(
+        artifacts.get("reconstruction.crop_plan"),
+        "reconstruction.crop_plan",
+        issues,
+    )
+    crop_manifest = _json_object(
+        artifacts.get("reconstruction.crop_manifest"),
+        "reconstruction.crop_manifest",
+        issues,
+    )
+    crop_coverage = _json_object(
+        artifacts.get("reconstruction.crop_coverage_summary"),
+        "reconstruction.crop_coverage_summary",
+        issues,
+    )
+    qa_evidence = _json_object(
+        artifacts.get("reconstruction.qa_evidence_summary"),
+        "reconstruction.qa_evidence_summary",
+        issues,
+    )
+    if crop_plan is not None:
+        _validate_crop_plan(crop_plan, issues)
+    if crop_manifest is not None and not isinstance(crop_manifest, dict):
+        issues.append("reconstruction.crop_manifest must be an object")
+    if crop_coverage is not None:
+        _validate_slide_keyed_evidence(
+            crop_coverage,
+            slide_count,
+            "reconstruction.crop_coverage_summary",
+            issues,
+        )
+    if qa_evidence is not None:
+        _validate_qa_evidence(qa_evidence, slide_count, issues)
+
+    render_trace = _json_object(
+        artifacts.get("reconstruction.render_trace"),
+        "reconstruction.render_trace",
+        issues,
+    )
+    if render_trace is not None:
+        _validate_render_trace(
+            render_trace,
+            payload["reconstruction"],
+            artifacts,
+            slide_count,
+            issues,
+        )
 
     openability = _json_object(
         artifacts.get("reconstruction.openability_report"),
@@ -505,6 +592,230 @@ def _validate_native_manifest(
             )
 
 
+def _validate_no_source_slide_embedding(
+    pptx_path: Path | None,
+    source_paths: list[Path | None],
+    issues: list[str],
+) -> None:
+    """Reject the exact generated slide PNG bytes as a PPTX media shortcut."""
+
+    if pptx_path is None:
+        return
+    source_hashes = {
+        _sha256_file(path)
+        for path in source_paths
+        if path is not None and path.is_file()
+    }
+    try:
+        with zipfile.ZipFile(pptx_path) as archive:
+            for name in archive.namelist():
+                if not name.startswith("ppt/media/") or name.endswith("/"):
+                    continue
+                digest = hashlib.sha256(archive.read(name)).hexdigest()
+                if digest in source_hashes:
+                    issues.append(
+                        "reconstruction.output_pptx embeds an exact generated source "
+                        f"slide image as media: {name}"
+                    )
+    except (OSError, zipfile.BadZipFile):
+        return
+
+
+def _validate_orchestration_state(
+    state: dict[str, Any],
+    quality_level: str,
+    slide_count: int,
+    issues: list[str],
+) -> None:
+    expected_slides = list(range(1, slide_count + 1))
+    if state.get("qualityLevel") != quality_level:
+        issues.append(
+            "reconstruction.orchestration_state qualityLevel must match "
+            "reconstruction.quality_level"
+        )
+    if state.get("slides") != expected_slides:
+        issues.append(
+            f"reconstruction.orchestration_state.slides must be {expected_slides}"
+        )
+    limits = state.get("limits")
+    if isinstance(limits, dict) and limits.get("maxWaveSize") not in (None, 5):
+        issues.append(
+            "reconstruction.orchestration_state.limits.maxWaveSize must be 5"
+        )
+
+
+def _validate_crop_plan(plan: dict[str, Any], issues: list[str]) -> None:
+    if plan.get("schema_version") == "1.0.0" and isinstance(plan.get("crops"), list):
+        return
+    if isinstance(plan.get("slides"), dict):
+        return
+    issues.append(
+        "reconstruction.crop_plan must contain the explicit v1 crops array or "
+        "the structured slides map"
+    )
+
+
+def _validate_slide_keyed_evidence(
+    payload: dict[str, Any],
+    slide_count: int,
+    label: str,
+    issues: list[str],
+) -> None:
+    slides = payload.get("slides")
+    expected = {str(number) for number in range(1, slide_count + 1)}
+    if not isinstance(slides, dict) or set(slides) != expected:
+        issues.append(f"{label}.slides must contain exactly 1..{slide_count}")
+
+
+def _validate_qa_evidence(
+    payload: dict[str, Any],
+    slide_count: int,
+    issues: list[str],
+) -> None:
+    _validate_slide_keyed_evidence(
+        payload,
+        slide_count,
+        "reconstruction.qa_evidence_summary",
+        issues,
+    )
+    slides = payload.get("slides")
+    if not isinstance(slides, dict):
+        return
+    for slide_number in range(1, slide_count + 1):
+        row = slides.get(str(slide_number))
+        if not isinstance(row, dict):
+            continue
+        if row.get("exists") is not True or row.get("hashesValid") is not True:
+            issues.append(
+                f"reconstruction.qa_evidence_summary slide {slide_number} "
+                "must exist with valid hashes"
+            )
+        if str(row.get("status", "")).lower() != "pass":
+            issues.append(
+                f"reconstruction.qa_evidence_summary slide {slide_number} "
+                "must record pass"
+            )
+
+
+def _validate_render_trace(
+    trace: dict[str, Any],
+    reconstruction: dict[str, Any],
+    artifacts: dict[str, Path],
+    slide_count: int,
+    issues: list[str],
+) -> None:
+    required_values = {
+        "quality": "reconstruction",
+        "target": "both",
+        "requireQa": True,
+        "requireReconstruction": True,
+        "strictMode": True,
+        "invokedByPipeline": True,
+        "enforcementDisabled": False,
+    }
+    for key, expected in required_values.items():
+        if trace.get(key) != expected:
+            issues.append(f"reconstruction.render_trace.{key} must be {expected!r}")
+    if Path(str(trace.get("skillRoot", ""))).name != RENDERER_SKILL:
+        issues.append(
+            "reconstruction.render_trace.skillRoot must identify slide-image-dual-render"
+        )
+    if trace.get("dependencyMissingPackages") not in ([], None):
+        issues.append(
+            "reconstruction.render_trace dependencyMissingPackages must be empty"
+        )
+    if trace.get("dependencyResolutionMode") != "cli":
+        issues.append(
+            "reconstruction.render_trace dependencyResolutionMode must be cli"
+        )
+    crop_plan_path = artifacts.get("reconstruction.crop_plan")
+    if crop_plan_path is not None:
+        expected_node_path = crop_plan_path.parent.parent / "node_modules"
+        raw_node_path = trace.get("nodePathUsed")
+        if (
+            not isinstance(raw_node_path, str)
+            or not raw_node_path
+            or Path(raw_node_path).resolve() != expected_node_path.resolve()
+        ):
+            issues.append(
+                "reconstruction.render_trace.nodePathUsed must identify the "
+                "project-local node_modules passed through --node-path"
+            )
+    if slide_count > 5 and trace.get("allowLargeBatch") is not True:
+        issues.append(
+            "reconstruction.render_trace final build must allow the explicit large batch"
+        )
+
+    for key in (
+        "validation",
+        "preflightValidation",
+        "postbuildValidation",
+        "finalValidation",
+        "reconstructionValidation",
+    ):
+        value = trace.get(key)
+        if not isinstance(value, dict) or value.get("passed") is not True:
+            issues.append(f"reconstruction.render_trace.{key}.passed must be true")
+    qa_summary = trace.get("qaSummary")
+    if not isinstance(qa_summary, dict) or qa_summary.get("passed") is not True:
+        issues.append("reconstruction.render_trace.qaSummary.passed must be true")
+    package = trace.get("pptxPackageValidation")
+    if not isinstance(package, dict) or package.get("passed") is not True:
+        issues.append(
+            "reconstruction.render_trace.pptxPackageValidation.passed must be true"
+        )
+
+    _trace_path_matches(
+        trace.get("pptxOut"),
+        artifacts.get("reconstruction.output_pptx"),
+        "pptxOut",
+        issues,
+    )
+    _trace_path_matches(
+        trace.get("htmlOut"),
+        artifacts.get("reconstruction.output_html"),
+        "htmlOut",
+        issues,
+    )
+    _trace_path_matches(
+        trace.get("cropPlanPath"),
+        artifacts.get("reconstruction.crop_plan"),
+        "cropPlanPath",
+        issues,
+    )
+    _trace_path_matches(
+        trace.get("cropManifestPath"),
+        artifacts.get("reconstruction.crop_manifest"),
+        "cropManifestPath",
+        issues,
+    )
+    if trace.get("cropPlanHash") != reconstruction["crop_plan"]["sha256"]:
+        issues.append("reconstruction.render_trace cropPlanHash mismatch")
+    if trace.get("cropManifestHash") != reconstruction["crop_manifest"]["sha256"]:
+        issues.append("reconstruction.render_trace cropManifestHash mismatch")
+    if trace.get("nativeObjectManifestHash") != reconstruction["native_object_manifest"]["sha256"]:
+        issues.append("reconstruction.render_trace nativeObjectManifestHash mismatch")
+    if trace.get("cropCoverageSummaryHash") != reconstruction["crop_coverage_summary"]["sha256"]:
+        issues.append("reconstruction.render_trace cropCoverageSummaryHash mismatch")
+    if trace.get("qaEvidenceSummaryHash") != reconstruction["qa_evidence_summary"]["sha256"]:
+        issues.append("reconstruction.render_trace qaEvidenceSummaryHash mismatch")
+
+
+def _trace_path_matches(
+    raw_path: Any,
+    expected: Path | None,
+    label: str,
+    issues: list[str],
+) -> None:
+    if expected is None:
+        return
+    if not isinstance(raw_path, str) or not raw_path:
+        issues.append(f"reconstruction.render_trace.{label} is missing")
+        return
+    if Path(raw_path).resolve() != expected.resolve():
+        issues.append(f"reconstruction.render_trace.{label} path mismatch")
+
+
 def _is_editable_text(value: Any) -> bool:
     if (
         not isinstance(value, dict)
@@ -617,6 +928,7 @@ __all__ = [
     "IMAGE_SKILL",
     "IMAGE_TOOL",
     "RECONSTRUCTION_SKILL",
+    "RENDERER_SKILL",
     "SCHEMA_NAME",
     "VISUAL_QA_SKILL",
     "seal_codex_run_manifest",

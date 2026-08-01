@@ -19,15 +19,28 @@ from presentation_agent.deckcompiler.orchestration.generate import (
     start_generate_workflow,
     validate_generate_workflow,
 )
+from presentation_agent.deckcompiler.orchestration.skillset_plan import (
+    required_skillset_paths,
+)
 
 
 ZERO_HASH = "0" * 64
 
 
 class GeneralGenerateWorkflowTests(unittest.TestCase):
+    @staticmethod
+    def _make_skill_root(root: Path) -> Path:
+        for relative in required_skillset_paths():
+            path = root / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            if not path.exists():
+                path.write_text(f"fixture: {relative}\n", encoding="utf-8")
+        return root
+
     def test_start_is_architect_first_and_does_not_run_legacy_production(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
-            runtime = Path(tmpdir) / "run"
+            base = Path(tmpdir)
+            runtime = base / "run"
             result = start_generate_workflow(
                 output_dir=runtime,
                 prompt=(
@@ -41,6 +54,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 language="Korean",
                 tone=("명료한", "시각적인"),
                 workflow="사용자 자유 형식 힌트",
+                skill_root=self._make_skill_root(base / "skills"),
             )
 
             self.assertEqual(result.exit_code, 2)
@@ -80,6 +94,9 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                     "pptx-workflow-architect",
                     "imagegen",
                     "slide-editable-deck-orchestrator",
+                    "slide-text-layer-inpaint",
+                    "slide-image-dual-render",
+                    "slide-visual-polish-qa",
                 ],
             )
             self.assertEqual(
@@ -88,8 +105,40 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             )
             self.assertEqual(
                 {artifact["kind"] for artifact in manifest["artifacts"]},
-                {"codex_dispatch", "codex_workflow_runbook"},
+                {
+                    "codex_dispatch",
+                    "codex_workflow_runbook",
+                    "skillset_execution_plan",
+                },
             )
+            plan = json.loads(
+                (runtime / "skillset_execution_plan.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            self.assertEqual(plan["status"], "READY")
+            self.assertEqual(
+                plan["quality_contract"]["renderer_quality"],
+                "reconstruction",
+            )
+            self.assertIn(
+                "--source-slides",
+                plan["command_templates"]["rasterize_wave"],
+            )
+            self.assertIn(
+                "--require-pptx-openable",
+                plan["command_templates"]["gate_wave"],
+            )
+            self.assertTrue((runtime / "pngtopptx-project" / "src").is_dir())
+            crop_plan = json.loads(
+                (
+                    runtime
+                    / "pngtopptx-project"
+                    / "work"
+                    / "crop_plan.json"
+                ).read_text(encoding="utf-8")
+            )
+            self.assertEqual(crop_plan, {"schema_version": "1.0.0", "crops": []})
             self.assertFalse((runtime / "phase3").exists())
             self.assertFalse((runtime / "phase4_preparation").exists())
             self.assertFalse(
@@ -99,6 +148,32 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 )
             )
             self.assertTrue(validate_generate_workflow(runtime)["valid"])
+
+    def test_start_fails_closed_when_official_skillset_entrypoint_is_missing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            base = Path(tmpdir)
+            skill_root = self._make_skill_root(base / "skills")
+            (
+                skill_root
+                / "slide-image-dual-render"
+                / "scripts"
+                / "final_gate.js"
+            ).unlink()
+            with self.assertRaises(DeckCompilerError) as caught:
+                start_generate_workflow(
+                    output_dir=base / "runtime",
+                    prompt="Build an editable deck.",
+                    prompt_file=None,
+                    pdf_paths=(),
+                    audience="operators",
+                    purpose="training",
+                    language="English",
+                    tone=("clear",),
+                    workflow="auto",
+                    skill_root=skill_root,
+                )
+            self.assertEqual(caught.exception.code, "DC_GENERATE_SKILLSET_MISSING")
+            self.assertFalse((base / "runtime").exists())
 
     def test_prompt_and_multiple_pdfs_are_copied_without_fixed_deck_shape(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -119,6 +194,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 language="Korean",
                 tone=("간결한",),
                 workflow="auto",
+                skill_root=self._make_skill_root(base / "skills"),
             )
 
             manifest = json.loads(result.manifest_path.read_text(encoding="utf-8"))
@@ -182,7 +258,12 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 {artifact["kind"] for artifact in manifest["artifacts"]},
             )
 
-            (runtime / "out" / "deck-final-editable.pptx").write_bytes(
+            (
+                runtime
+                / "pngtopptx-project"
+                / "out"
+                / "deck-final-editable.pptx"
+            ).write_bytes(
                 b"tampered-after-completion"
             )
             validation = validate_generate_workflow(runtime)
@@ -237,7 +318,9 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             )
             sealed = runtime / "codex_run.json"
             seal_codex_run_manifest(draft, sealed)
-            (runtime / "src" / "slide1.png").write_bytes(b"tampered")
+            (
+                runtime / "pngtopptx-project" / "src" / "slide1.png"
+            ).write_bytes(b"tampered")
 
             report = validate_codex_run_manifest(sealed)
             self.assertFalse(report["contract_valid"])
@@ -259,7 +342,9 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 fail_count=0,
                 blocking_count=0,
             )
-            (runtime / "src" / "slide1.png").write_bytes(b"not-a-real-png")
+            (
+                runtime / "pngtopptx-project" / "src" / "slide1.png"
+            ).write_bytes(b"not-a-real-png")
 
             with self.assertRaises(DeckCompilerError) as caught:
                 seal_codex_run_manifest(draft, runtime / "codex_run.json")
@@ -288,6 +373,75 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             with self.assertRaises(DeckCompilerError):
                 resume_generate_workflow(resume=runtime)
 
+    def test_skillset_plan_detects_changed_installed_entrypoint(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            self._start(runtime)
+            entrypoint = (
+                runtime.parent
+                / "skills"
+                / "slide-image-dual-render"
+                / "scripts"
+                / "slide_pipeline.js"
+            )
+            entrypoint.write_text("changed after intake\n", encoding="utf-8")
+
+            validation = validate_generate_workflow(runtime)
+            self.assertFalse(validation["valid"])
+            self.assertTrue(
+                any("entrypoint slide_pipeline hash mismatch" in issue for issue in validation["issues"]),
+                validation,
+            )
+
+    def test_sealer_rejects_renderer_trace_that_bypasses_official_pipeline(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            started = self._start(runtime)
+            draft = self._build_run_draft(
+                runtime,
+                workflow_id=started.workflow_id,
+                slide_count=1,
+                status="COMPLETED",
+                qa_status="PASS",
+                fail_count=0,
+                blocking_count=0,
+            )
+            trace_path = (
+                runtime
+                / "pngtopptx-project"
+                / "out"
+                / "render_trace.json"
+            )
+            trace = json.loads(trace_path.read_text(encoding="utf-8"))
+            trace["invokedByPipeline"] = False
+            trace_path.write_text(json.dumps(trace), encoding="utf-8")
+
+            with self.assertRaises(DeckCompilerError) as caught:
+                seal_codex_run_manifest(draft, runtime / "codex_run.json")
+            self.assertIn("invokedByPipeline", caught.exception.message)
+
+    def test_sealer_rejects_non_cli_node_dependency_resolution(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            started = self._start(runtime)
+            draft = self._build_run_draft(
+                runtime,
+                workflow_id=started.workflow_id,
+                slide_count=1,
+                status="COMPLETED",
+                qa_status="PASS",
+                fail_count=0,
+                blocking_count=0,
+            )
+            trace_path = runtime / "pngtopptx-project" / "out" / "render_trace.json"
+            trace = json.loads(trace_path.read_text(encoding="utf-8"))
+            trace["dependencyResolutionMode"] = "skill"
+            trace_path.write_text(json.dumps(trace), encoding="utf-8")
+
+            with self.assertRaises(DeckCompilerError) as caught:
+                seal_codex_run_manifest(draft, runtime / "codex_run.json")
+            self.assertIn("dependencyResolutionMode", caught.exception.message)
+
     def _start(self, runtime: Path):
         return start_generate_workflow(
             output_dir=runtime,
@@ -299,6 +453,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             language="English",
             tone=("clear",),
             workflow="auto",
+            skill_root=self._make_skill_root(runtime.parent / "skills"),
         )
 
     def _build_run_draft(
@@ -314,10 +469,13 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
     ) -> Path:
         architect = root / "architect"
         prompts = root / "image_requests"
-        src = root / "src"
+        project = root / "pngtopptx-project"
+        src = project / "src"
         sidecars = root / "semantic_sidecars"
         inspections = root / "inspections"
-        out = root / "out"
+        work = project / "work"
+        assets = project / "assets"
+        out = project / "out"
         qa = out / "qa"
         for directory in (
             architect,
@@ -325,6 +483,8 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             src,
             sidecars,
             inspections,
+            work,
+            assets,
             out,
             qa,
         ):
@@ -337,8 +497,17 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             "approval_record": architect / "approval_record.json",
             "pptx": out / "deck-final-editable.pptx",
             "html": out / "deck-final-editable.html",
+            "execution_plan": root / "skillset_execution_plan.json",
+            "orchestration_state": work / "orchestration_state.json",
+            "render_trace": out / "render_trace.json",
+            "crop_plan": work / "crop_plan.json",
+            "crop_manifest": assets / "manifest.json",
+            "crop_coverage": out / "crop_coverage_summary.json",
+            "qa_evidence": out / "qa_evidence_summary.json",
             "native": out / "native_object_manifest.json",
-            "openability": out / "pptx_openability.json",
+            "openability": out
+            / "pptx_openability_debug"
+            / "pptx_package_validation.json",
             "summary": out / "visual_qa_summary_final.json",
             "contact": qa / "contact_sheet.png",
             "inventory": out / "editability_inventory.md",
@@ -390,6 +559,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             ),
             encoding="utf-8",
         )
+        files["openability"].parent.mkdir(parents=True, exist_ok=True)
         files["openability"].write_text(
             json.dumps(
                 {
@@ -419,6 +589,69 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
         self._write_png(files["contact"], 800, 450, (20, 30, 40))
         files["inventory"].write_text(
             "# Editability Inventory\n\n- editable text: verified\n",
+            encoding="utf-8",
+        )
+        if not files["crop_plan"].is_file():
+            files["crop_plan"].write_text(
+                json.dumps({"schema_version": "1.0.0", "crops": []}),
+                encoding="utf-8",
+            )
+        files["crop_manifest"].write_text("{}\n", encoding="utf-8")
+        files["crop_coverage"].write_text(
+            json.dumps(
+                {
+                    "source": "work/crop_plan.json + assets/manifest.json",
+                    "slides": {
+                        str(number): {
+                            "totalCropAreaRatio": 0,
+                            "largestCropAreaRatio": 0,
+                            "crops": [],
+                        }
+                        for number in range(1, slide_count + 1)
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+        files["qa_evidence"].write_text(
+            json.dumps(
+                {
+                    "source": "work/slideXX/qa_evidence.json",
+                    "slides": {
+                        str(number): {
+                            "exists": True,
+                            "status": "pass",
+                            "hashesValid": True,
+                        }
+                        for number in range(1, slide_count + 1)
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+        files["orchestration_state"].write_text(
+            json.dumps(
+                {
+                    "schemaVersion": "0.1.0",
+                    "projectRoot": project.resolve().as_posix(),
+                    "qualityLevel": "polish",
+                    "slides": list(range(1, slide_count + 1)),
+                    "waves": [],
+                    "iterations": [],
+                    "currentStatus": {
+                        "pass": list(range(1, slide_count + 1)),
+                        "needs_polish": [],
+                        "fail": [],
+                    },
+                    "artifacts": {
+                        "pptx": "out/deck-final-editable.pptx",
+                        "html": "out/deck-final-editable.html",
+                        "visualQaSummary": "out/visual_qa_summary_final.json",
+                        "renderTrace": "out/render_trace.json",
+                    },
+                    "limits": {"maxIterations": 10, "maxWaveSize": 5},
+                }
+            ),
             encoding="utf-8",
         )
 
@@ -472,9 +705,70 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 }
             )
 
+        files["render_trace"].write_text(
+            json.dumps(
+                {
+                    "args": [
+                        "--quality",
+                        "reconstruction",
+                        "--require-qa",
+                        "--require-reconstruction",
+                        "--crop-plan",
+                        "work/crop_plan.json",
+                        "--node-path",
+                        "node_modules",
+                    ],
+                    "target": "both",
+                    "quality": "reconstruction",
+                    "requireQa": True,
+                    "requireReconstruction": True,
+                    "maxBatchSize": 5,
+                    "allowLargeBatch": slide_count > 5,
+                    "skillRoot": (
+                        root.parent
+                        / "skills"
+                        / "slide-image-dual-render"
+                    ).resolve().as_posix(),
+                    "projectRoot": project.resolve().as_posix(),
+                    "pptxOut": files["pptx"].resolve().as_posix(),
+                    "htmlOut": files["html"].resolve().as_posix(),
+                    "cropPlanPath": files["crop_plan"].resolve().as_posix(),
+                    "cropPlanHash": self._sha256(files["crop_plan"]),
+                    "cropManifestPath": files["crop_manifest"].resolve().as_posix(),
+                    "cropManifestHash": self._sha256(files["crop_manifest"]),
+                    "nodePathUsed": (project / "node_modules").resolve().as_posix(),
+                    "dependencyResolutionMode": "cli",
+                    "dependencyMissingPackages": [],
+                    "strictMode": True,
+                    "invokedByPipeline": True,
+                    "enforcementDisabled": False,
+                    "validation": {"passed": True},
+                    "preflightValidation": {"passed": True},
+                    "postbuildValidation": {"passed": True},
+                    "finalValidation": {"passed": True},
+                    "reconstructionValidation": {
+                        "passed": True,
+                        "slidesPassed": list(range(1, slide_count + 1)),
+                        "slidesFailed": [],
+                    },
+                    "qaSummary": {"required": True, "passed": True},
+                    "nativeObjectManifestHash": self._sha256(files["native"]),
+                    "cropCoverageSummaryHash": self._sha256(files["crop_coverage"]),
+                    "qaEvidenceSummaryHash": self._sha256(files["qa_evidence"]),
+                    "pptxPackageValidation": {
+                        "passed": True,
+                        "pptx": files["pptx"].resolve().as_posix(),
+                        "reportJson": files["openability"].resolve().as_posix(),
+                        "exitCode": 0,
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+
         payload = {
             "schema_name": "codex_pptx_generation_run",
-            "schema_version": "1.0.0",
+            "schema_version": "2.0.0",
             "workflow_id": workflow_id,
             "status": status,
             "architect": {
@@ -498,10 +792,34 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             },
             "reconstruction": {
                 "skill_name": "slide-editable-deck-orchestrator",
+                "renderer_skill": "slide-image-dual-render",
+                "companion_skills": [
+                    "slide-text-layer-inpaint",
+                    "slide-image-dual-render",
+                    "slide-visual-polish-qa",
+                ],
+                "text_layer_preprocessing": {
+                    "skill_name": "slide-text-layer-inpaint",
+                    "decision": "SKIPPED_WITH_REASON",
+                    "reason": "fixture slides contain reviewed semantic text and need no inpainting",
+                },
                 "quality_level": "polish",
                 "route_hardlock": "PASS",
                 "reconstruction_hardlock": "PASS",
                 "pptx_openability": "PASS",
+                "execution_plan": self._artifact(root, files["execution_plan"]),
+                "orchestration_state": self._artifact(
+                    root, files["orchestration_state"]
+                ),
+                "render_trace": self._artifact(root, files["render_trace"]),
+                "crop_plan": self._artifact(root, files["crop_plan"]),
+                "crop_manifest": self._artifact(root, files["crop_manifest"]),
+                "crop_coverage_summary": self._artifact(
+                    root, files["crop_coverage"]
+                ),
+                "qa_evidence_summary": self._artifact(
+                    root, files["qa_evidence"]
+                ),
                 "output_pptx": self._artifact(root, files["pptx"]),
                 "output_html": self._artifact(root, files["html"]),
                 "native_object_manifest": self._artifact(root, files["native"]),

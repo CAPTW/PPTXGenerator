@@ -158,6 +158,15 @@
         "reconstruction_skill": {
           "const": "slide-editable-deck-orchestrator"
         },
+        "renderer_skill": {
+          "const": "slide-image-dual-render"
+        },
+        "visual_qa_skill": {
+          "const": "slide-visual-polish-qa"
+        },
+        "skillset_execution_plan": {
+          "const": "skillset_execution_plan.json"
+        },
         "default_quality_level": {
           "const": "polish"
         },

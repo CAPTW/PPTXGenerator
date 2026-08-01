@@ -32,10 +32,15 @@ class CodexWorkflowSkillTests(unittest.TestCase):
                 (1, "pptx-workflow-architect"),
                 (2, "imagegen"),
                 (3, "slide-editable-deck-orchestrator"),
+                (4, "slide-text-layer-inpaint"),
+                (5, "slide-image-dual-render"),
+                (6, "slide-visual-polish-qa"),
             ],
         )
         self.assertEqual(ordered[1]["platform_tool_id"], "image_gen.imagegen")
         self.assertEqual(ordered[2]["default_quality_level"], "polish")
+        self.assertEqual(ordered[4]["renderer_quality"], "reconstruction")
+        self.assertTrue(ordered[5]["source_slide_mapping_required"])
         self.assertEqual(
             dependencies["completion_requirements"]["visual_qa_blocking_count"],
             0,
@@ -46,6 +51,9 @@ class CodexWorkflowSkillTests(unittest.TestCase):
         self.assertIn("Use the built-in `image_gen.imagegen` tool", text)
         self.assertIn("one call per slide", text)
         self.assertIn("zero fail/blocking slides", text)
+        self.assertIn("skillset_execution_plan.json", text)
+        self.assertIn("--quality reconstruction", text)
+        self.assertIn("--source-slides", text)
         self.assertIn("CONTINUE", text.upper())
         self.assertNotIn("exactly six slides", text.lower())
 

@@ -8,7 +8,7 @@ executed. It is not a request plan.
 ```json
 {
   "schema_name": "codex_pptx_generation_run",
-  "schema_version": "1.0.0",
+  "schema_version": "2.0.0",
   "workflow_id": "generate_...",
   "status": "COMPLETED"
 }
@@ -51,10 +51,19 @@ Sidecar, inspection report, `inspection_status: PASS`, and regeneration count.
 Record:
 
 - `skill_name: slide-editable-deck-orchestrator`;
+- `renderer_skill: slide-image-dual-render` and the exact three-companion
+  Skill list;
+- the explicit execute/skip decision for `slide-text-layer-inpaint`;
 - quality level;
 - route hardlock, reconstruction hardlock, and PPTX openability results;
-- final editable PPTX and optional HTML;
+- final editable PPTX and standalone HTML;
 - native-object manifest and openability report.
+
+Also hash-bind the intake-created `skillset_execution_plan.json`,
+`work/orchestration_state.json`, official `out/render_trace.json`, explicit crop
+plan and generated asset manifest, crop-coverage summary, and objective QA
+evidence summary. HTML is required because the approved renderer is the dual
+PPTX/HTML path.
 
 ## Visual QA record
 
@@ -74,7 +83,8 @@ field reference. Draft hashes may be 64 zeroes; `deckcompiler seal-codex-run`
 recomputes them before validation.
 
 The sealer also rejects placeholder evidence. It checks selected PNG structure,
-consistent 16:9 dimensions, PPTX package structure and slide count, the
-actual-render native-object manifest, PPTX openability, and the external
-visual-QA summary. A self-declared `PASS` with inconsistent files cannot be
-registered as completion.
+consistent 16:9 dimensions, PPTX package structure and slide count, exact source
+PNG embedding, the actual-render native-object manifest, the official
+dual-render trace and hardlocks, crop/QA objective evidence, PPTX openability,
+and the external visual-QA summary. A self-declared `PASS` with inconsistent
+files cannot be registered as completion.

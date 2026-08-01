@@ -91,12 +91,22 @@ deckcompiler generate `
 ```
 
 The entrypoint copies and fingerprints the inputs, writes a hash-bound resumable
-manifest, and exits with code `2` at
+manifest plus `skillset_execution_plan.json`, scaffolds an isolated
+`pngtopptx-project`, and exits with code `2` at
 `AWAITING_WORKFLOW_ARCHITECT`. The first production Skill is always
 `pptx-workflow-architect`, regardless of prompt wording or input channel.
 After approved Gates 1 and 2, the repo-owned Codex workflow calls
 `image_gen.imagegen` for every approved slide, runs the installed PNGtoPPTX
 orchestrator, and iterates visual-QA repair waves to zero blocking slides.
+
+`generate` fails closed before intake when any required Architect/ImageGen/
+PNGtoPPTX Skill or official script is absent. The execution plan binds the
+installed Skill and entrypoint hashes and spells out the tested companion path:
+conditional text-layer preprocessing, project-local Node dependencies, explicit
+crop plan/manifest, `slide-image-dual-render` reconstruction hardlocks,
+source-mapped PPTX/HTML visual QA, repair waves of at most five slides, and the
+final openability gate. Use `--skill-root <path>` only when the verified Skills
+are not under `CODEX_HOME\skills` or `USERPROFILE\.codex\skills`.
 
 See the [general workflow runbook](docs/GENERAL_GENERATE_WORKFLOW.md) for the
 Skill order, approval gates, run sealing, and completion contract.

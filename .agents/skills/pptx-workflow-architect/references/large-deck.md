@@ -123,6 +123,17 @@ When one-pass production is unsafe or low quality, create a Batch Manifest autom
 - Do not ask the user to manually solve batching unless they explicitly want to
 - The system manages modular production proactively
 
+### Fast-quality execution batches
+
+Logical content batches do not require serial Image Generation. Under the
+repository `fast-quality-20` profile, prepare the whole wave first and dispatch
+up to 20 independent built-in ImageGen calls concurrently. For exactly 20
+slides, all initial calls belong to one wave. For larger decks, use deterministic
+waves of 20 while preserving the Deck Constitution. After all approved source
+images and per-slide artifacts exist, compile all approved slides in one
+`--allow-large-batch` renderer invocation. Repair waves remain targeted and may
+be smaller.
+
 ### Context-Limit Aware Generation
 If generating the entire deck in one pass risks truncation or coherence loss:
 - Automatically split production into smaller units

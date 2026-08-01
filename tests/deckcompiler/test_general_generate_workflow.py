@@ -19,6 +19,10 @@ from presentation_agent.deckcompiler.orchestration.generate import (
     start_generate_workflow,
     validate_generate_workflow,
 )
+from presentation_agent.deckcompiler.orchestration.image_requests import (
+    prepare_image_requests,
+    validate_image_request_bundle,
+)
 from presentation_agent.deckcompiler.orchestration.skillset_plan import (
     inspect_skillset,
     required_repository_skillset_paths,
@@ -107,6 +111,15 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 dispatch["skill_sequence"][1]["platform_tool_id"],
                 "image_gen.imagegen",
             )
+            self.assertEqual(dispatch["schema_version"], "1.3.0")
+            self.assertEqual(
+                dispatch["execution_profile"]["default_design_direction"],
+                ["Academic", "Informative", "Professional", "Creative"],
+            )
+            self.assertEqual(
+                dispatch["execution_profile"]["image_generation"]["batch_size"],
+                20,
+            )
             self.assertEqual(
                 Path(dispatch["skillset_preflight"]["repository_skill_root"]).resolve(),
                 (ROOT / ".agents" / "skills" / "pptx-workflow-architect").resolve(),
@@ -128,7 +141,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 (runtime / "skillset_execution_plan.json").read_text(encoding="utf-8")
             )
             self.assertEqual(plan["status"], "READY")
-            self.assertEqual(plan["schema_version"], "1.2.0")
+            self.assertEqual(plan["schema_version"], "1.4.0")
             repository_architect = (
                 ROOT / ".agents" / "skills" / "pptx-workflow-architect"
             ).resolve()
@@ -148,6 +161,27 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 plan["quality_contract"]["renderer_quality"],
                 "reconstruction",
             )
+            self.assertEqual(
+                plan["execution_profile"]["profile_name"], "fast-quality-20"
+            )
+            self.assertEqual(plan["execution_profile"]["target_model"], "gpt-5.6-sol")
+            self.assertEqual(
+                plan["execution_profile"]["target_reasoning_effort"], "medium"
+            )
+            self.assertFalse(
+                plan["execution_profile"]["prompt_policy"][
+                    "additional_model_call_required"
+                ]
+            )
+            self.assertTrue(
+                plan["execution_profile"]["prompt_policy"][
+                    "architect_lineage_required"
+                ]
+            )
+            self.assertEqual(
+                plan["execution_profile"]["performance_target"]["target_speedup"],
+                4.0,
+            )
             self.assertIn(
                 "--source-slides",
                 plan["command_templates"]["rasterize_wave"],
@@ -158,43 +192,46 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             )
             self.assertIn(
                 "--source-slides",
-                plan["command_templates"]["rasterize_initial"],
-            )
-            self.assertIn(
-                "--source-slides",
-                plan["command_templates"]["rasterize_final"],
+                plan["command_templates"]["rasterize_full_deck"],
             )
             self.assertEqual(
-                plan["execution_contract"]["initial_full_deck"],
+                plan["execution_contract"]["single_compile_fast_path"],
                 [
-                    "initial_reconstruction",
-                    "initial_gate",
-                    "rasterize_initial",
-                    "capture_initial_html",
-                    "compare_initial",
-                    "summarize_initial",
-                    "enforce_initial_qa",
-                    "summarize_backlog",
+                    "compile_full_deck",
+                    "gate_full_deck",
+                    "rasterize_full_deck",
+                    "capture_full_html",
+                    "compare_full_deck",
+                    "summarize_full_deck",
+                    "enforce_full_deck_qa",
                 ],
             )
             self.assertEqual(
-                plan["execution_contract"]["final_full_deck"],
+                plan["execution_contract"]["fast_path_acceptance"],
+                ["enforce_orchestration_state"],
+            )
+            self.assertEqual(
+                plan["execution_contract"]["post_repair_recompile"],
                 [
-                    "final_reconstruction",
-                    "final_gate",
-                    "rasterize_final",
-                    "capture_final_html",
-                    "compare_final",
-                    "summarize_final",
-                    "enforce_final_qa",
+                    "compile_full_deck",
+                    "gate_full_deck",
+                    "rasterize_full_deck",
+                    "capture_full_html",
+                    "compare_full_deck",
+                    "summarize_full_deck",
+                    "enforce_full_deck_qa",
                     "enforce_orchestration_state",
                 ],
+            )
+            self.assertFalse(
+                plan["execution_contract"]["unconditional_second_full_compile"]
             )
             self.assertIn(
                 "out/visual_qa_summary_final.md",
                 plan["required_artifacts"],
             )
             self.assertTrue((runtime / "pngtopptx-project" / "src").is_dir())
+            self.assertTrue((runtime / "image_batches").is_dir())
             crop_plan = json.loads(
                 (runtime / "pngtopptx-project" / "work" / "crop_plan.json").read_text(
                     encoding="utf-8"
@@ -351,6 +388,220 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 validation,
             )
 
+    def test_twenty_slide_fast_quality_run_is_one_concurrent_wave_and_one_compile(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            started = self._start(runtime)
+            draft = self._build_run_draft(
+                runtime,
+                workflow_id=started.workflow_id,
+                slide_count=20,
+                status="COMPLETED",
+                qa_status="PASS",
+                fail_count=0,
+                blocking_count=0,
+            )
+            sealed = runtime / "codex_run.json"
+            payload = seal_codex_run_manifest(draft, sealed)
+            report = validate_codex_run_manifest(sealed)
+
+            self.assertTrue(report["contract_valid"], report)
+            self.assertTrue(report["completion_ready"], report)
+            batch_path = runtime / payload["image_generation"]["batch_manifest"]["path"]
+            batch = json.loads(batch_path.read_text(encoding="utf-8"))
+            self.assertEqual(len(batch["waves"]), 1)
+            self.assertEqual(batch["waves"][0]["slides"], list(range(1, 21)))
+            self.assertTrue(batch["waves"][0]["concurrent_dispatch"])
+            timing_path = runtime / payload["performance"]["timing_report"]["path"]
+            timing = json.loads(timing_path.read_text(encoding="utf-8"))
+            self.assertEqual(timing["full_deck_compile_count"], 1)
+            self.assertTrue(timing["target_met"])
+
+    def test_image_requests_are_deterministically_bound_to_architect_outputs(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            started = self._start(runtime)
+            self._build_run_draft(
+                runtime,
+                workflow_id=started.workflow_id,
+                slide_count=2,
+                status="COMPLETED",
+                qa_status="PASS",
+                fail_count=0,
+                blocking_count=0,
+            )
+
+            report = validate_image_request_bundle(runtime)
+            self.assertTrue(report["valid"], report)
+            manifest = json.loads(
+                (
+                    runtime / "image_requests" / "image_request_manifest.json"
+                ).read_text(encoding="utf-8")
+            )
+            self.assertEqual(manifest["additional_model_calls"], 0)
+            self.assertEqual(
+                manifest["design_context_mode"],
+                "selected_route_and_layout_cues_only",
+            )
+            self.assertGreater(manifest["prompt_character_count_total"], 0)
+            prompt = json.loads(
+                (runtime / manifest["slides"][0]["prompt"]["path"]).read_text(
+                    encoding="utf-8"
+                )
+            )
+            self.assertIn("Readiness Topic 1", prompt["prompt_text"])
+            self.assertIn("Evidence-backed point 1", prompt["prompt_text"])
+            self.assertEqual(prompt["visual_route_id"], "academic-editorial")
+            self.assertEqual(prompt["layout_id"], "editorial-evidence")
+
+    def test_sealer_rejects_generic_prompt_not_derived_from_blueprint(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            started = self._start(runtime)
+            draft = self._build_run_draft(
+                runtime,
+                workflow_id=started.workflow_id,
+                slide_count=2,
+                status="COMPLETED",
+                qa_status="PASS",
+                fail_count=0,
+                blocking_count=0,
+            )
+            prompt_path = runtime / "image_requests" / "slide-001.prompt.json"
+            prompt_path.write_text(
+                json.dumps(
+                    {
+                        "slide_number": 1,
+                        "prompt": "Generate slide 1 as a 16:9 reference.",
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            with self.assertRaises(DeckCompilerError) as caught:
+                seal_codex_run_manifest(draft, runtime / "codex_run.json")
+            self.assertIn("not deterministically derived", caught.exception.message)
+
+    def test_sealer_rejects_architect_change_after_request_preparation(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            started = self._start(runtime)
+            draft = self._build_run_draft(
+                runtime,
+                workflow_id=started.workflow_id,
+                slide_count=2,
+                status="COMPLETED",
+                qa_status="PASS",
+                fail_count=0,
+                blocking_count=0,
+            )
+            blueprint_path = runtime / "architect" / "blueprint.json"
+            blueprint = json.loads(blueprint_path.read_text(encoding="utf-8"))
+            blueprint["slides"][0]["title"] = "Changed after approval"
+            blueprint_path.write_text(json.dumps(blueprint), encoding="utf-8")
+
+            with self.assertRaises(DeckCompilerError) as caught:
+                seal_codex_run_manifest(draft, runtime / "codex_run.json")
+            self.assertIn("Architect", caught.exception.message)
+
+    def test_sealer_rejects_serial_image_wave(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            started = self._start(runtime)
+            draft = self._build_run_draft(
+                runtime,
+                workflow_id=started.workflow_id,
+                slide_count=2,
+                status="COMPLETED",
+                qa_status="PASS",
+                fail_count=0,
+                blocking_count=0,
+            )
+            batch_path = (
+                runtime / "image_batches" / "image_generation_batch_manifest.json"
+            )
+            batch = json.loads(batch_path.read_text(encoding="utf-8"))
+            batch["waves"][0]["concurrent_dispatch"] = False
+            batch_path.write_text(json.dumps(batch), encoding="utf-8")
+            with self.assertRaises(DeckCompilerError) as caught:
+                seal_codex_run_manifest(draft, runtime / "codex_run.json")
+            self.assertIn("concurrent_dispatch", caught.exception.message)
+
+    def test_sealer_rejects_more_than_one_image_regeneration_per_slide(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            started = self._start(runtime)
+            draft = self._build_run_draft(
+                runtime,
+                workflow_id=started.workflow_id,
+                slide_count=1,
+                status="COMPLETED",
+                qa_status="PASS",
+                fail_count=0,
+                blocking_count=0,
+            )
+            payload = json.loads(draft.read_text(encoding="utf-8"))
+            payload["image_generation"]["slides"][0]["regeneration_count"] = 2
+            draft.write_text(json.dumps(payload), encoding="utf-8")
+
+            with self.assertRaises(DeckCompilerError) as caught:
+                seal_codex_run_manifest(draft, runtime / "codex_run.json")
+            self.assertIn("regeneration_count", caught.exception.message)
+
+    def test_sealer_rejects_duplicate_compile_on_zero_repair_fast_path(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            started = self._start(runtime)
+            draft = self._build_run_draft(
+                runtime,
+                workflow_id=started.workflow_id,
+                slide_count=2,
+                status="COMPLETED",
+                qa_status="PASS",
+                fail_count=0,
+                blocking_count=0,
+            )
+            timing_path = runtime / "execution_timing.json"
+            timing = json.loads(timing_path.read_text(encoding="utf-8"))
+            timing["full_deck_compile_count"] = 2
+            timing_path.write_text(json.dumps(timing), encoding="utf-8")
+
+            with self.assertRaises(DeckCompilerError) as caught:
+                seal_codex_run_manifest(draft, runtime / "codex_run.json")
+            self.assertIn("full_deck_compile_count", caught.exception.message)
+
+    def test_completed_repair_path_records_one_conditional_full_deck_recompile(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            started = self._start(runtime)
+            draft = self._build_run_draft(
+                runtime,
+                workflow_id=started.workflow_id,
+                slide_count=2,
+                status="COMPLETED",
+                qa_status="PASS",
+                fail_count=0,
+                blocking_count=0,
+                repair_iterations=1,
+            )
+            sealed = runtime / "codex_run.json"
+            payload = seal_codex_run_manifest(draft, sealed)
+            report = validate_codex_run_manifest(sealed)
+            self.assertTrue(report["completion_ready"], report)
+            self.assertEqual(
+                payload["reconstruction"]["execution_mode"],
+                "post_repair_recompile",
+            )
+            timing_path = runtime / payload["performance"]["timing_report"]["path"]
+            timing = json.loads(timing_path.read_text(encoding="utf-8"))
+            self.assertEqual(timing["full_deck_compile_count"], 2)
+
     def test_visual_blockers_return_needs_repair_and_repair_action(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             base = Path(tmpdir)
@@ -476,19 +727,20 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 validation,
             )
 
-    def test_skillset_plan_rejects_missing_final_full_deck_qa_mapping(self) -> None:
+    def test_skillset_plan_rejects_missing_full_deck_qa_mapping(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             runtime = Path(tmpdir) / "runtime"
             self._start(runtime)
             plan_path = runtime / "skillset_execution_plan.json"
             plan = json.loads(plan_path.read_text(encoding="utf-8"))
-            plan["command_templates"]["rasterize_final"].remove("--source-slides")
+            plan["command_templates"]["rasterize_full_deck"].remove("--source-slides")
             plan_path.write_text(json.dumps(plan), encoding="utf-8")
 
             issues = validate_skillset_execution_plan(plan_path)
             self.assertTrue(
                 any(
-                    "command rasterize_final is missing ['--source-slides']" in issue
+                    "command rasterize_full_deck is missing ['--source-slides']"
+                    in issue
                     for issue in issues
                 ),
                 issues,
@@ -596,9 +848,11 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
         qa_status: str,
         fail_count: int,
         blocking_count: int,
+        repair_iterations: int = 0,
     ) -> Path:
         architect = root / "architect"
         prompts = root / "image_requests"
+        image_batches = root / "image_batches"
         project = root / "pngtopptx-project"
         src = project / "src"
         sidecars = root / "semantic_sidecars"
@@ -610,6 +864,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
         for directory in (
             architect,
             prompts,
+            image_batches,
             src,
             sidecars,
             inspections,
@@ -625,6 +880,9 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             "blueprint": architect / "blueprint.json",
             "design_system": architect / "design_system.json",
             "approval_record": architect / "approval_record.json",
+            "request_manifest": prompts / "image_request_manifest.json",
+            "batch_manifest": image_batches / "image_generation_batch_manifest.json",
+            "timing": root / "execution_timing.json",
             "pptx": out / "deck-final-editable.pptx",
             "html": out / "deck-final-editable.html",
             "execution_plan": root / "skillset_execution_plan.json",
@@ -643,11 +901,82 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             "contact": qa / "contact_sheet.png",
             "inventory": out / "editability_inventory.md",
         }
-        for key in ("workflow_design", "blueprint", "design_system"):
-            files[key].write_text(
-                json.dumps({"artifact": key, "slide_count": slide_count}),
-                encoding="utf-8",
-            )
+        files["workflow_design"].write_text(
+            json.dumps(
+                {
+                    "schema_name": "pptx_architect_workflow_design",
+                    "schema_version": "1.0.0",
+                    "selected_workflow": "fixture-explainer",
+                    "reason": "Deterministic workflow fixture",
+                }
+            ),
+            encoding="utf-8",
+        )
+        files["blueprint"].write_text(
+            json.dumps(
+                {
+                    "schema_name": "pptx_architect_blueprint",
+                    "schema_version": "1.0.0",
+                    "deck_title": "Operational Readiness",
+                    "audience": "operators",
+                    "approved_visual_route_id": "academic-editorial",
+                    "slides": [
+                        {
+                            "slide_number": slide_number,
+                            "slide_id": f"slide-{slide_number:03d}",
+                            "purpose": f"Explain readiness topic {slide_number}",
+                            "title": f"Readiness Topic {slide_number}",
+                            "on_slide_copy": [
+                                f"Evidence-backed point {slide_number}",
+                                f"Action for operators {slide_number}",
+                            ],
+                            "layout_id": "editorial-evidence",
+                            "visual_direction": (
+                                "Use a clear editorial composition with a meaningful "
+                                "technical visual and structured supporting content."
+                            ),
+                            "evidence_refs": [f"evidence-{slide_number:03d}"],
+                            "presenter_notes": f"Explain the evidence for slide {slide_number}.",
+                        }
+                        for slide_number in range(1, slide_count + 1)
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
+        files["design_system"].write_text(
+            json.dumps(
+                {
+                    "schema_name": "pptx_architect_design_system",
+                    "schema_version": "1.0.0",
+                    "global_prompt_cues": [
+                        "confident typographic hierarchy",
+                        "coherent deck-wide color and shape language",
+                    ],
+                    "visual_routes": [
+                        {
+                            "route_id": "academic-editorial",
+                            "name": "Academic Editorial",
+                            "prompt_cues": [
+                                "credible academic information design",
+                                "professional but creative visual storytelling",
+                            ],
+                        }
+                    ],
+                    "layouts": [
+                        {
+                            "layout_id": "editorial-evidence",
+                            "name": "Editorial Evidence",
+                            "prompt_cues": [
+                                "strong entry point",
+                                "balanced evidence and visual regions",
+                            ],
+                        }
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
         files["approval_record"].write_text(
             json.dumps(
                 {
@@ -825,27 +1154,26 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                         "visualQaSummary": "out/visual_qa_summary_final.json",
                         "renderTrace": "out/render_trace.json",
                     },
-                    "limits": {"maxIterations": 10, "maxWaveSize": 5},
+                    "limits": {"maxIterations": 2, "maxWaveSize": 5},
                 }
             ),
             encoding="utf-8",
         )
 
+        prepared = prepare_image_requests(root)
+        self.assertEqual(prepared.slide_count, slide_count)
+        request_manifest = json.loads(
+            prepared.request_manifest_path.read_text(encoding="utf-8")
+        )
+        self.assertTrue(validate_image_request_bundle(root)["valid"])
+
         image_rows = []
-        for slide_number in range(1, slide_count + 1):
-            prompt = prompts / f"slide-{slide_number:03d}.prompt.json"
+        for request_row in request_manifest["slides"]:
+            slide_number = request_row["slide_number"]
+            prompt = root / request_row["prompt"]["path"]
             png = src / f"slide{slide_number}.png"
-            sidecar = sidecars / f"slide-{slide_number:03d}.semantic.json"
+            sidecar = root / request_row["semantic_sidecar"]["path"]
             inspection = inspections / f"slide-{slide_number:03d}.json"
-            prompt.write_text(
-                json.dumps(
-                    {
-                        "slide_number": slide_number,
-                        "prompt": f"Generate slide {slide_number} as a 16:9 reference.",
-                    }
-                ),
-                encoding="utf-8",
-            )
             self._write_png(
                 png,
                 1600,
@@ -856,22 +1184,26 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                     60 + slide_number,
                 ),
             )
-            sidecar.write_text(
-                json.dumps(
-                    {
-                        "slide_number": slide_number,
-                        "editable_text": [f"Slide {slide_number}"],
-                    }
-                ),
-                encoding="utf-8",
-            )
             inspection.write_text(
                 json.dumps({"status": "PASS", "slide_number": slide_number}),
                 encoding="utf-8",
             )
             image_rows.append(
                 {
-                    "slide_number": slide_number,
+                    **{
+                        key: request_row[key]
+                        for key in (
+                            "slide_number",
+                            "slide_id",
+                            "request_id",
+                            "blueprint_entry_sha256",
+                            "visual_route_id",
+                            "visual_route_sha256",
+                            "layout_id",
+                            "layout_sha256",
+                            "evidence_refs",
+                        )
+                    },
                     "prompt": self._artifact(root, prompt),
                     "source_png": self._artifact(root, png),
                     "semantic_sidecar": self._artifact(root, sidecar),
@@ -880,6 +1212,82 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                     "regeneration_count": 0,
                 }
             )
+
+        image_by_number = {row["slide_number"]: row for row in image_rows}
+        waves = []
+        for wave_number, start in enumerate(range(1, slide_count + 1, 20), start=1):
+            wave_slides = list(range(start, min(start + 19, slide_count) + 1))
+            waves.append(
+                {
+                    "wave_number": wave_number,
+                    "concurrent_dispatch": True,
+                    "slides": wave_slides,
+                    "initial_call_count": len(wave_slides),
+                    "regeneration_call_count": 0,
+                    "accepted_count": len(wave_slides),
+                    "calls": [
+                        {
+                            "slide_number": slide_number,
+                            "request_id": image_by_number[slide_number]["request_id"],
+                            "prompt_sha256": self._sha256(
+                                root
+                                / image_by_number[slide_number]["prompt"]["path"]
+                            ),
+                            "selected_png_sha256": self._sha256(
+                                root
+                                / image_by_number[slide_number]["source_png"]["path"]
+                            ),
+                            "status": "ACCEPTED",
+                            "attempt_count": 1,
+                        }
+                        for slide_number in wave_slides
+                    ],
+                }
+            )
+        files["batch_manifest"].write_text(
+            json.dumps(
+                {
+                    "schema_name": "image_generation_batch_manifest",
+                    "schema_version": "1.0.0",
+                    "platform_tool_id": "image_gen.imagegen",
+                    "batch_size": 20,
+                    "dispatch_mode": "concurrent_wave",
+                    "call_strategy": "one_independent_builtin_call_per_slide",
+                    "slide_count": slide_count,
+                    "initial_call_count": slide_count,
+                    "regeneration_call_count": 0,
+                    "accepted_count": slide_count,
+                    "waves": waves,
+                }
+            ),
+            encoding="utf-8",
+        )
+        files["timing"].write_text(
+            json.dumps(
+                {
+                    "schema_name": "pptx_generation_execution_timing",
+                    "schema_version": "1.0.0",
+                    "profile_name": "fast-quality-20",
+                    "slide_count": slide_count,
+                    "started_at": "2026-01-01T00:00:00Z",
+                    "completed_at": (
+                        "2026-01-01T00:20:00Z"
+                        if slide_count == 20
+                        else "2026-01-01T00:02:00Z"
+                    ),
+                    "total_seconds": 1200 if slide_count == 20 else 120,
+                    "image_generation_seconds": 900 if slide_count == 20 else 60,
+                    "reconstruction_seconds": 180 if slide_count == 20 else 30,
+                    "visual_qa_seconds": 120 if slide_count == 20 else 30,
+                    "full_deck_compile_count": 2 if repair_iterations else 1,
+                    "target_seconds_20_slides": 1800,
+                    "target_applicable": slide_count == 20,
+                    "target_met": True if slide_count == 20 else None,
+                    "quality_gates_take_precedence": True,
+                }
+            ),
+            encoding="utf-8",
+        )
 
         remaining_blocking = blocking_count
         for slide_number in range(1, slide_count + 1):
@@ -1043,7 +1451,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
 
         payload = {
             "schema_name": "codex_pptx_generation_run",
-            "schema_version": "2.1.0",
+            "schema_version": "2.3.0",
             "workflow_id": workflow_id,
             "status": status,
             "architect": {
@@ -1063,6 +1471,17 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 "platform_tool_id": "image_gen.imagegen",
                 "requested_slide_count": slide_count,
                 "completed_slide_count": slide_count,
+                "dispatch_profile": {
+                    "batch_size": 20,
+                    "dispatch_mode": "concurrent_wave",
+                    "call_strategy": "one_independent_builtin_call_per_slide",
+                    "initial_variants_per_slide": 1,
+                    "max_regenerations_per_slide": 1,
+                    "automatic_canary": False,
+                    "compile_after_all_images": True,
+                },
+                "request_manifest": self._artifact(root, files["request_manifest"]),
+                "batch_manifest": self._artifact(root, files["batch_manifest"]),
                 "slides": image_rows,
             },
             "reconstruction": {
@@ -1078,6 +1497,11 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                     "decision": "SKIPPED_WITH_REASON",
                     "reason": "fixture slides contain reviewed semantic text and need no inpainting",
                 },
+                "execution_mode": (
+                    "post_repair_recompile"
+                    if repair_iterations
+                    else "single_compile_fast_path"
+                ),
                 "quality_level": "polish",
                 "route_hardlock": "PASS",
                 "reconstruction_hardlock": "PASS",
@@ -1102,10 +1526,19 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 "fail_count": fail_count,
                 "blocking_count": blocking_count,
                 "needs_polish_count": 0,
-                "repair_iterations": 1,
+                "repair_iterations": repair_iterations,
                 "summary": self._artifact(root, files["summary"]),
                 "summary_markdown": self._artifact(root, files["summary_markdown"]),
                 "contact_sheet": self._artifact(root, files["contact"]),
+            },
+            "performance": {
+                "profile_name": "fast-quality-20",
+                "target_model": "gpt-5.6-sol",
+                "target_reasoning_effort": "medium",
+                "baseline_minutes_20_slides": 120,
+                "target_minutes_20_slides": 30,
+                "target_speedup": 4.0,
+                "timing_report": self._artifact(root, files["timing"]),
             },
             "delivery": {
                 "format": "editable_pptx",

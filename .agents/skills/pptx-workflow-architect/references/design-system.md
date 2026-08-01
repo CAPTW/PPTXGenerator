@@ -67,6 +67,11 @@ Never stop at vague adjectives. If the user says any of these, translate into ex
 
 Always specify: level of formality, density, editorial vs corporate tone, modern vs conservative feel, whitespace usage, title scale, contrast strategy, image dependence, data emphasis, icon style, chart style, section-divider behavior.
 
+For the default route, begin with **Academic, Informative, Professional &
+Creative Design**. Translate those qualities into a coherent system at the
+blueprint level, but keep each ImageGen request concise and content-adaptive.
+Do not turn this table into a long negative-prompt checklist.
+
 ---
 
 ## Master Design System Specification
@@ -130,15 +135,16 @@ Each slide should map to a named layout pattern unless there is a justified exce
 Use infographics only when they clarify the message faster than bullets, tables, or plain text.
 
 ### Principles
-- Every infographic must be **slide-native**, not poster-like
-- Design for the target slide frame from the beginning
-- Readability is the highest priority; decorative complexity is secondary
-- Never place a portrait infographic onto a landscape slide without redesigning
-- If dense or hard to read → redesign or split into multiple slides
-- Prefer one dominant idea per infographic
-- Use a clear reading path
-- Keep labels concise and scannable
-- Speaker notes carry nuance; the slide carries the core message
+- Design for the target slide frame and intended delivery context.
+- Choose density, hierarchy, and reading path to fit the content. Dense tables,
+  small meaningful labels, dashboards, card grids, and poster-influenced
+  infographic compositions are allowed when they are the clearest solution.
+- Adapt portrait or other source compositions thoughtfully when the slide ratio
+  differs; preserve meaning rather than applying a blanket style ban.
+- Split content only when the approved composition is genuinely illegible or
+  cannot be reconstructed as editable objects at the target size.
+- Speaker notes may carry supporting nuance, but the slide may contain as much
+  visible evidence as its purpose requires.
 
 ### Supported Types
 - Process / flow
@@ -179,16 +185,21 @@ Always design for the declared slide ratio first (typically 16:9).
 - Never solve fit problems by shrinking everything
 - Preserve safe margins and breathing room
 - Do not place critical labels too close to edges
-- When a visual is too dense: simplify first → split second → shrink last
-- For live presentations, optimize for rapid distance-view comprehension
+- When a visual is too dense for its declared use, adjust hierarchy, spacing,
+  scale, or slide count based on the content rather than a fixed element cap.
+- For live presentations, consider distance viewing; for read-ahead,
+  instructional, academic, and reference decks, allow greater useful density.
 
-### 3-Second Comprehension Test
+### Context-Aware Comprehension Check
 
-Every visual slide must pass:
-1. Is the main point obvious?
-2. Is the reading path obvious?
-3. Are labels scannable?
-4. Is anything competing with the main message?
+Review each slide against its intended use:
+1. Can the intended audience find the primary entry point?
+2. Does the reading path support the content structure?
+3. Are labels and evidence legible at the expected viewing distance or zoom?
+4. Is complexity purposeful rather than accidental?
+
+This is not a mandatory three-second test and does not require every slide to
+reduce itself to one message.
 
 ---
 

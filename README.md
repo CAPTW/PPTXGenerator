@@ -97,8 +97,10 @@ manifest plus `skillset_execution_plan.json`, scaffolds an isolated
 the repository-owned `.agents/skills/pptx-workflow-architect`, regardless of
 prompt wording or input channel.
 After approved Gates 1 and 2, the repo-owned Codex workflow calls
-`image_gen.imagegen` for every approved slide, runs the installed PNGtoPPTX
-orchestrator, and iterates visual-QA repair waves to zero blocking slides.
+`image_gen.imagegen` for every approved slide. The default `fast-quality-20`
+profile dispatches 20 independent built-in calls concurrently, then runs one
+all-slide PNGtoPPTX compile and one source-mapped full-deck QA pass. It enters
+targeted repair only when a blocking slide actually exists.
 
 `generate` fails closed before intake when any tracked Architect package file,
 required ImageGen/PNGtoPPTX Skill, or official script is absent. The execution
@@ -106,8 +108,10 @@ plan binds the four repository Architect files plus installed companion Skill
 and entrypoint hashes and spells out the tested companion path:
 conditional text-layer preprocessing, project-local Node dependencies, explicit
 crop plan/manifest, `slide-image-dual-render` reconstruction hardlocks,
-source-mapped PPTX/HTML visual QA, repair waves of at most five slides, and the
-final openability gate. Use `--skill-root <path>` only when the verified
+source-mapped PPTX/HTML visual QA, a single-compile fast path, repair waves of at
+most five slides only for blockers, and the final openability gate. The profile
+records a 120-to-30-minute target for 20 slides (approximately 4x) without
+weakening the quality gates. Use `--skill-root <path>` only when the verified
 ImageGen/PNGtoPPTX companions are not under `CODEX_HOME\skills` or
 `USERPROFILE\.codex\skills`; it never overrides the repository Architect.
 
@@ -180,11 +184,14 @@ See the [demo runbook](docs/devpost/PHASE_07_DEMO_RUNBOOK.md) and [runtime guide
 The general workflow has two explicit execution surfaces:
 
 - Repository Python captures inputs, emits the mandatory Architect-first Codex
-  dispatch, seals execution evidence, and validates completion. It does not
-  pretend to invoke a platform tool.
+  dispatch, deterministically derives all slide requests from the approved
+  Blueprint and Design System without another model call, seals execution
+  evidence, and validates completion. It does not pretend to invoke a platform
+  tool.
 - The live Codex Skill calls `image_gen.imagegen`, inspects and regenerates
-  slide images, runs the installed PNGtoPPTX SkillSet, and executes visual-QA
-  repair waves.
+  slide images in concurrent waves of up to 20, runs the installed PNGtoPPTX
+  SkillSet once across the accepted deck, and executes visual-QA repair waves
+  only for named blockers.
 
 The separate reproducible release demo still validates and consumes its frozen
 visual bundle without rerunning Image Generation. Generated slide PNGs are

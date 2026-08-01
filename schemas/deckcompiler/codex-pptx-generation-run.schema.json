@@ -13,6 +13,7 @@
     "image_generation",
     "reconstruction",
     "visual_qa",
+    "performance",
     "delivery",
     "content_hash"
   ],
@@ -21,7 +22,7 @@
       "const": "codex_pptx_generation_run"
     },
     "schema_version": {
-      "const": "2.1.0"
+      "const": "2.3.0"
     },
     "workflow_id": {
       "type": "string",
@@ -45,6 +46,9 @@
     },
     "visual_qa": {
       "$ref": "#/$defs/visualQa"
+    },
+    "performance": {
+      "$ref": "#/$defs/performance"
     },
     "delivery": {
       "$ref": "#/$defs/delivery"
@@ -144,6 +148,14 @@
       "additionalProperties": false,
       "required": [
         "slide_number",
+        "slide_id",
+        "request_id",
+        "blueprint_entry_sha256",
+        "visual_route_id",
+        "visual_route_sha256",
+        "layout_id",
+        "layout_sha256",
+        "evidence_refs",
         "prompt",
         "source_png",
         "semantic_sidecar",
@@ -156,6 +168,42 @@
           "type": "integer",
           "minimum": 1,
           "maximum": 400
+        },
+        "slide_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request_id": {
+          "type": "string",
+          "pattern": "^imagerequest_[0-9a-f]{20}$"
+        },
+        "blueprint_entry_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "visual_route_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "visual_route_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "layout_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "layout_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         },
         "prompt": {
           "$ref": "#/$defs/artifact"
@@ -174,7 +222,8 @@
         },
         "regeneration_count": {
           "type": "integer",
-          "minimum": 0
+          "minimum": 0,
+          "maximum": 1
         }
       }
     },
@@ -186,6 +235,9 @@
         "platform_tool_id",
         "requested_slide_count",
         "completed_slide_count",
+        "dispatch_profile",
+        "request_manifest",
+        "batch_manifest",
         "slides"
       ],
       "properties": {
@@ -205,6 +257,15 @@
           "minimum": 1,
           "maximum": 400
         },
+        "dispatch_profile": {
+          "$ref": "#/$defs/imageDispatchProfile"
+        },
+        "request_manifest": {
+          "$ref": "#/$defs/artifact"
+        },
+        "batch_manifest": {
+          "$ref": "#/$defs/artifact"
+        },
         "slides": {
           "type": "array",
           "minItems": 1,
@@ -223,6 +284,7 @@
         "renderer_skill",
         "companion_skills",
         "text_layer_preprocessing",
+        "execution_mode",
         "quality_level",
         "route_hardlock",
         "reconstruction_hardlock",
@@ -259,6 +321,9 @@
         },
         "text_layer_preprocessing": {
           "$ref": "#/$defs/textLayerPreprocessing"
+        },
+        "execution_mode": {
+          "enum": ["single_compile_fast_path", "post_repair_recompile"]
         },
         "quality_level": {
           "enum": [
@@ -350,7 +415,8 @@
         },
         "repair_iterations": {
           "type": "integer",
-          "minimum": 0
+          "minimum": 0,
+          "maximum": 2
         },
         "summary": {
           "$ref": "#/$defs/artifact"
@@ -361,6 +427,28 @@
         "contact_sheet": {
           "$ref": "#/$defs/artifact"
         }
+      }
+    },
+    "performance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile_name",
+        "target_model",
+        "target_reasoning_effort",
+        "baseline_minutes_20_slides",
+        "target_minutes_20_slides",
+        "target_speedup",
+        "timing_report"
+      ],
+      "properties": {
+        "profile_name": {"const": "fast-quality-20"},
+        "target_model": {"const": "gpt-5.6-sol"},
+        "target_reasoning_effort": {"const": "medium"},
+        "baseline_minutes_20_slides": {"const": 120},
+        "target_minutes_20_slides": {"const": 30},
+        "target_speedup": {"const": 4.0},
+        "timing_report": {"$ref": "#/$defs/artifact"}
       }
     },
     "delivery": {
@@ -385,6 +473,28 @@
         "editability_inventory": {
           "$ref": "#/$defs/artifact"
         }
+      }
+    },
+    "imageDispatchProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "batch_size",
+        "dispatch_mode",
+        "call_strategy",
+        "initial_variants_per_slide",
+        "max_regenerations_per_slide",
+        "automatic_canary",
+        "compile_after_all_images"
+      ],
+      "properties": {
+        "batch_size": {"const": 20},
+        "dispatch_mode": {"const": "concurrent_wave"},
+        "call_strategy": {"const": "one_independent_builtin_call_per_slide"},
+        "initial_variants_per_slide": {"const": 1},
+        "max_regenerations_per_slide": {"const": 1},
+        "automatic_canary": {"const": false},
+        "compile_after_all_images": {"const": true}
       }
     },
     "textLayerPreprocessing": {

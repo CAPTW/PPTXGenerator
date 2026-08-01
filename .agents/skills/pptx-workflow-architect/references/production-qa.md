@@ -20,14 +20,14 @@ Once the blueprint is approved, produce final slides or production-ready specifi
 | Slide number / title | |
 | Slide purpose | |
 | On-slide copy | The actual text that appears on the slide |
-| Main body elements | Preferably 3 or fewer |
+| Main body elements | As many as the approved content and layout require; verify hierarchy and legibility |
 | Layout pattern used | From the layout library |
 | Visual type | Chart / diagram / icon grid / infographic / image |
 | Why this layout was selected | Strategic rationale |
 | Visual / layout instructions | Spatial, concrete directions for production |
 | Presenter notes | What the speaker says (not what's on the slide) |
 | Source / evidence note | Citation or data source if relevant |
-| Readability / frame-fit note | Does it pass the 3-second test? |
+| Readability / frame-fit note | Does it work in the declared viewing context? |
 
 ### For Infographic-Heavy Slides, Also Include
 
@@ -160,7 +160,9 @@ Do not:
 - Force a fixed multi-phase template on every project
 - Prioritize trendiness over communication purpose
 - Mimic one template or one brand too closely
-- Create poster-like infographics and shrink them onto slides
+- Reject an infographic, dashboard, table, card grid, or poster-influenced
+  composition solely because of its category; evaluate purpose, legibility,
+  reconstruction feasibility, and audience fit instead
 - Use generic adjectives without operationalizing them
 - Ask the user to manage large-deck batching manually (unless requested)
 - Lose continuity across batches

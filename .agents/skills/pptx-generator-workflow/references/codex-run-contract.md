@@ -8,7 +8,7 @@ executed. It is not a request plan.
 ```json
 {
   "schema_name": "codex_pptx_generation_run",
-  "schema_version": "2.1.0",
+  "schema_version": "2.3.0",
   "workflow_id": "generate_...",
   "status": "COMPLETED"
 }
@@ -46,10 +46,23 @@ Record:
 - `skill_name: imagegen`;
 - `platform_tool_id: image_gen.imagegen`;
 - planned and completed slide counts;
+- the `fast-quality-20` dispatch profile;
+- a hash-bound `image_request_manifest.json` produced by the one-pass
+  deterministic Blueprint/Design-System adapter;
+- a hash-bound `image_generation_batch_manifest.json` proving deterministic
+  concurrent waves of at most 20 independent built-in calls;
 - one ordered slide record per blueprint slide.
 
-Each slide record contains the slide number, prompt, source PNG, Semantic
-Sidecar, inspection report, `inspection_status: PASS`, and regeneration count.
+Each slide record contains the slide number, stable slide/request IDs, Blueprint
+entry hash, visual-route/layout IDs and hashes, evidence references, Prompt,
+source PNG, Semantic Sidecar, inspection report, `inspection_status: PASS`, and
+regeneration count. The sealer rebuilds the expected Prompt and Sidecar from the
+current approved Architect package; independently authored or generic Prompts
+are rejected even when their files and SHA-256 values are internally valid.
+The batch manifest records one initial call per slide, at most one targeted
+regeneration for a failed slide, accepted coverage, request ID, Prompt SHA-256,
+and selected PNG SHA-256. For exactly 20 slides, the initial generation is one
+concurrent 20-call wave.
 
 ## Reconstruction record
 
@@ -59,6 +72,8 @@ Record:
 - `renderer_skill: slide-image-dual-render` and the exact three-companion
   Skill list;
 - the explicit execute/skip decision for `slide-text-layer-inpaint`;
+- `execution_mode: single_compile_fast_path` when no repairs were needed, or
+  `post_repair_recompile` after targeted repairs;
 - quality level;
 - route hardlock, reconstruction hardlock, and PPTX openability results;
 - final editable PPTX and standalone HTML;
@@ -69,6 +84,11 @@ Also hash-bind the intake-created `skillset_execution_plan.json`,
 plan and generated asset manifest, crop-coverage summary, and objective QA
 evidence summary. HTML is required because the approved renderer is the dual
 PPTX/HTML path.
+
+The normal path compiles all approved slide artifacts in one full-deck
+`--allow-large-batch` invocation and runs one source-mapped full-deck QA chain.
+It does not unconditionally repeat that compile. A second full-deck compile is
+valid only after recorded repair iterations.
 
 ## Visual QA record
 
@@ -82,6 +102,18 @@ Record:
   delivered PPTX/HTML, plus metrics hashes matching the selected source PNG and
   final render images;
 - `status: PASS` only when fail and blocking counts are zero.
+
+## Performance record
+
+Record the `fast-quality-20` target model (`gpt-5.6-sol`), reasoning effort
+(`medium`), 120-minute observed baseline, 30-minute target, approximate 4x
+target, and a hash-bound `execution_timing.json`. The timing report includes
+actual total/ImageGen/reconstruction/QA seconds and the full-deck compile count.
+It also records timezone-qualified start/completion timestamps whose span must
+match the reported total duration.
+For a zero-repair run that count must be one. The time target is measured and
+reported; it never overrides quality, hardlock, editability, or openability
+gates.
 
 ## Draft example
 

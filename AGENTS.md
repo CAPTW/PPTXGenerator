@@ -49,9 +49,26 @@ is outside this dispatch rule.
   `slide-text-layer-inpaint` decision, render only through
   `slide-image-dual-render/scripts/slide_pipeline.js`, gate with its
   `final_gate.js`, and run `slide-visual-polish-qa` with source-slide mapping.
-- Follow the hash-bound `skillset_execution_plan.json`; use project-local Node
-  dependencies, an explicit crop plan and generated asset manifest, waves of at
-  most five slides, renderer quality `reconstruction`, and QA mode `qa-polish`.
+- Follow the hash-bound `skillset_execution_plan.json`. Its default
+  `fast-quality-20` profile targets GPT-5.6 Sol at medium reasoning, prepares a
+  full image wave before dispatch, launches up to 20 independent built-in
+  ImageGen calls concurrently, and compiles all accepted slides in one
+  `--allow-large-batch` renderer invocation. Use project-local Node
+  dependencies, an explicit crop plan and generated asset manifest, renderer
+  quality `reconstruction`, and QA mode `qa-polish`.
+- After Architect approval, run `deckcompiler prepare-image-requests` once. It
+  must deterministically derive every Prompt and Semantic Sidecar from the
+  approved Blueprint and Design System, with no additional model call. Do not
+  hand-author a second prompt set or dispatch an unbound generic prompt.
+- Do not add unrequested hard prompt rules such as one-message-per-slide, three
+  body elements, a mandatory three-second test, or category bans on body copy,
+  tables, labels, dashboards, card grids, and infographic/poster compositions.
+  The default visual direction is Academic, Informative, Professional &
+  Creative Design, adapted to the approved content and user direction.
+- Do not run an unconditional second full-deck compile. If the first full-deck
+  gate and source-mapped QA pass with zero fail/blocking slides, seal that
+  output. Only blocker repairs may trigger a second full-deck compile; targeted
+  repair waves remain at most five slides and at most two iterations.
 - Do not use `--skip-crops` for final delivery. A zero-crop deck still carries
   `work/crop_plan.json` and `assets/manifest.json`.
 - Production acceptance requires route hardlock, reconstruction hardlock, PPTX

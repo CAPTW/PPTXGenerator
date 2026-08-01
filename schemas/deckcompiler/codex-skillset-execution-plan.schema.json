@@ -17,6 +17,7 @@
     "project_layout",
     "environment_template",
     "dependency_contract",
+    "execution_profile",
     "quality_contract",
     "crop_contract",
     "command_templates",
@@ -27,7 +28,7 @@
   ],
   "properties": {
     "schema_name": {"const": "codex_skillset_execution_plan"},
-    "schema_version": {"const": "1.2.0"},
+    "schema_version": {"const": "1.4.0"},
     "workflow_id": {"type": "string", "pattern": "^generate_[0-9a-f]{20}$"},
     "status": {"const": "READY"},
     "skill_root": {"type": "string", "minLength": 1},
@@ -92,6 +93,9 @@
       "required": [
         "project_root",
         "source_png_pattern",
+        "image_batch_manifest_path",
+        "image_request_manifest_path",
+        "timing_report_path",
         "semantic_sidecar_pattern",
         "per_slide_work_pattern",
         "profile_path",
@@ -103,6 +107,9 @@
       "properties": {
         "project_root": {"type": "string", "minLength": 1},
         "source_png_pattern": {"type": "string", "pattern": "slideN\\.png$"},
+        "image_batch_manifest_path": {"type": "string", "pattern": "image_generation_batch_manifest\\.json$"},
+        "image_request_manifest_path": {"type": "string", "pattern": "image_request_manifest\\.json$"},
+        "timing_report_path": {"type": "string", "pattern": "execution_timing\\.json$"},
         "semantic_sidecar_pattern": {"type": "string", "pattern": "slide-NNN\\.semantic\\.json$"},
         "per_slide_work_pattern": {"type": "string", "pattern": "slideXX$"},
         "profile_path": {"type": "string", "pattern": "active\\.json$"},
@@ -148,6 +155,79 @@
         "hidden_node_path_forbidden": {"const": true}
       }
     },
+    "execution_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile_name",
+        "target_model",
+        "target_reasoning_effort",
+        "default_design_direction",
+        "prompt_policy",
+        "image_generation",
+        "compilation",
+        "performance_target"
+      ],
+      "properties": {
+        "profile_name": {"const": "fast-quality-20"},
+        "target_model": {"const": "gpt-5.6-sol"},
+        "target_reasoning_effort": {"const": "medium"},
+        "default_design_direction": {
+          "const": ["Academic", "Informative", "Professional", "Creative"]
+        },
+        "prompt_policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "preserve_user_direction", "blanket_layout_bans_forbidden", "hard_numeric_density_caps_forbidden", "preparation_mode", "preparation_command", "additional_model_call_required", "architect_lineage_required"],
+          "properties": {
+            "mode": {"const": "concise_content_adaptive"},
+            "preserve_user_direction": {"const": true},
+            "blanket_layout_bans_forbidden": {"const": true},
+            "hard_numeric_density_caps_forbidden": {"const": true},
+            "preparation_mode": {"const": "single_deterministic_pass"},
+            "preparation_command": {"const": "deckcompiler prepare-image-requests --runtime <runtime>"},
+            "additional_model_call_required": {"const": false},
+            "architect_lineage_required": {"const": true}
+          }
+        },
+        "image_generation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["batch_size", "dispatch_mode", "call_strategy", "initial_variants_per_slide", "max_regenerations_per_slide", "automatic_canary", "compile_after_all_images"],
+          "properties": {
+            "batch_size": {"const": 20},
+            "dispatch_mode": {"const": "concurrent_wave"},
+            "call_strategy": {"const": "one_independent_builtin_call_per_slide"},
+            "initial_variants_per_slide": {"const": 1},
+            "max_regenerations_per_slide": {"const": 1},
+            "automatic_canary": {"const": false},
+            "compile_after_all_images": {"const": true}
+          }
+        },
+        "compilation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["single_full_deck_invocation", "unconditional_second_full_compile", "post_repair_recompile_only"],
+          "properties": {
+            "single_full_deck_invocation": {"const": true},
+            "unconditional_second_full_compile": {"const": false},
+            "post_repair_recompile_only": {"const": true}
+          }
+        },
+        "performance_target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["baseline_minutes_20_slides", "target_minutes_20_slides", "target_speedup", "measurement_required", "quality_gates_take_precedence"],
+          "properties": {
+            "baseline_minutes_20_slides": {"const": 120},
+            "target_minutes_20_slides": {"const": 30},
+            "target_speedup": {"const": 4.0},
+            "measurement_required": {"const": true},
+            "quality_gates_take_precedence": {"const": true}
+          }
+        }
+      }
+    },
     "quality_contract": {
       "type": "object",
       "additionalProperties": false,
@@ -155,13 +235,14 @@
         "orchestrator_quality_level",
         "renderer_quality",
         "visual_qa_mode",
-        "max_wave_size",
+        "max_repair_wave_size",
         "route_hardlock_required",
         "reconstruction_hardlock_required",
         "pptx_openability_required",
         "zero_fail_required",
         "zero_blocking_required",
-        "initial_full_deck_qa_required",
+        "single_full_deck_fast_path_required",
+        "unconditional_second_full_deck_compile_forbidden",
         "final_full_deck_qa_required",
         "source_slide_mapping_required",
         "full_slide_source_raster_forbidden"
@@ -170,13 +251,14 @@
         "orchestrator_quality_level": {"const": "polish"},
         "renderer_quality": {"const": "reconstruction"},
         "visual_qa_mode": {"const": "qa-polish"},
-        "max_wave_size": {"const": 5},
+        "max_repair_wave_size": {"const": 5},
         "route_hardlock_required": {"const": true},
         "reconstruction_hardlock_required": {"const": true},
         "pptx_openability_required": {"const": true},
         "zero_fail_required": {"const": true},
         "zero_blocking_required": {"const": true},
-        "initial_full_deck_qa_required": {"const": true},
+        "single_full_deck_fast_path_required": {"const": true},
+        "unconditional_second_full_deck_compile_forbidden": {"const": true},
         "final_full_deck_qa_required": {"const": true},
         "source_slide_mapping_required": {"const": true},
         "full_slide_source_raster_forbidden": {"const": true}
@@ -209,13 +291,13 @@
         "install_hardlock",
         "plan_orchestration",
         "prepare_crops",
-        "initial_reconstruction",
-        "initial_gate",
-        "rasterize_initial",
-        "capture_initial_html",
-        "compare_initial",
-        "summarize_initial",
-        "enforce_initial_qa",
+        "compile_full_deck",
+        "gate_full_deck",
+        "rasterize_full_deck",
+        "capture_full_html",
+        "compare_full_deck",
+        "summarize_full_deck",
+        "enforce_full_deck_qa",
         "reconstruct_wave",
         "gate_wave",
         "rasterize_wave",
@@ -226,13 +308,6 @@
         "summarize_backlog",
         "make_repair_wave_plan",
         "generate_repair_prompt",
-        "final_reconstruction",
-        "final_gate",
-        "rasterize_final",
-        "capture_final_html",
-        "compare_final",
-        "summarize_final",
-        "enforce_final_qa",
         "enforce_orchestration_state",
         "seal_codex_run",
         "register_completion"
@@ -242,13 +317,13 @@
         "install_hardlock": {"$ref": "#/$defs/command"},
         "plan_orchestration": {"$ref": "#/$defs/command"},
         "prepare_crops": {"$ref": "#/$defs/command"},
-        "initial_reconstruction": {"$ref": "#/$defs/command"},
-        "initial_gate": {"$ref": "#/$defs/command"},
-        "rasterize_initial": {"$ref": "#/$defs/command"},
-        "capture_initial_html": {"$ref": "#/$defs/command"},
-        "compare_initial": {"$ref": "#/$defs/command"},
-        "summarize_initial": {"$ref": "#/$defs/command"},
-        "enforce_initial_qa": {"$ref": "#/$defs/command"},
+        "compile_full_deck": {"$ref": "#/$defs/command"},
+        "gate_full_deck": {"$ref": "#/$defs/command"},
+        "rasterize_full_deck": {"$ref": "#/$defs/command"},
+        "capture_full_html": {"$ref": "#/$defs/command"},
+        "compare_full_deck": {"$ref": "#/$defs/command"},
+        "summarize_full_deck": {"$ref": "#/$defs/command"},
+        "enforce_full_deck_qa": {"$ref": "#/$defs/command"},
         "reconstruct_wave": {"$ref": "#/$defs/command"},
         "gate_wave": {"$ref": "#/$defs/command"},
         "rasterize_wave": {"$ref": "#/$defs/command"},
@@ -259,13 +334,6 @@
         "summarize_backlog": {"$ref": "#/$defs/command"},
         "make_repair_wave_plan": {"$ref": "#/$defs/command"},
         "generate_repair_prompt": {"$ref": "#/$defs/command"},
-        "final_reconstruction": {"$ref": "#/$defs/command"},
-        "final_gate": {"$ref": "#/$defs/command"},
-        "rasterize_final": {"$ref": "#/$defs/command"},
-        "capture_final_html": {"$ref": "#/$defs/command"},
-        "compare_final": {"$ref": "#/$defs/command"},
-        "summarize_final": {"$ref": "#/$defs/command"},
-        "enforce_final_qa": {"$ref": "#/$defs/command"},
         "enforce_orchestration_state": {"$ref": "#/$defs/command"},
         "seal_codex_run": {"$ref": "#/$defs/command"},
         "register_completion": {"$ref": "#/$defs/command"}
@@ -276,12 +344,14 @@
       "additionalProperties": false,
       "required": [
         "setup",
-        "initial_full_deck",
+        "single_compile_fast_path",
+        "fast_path_acceptance",
         "repair_wave_loop",
-        "final_full_deck",
+        "post_repair_recompile",
         "completion",
         "repair_exit_codes",
-        "max_repair_iterations"
+        "max_repair_iterations",
+        "unconditional_second_full_compile"
       ],
       "properties": {
         "setup": {
@@ -292,18 +362,18 @@
             "prepare_crops"
           ]
         },
-        "initial_full_deck": {
+        "single_compile_fast_path": {
           "const": [
-            "initial_reconstruction",
-            "initial_gate",
-            "rasterize_initial",
-            "capture_initial_html",
-            "compare_initial",
-            "summarize_initial",
-            "enforce_initial_qa",
-            "summarize_backlog"
+            "compile_full_deck",
+            "gate_full_deck",
+            "rasterize_full_deck",
+            "capture_full_html",
+            "compare_full_deck",
+            "summarize_full_deck",
+            "enforce_full_deck_qa"
           ]
         },
+        "fast_path_acceptance": {"const": ["enforce_orchestration_state"]},
         "repair_wave_loop": {
           "const": [
             "make_repair_wave_plan",
@@ -318,15 +388,15 @@
             "summarize_backlog"
           ]
         },
-        "final_full_deck": {
+        "post_repair_recompile": {
           "const": [
-            "final_reconstruction",
-            "final_gate",
-            "rasterize_final",
-            "capture_final_html",
-            "compare_final",
-            "summarize_final",
-            "enforce_final_qa",
+            "compile_full_deck",
+            "gate_full_deck",
+            "rasterize_full_deck",
+            "capture_full_html",
+            "compare_full_deck",
+            "summarize_full_deck",
+            "enforce_full_deck_qa",
             "enforce_orchestration_state"
           ]
         },
@@ -334,17 +404,18 @@
         "repair_exit_codes": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["enforce_initial_qa", "enforce_wave_qa", "enforce_final_qa"],
+          "required": ["enforce_full_deck_qa_fast_path", "enforce_wave_qa", "enforce_full_deck_qa_post_repair"],
           "properties": {
-            "enforce_initial_qa": {"const": [0, 1]},
+            "enforce_full_deck_qa_fast_path": {"const": [0, 1]},
             "enforce_wave_qa": {"const": [0, 1]},
-            "enforce_final_qa": {"const": [0]}
+            "enforce_full_deck_qa_post_repair": {"const": [0]}
           }
         },
-        "max_repair_iterations": {"const": 10}
+        "max_repair_iterations": {"const": 2},
+        "unconditional_second_full_compile": {"const": false}
       }
     },
-    "required_artifacts": {"type": "array", "minItems": 12, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "required_artifacts": {"type": "array", "minItems": 13, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
     "stop_conditions": {
       "type": "object",
       "additionalProperties": false,

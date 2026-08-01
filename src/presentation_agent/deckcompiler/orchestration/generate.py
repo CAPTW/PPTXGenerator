@@ -121,6 +121,7 @@ def start_generate_workflow(
             workflow_id,
             input_contract,
             skillset=skillset,
+            execution_profile=execution_plan["execution_profile"],
         )
         dispatch_path = write_json(root / DISPATCH_NAME, dispatch)
         runbook_path = root / RUNBOOK_NAME
@@ -338,10 +339,11 @@ def _dispatch_payload(
     input_contract: dict[str, Any],
     *,
     skillset: dict[str, Any],
+    execution_profile: dict[str, Any],
 ) -> dict[str, Any]:
     payload = {
         "schema_name": "pptx_generator_codex_dispatch",
-        "schema_version": "1.1.0",
+        "schema_version": "1.3.0",
         "workflow_id": workflow_id,
         "input_contract": input_contract,
         "skillset_execution_plan": PLAN_NAME,
@@ -350,6 +352,7 @@ def _dispatch_payload(
             "repository_skill_root": skillset["repository_skill_root"],
             "external_skill_root": skillset["skill_root"],
         },
+        "execution_profile": execution_profile,
         "skill_sequence": [
             {
                 **row,
@@ -365,9 +368,18 @@ def _dispatch_payload(
                     if row["skill_name"] == "pptx-workflow-architect"
                     else {
                         "platform_tool_id": "image_gen.imagegen",
+                        "request_preparation": (
+                            "deckcompiler prepare-image-requests --runtime <runtime>"
+                        ),
+                        "request_manifest": (
+                            "image_requests/image_request_manifest.json"
+                        ),
                         "required_coverage": (
                             "one inspected selected PNG per approved slide"
                         ),
+                        "dispatch_mode": "concurrent_wave",
+                        "batch_size": 20,
+                        "call_strategy": "one_independent_builtin_call_per_slide",
                     }
                     if row["skill_name"] == "imagegen"
                     else {
@@ -407,28 +419,43 @@ Workflow ID: `{workflow_id}`
 3. Read `.agents/skills/pptx-generator-workflow/SKILL.md` and the installed
    ImageGen plus four PNGtoPPTX companion Skills listed in
    `skillset_execution_plan.json`.
-4. Call `image_gen.imagegen` for every approved slide; inspect and iterate.
-5. Save selected references as `pngtopptx-project/src/slideN.png` and preserve
-   exact editable copy in the matching Semantic Sidecar.
-6. Materialize `styles/active.json`, `lib/slides.js`, and per-slide worker
+4. Persist the approved Architect JSON package, then run
+   `deckcompiler prepare-image-requests --runtime <runtime>` exactly once. This
+   deterministic, no-model-call adapter creates every Prompt and Semantic
+   Sidecar from the approved Blueprint and Design System and writes their
+   hash-bound lineage manifest. Do not hand-author or summarize the prompts a
+   second time. The concise default direction is `Academic, Informative,
+   Professional, Creative`; preserve the approved route without blanket layout
+   bans, a hard element-count cap, or a mandatory three-second rule.
+5. Dispatch up to 20 independent built-in `image_gen.imagegen` calls as one
+   concurrent wave. This is still one platform call per slide, not a mock,
+   repository CLI fallback, or one multi-image API call. For a 20-slide deck,
+   dispatch all 20 initial calls together. Retry only a failed slide, at most
+   once; never restart the whole wave.
+6. Inspect every selected result, save it as
+   `pngtopptx-project/src/slideN.png`, preserve exact editable copy in the
+   matching Semantic Sidecar, and write
+   `image_batches/image_generation_batch_manifest.json`.
+7. Materialize `styles/active.json`, `lib/slides.js`, and per-slide worker
    artifacts. Record an explicit execute/skip decision for
    `slide-text-layer-inpaint`.
-7. Execute the plan's `setup` and `initial_full_deck` sequences exactly: install
-   project-local Node dependencies and hardlock, prepare the explicit crop
-   plan/manifest, build and gate the initial all-slide PPTX/HTML, then run all
-   five `slide-visual-polish-qa` steps with `--source-slides`.
-8. Use the initial full-deck summary to create the backlog. Execute the plan's
-   `repair_wave_loop` in waves of at most five slides, including source-mapped
-   PPTX/HTML QA after every rebuild. Exit code 1 from the initial/wave QA gate
-   means `NEEDS_REPAIR`, not permission to skip the repair loop.
-9. Repeat repair waves until fail/blocking count is zero or the iteration cap
-   is reached. Never use a full-slide source PNG as the delivered slide surface.
-10. Execute the complete `final_full_deck` sequence exactly: all-slide
-   hardlocked reconstruction, final gate, PPTX rasterization, HTML capture,
-   comparison, JSON/Markdown summary, final QA enforcement, and orchestration
-   state enforcement. The final raster/capture metadata must bind to the hashes
-   of `deck-final-editable.pptx` and `deck-final-editable.html`.
-11. Seal `codex_run.json` and register it with `deckcompiler generate --resume`.
+8. Wait until every approved image and per-slide reconstruction artifact exists,
+   then execute `setup` and `single_compile_fast_path`: one all-slide
+   `slide_pipeline.js --allow-large-batch` invocation, one final gate, and one
+   source-mapped full-deck Visual QA chain. Its output names are already the
+   final PPTX/HTML names.
+9. If that full-deck QA has zero fail/blocking slides, do not run a second full
+   compile or duplicate QA pass; execute `fast_path_acceptance` and seal it. If
+   QA fails, skip fast-path acceptance, repair only named blocking slides in
+   waves of at most five, for no more than two iterations, then execute
+   `post_repair_recompile` once and rerun the full-deck gate/QA.
+10. Never use a full-slide source PNG as the delivered slide surface. Keep
+    `qa-polish`, hardlocks, openability, editability evidence, and zero
+    fail/blocking acceptance unchanged.
+11. Write `execution_timing.json`, seal `codex_run.json`, and register it with
+    `deckcompiler generate --resume`. For 20 slides, record the 120-minute
+    baseline, 30-minute target, actual duration, and whether the approximate
+    4x target was met; quality gates always take precedence over the time target.
 
 `skillset_execution_plan.json` is hash-bound and contains the exact installed
 Skill paths, official script hashes, environment, command templates, artifact
@@ -489,15 +516,30 @@ def _bind_codex_run_artifacts(
         "platform_tool_id": payload["image_generation"]["platform_tool_id"],
         "requested_slide_count": payload["image_generation"]["requested_slide_count"],
         "completed_slide_count": payload["image_generation"]["completed_slide_count"],
+        "dispatch_profile": payload["image_generation"]["dispatch_profile"],
     }
     image["artifacts"] = [
         _run_artifact_reference(
             root,
             base,
-            row["source_png"],
-            f"imagegen_slide_{row['slide_number']:03d}",
-        )
-        for row in payload["image_generation"]["slides"]
+            payload["image_generation"]["request_manifest"],
+            "image_request_manifest",
+        ),
+        _run_artifact_reference(
+            root,
+            base,
+            payload["image_generation"]["batch_manifest"],
+            "image_generation_batch_manifest",
+        ),
+        *[
+            _run_artifact_reference(
+                root,
+                base,
+                row["source_png"],
+                f"imagegen_slide_{row['slide_number']:03d}",
+            )
+            for row in payload["image_generation"]["slides"]
+        ],
     ]
 
     reconstruction["status"] = "COMPLETED"
@@ -615,7 +657,11 @@ def _bind_codex_run_artifacts(
 
     delivery["status"] = "COMPLETED" if payload["status"] == "COMPLETED" else "PENDING"
     delivery["required_action"] = None
-    delivery["details"] = {"format": payload["delivery"]["format"]}
+    delivery["details"] = {
+        "format": payload["delivery"]["format"],
+        "performance_profile": payload["performance"]["profile_name"],
+        "target_minutes_20_slides": payload["performance"]["target_minutes_20_slides"],
+    }
     delivery["artifacts"] = [
         _artifact_reference(root, run_path, "sealed_codex_run_manifest"),
         _run_artifact_reference(
@@ -626,6 +672,12 @@ def _bind_codex_run_artifacts(
             base,
             payload["delivery"]["editability_inventory"],
             "editability_inventory",
+        ),
+        _run_artifact_reference(
+            root,
+            base,
+            payload["performance"]["timing_report"],
+            "execution_timing",
         ),
     ]
     if payload["delivery"]["html"] is not None:

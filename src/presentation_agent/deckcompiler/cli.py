@@ -19,6 +19,10 @@ from .orchestration.generate import (
     start_generate_workflow,
     validate_generate_workflow,
 )
+from .orchestration.image_requests import (
+    prepare_image_requests,
+    validate_image_request_bundle,
+)
 from .orchestration.phase3_runner import run_phase3
 from .pngtopptx_pinning import (
     PinningError,
@@ -98,6 +102,21 @@ def build_parser() -> argparse.ArgumentParser:
         help="Validate a resumable general generate workflow manifest.",
     )
     validate_generate.add_argument("path", type=Path)
+
+    prepare_image_requests_parser = subparsers.add_parser(
+        "prepare-image-requests",
+        help=(
+            "Deterministically derive all ImageGen prompts and Semantic Sidecars "
+            "from an approved Architect package without another model call."
+        ),
+    )
+    prepare_image_requests_parser.add_argument("--runtime", type=Path, required=True)
+
+    validate_image_requests_parser = subparsers.add_parser(
+        "validate-image-requests",
+        help="Validate Blueprint/Design-System lineage for prepared ImageGen requests.",
+    )
+    validate_image_requests_parser.add_argument("--runtime", type=Path, required=True)
 
     seal_codex_run = subparsers.add_parser(
         "seal-codex-run",
@@ -306,6 +325,23 @@ def main(argv: list[str] | None = None) -> int:
         except (DeckCompilerError, OSError, ValueError, json.JSONDecodeError) as exc:
             print(f"DECKCOMPILER_GENERATE_MANIFEST_INVALID {exc}")
             return 1
+        print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0 if report["valid"] else 1
+    if args.command == "prepare-image-requests":
+        try:
+            result = prepare_image_requests(args.runtime)
+        except (DeckCompilerError, OSError, ValueError, json.JSONDecodeError) as exc:
+            code = getattr(exc, "code", "DC_IMAGE_REQUEST_PREPARATION_FAILED")
+            print(f"DECKCOMPILER_IMAGE_REQUESTS_BLOCKED code={code} message={exc}")
+            return 1
+        print(
+            "DECKCOMPILER_IMAGE_REQUESTS_READY "
+            f"workflow_id={result.workflow_id} slides={result.slide_count} "
+            f"manifest={result.request_manifest_path.as_posix()}"
+        )
+        return 0
+    if args.command == "validate-image-requests":
+        report = validate_image_request_bundle(args.runtime)
         print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
         return 0 if report["valid"] else 1
     if args.command == "seal-codex-run":

@@ -1,6 +1,27 @@
 {
   "schema_name": "pptx_generator_codex_skill_dependencies",
-  "schema_version": "1.2.0",
+  "schema_version": "1.4.0",
+  "execution_profile": {
+    "name": "fast-quality-20",
+    "target_model": "gpt-5.6-sol",
+    "target_reasoning_effort": "medium",
+    "default_design_direction": [
+      "Academic",
+      "Informative",
+      "Professional",
+      "Creative"
+    ],
+    "image_generation_batch_size": 20,
+    "image_generation_dispatch": "concurrent_wave",
+    "full_deck_compile_mode": "single_compile_fast_path",
+    "unconditional_second_full_compile": false,
+    "node_install_mode": "prefer_offline_no_audit_no_fund_once_per_run",
+    "max_repair_iterations": 2,
+    "baseline_minutes_20_slides": 120,
+    "target_minutes_20_slides": 30,
+    "target_speedup": 4.0,
+    "image_request_preparation": "single_deterministic_pass_no_model_call"
+  },
   "ordered_dependencies": [
     {
       "invocation_order": 1,
@@ -23,7 +44,12 @@
       "invocation_order": 2,
       "skill_name": "imagegen",
       "skill_path": "${CODEX_HOME}/skills/.system/imagegen/SKILL.md",
-      "platform_tool_id": "image_gen.imagegen"
+      "platform_tool_id": "image_gen.imagegen",
+      "call_strategy": "one_independent_builtin_call_per_slide",
+      "dispatch_mode": "concurrent_wave",
+      "batch_size": 20,
+      "max_regenerations_per_slide": 1,
+      "request_manifest": "image_requests/image_request_manifest.json"
     },
     {
       "invocation_order": 3,
@@ -63,7 +89,9 @@
     "pptx_openability": "PASS",
     "exact_skillset_execution_plan": "PASS",
     "explicit_crop_plan_and_manifest": "PASS",
-    "initial_full_deck_visual_qa": "PASS",
+    "image_generation_batch_manifest": "PASS",
+    "architect_to_image_request_lineage": "PASS",
+    "single_compile_fast_path_or_conditional_post_repair_recompile": "PASS",
     "source_mapped_visual_qa": "PASS",
     "final_full_deck_visual_qa": "PASS",
     "final_visual_qa_output_hash_binding": "PASS",

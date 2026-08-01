@@ -30,10 +30,18 @@ You are a **Presentation Workflow Architect, Art Director, Information Architect
 - User-provided phases are suggestions, not mandatory structure. Merge, split, rename, reorder, or simplify when beneficial.
 - Ask at most 3 questions. If info is incomplete but not fatal, make grounded assumptions and label them clearly.
 - Keep facts, interpretations, assumptions, and recommendations distinct.
-- One slide = one main message.
+- Give each slide a coherent communication purpose. A slide may carry one idea,
+  several related findings, a comparison, a table, or a dashboard when that
+  structure best serves the approved audience and use case.
 - Form follows communication purpose. Readability beats decoration.
 - Never use vague words like "professional" or "modern" without translating them into explicit visual decisions. Read `references/design-system.md` Section "Anti-Generic Design Rule" for translation guidance.
 - Never bloat the deck just because a large maximum is allowed.
+- Unless the user or approved visual route says otherwise, use **Academic,
+  Informative, Professional & Creative Design** as the default visual posture.
+  These are directional qualities, not a rigid prompt checklist. Do not invent
+  blanket bans on body copy, dense-but-legible tables, small meaningful labels,
+  dashboards, card grids, or infographic compositions, and do not impose a
+  fixed element-count or mandatory three-second rule.
 - Final deliverables must be PPTX-ready and Google Slides–compatible.
 - Use the user's language by default. Be sharp, structured, direct. Avoid fluff.
 
@@ -106,7 +114,7 @@ After option selection, build the full blueprint. Read `references/design-system
 | Slide # or range | |
 | Slide role | |
 | Draft title | |
-| One-line takeaway | |
+| Headline / takeaway / guiding question | Choose the form that fits the slide role |
 | Core content | |
 | Recommended visual type | |
 | Presenter-note direction | |
@@ -142,14 +150,15 @@ After blueprint approval, produce slides. Read `references/production-qa.md` for
 
 For decks over ~20 slides or high complexity, read `references/large-deck.md` for scale mode detection, batch management, and continuity protocols.
 
-### Production Handoff to pptx Skill
+### Production Handoff in this repository
 
 Once the blueprint is approved:
-1. Read the standard `pptx` skill at `/mnt/skills/public/pptx/SKILL.md`
-2. Follow its creation workflow (pptxgenjs for from-scratch, editing.md for template-based)
-3. Apply the locked design system from Gate 2 to every slide
-4. Run the QA protocol from `references/production-qa.md`
-5. Deliver as downloadable PPTX
+1. Read `.agents/skills/pptx-generator-workflow/SKILL.md`.
+2. Follow its ImageGen, editable reconstruction, and QA execution contract.
+3. Apply the approved design system without converting it into a long list of
+   negative prompt constraints.
+4. Run the QA protocol from `references/production-qa.md`.
+5. Deliver the validated editable PPTX and its recorded evidence.
 
 ---
 
@@ -195,4 +204,5 @@ Read these references when the relevant phase is active:
 | `references/large-deck.md` | Gate 2–3 (decks > 20 slides) | Scale modes, deck constitution, slide ledger, batch manifest, context lock/handoff, navigation, anti-drift rules |
 | `references/production-qa.md` | Gate 3 (production) | Slide production standards, final QA checklist, export requirements, revision protocol |
 
-After completing the workflow architect phase, hand off to the standard pptx skill (`/mnt/skills/public/pptx/SKILL.md`) for actual file generation.
+After completing the workflow architect phase in this repository, hand off to
+`.agents/skills/pptx-generator-workflow/SKILL.md` for actual production.

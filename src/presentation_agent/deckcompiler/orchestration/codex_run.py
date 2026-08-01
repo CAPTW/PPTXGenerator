@@ -7,6 +7,7 @@ import json
 import re
 import zipfile
 from collections.abc import Iterator
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -14,6 +15,7 @@ from ..errors import DeckCompilerError
 from ..identity import content_sha256
 from ..manifest_io import read_json, write_json
 from ..schemas import validator_for
+from .image_requests import validate_image_request_bundle
 from .skillset_plan import validate_skillset_execution_plan
 
 
@@ -151,6 +153,16 @@ def validate_codex_run_manifest_payload(
         )
     if len({row["source_png"]["sha256"] for row in image["slides"]}) != slide_count:
         issues.append("selected source PNG hashes must be unique per slide")
+    if qa["repair_iterations"] == 0:
+        if reconstruction["execution_mode"] != "single_compile_fast_path":
+            issues.append(
+                "zero-repair run must use reconstruction.execution_mode "
+                "single_compile_fast_path"
+            )
+    elif reconstruction["execution_mode"] != "post_repair_recompile":
+        issues.append(
+            "repaired run must use reconstruction.execution_mode post_repair_recompile"
+        )
 
     issues.extend(
         _execution_artifact_issues(
@@ -211,6 +223,12 @@ def _artifact_references(
 
     image = payload.get("image_generation")
     if isinstance(image, dict):
+        request_manifest = image.get("request_manifest")
+        if isinstance(request_manifest, dict):
+            yield "image_generation.request_manifest", request_manifest
+        batch_manifest = image.get("batch_manifest")
+        if isinstance(batch_manifest, dict):
+            yield "image_generation.batch_manifest", batch_manifest
         slides = image.get("slides")
         if isinstance(slides, list):
             for index, slide in enumerate(slides):
@@ -251,6 +269,12 @@ def _artifact_references(
             value = visual_qa.get(key)
             if isinstance(value, dict):
                 yield f"visual_qa.{key}", value
+
+    performance = payload.get("performance")
+    if isinstance(performance, dict):
+        timing_report = performance.get("timing_report")
+        if isinstance(timing_report, dict):
+            yield "performance.timing_report", timing_report
 
     delivery = payload.get("delivery")
     if isinstance(delivery, dict):
@@ -301,6 +325,44 @@ def _execution_artifact_issues(
     for key in ("workflow_design", "blueprint", "design_system", "approval_record"):
         _json_object(artifacts.get(f"architect.{key}"), f"architect.{key}", issues)
 
+    request_manifest_path = artifacts.get("image_generation.request_manifest")
+    request_manifest = _json_object(
+        request_manifest_path,
+        "image_generation.request_manifest",
+        issues,
+    )
+    if request_manifest_path is not None:
+        runtime_root = request_manifest_path.resolve().parent.parent
+        request_report = validate_image_request_bundle(
+            runtime_root,
+            request_manifest_path,
+        )
+        issues.extend(
+            f"image_generation.request_manifest: {issue}"
+            for issue in request_report["issues"]
+        )
+        if request_manifest is not None:
+            _validate_image_request_run_linkage(
+                request_manifest,
+                payload["image_generation"],
+                artifacts,
+                runtime_root,
+                issues,
+            )
+
+    batch_manifest = _json_object(
+        artifacts.get("image_generation.batch_manifest"),
+        "image_generation.batch_manifest",
+        issues,
+    )
+    if batch_manifest is not None:
+        _validate_image_batch_manifest(
+            batch_manifest,
+            payload["image_generation"],
+            slide_count,
+            issues,
+        )
+
     source_dimensions: list[tuple[int, int]] = []
     for index, slide in enumerate(payload["image_generation"]["slides"]):
         prefix = f"image_generation.slides[{index}]"
@@ -343,6 +405,19 @@ def _execution_artifact_issues(
         for width, height in source_dimensions:
             if abs((width / height) - (16 / 9)) > 0.02:
                 issues.append(f"selected source PNG must be 16:9, got {width}x{height}")
+
+    timing_report = _json_object(
+        artifacts.get("performance.timing_report"),
+        "performance.timing_report",
+        issues,
+    )
+    if timing_report is not None:
+        _validate_timing_report(
+            timing_report,
+            payload["reconstruction"]["execution_mode"],
+            slide_count,
+            issues,
+        )
 
     pptx_path = artifacts.get("reconstruction.output_pptx")
     _validate_pptx_package(pptx_path, slide_count, issues)
@@ -513,6 +588,275 @@ def _json_object(
     return value
 
 
+def _validate_image_request_run_linkage(
+    manifest: dict[str, Any],
+    image: dict[str, Any],
+    artifacts: dict[str, Path],
+    runtime_root: Path,
+    issues: list[str],
+) -> None:
+    """Bind sealed run rows to the deterministic Architect-derived request rows."""
+
+    request_rows = manifest.get("slides")
+    image_rows = image.get("slides")
+    if not isinstance(request_rows, list) or not isinstance(image_rows, list):
+        return
+    if len(request_rows) != len(image_rows):
+        issues.append(
+            "image_generation.request_manifest slide count does not match run slides"
+        )
+        return
+    lineage_fields = (
+        "slide_number",
+        "slide_id",
+        "request_id",
+        "blueprint_entry_sha256",
+        "visual_route_id",
+        "visual_route_sha256",
+        "layout_id",
+        "layout_sha256",
+        "evidence_refs",
+    )
+    for index, (request_row, image_row) in enumerate(zip(request_rows, image_rows)):
+        label = f"image_generation.slides[{index}]"
+        if not isinstance(request_row, dict) or not isinstance(image_row, dict):
+            continue
+        for field in lineage_fields:
+            if image_row.get(field) != request_row.get(field):
+                issues.append(
+                    f"{label}.{field} does not match the Architect-derived request manifest"
+                )
+        for key in ("prompt", "semantic_sidecar"):
+            manifest_artifact = request_row.get(key)
+            run_artifact = image_row.get(key)
+            actual_path = artifacts.get(f"{label}.{key}")
+            if not isinstance(manifest_artifact, dict) or not isinstance(run_artifact, dict):
+                continue
+            manifest_path = _runtime_artifact_path(runtime_root, manifest_artifact.get("path"))
+            if actual_path is None or manifest_path is None or actual_path.resolve() != manifest_path:
+                issues.append(f"{label}.{key} path does not match request manifest")
+            if run_artifact.get("sha256") != manifest_artifact.get("sha256"):
+                issues.append(f"{label}.{key} sha256 does not match request manifest")
+
+
+def _runtime_artifact_path(root: Path, raw: Any) -> Path | None:
+    if not isinstance(raw, str) or not raw.strip():
+        return None
+    candidate = Path(raw)
+    resolved = candidate.resolve() if candidate.is_absolute() else (root / candidate).resolve()
+    try:
+        resolved.relative_to(root.resolve())
+    except ValueError:
+        return None
+    return resolved
+
+
+def _validate_image_batch_manifest(
+    manifest: dict[str, Any],
+    image: dict[str, Any],
+    slide_count: int,
+    issues: list[str],
+) -> None:
+    """Verify one concurrent built-in call per slide in deterministic waves of 20."""
+
+    expected_values = {
+        "schema_name": "image_generation_batch_manifest",
+        "schema_version": "1.0.0",
+        "platform_tool_id": IMAGE_TOOL,
+        "batch_size": 20,
+        "dispatch_mode": "concurrent_wave",
+        "call_strategy": "one_independent_builtin_call_per_slide",
+        "slide_count": slide_count,
+    }
+    for key, expected in expected_values.items():
+        if manifest.get(key) != expected:
+            issues.append(f"image_generation.batch_manifest.{key} must be {expected!r}")
+
+    waves = manifest.get("waves")
+    image_by_slide = {
+        row["slide_number"]: row
+        for row in image.get("slides", [])
+        if isinstance(row, dict) and isinstance(row.get("slide_number"), int)
+    }
+    expected_wave_count = (slide_count + 19) // 20
+    if not isinstance(waves, list) or len(waves) != expected_wave_count:
+        issues.append(
+            "image_generation.batch_manifest.waves must contain exactly "
+            f"{expected_wave_count} wave(s)"
+        )
+        return
+
+    attempts_by_slide: dict[int, int] = {}
+    total_regenerations = 0
+    for index, wave in enumerate(waves, start=1):
+        label = f"image_generation.batch_manifest.waves[{index - 1}]"
+        if not isinstance(wave, dict):
+            issues.append(f"{label} must be an object")
+            continue
+        expected_slides = list(
+            range((index - 1) * 20 + 1, min(index * 20, slide_count) + 1)
+        )
+        if wave.get("wave_number") != index:
+            issues.append(f"{label}.wave_number must be {index}")
+        if wave.get("concurrent_dispatch") is not True:
+            issues.append(f"{label}.concurrent_dispatch must be true")
+        if wave.get("slides") != expected_slides:
+            issues.append(f"{label}.slides must be {expected_slides}")
+        calls = wave.get("calls")
+        if not isinstance(calls, list) or len(calls) != len(expected_slides):
+            issues.append(
+                f"{label}.calls must contain one call record per slide in the wave"
+            )
+            continue
+        call_slides: list[int] = []
+        wave_regenerations = 0
+        for call_index, call in enumerate(calls):
+            call_label = f"{label}.calls[{call_index}]"
+            if not isinstance(call, dict):
+                issues.append(f"{call_label} must be an object")
+                continue
+            slide_number = call.get("slide_number")
+            attempt_count = call.get("attempt_count")
+            call_slides.append(slide_number)
+            if call.get("status") != "ACCEPTED":
+                issues.append(f"{call_label}.status must be ACCEPTED")
+            if not isinstance(attempt_count, int) or attempt_count not in (1, 2):
+                issues.append(f"{call_label}.attempt_count must be 1 or 2")
+                continue
+            if isinstance(slide_number, int):
+                attempts_by_slide[slide_number] = attempt_count
+                image_row = image_by_slide.get(slide_number)
+                if image_row is not None:
+                    if call.get("request_id") != image_row.get("request_id"):
+                        issues.append(
+                            f"{call_label}.request_id must match the prepared request"
+                        )
+                    if call.get("prompt_sha256") != image_row.get("prompt", {}).get(
+                        "sha256"
+                    ):
+                        issues.append(
+                            f"{call_label}.prompt_sha256 must match the prepared prompt"
+                        )
+                    if call.get("selected_png_sha256") != image_row.get(
+                        "source_png", {}
+                    ).get("sha256"):
+                        issues.append(
+                            f"{call_label}.selected_png_sha256 must match the selected PNG"
+                        )
+            wave_regenerations += attempt_count - 1
+        if call_slides != expected_slides:
+            issues.append(f"{label}.calls must follow slide order {expected_slides}")
+        if wave.get("initial_call_count") != len(expected_slides):
+            issues.append(f"{label}.initial_call_count must equal its number of slides")
+        if wave.get("regeneration_call_count") != wave_regenerations:
+            issues.append(f"{label}.regeneration_call_count is inconsistent")
+        if wave.get("accepted_count") != len(expected_slides):
+            issues.append(f"{label}.accepted_count must equal its number of slides")
+        total_regenerations += wave_regenerations
+
+    if manifest.get("initial_call_count") != slide_count:
+        issues.append(
+            "image_generation.batch_manifest.initial_call_count must equal slide_count"
+        )
+    if manifest.get("regeneration_call_count") != total_regenerations:
+        issues.append(
+            "image_generation.batch_manifest.regeneration_call_count is inconsistent"
+        )
+    if manifest.get("accepted_count") != slide_count:
+        issues.append(
+            "image_generation.batch_manifest.accepted_count must equal slide_count"
+        )
+    for slide in image["slides"]:
+        slide_number = slide["slide_number"]
+        expected_regenerations = attempts_by_slide.get(slide_number, 1) - 1
+        if slide["regeneration_count"] != expected_regenerations:
+            issues.append(
+                f"image slide {slide_number} regeneration_count does not match "
+                "the batch manifest"
+            )
+
+
+def _validate_timing_report(
+    report: dict[str, Any],
+    execution_mode: str,
+    slide_count: int,
+    issues: list[str],
+) -> None:
+    """Validate measured timing without allowing a speed target to bypass quality."""
+
+    expected_values = {
+        "schema_name": "pptx_generation_execution_timing",
+        "schema_version": "1.0.0",
+        "profile_name": "fast-quality-20",
+        "slide_count": slide_count,
+        "target_seconds_20_slides": 1800,
+        "quality_gates_take_precedence": True,
+    }
+    for key, expected in expected_values.items():
+        if report.get(key) != expected:
+            issues.append(f"performance.timing_report.{key} must be {expected!r}")
+
+    for key in (
+        "total_seconds",
+        "image_generation_seconds",
+        "reconstruction_seconds",
+        "visual_qa_seconds",
+    ):
+        value = report.get(key)
+        if not isinstance(value, (int, float)) or isinstance(value, bool) or value < 0:
+            issues.append(f"performance.timing_report.{key} must be non-negative")
+    total_seconds = report.get("total_seconds")
+    if isinstance(total_seconds, (int, float)) and not isinstance(total_seconds, bool):
+        if total_seconds <= 0:
+            issues.append("performance.timing_report.total_seconds must be positive")
+
+    timestamps: dict[str, datetime] = {}
+    for key in ("started_at", "completed_at"):
+        value = report.get(key)
+        if not isinstance(value, str) or not value:
+            issues.append(f"performance.timing_report.{key} must be an ISO timestamp")
+            continue
+        try:
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError:
+            issues.append(f"performance.timing_report.{key} must be an ISO timestamp")
+            continue
+        if parsed.tzinfo is None:
+            issues.append(f"performance.timing_report.{key} must include a timezone")
+            continue
+        timestamps[key] = parsed
+    if (
+        "started_at" in timestamps
+        and "completed_at" in timestamps
+        and isinstance(total_seconds, (int, float))
+    ):
+        observed_seconds = (
+            timestamps["completed_at"] - timestamps["started_at"]
+        ).total_seconds()
+        if observed_seconds <= 0 or abs(observed_seconds - total_seconds) > 1:
+            issues.append(
+                "performance.timing_report.total_seconds must match the timestamp span"
+            )
+
+    expected_compile_count = 1 if execution_mode == "single_compile_fast_path" else 2
+    if report.get("full_deck_compile_count") != expected_compile_count:
+        issues.append(
+            "performance.timing_report.full_deck_compile_count must be "
+            f"{expected_compile_count} for {execution_mode}"
+        )
+
+    target_applicable = slide_count == 20
+    if report.get("target_applicable") is not target_applicable:
+        issues.append(
+            "performance.timing_report.target_applicable must reflect a 20-slide run"
+        )
+    expected_target_met: bool | None = None
+    if target_applicable and isinstance(total_seconds, (int, float)):
+        expected_target_met = total_seconds <= 1800
+    if report.get("target_met") is not expected_target_met:
+        issues.append("performance.timing_report.target_met is inconsistent")
+
+
 def _png_dimensions(
     path: Path | None,
     label: str,
@@ -679,6 +1023,10 @@ def _validate_orchestration_state(
     limits = state.get("limits")
     if isinstance(limits, dict) and limits.get("maxWaveSize") not in (None, 5):
         issues.append("reconstruction.orchestration_state.limits.maxWaveSize must be 5")
+    if isinstance(limits, dict) and limits.get("maxIterations") not in (None, 2):
+        issues.append(
+            "reconstruction.orchestration_state.limits.maxIterations must be 2"
+        )
 
 
 def _validate_crop_plan(plan: dict[str, Any], issues: list[str]) -> None:

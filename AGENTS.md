@@ -46,14 +46,19 @@ is outside this dispatch rule.
 - The live reconstruction path must use the installed
   `slide-editable-deck-orchestrator` and its companion Skills.
 - The companion path is explicit: record the conditional
-  `slide-text-layer-inpaint` decision, render only through
-  `slide-image-dual-render/scripts/slide_pipeline.js`, gate with its
-  `final_gate.js`, and run `slide-visual-polish-qa` with source-slide mapping.
+  `slide-text-layer-inpaint` decision; prepare one hash-bound reconstruction job
+  per accepted source PNG; execute each slide in a fresh context; validate and
+  merge only through the official `validate_agent_work.js` and
+  `integrate_subagent_work.js`; render only through
+  `slide-image-dual-render/scripts/slide_pipeline.js`; gate with its
+  `final_gate.js`; and run `slide-visual-polish-qa` with source-slide mapping.
 - Follow the hash-bound `skillset_execution_plan.json`. Its default
   `fast-quality-20` profile targets GPT-5.6 Sol at medium reasoning, prepares a
   full image wave before dispatch, launches up to 20 independent built-in
-  ImageGen calls concurrently, and compiles all accepted slides in one
-  `--allow-large-batch` renderer invocation. Use project-local Node
+  ImageGen calls concurrently, then launches at most four one-slide
+  reconstruction workers concurrently without duplicating the full-deck
+  context. The integrator is the only writer of shared renderer inputs. Compile
+  all accepted slides in one `--allow-large-batch` renderer invocation. Use project-local Node
   dependencies, an explicit crop plan and generated asset manifest, renderer
   quality `reconstruction`, and QA mode `qa-polish`.
 - After Architect approval, run `deckcompiler prepare-image-requests` once. It
@@ -72,7 +77,11 @@ is outside this dispatch rule.
 - Do not use `--skip-crops` for final delivery. A zero-crop deck still carries
   `work/crop_plan.json` and `assets/manifest.json`.
 - Production acceptance requires route hardlock, reconstruction hardlock, PPTX
-  openability, and zero fail/blocking slides in visual QA.
+  openability, zero fail/blocking slides in visual QA, and repository
+  high-fidelity acceptance. Only `palette_drift` and
+  `pptx_html_edge_mismatch` may remain as known noticeable native-renderer
+  diagnostics; content, layout, spacing, hierarchy, typography, clipping, and
+  meaningful-detail issues require repair.
 - Preserve editable native text, tables, charts, diagrams, and shapes. A
   generated full-slide PNG is a reconstruction reference, never the final slide
   background or final semantic surface.

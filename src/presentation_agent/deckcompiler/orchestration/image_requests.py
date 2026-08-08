@@ -17,11 +17,18 @@ REQUEST_MANIFEST_NAME = "image_request_manifest.json"
 REQUEST_MANIFEST_SCHEMA = "codex_image_request_manifest"
 REQUEST_SCHEMA = "codex_image_request"
 SIDECAR_SCHEMA = "codex_semantic_sidecar"
+REQUEST_MANIFEST_VERSION = "1.1.0"
+REQUEST_VERSION = "1.1.0"
+SIDECAR_VERSION = "1.1.0"
 DEFAULT_DESIGN_DIRECTION = (
     "Academic",
     "Informative",
     "Professional",
     "Creative",
+)
+REFERENCE_MODE = "content_complete_slide_reference"
+DESIGN_CONTEXT_MODE = (
+    "compact_architect_context_plus_selected_route_and_layout"
 )
 
 
@@ -42,6 +49,7 @@ def prepare_image_requests(runtime_root: Path) -> ImageRequestPreparationResult:
     workflow, workflow_design, blueprint, design_system, approval = _load_inputs(root)
     workflow_id = _required_text(workflow.get("workflow_id"), "workflow_id")
     prepared = _build_payloads(
+        runtime_root=root,
         workflow_id=workflow_id,
         presentation=_presentation(workflow),
         workflow_design=workflow_design,
@@ -84,12 +92,13 @@ def prepare_image_requests(runtime_root: Path) -> ImageRequestPreparationResult:
 
     manifest = {
         "schema_name": REQUEST_MANIFEST_SCHEMA,
-        "schema_version": "1.0.0",
+        "schema_version": REQUEST_MANIFEST_VERSION,
         "workflow_id": workflow_id,
         "profile_name": "fast-quality-20",
         "generation_strategy": "single_deterministic_preparation_pass",
         "additional_model_calls": 0,
-        "design_context_mode": "selected_route_and_layout_cues_only",
+        "design_context_mode": DESIGN_CONTEXT_MODE,
+        "reference_mode": REFERENCE_MODE,
         "source_artifacts": {
             name: _artifact(root, root / "architect" / filename)
             for name, filename in _architect_filenames().items()
@@ -140,6 +149,7 @@ def validate_image_request_bundle(
         workflow_id = _required_text(workflow.get("workflow_id"), "workflow_id")
         source_hashes = _source_hashes(root)
         expected = _build_payloads(
+            runtime_root=root,
             workflow_id=workflow_id,
             presentation=_presentation(workflow),
             workflow_design=workflow_design,
@@ -159,12 +169,13 @@ def validate_image_request_bundle(
 
     expected_header = {
         "schema_name": REQUEST_MANIFEST_SCHEMA,
-        "schema_version": "1.0.0",
+        "schema_version": REQUEST_MANIFEST_VERSION,
         "workflow_id": workflow_id,
         "profile_name": "fast-quality-20",
         "generation_strategy": "single_deterministic_preparation_pass",
         "additional_model_calls": 0,
-        "design_context_mode": "selected_route_and_layout_cues_only",
+        "design_context_mode": DESIGN_CONTEXT_MODE,
+        "reference_mode": REFERENCE_MODE,
         "slide_count": len(expected),
         "prompt_character_count_total": sum(
             len(row["prompt"]["prompt_text"]) for row in expected
@@ -246,6 +257,7 @@ def validate_image_request_bundle(
 
 def _build_payloads(
     *,
+    runtime_root: Path,
     workflow_id: str,
     presentation: dict[str, Any],
     workflow_design: dict[str, Any],
@@ -254,7 +266,6 @@ def _build_payloads(
     approval: dict[str, Any],
     source_hashes: dict[str, str],
 ) -> list[dict[str, Any]]:
-    del workflow_design
     _validate_approval(approval)
     slides = blueprint.get("slides")
     if not isinstance(slides, list) or not slides or len(slides) > 400:
@@ -318,6 +329,15 @@ def _build_payloads(
         presenter_notes = _required_text(
             slide.get("presenter_notes"), f"slide {slide_number} presenter_notes"
         )
+        workflow_context = _compact_workflow_context(
+            workflow_design,
+            slide_number=slide_number,
+            slide_id=slide_id,
+        )
+        reference_assets, referenced_image_paths = _reference_inputs(
+            runtime_root,
+            slide,
+        )
         blueprint_entry_sha = content_sha256(slide)
         route_sha = content_sha256(route)
         layout_sha = content_sha256(layout)
@@ -341,29 +361,42 @@ def _build_payloads(
         }
         prompt = {
             "schema_name": REQUEST_SCHEMA,
-            "schema_version": "1.0.0",
+            "schema_version": REQUEST_VERSION,
             "workflow_id": workflow_id,
             **lineage,
             "architect_lineage": source_hashes,
+            "reference_mode": REFERENCE_MODE,
+            "architect_context": workflow_context,
+            "reference_assets": reference_assets,
             "prompt_text": _prompt_text(
                 presentation=presentation,
                 blueprint=blueprint,
                 slide=slide,
-                copy_text=copy_text,
+                structured_copy=_structured_copy_lines(copy),
+                workflow_context=workflow_context,
+                reference_assets=reference_assets,
                 route=route,
                 route_cues=route_cues,
                 layout=layout,
                 layout_cues=layout_cues,
                 global_cues=global_cues,
             ),
+            "tool_input": {
+                "tool": "image_gen.imagegen",
+                "prompt_field": "prompt_text",
+                "referenced_image_paths": referenced_image_paths,
+            },
         }
         prompt["prompt_hash"] = content_sha256(prompt)
         sidecar = {
             "schema_name": SIDECAR_SCHEMA,
-            "schema_version": "1.0.0",
+            "schema_version": SIDECAR_VERSION,
             "workflow_id": workflow_id,
             **lineage,
             "architect_lineage": source_hashes,
+            "reference_mode": REFERENCE_MODE,
+            "architect_context": workflow_context,
+            "reference_assets": reference_assets,
             "exact_title": title,
             "exact_on_slide_copy": copy,
             "presenter_notes": presenter_notes,
@@ -386,7 +419,9 @@ def _prompt_text(
     presentation: dict[str, Any],
     blueprint: dict[str, Any],
     slide: dict[str, Any],
-    copy_text: str,
+    structured_copy: list[str],
+    workflow_context: dict[str, Any],
+    reference_assets: list[dict[str, Any]],
     route: dict[str, Any],
     route_cues: list[str],
     layout: dict[str, Any],
@@ -403,6 +438,12 @@ def _prompt_text(
     cue_text = "; ".join(cues) if cues else "Use the approved route and layout naturally."
     route_name = _display_value(route.get("name") or route.get("route_id"))
     layout_name = _display_value(layout.get("name") or layout.get("layout_id"))
+    workflow_text = _display_value(workflow_context) or "Use the approved Architect plan."
+    reference_text = (
+        _display_value(reference_assets)
+        if reference_assets
+        else "None declared"
+    )
     return "\n".join(
         (
             "Create a 16:9 presentation-slide design reference.",
@@ -411,18 +452,201 @@ def _prompt_text(
             f"Deck purpose: {deck_purpose}",
             f"Language: {language}",
             f"Tone: {tone}",
+            f"Approved workflow context: {workflow_text}",
             f"Slide purpose: {_display_value(slide.get('purpose'))}",
             f"Exact title: {_display_value(slide.get('title'))}",
-            f"Exact on-slide content: {copy_text}",
+            "Exact on-slide content (preserve structure):",
+            *structured_copy,
             f"Visual direction: {_display_value(slide.get('visual_direction'))}",
             f"Approved visual route: {route_name}",
             f"Approved layout: {layout_name}",
             f"Relevant design cues: {cue_text}",
             f"Evidence references: {evidence}",
+            f"Reference assets: {reference_text}",
             "Design posture: Academic, Informative, Professional and Creative.",
             "Represent supplied facts faithfully and choose a natural composition, hierarchy, density and visual language for this slide. Keep it coherent with the deck; do not invent facts or add watermarks.",
         )
     )
+
+
+def _compact_workflow_context(
+    workflow_design: dict[str, Any],
+    *,
+    slide_number: int,
+    slide_id: str,
+) -> dict[str, Any]:
+    """Keep the planning signal that affects art direction without prompt bloat."""
+
+    preferred_keys = (
+        "selected_workflow",
+        "chosen_workflow",
+        "workflow_option",
+        "workflow_delta",
+        "reason",
+        "objective",
+        "message_spine",
+        "narrative_promise",
+        "communication_core",
+        "story_architecture",
+        "continuity_rules",
+        "approved_visual_route",
+        "visual_route_rationale",
+        "evidence_asset_plan",
+    )
+    context = {
+        key: _compact_context_value(workflow_design[key])
+        for key in preferred_keys
+        if key in workflow_design and _has_content(workflow_design[key])
+    }
+    slide_contexts = workflow_design.get("slide_contexts")
+    if isinstance(slide_contexts, list):
+        matches = [
+            row
+            for row in slide_contexts
+            if isinstance(row, dict)
+            and (
+                row.get("slide_number") == slide_number
+                or row.get("slide_id") == slide_id
+            )
+        ]
+        if len(matches) == 1:
+            context["slide_context"] = _compact_context_value(matches[0])
+    elif isinstance(slide_contexts, dict):
+        selected = slide_contexts.get(slide_id) or slide_contexts.get(
+            str(slide_number)
+        )
+        if _has_content(selected):
+            context["slide_context"] = _compact_context_value(selected)
+    return context
+
+
+def _compact_context_value(value: Any, *, depth: int = 0) -> Any:
+    """Project rich Gate output into a bounded prompt signal."""
+
+    if isinstance(value, str):
+        normalized = " ".join(value.split())
+        return normalized if len(normalized) <= 600 else normalized[:597] + "..."
+    if isinstance(value, list):
+        return [
+            _compact_context_value(item, depth=depth + 1)
+            for item in value[:6]
+            if _has_content(item)
+        ]
+    if isinstance(value, dict):
+        if depth >= 2:
+            return _display_value(value)[:600]
+        useful_subkeys = (
+            "name",
+            "summary",
+            "reason",
+            "rationale",
+            "objective",
+            "takeaway",
+            "key_question",
+            "message",
+            "narrative_flow",
+            "audience_journey",
+            "role",
+        )
+        selected_keys = [key for key in useful_subkeys if key in value]
+        if not selected_keys:
+            selected_keys = list(value)[:6]
+        return {
+            key: _compact_context_value(value[key], depth=depth + 1)
+            for key in selected_keys
+            if _has_content(value[key])
+        }
+    return value
+
+
+def _reference_inputs(
+    runtime_root: Path,
+    slide: dict[str, Any],
+) -> tuple[list[dict[str, Any]], list[str]]:
+    raw = slide.get("reference_inputs", slide.get("referenced_assets", []))
+    if raw is None:
+        raw = []
+    if not isinstance(raw, list):
+        raise _error(
+            "DC_IMAGE_REQUEST_INPUT_INVALID",
+            "slide reference_inputs/referenced_assets must be a list",
+        )
+
+    assets: list[dict[str, Any]] = []
+    image_paths: list[str] = []
+    for index, value in enumerate(raw):
+        if isinstance(value, str):
+            item: dict[str, Any] = {"path": value, "role": "visual_reference"}
+        elif isinstance(value, dict):
+            item = dict(value)
+        else:
+            raise _error(
+                "DC_IMAGE_REQUEST_INPUT_INVALID",
+                f"slide reference input {index} must be a string or object",
+            )
+        raw_path = str(item.get("path", "")).strip()
+        role = str(item.get("role", "visual_reference")).strip()
+        if not raw_path:
+            label = str(item.get("label", "")).strip()
+            if not label:
+                raise _error(
+                    "DC_IMAGE_REQUEST_INPUT_INVALID",
+                    f"slide reference input {index} needs path or label",
+                )
+            assets.append({"label": label, "role": role})
+            continue
+        resolved = _resolve_inside(runtime_root, raw_path, "reference input")
+        if resolved is None or not resolved.is_file():
+            raise _error(
+                "DC_IMAGE_REQUEST_INPUT_INVALID",
+                f"reference input must be an existing file inside the runtime: {raw_path}",
+            )
+        relative = resolved.relative_to(runtime_root).as_posix()
+        asset = {
+            "path": relative,
+            "role": role,
+            "sha256": _sha256_file(resolved),
+        }
+        if str(item.get("usage", "")).strip():
+            asset["usage"] = str(item["usage"]).strip()
+        assets.append(asset)
+        if resolved.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp"}:
+            image_paths.append(resolved.as_posix())
+    return assets, image_paths
+
+
+def _structured_copy_lines(value: Any, *, indent: int = 0) -> list[str]:
+    prefix = "  " * indent
+    if isinstance(value, str):
+        return [f"{prefix}- {' '.join(value.split())}"]
+    if isinstance(value, list):
+        lines: list[str] = []
+        for item in value:
+            lines.extend(_structured_copy_lines(item, indent=indent))
+        return lines
+    if isinstance(value, dict):
+        lines = []
+        for key, item in value.items():
+            if isinstance(item, (list, dict)):
+                lines.append(f"{prefix}- {key}:")
+                lines.extend(_structured_copy_lines(item, indent=indent + 1))
+            else:
+                rendered = " ".join(str(item).split())
+                lines.append(f"{prefix}- {key}: {rendered}")
+        return lines
+    if value is None:
+        return []
+    return [f"{prefix}- {value}"]
+
+
+def _has_content(value: Any) -> bool:
+    if value is None:
+        return False
+    if isinstance(value, str):
+        return bool(value.strip())
+    if isinstance(value, (list, dict)):
+        return bool(value)
+    return True
 
 
 def _load_inputs(
@@ -603,9 +827,14 @@ def _error(code: str, message: str, path: Path | None = None) -> DeckCompilerErr
 
 
 __all__ = [
+    "DESIGN_CONTEXT_MODE",
     "DEFAULT_DESIGN_DIRECTION",
     "ImageRequestPreparationResult",
     "REQUEST_MANIFEST_NAME",
+    "REQUEST_MANIFEST_VERSION",
+    "REQUEST_VERSION",
+    "REFERENCE_MODE",
+    "SIDECAR_VERSION",
     "prepare_image_requests",
     "validate_image_request_bundle",
 ]

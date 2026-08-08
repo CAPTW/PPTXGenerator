@@ -11,6 +11,7 @@ from ..errors import DeckCompilerError
 from ..identity import content_sha256
 from ..manifest_io import read_json, write_json
 from ..schemas import REPO_ROOT, validator_for
+from .quality_acceptance import CANARY_METRIC_LIMITS
 
 
 PLAN_NAME = "skillset_execution_plan.json"
@@ -118,6 +119,14 @@ _ENTRYPOINTS = {
     "final_gate": (
         "slide-image-dual-render",
         "slide-image-dual-render/scripts/final_gate.js",
+    ),
+    "validate_agent_work": (
+        "slide-image-dual-render",
+        "slide-image-dual-render/scripts/validate_agent_work.js",
+    ),
+    "integrate_subagent_work": (
+        "slide-image-dual-render",
+        "slide-image-dual-render/scripts/integrate_subagent_work.js",
     ),
     "rasterize_pptx": (
         "slide-visual-polish-qa",
@@ -318,6 +327,8 @@ def build_skillset_execution_plan(
     final_html = (project / "out" / "deck-final-editable.html").as_posix()
     final_summary = (project / "out" / "visual_qa_summary_final.json").as_posix()
     final_summary_md = (project / "out" / "visual_qa_summary_final.md").as_posix()
+    reconstruction_jobs = (project / "work" / "reconstruction_job_manifest.json").as_posix()
+    integration_report = (project / "work" / "integration_report.md").as_posix()
 
     commands = {
         "install_node_dependencies": [
@@ -347,6 +358,40 @@ def build_skillset_execution_plan(
             "polish",
             "--max-iterations",
             "2",
+        ],
+        "prepare_reconstruction_jobs": [
+            "deckcompiler",
+            "prepare-reconstruction-jobs",
+            "--runtime",
+            runtime_root.resolve().as_posix(),
+        ],
+        "codex_execute_reconstruction_jobs": [
+            "CODEX_AGENT_ACTION",
+            "execute-isolated-reconstruction-jobs",
+            "--manifest",
+            reconstruction_jobs,
+            "--fresh-context-per-slide",
+            "--max-parallel-workers",
+            "4",
+        ],
+        "validate_reconstruction_jobs": [
+            "deckcompiler",
+            "validate-reconstruction-jobs",
+            "--runtime",
+            runtime_root.resolve().as_posix(),
+            "--require-worker-outputs",
+        ],
+        "validate_agent_work": [
+            "node",
+            ep("validate_agent_work"),
+            "--work",
+            work,
+            "--slides",
+            "<slides>",
+        ],
+        "integrate_agent_work": [
+            "node",
+            ep("integrate_subagent_work"),
         ],
         "prepare_crops": ["python", ep("crop_generator")],
         "compile_full_deck": [
@@ -461,6 +506,16 @@ def build_skillset_execution_plan(
             "--require-pptx",
             "--require-html",
         ],
+        "enforce_full_deck_quality_acceptance": [
+            "deckcompiler",
+            "validate-visual-quality",
+            "--project",
+            project_value,
+            "--summary",
+            final_summary,
+            "--slides",
+            "<slides>",
+        ],
         "reconstruct_wave": [
             "node",
             ep("slide_pipeline"),
@@ -572,6 +627,16 @@ def build_skillset_execution_plan(
             "--require-pptx",
             "--require-html",
         ],
+        "enforce_wave_quality_acceptance": [
+            "deckcompiler",
+            "validate-visual-quality",
+            "--project",
+            project_value,
+            "--summary",
+            f"{out}/visual_qa_summary_wave-<wave>.json",
+            "--slides",
+            "<wave-slides-max-5>",
+        ],
         "summarize_backlog": [
             "node",
             ep("summarize_visual_backlog"),
@@ -631,7 +696,7 @@ def build_skillset_execution_plan(
 
     payload: dict[str, Any] = {
         "schema_name": PLAN_SCHEMA,
-        "schema_version": "1.4.0",
+        "schema_version": "1.5.0",
         "workflow_id": workflow_id,
         "status": "READY",
         "skill_root": inspection["skill_root"],
@@ -661,6 +726,8 @@ def build_skillset_execution_plan(
             .resolve()
             .as_posix(),
             "per_slide_work_pattern": (project / "work" / "slideXX").as_posix(),
+            "reconstruction_job_manifest_path": reconstruction_jobs,
+            "integration_report_path": integration_report,
             "profile_path": (project / "styles" / "active.json").as_posix(),
             "slides_source_path": (project / "lib" / "slides.js").as_posix(),
             "crop_plan_path": crop_plan,
@@ -675,6 +742,10 @@ def build_skillset_execution_plan(
             "DECK_PXH": "<source-height>",
             "CROP_PLAN": crop_plan,
             "SRC_DIR": (project / "src").as_posix(),
+            "WORK_DIR": work,
+            "SLIDES_OUT": (project / "lib" / "slides.js").as_posix(),
+            "CROP_PLAN_OUT": crop_plan,
+            "INTEGRATION_REPORT_OUT": integration_report,
         },
         "dependency_contract": {
             "node_packages": list(NODE_PACKAGES),
@@ -716,6 +787,19 @@ def build_skillset_execution_plan(
                 "automatic_canary": False,
                 "compile_after_all_images": True,
             },
+            "reconstruction_authoring": {
+                "context_unit": "one_source_slide_per_fresh_context",
+                "dispatch_mode": "bounded_parallel_workers",
+                "max_parallel_workers": 4,
+                "shared_file_writer": "integrator_only",
+                "worker_scope": "one_slide_work_directory_only",
+                "worker_model": "gpt-5.6-sol",
+                "worker_reasoning_effort": "medium",
+                "token_policy": (
+                    "compact_job_plus_one_source_slide_no_full_deck_duplication"
+                ),
+                "isolated_dual_render_qa_required": True,
+            },
             "compilation": {
                 "single_full_deck_invocation": True,
                 "unconditional_second_full_compile": False,
@@ -744,6 +828,13 @@ def build_skillset_execution_plan(
             "final_full_deck_qa_required": True,
             "source_slide_mapping_required": True,
             "full_slide_source_raster_forbidden": True,
+            "high_fidelity_acceptance_required": True,
+            "allowed_needs_polish_issue_types": [
+                "palette_drift",
+                "pptx_html_edge_mismatch",
+            ],
+            "quality_reference_baseline": "accepted_one_slide_canary_20260808",
+            "allowed_needs_polish_metric_limits": CANARY_METRIC_LIMITS,
         },
         "crop_contract": {
             "explicit_crop_plan_required": True,
@@ -757,6 +848,13 @@ def build_skillset_execution_plan(
                 "install_node_dependencies",
                 "install_hardlock",
                 "plan_orchestration",
+            ],
+            "reconstruction_authoring": [
+                "prepare_reconstruction_jobs",
+                "codex_execute_reconstruction_jobs",
+                "validate_reconstruction_jobs",
+                "validate_agent_work",
+                "integrate_agent_work",
                 "prepare_crops",
             ],
             "single_compile_fast_path": [
@@ -767,6 +865,7 @@ def build_skillset_execution_plan(
                 "compare_full_deck",
                 "summarize_full_deck",
                 "enforce_full_deck_qa",
+                "enforce_full_deck_quality_acceptance",
             ],
             "fast_path_acceptance": ["enforce_orchestration_state"],
             "repair_wave_loop": [
@@ -779,6 +878,7 @@ def build_skillset_execution_plan(
                 "compare_wave",
                 "summarize_wave",
                 "enforce_wave_qa",
+                "enforce_wave_quality_acceptance",
                 "summarize_backlog",
             ],
             "post_repair_recompile": [
@@ -789,6 +889,7 @@ def build_skillset_execution_plan(
                 "compare_full_deck",
                 "summarize_full_deck",
                 "enforce_full_deck_qa",
+                "enforce_full_deck_quality_acceptance",
                 "enforce_orchestration_state",
             ],
             "completion": ["seal_codex_run", "register_completion"],
@@ -804,6 +905,8 @@ def build_skillset_execution_plan(
             "../image_requests/image_request_manifest.json",
             "../image_batches/image_generation_batch_manifest.json",
             "../execution_timing.json",
+            "work/reconstruction_job_manifest.json",
+            "work/integration_report.md",
             "work/orchestration_state.json",
             "work/crop_plan.json",
             "assets/manifest.json",
@@ -822,7 +925,8 @@ def build_skillset_execution_plan(
             "complete": (
                 "single fast-path or conditional post-repair full-deck gate PASS, "
                 "PPTX openable, route and reconstruction hardlocks PASS, "
-                "and visual QA fail/blocking counts both zero"
+                "high-fidelity issue policy accepted, and visual QA fail/blocking "
+                "counts both zero"
             ),
             "needs_repair": "any visual QA fail or blocking slide remains",
             "blocked": "missing Skill, Skill bug, hardlock failure, or PPTX openability failure",
@@ -904,6 +1008,30 @@ def validate_skillset_execution_plan(
         commands["plan_orchestration"],
         ("--quality-level", "polish", "--max-iterations", "2"),
         "plan_orchestration",
+        issues,
+    )
+    _require_flags(
+        commands["prepare_reconstruction_jobs"],
+        ("prepare-reconstruction-jobs", "--runtime"),
+        "prepare_reconstruction_jobs",
+        issues,
+    )
+    _require_flags(
+        commands["codex_execute_reconstruction_jobs"],
+        ("--manifest", "--fresh-context-per-slide", "--max-parallel-workers", "4"),
+        "codex_execute_reconstruction_jobs",
+        issues,
+    )
+    _require_flags(
+        commands["validate_reconstruction_jobs"],
+        ("validate-reconstruction-jobs", "--runtime", "--require-worker-outputs"),
+        "validate_reconstruction_jobs",
+        issues,
+    )
+    _require_flags(
+        commands["validate_agent_work"],
+        ("--work", "--slides"),
+        "validate_agent_work",
         issues,
     )
     _require_flags(
@@ -993,6 +1121,12 @@ def validate_skillset_execution_plan(
         issues,
     )
     _require_flags(
+        commands["enforce_full_deck_quality_acceptance"],
+        ("validate-visual-quality", "--project", "--summary", "--slides"),
+        "enforce_full_deck_quality_acceptance",
+        issues,
+    )
+    _require_flags(
         commands["reconstruct_wave"],
         (
             "--quality",
@@ -1023,6 +1157,12 @@ def validate_skillset_execution_plan(
         commands["capture_wave_html"],
         ("--source-slides",),
         "capture_wave_html",
+        issues,
+    )
+    _require_flags(
+        commands["enforce_wave_quality_acceptance"],
+        ("validate-visual-quality", "--project", "--summary", "--slides"),
+        "enforce_wave_quality_acceptance",
         issues,
     )
     _require_flags(

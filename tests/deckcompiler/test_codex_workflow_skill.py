@@ -63,7 +63,7 @@ class CodexWorkflowSkillTests(unittest.TestCase):
             dependencies["completion_requirements"]["visual_qa_blocking_count"],
             0,
         )
-        self.assertEqual(dependencies["schema_version"], "1.4.0")
+        self.assertEqual(dependencies["schema_version"], "1.5.0")
         self.assertEqual(
             dependencies["execution_profile"]["default_design_direction"],
             ["Academic", "Informative", "Professional", "Creative"],
@@ -74,6 +74,21 @@ class CodexWorkflowSkillTests(unittest.TestCase):
         self.assertEqual(
             dependencies["execution_profile"]["image_request_preparation"],
             "single_deterministic_pass_no_model_call",
+        )
+        self.assertEqual(
+            dependencies["execution_profile"]["reconstruction_context_unit"],
+            "one_source_slide_per_fresh_context",
+        )
+        self.assertEqual(
+            dependencies["execution_profile"]["max_parallel_reconstruction_workers"],
+            4,
+        )
+        self.assertEqual(
+            ordered[4]["worker_validator"], "scripts/validate_agent_work.js"
+        )
+        self.assertEqual(
+            ordered[4]["worker_integrator"],
+            "scripts/integrate_subagent_work.js",
         )
         self.assertEqual(
             dependencies["completion_requirements"][
@@ -100,6 +115,10 @@ class CodexWorkflowSkillTests(unittest.TestCase):
         self.assertIn("--source-slides", text)
         self.assertIn("single-compile fast path", text)
         self.assertIn("conditional all-slide compile", text)
+        self.assertIn("prepare-reconstruction-jobs", text)
+        self.assertIn("one source slide", text)
+        self.assertIn("integrate_subagent_work.js", text)
+        self.assertIn("validate-visual-quality", text)
         self.assertIn("CONTINUE", text.upper())
         self.assertNotIn("exactly six slides", text.lower())
 

@@ -85,6 +85,14 @@ plan and generated asset manifest, crop-coverage summary, and objective QA
 evidence summary. HTML is required because the approved renderer is the dual
 PPTX/HTML path.
 
+The sealer also rebuilds and validates
+`work/reconstruction_job_manifest.json`. Every selected PNG must map to one
+fresh-context slide job, complete hash-bound worker outputs, and a receipt that
+proves the worker did not edit shared files. Completion additionally requires
+the official integrator outputs `lib/slides.js` and
+`work/integration_report.md`, with exactly one `sN(s)` function for every
+approved slide. This is execution evidence, not a planning-only declaration.
+
 The normal path compiles all approved slide artifacts in one full-deck
 `--allow-large-batch` invocation and runs one source-mapped full-deck QA chain.
 It does not unconditionally repeat that compile. A second full-deck compile is
@@ -102,6 +110,12 @@ Record:
   delivered PPTX/HTML, plus metrics hashes matching the selected source PNG and
   final render images;
 - `status: PASS` only when fail and blocking counts are zero.
+
+After the official Visual QA gate, apply the repository high-fidelity policy.
+`palette_drift` and `pptx_html_edge_mismatch` may remain as known noticeable
+native-renderer diagnostics. Any spacing, hierarchy, typography, clipping,
+missing-content, or meaningful-detail issue blocks completion and enters the
+targeted repair loop.
 
 ## Performance record
 

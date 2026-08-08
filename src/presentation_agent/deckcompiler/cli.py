@@ -23,6 +23,11 @@ from .orchestration.image_requests import (
     prepare_image_requests,
     validate_image_request_bundle,
 )
+from .orchestration.quality_acceptance import evaluate_visual_quality_acceptance
+from .orchestration.reconstruction_jobs import (
+    prepare_reconstruction_jobs,
+    validate_reconstruction_job_bundle,
+)
 from .orchestration.phase3_runner import run_phase3
 from .pngtopptx_pinning import (
     PinningError,
@@ -117,6 +122,41 @@ def build_parser() -> argparse.ArgumentParser:
         help="Validate Blueprint/Design-System lineage for prepared ImageGen requests.",
     )
     validate_image_requests_parser.add_argument("--runtime", type=Path, required=True)
+
+    prepare_reconstruction_jobs_parser = subparsers.add_parser(
+        "prepare-reconstruction-jobs",
+        help=(
+            "Create one hash-bound, fresh-context slide-image-dual-render job "
+            "for every accepted ImageGen PNG."
+        ),
+    )
+    prepare_reconstruction_jobs_parser.add_argument(
+        "--runtime", type=Path, required=True
+    )
+
+    validate_reconstruction_jobs_parser = subparsers.add_parser(
+        "validate-reconstruction-jobs",
+        help=(
+            "Validate reconstruction job lineage and optionally every isolated "
+            "worker artifact."
+        ),
+    )
+    validate_reconstruction_jobs_parser.add_argument(
+        "--runtime", type=Path, required=True
+    )
+    validate_reconstruction_jobs_parser.add_argument(
+        "--require-worker-outputs", action="store_true"
+    )
+
+    validate_visual_quality_parser = subparsers.add_parser(
+        "validate-visual-quality",
+        help="Apply the final high-fidelity issue policy to official Visual QA evidence.",
+    )
+    validate_visual_quality_parser.add_argument("--project", type=Path, required=True)
+    validate_visual_quality_parser.add_argument("--summary", type=Path, required=True)
+    validate_visual_quality_parser.add_argument(
+        "--slides", required=True, help="Comma-separated source slide numbers."
+    )
 
     seal_codex_run = subparsers.add_parser(
         "seal-codex-run",
@@ -344,6 +384,47 @@ def main(argv: list[str] | None = None) -> int:
         report = validate_image_request_bundle(args.runtime)
         print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
         return 0 if report["valid"] else 1
+    if args.command == "prepare-reconstruction-jobs":
+        try:
+            result = prepare_reconstruction_jobs(args.runtime)
+        except (DeckCompilerError, OSError, ValueError, json.JSONDecodeError) as exc:
+            code = getattr(exc, "code", "DC_RECONSTRUCTION_JOB_PREPARATION_FAILED")
+            print(f"DECKCOMPILER_RECONSTRUCTION_JOBS_BLOCKED code={code} message={exc}")
+            return 1
+        print(
+            "DECKCOMPILER_RECONSTRUCTION_JOBS_READY "
+            f"workflow_id={result.workflow_id} slides={result.slide_count} "
+            f"manifest={result.manifest_path.as_posix()}"
+        )
+        return 0
+    if args.command == "validate-reconstruction-jobs":
+        report = validate_reconstruction_job_bundle(
+            args.runtime,
+            require_worker_outputs=args.require_worker_outputs,
+        )
+        print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0 if report["valid"] else 1
+    if args.command == "validate-visual-quality":
+        try:
+            slides = sorted(
+                {
+                    int(value.strip())
+                    for value in args.slides.split(",")
+                    if value.strip()
+                }
+            )
+            if not slides or any(value <= 0 for value in slides):
+                raise ValueError("--slides must contain positive integers")
+            report = evaluate_visual_quality_acceptance(
+                project=args.project,
+                summary_path=args.summary,
+                slides=slides,
+            )
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
+            print(f"DECKCOMPILER_VISUAL_QUALITY_INVALID message={exc}")
+            return 1
+        print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0 if report["accepted"] else 1
     if args.command == "seal-codex-run":
         try:
             payload = seal_codex_run_manifest(args.draft, args.output)

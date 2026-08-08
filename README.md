@@ -99,8 +99,11 @@ prompt wording or input channel.
 After approved Gates 1 and 2, the repo-owned Codex workflow calls
 `image_gen.imagegen` for every approved slide. The default `fast-quality-20`
 profile dispatches 20 independent built-in calls concurrently, then runs one
-all-slide PNGtoPPTX compile and one source-mapped full-deck QA pass. It enters
-targeted repair only when a blocking slide actually exists.
+fresh, isolated reconstruction context per accepted source slide (at most four
+workers concurrently), validates and integrates those fragments with the
+official PNGtoPPTX scripts, then runs one all-slide compile and one
+source-mapped full-deck QA pass. It enters targeted repair only when the
+external gate or the repository high-fidelity issue policy finds a real defect.
 
 `generate` fails closed before intake when any tracked Architect package file,
 required ImageGen/PNGtoPPTX Skill, or official script is absent. The execution
@@ -108,8 +111,9 @@ plan binds the four repository Architect files plus installed companion Skill
 and entrypoint hashes and spells out the tested companion path:
 conditional text-layer preprocessing, project-local Node dependencies, explicit
 crop plan/manifest, `slide-image-dual-render` reconstruction hardlocks,
+hash-bound per-slide worker receipts, integrator-owned `lib/slides.js`,
 source-mapped PPTX/HTML visual QA, a single-compile fast path, repair waves of at
-most five slides only for blockers, and the final openability gate. The profile
+most five slides only for defects, and the final openability gate. The profile
 records a 120-to-30-minute target for 20 slides (approximately 4x) without
 weakening the quality gates. Use `--skill-root <path>` only when the verified
 ImageGen/PNGtoPPTX companions are not under `CODEX_HOME\skills` or

@@ -1,0 +1,975 @@
+"""Prepare and validate isolated high-fidelity PNG-to-PPTX slide jobs."""
+
+from __future__ import annotations
+
+import hashlib
+import re
+import struct
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
+
+from ..errors import DeckCompilerError
+from ..identity import content_sha256, stable_id
+from ..manifest_io import read_json, write_json
+from .image_requests import REQUEST_MANIFEST_NAME, validate_image_request_bundle
+from .skillset_plan import validate_skillset_execution_plan
+
+
+PROJECT_DIRECTORY = "pngtopptx-project"
+JOB_MANIFEST_NAME = "reconstruction_job_manifest.json"
+JOB_MANIFEST_SCHEMA = "codex_reconstruction_job_manifest"
+JOB_SCHEMA = "codex_slide_reconstruction_job"
+MAX_PARALLEL_WORKERS = 4
+REQUIRED_OUTPUT_NAMES = (
+    "measurements.json",
+    "profile_override.json",
+    "crop_plan.json",
+    "s{slide}.fragment.js",
+    "reconstruction_notes.md",
+    "editability_inventory.md",
+    "reconstruction_score.json",
+    "qa_report.md",
+    "qa_result.json",
+    "qa_evidence.json",
+    "worker_receipt.json",
+)
+
+
+@dataclass(frozen=True, slots=True)
+class ReconstructionJobPreparationResult:
+    workflow_id: str
+    runtime_root: Path
+    manifest_path: Path
+    job_paths: tuple[Path, ...]
+    worker_prompt_paths: tuple[Path, ...]
+    slide_count: int
+
+
+def prepare_reconstruction_jobs(
+    runtime_root: Path,
+) -> ReconstructionJobPreparationResult:
+    """Write one hash-bound, fresh-context reconstruction job per source PNG."""
+
+    root = runtime_root.resolve()
+    bundle = _expected_bundle(root)
+    job_paths: list[Path] = []
+    prompt_paths: list[Path] = []
+    manifest_rows: list[dict[str, Any]] = []
+    for row in bundle["jobs"]:
+        work_dir = root / row["work_dir"]
+        work_dir.mkdir(parents=True, exist_ok=True)
+        job_path = write_json(work_dir / "reconstruction_job.json", row["job"])
+        prompt_path = work_dir / "worker_prompt.md"
+        prompt_path.write_text(row["worker_prompt"], encoding="utf-8", newline="\n")
+        job_paths.append(job_path)
+        prompt_paths.append(prompt_path)
+        manifest_rows.append(
+            {
+                **row["lineage"],
+                "job": _artifact(root, job_path),
+                "worker_prompt": _artifact(root, prompt_path),
+            }
+        )
+
+    manifest = {
+        **bundle["header"],
+        "jobs": manifest_rows,
+    }
+    manifest["content_hash"] = content_sha256(manifest)
+    manifest_path = write_json(
+        root / PROJECT_DIRECTORY / "work" / JOB_MANIFEST_NAME,
+        manifest,
+    )
+    report = validate_reconstruction_job_bundle(root)
+    if not report["valid"]:
+        raise _error(
+            "DC_RECONSTRUCTION_JOB_PREPARATION_INVALID",
+            "; ".join(report["issues"][:8]),
+            manifest_path,
+        )
+    return ReconstructionJobPreparationResult(
+        workflow_id=bundle["header"]["workflow_id"],
+        runtime_root=root,
+        manifest_path=manifest_path,
+        job_paths=tuple(job_paths),
+        worker_prompt_paths=tuple(prompt_paths),
+        slide_count=len(job_paths),
+    )
+
+
+def validate_reconstruction_job_bundle(
+    runtime_root: Path,
+    *,
+    require_worker_outputs: bool = False,
+    require_integrated_outputs: bool = False,
+) -> dict[str, Any]:
+    """Reject stale jobs, cross-slide context, shared writes, or incomplete workers."""
+
+    root = runtime_root.resolve()
+    manifest_path = root / PROJECT_DIRECTORY / "work" / JOB_MANIFEST_NAME
+    issues: list[str] = []
+    try:
+        expected = _expected_bundle(root)
+        manifest = read_json(manifest_path)
+    except (DeckCompilerError, OSError, ValueError, TypeError) as exc:
+        message = exc.message if isinstance(exc, DeckCompilerError) else str(exc)
+        return {
+            "valid": False,
+            "workflow_id": None,
+            "slide_count": 0,
+            "worker_outputs_required": require_worker_outputs,
+            "integrated_outputs_required": require_integrated_outputs,
+            "issues": [message],
+        }
+
+    expected_header = expected["header"]
+    for key, value in expected_header.items():
+        if manifest.get(key) != value:
+            issues.append(f"reconstruction job manifest {key} must be {value!r}")
+    rows = manifest.get("jobs")
+    if not isinstance(rows, list) or len(rows) != len(expected["jobs"]):
+        issues.append(
+            "reconstruction job manifest jobs must contain exactly "
+            f"{len(expected['jobs'])} rows"
+        )
+        rows = []
+
+    for index, expected_row in enumerate(expected["jobs"]):
+        if index >= len(rows):
+            break
+        actual_row = rows[index]
+        slide = expected_row["lineage"]["slide_number"]
+        label = f"reconstruction job slide {slide}"
+        if not isinstance(actual_row, dict):
+            issues.append(f"{label} manifest row must be an object")
+            continue
+        for key, value in expected_row["lineage"].items():
+            if actual_row.get(key) != value:
+                issues.append(f"{label} {key} does not match selected ImageGen output")
+        for artifact_key, expected_value in (
+            ("job", expected_row["job"]),
+            ("worker_prompt", expected_row["worker_prompt"]),
+        ):
+            artifact = actual_row.get(artifact_key)
+            if not isinstance(artifact, dict):
+                issues.append(f"{label} {artifact_key} artifact is missing")
+                continue
+            path = _resolve_inside(
+                root, artifact.get("path"), f"{label} {artifact_key}"
+            )
+            if path is None or not path.is_file():
+                issues.append(f"{label} {artifact_key} file is missing")
+                continue
+            actual_sha = _sha256_file(path)
+            if artifact.get("sha256") != actual_sha:
+                issues.append(f"{label} {artifact_key} sha256 mismatch")
+            if artifact_key == "job":
+                try:
+                    actual_value = read_json(path)
+                except (OSError, ValueError, TypeError) as exc:
+                    issues.append(f"{label} job is invalid JSON: {exc}")
+                    continue
+            else:
+                try:
+                    actual_value = path.read_text(encoding="utf-8")
+                except (OSError, UnicodeError) as exc:
+                    issues.append(f"{label} worker prompt is invalid UTF-8: {exc}")
+                    continue
+            if actual_value != expected_value:
+                issues.append(
+                    f"{label} {artifact_key} was not deterministically derived from "
+                    "the approved request and selected source PNG"
+                )
+        if require_worker_outputs:
+            job_path = root / expected_row["work_dir"] / "reconstruction_job.json"
+            _validate_worker_outputs(root, job_path, expected_row["job"], issues)
+
+    if require_integrated_outputs:
+        _validate_integrated_outputs(root, expected["jobs"], issues)
+
+    expected_hash = content_sha256(
+        {key: value for key, value in manifest.items() if key != "content_hash"}
+    )
+    if manifest.get("content_hash") != expected_hash:
+        issues.append("reconstruction job manifest content_hash mismatch")
+
+    return {
+        "valid": not issues,
+        "workflow_id": expected_header["workflow_id"],
+        "slide_count": len(expected["jobs"]),
+        "worker_outputs_required": require_worker_outputs,
+        "integrated_outputs_required": require_integrated_outputs,
+        "issues": issues,
+    }
+
+
+def _expected_bundle(root: Path) -> dict[str, Any]:
+    request_path = root / "image_requests" / REQUEST_MANIFEST_NAME
+    request_report = validate_image_request_bundle(root, request_path)
+    if not request_report["valid"]:
+        raise _error(
+            "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+            "Image request lineage is invalid: "
+            + "; ".join(request_report["issues"][:6]),
+            request_path,
+        )
+    request_manifest = read_json(request_path)
+    workflow_id = str(request_manifest.get("workflow_id", "")).strip()
+    batch_path = root / "image_batches" / "image_generation_batch_manifest.json"
+    batch = read_json(batch_path)
+    calls = _accepted_calls(batch, len(request_manifest["slides"]))
+    plan_path = root / "skillset_execution_plan.json"
+    plan = read_json(plan_path)
+    plan_issues = validate_skillset_execution_plan(
+        plan_path,
+        expected_workflow_id=workflow_id,
+    )
+    if plan_issues:
+        raise _error(
+            "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+            "skillset execution plan is invalid: " + "; ".join(plan_issues[:6]),
+            plan_path,
+        )
+    renderer = next(
+        (
+            row
+            for row in plan.get("ordered_skills", [])
+            if isinstance(row, dict)
+            and row.get("skill_name") == "slide-image-dual-render"
+        ),
+        None,
+    )
+    if not isinstance(renderer, dict):
+        raise _error(
+            "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+            "skillset execution plan is missing slide-image-dual-render",
+            plan_path,
+        )
+
+    project = root / PROJECT_DIRECTORY
+    jobs: list[dict[str, Any]] = []
+    for request_row in request_manifest["slides"]:
+        slide = int(request_row["slide_number"])
+        call = calls.get(slide)
+        if call is None:
+            raise _error(
+                "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+                f"image batch has no accepted call for slide {slide}",
+                batch_path,
+            )
+        prompt_path = _required_artifact_path(root, request_row.get("prompt"), "prompt")
+        sidecar_path = _required_artifact_path(
+            root, request_row.get("semantic_sidecar"), "semantic sidecar"
+        )
+        source_path = project / "src" / f"slide{slide}.png"
+        width, height = _png_dimensions(source_path)
+        prompt_sha = _sha256_file(prompt_path)
+        sidecar_sha = _sha256_file(sidecar_path)
+        source_sha = _sha256_file(source_path)
+        if call.get("request_id") != request_row.get("request_id"):
+            raise _error(
+                "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+                f"slide {slide} batch request_id mismatch",
+                batch_path,
+            )
+        if call.get("prompt_sha256") != prompt_sha:
+            raise _error(
+                "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+                f"slide {slide} batch prompt_sha256 mismatch",
+                batch_path,
+            )
+        if call.get("selected_png_sha256") != source_sha:
+            raise _error(
+                "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+                f"slide {slide} selected_png_sha256 mismatch",
+                batch_path,
+            )
+        job_id = stable_id(
+            "reconstructionjob",
+            workflow_id,
+            request_row["request_id"],
+            source_sha,
+            sidecar_sha,
+        )
+        work_dir = project / "work" / f"slide{slide:02d}"
+        output_names = [name.format(slide=slide) for name in REQUIRED_OUTPUT_NAMES]
+        job: dict[str, Any] = {
+            "schema_name": JOB_SCHEMA,
+            "schema_version": "1.0.0",
+            "workflow_id": workflow_id,
+            "job_id": job_id,
+            "slide_number": slide,
+            "slide_id": request_row["slide_id"],
+            "source_png": {
+                **_artifact(root, source_path),
+                "width": width,
+                "height": height,
+            },
+            "image_request": _artifact(root, prompt_path),
+            "semantic_sidecar": _artifact(root, sidecar_path),
+            "request_lineage": {
+                key: request_row[key]
+                for key in (
+                    "request_id",
+                    "blueprint_entry_sha256",
+                    "visual_route_id",
+                    "visual_route_sha256",
+                    "layout_id",
+                    "layout_sha256",
+                )
+            },
+            "context_policy": {
+                "fresh_context_required": True,
+                "allowed_source_slides": [slide],
+                "full_deck_context_forbidden": True,
+                "shared_file_writes_forbidden": True,
+            },
+            "authoring_contract": {
+                "renderer_skill": "slide-image-dual-render",
+                "renderer_skill_path": renderer["skill_path"],
+                "quality": "reconstruction",
+                "targets": ["pptx", "html"],
+                "source_image_role": "visual_fidelity_target_not_delivered_slide_surface",
+                "exact_text_source": "semantic_sidecar",
+                "native_text_required": True,
+                "native_structure_required": True,
+                "selective_photoreal_crops_allowed": True,
+                "full_slide_raster_forbidden": True,
+                "backend_branching_forbidden": True,
+            },
+            "required_outputs": output_names,
+            "receipt_binding": {
+                "job_id": job_id,
+                "source_png_sha256": source_sha,
+                "image_request_sha256": prompt_sha,
+                "semantic_sidecar_sha256": sidecar_sha,
+                "artifact_hashes_required": True,
+            },
+            "content_hash": "0" * 64,
+        }
+        job["content_hash"] = content_sha256(
+            {key: value for key, value in job.items() if key != "content_hash"}
+        )
+        worker_prompt = _worker_prompt(root, work_dir, job)
+        jobs.append(
+            {
+                "work_dir": work_dir.relative_to(root).as_posix(),
+                "lineage": {
+                    "slide_number": slide,
+                    "slide_id": request_row["slide_id"],
+                    "job_id": job_id,
+                    "request_id": request_row["request_id"],
+                    "source_png_sha256": source_sha,
+                    "job_content_hash": job["content_hash"],
+                },
+                "job": job,
+                "worker_prompt": worker_prompt,
+            }
+        )
+
+    header = {
+        "schema_name": JOB_MANIFEST_SCHEMA,
+        "schema_version": "1.0.0",
+        "workflow_id": workflow_id,
+        "context_unit": "one_source_slide_per_fresh_context",
+        "dispatch_mode": "bounded_parallel_workers",
+        "max_parallel_workers": min(MAX_PARALLEL_WORKERS, len(jobs)),
+        "shared_file_writer": "integrator_only",
+        "worker_model": "gpt-5.6-sol",
+        "worker_reasoning_effort": "medium",
+        "token_policy": "compact_job_plus_one_source_slide_no_full_deck_duplication",
+        "source_artifacts": {
+            "image_request_manifest": _artifact(root, request_path),
+            "image_generation_batch_manifest": _artifact(root, batch_path),
+            "skillset_execution_plan": _artifact(root, plan_path),
+        },
+        "slide_count": len(jobs),
+    }
+    return {"header": header, "jobs": jobs}
+
+
+def _worker_prompt(root: Path, work_dir: Path, job: dict[str, Any]) -> str:
+    slide = job["slide_number"]
+    required = "\n".join(f"- `{name}`" for name in job["required_outputs"])
+    return f"""Use `$slide-image-dual-render` for exactly slide {slide}.
+
+This is one isolated fresh-context reconstruction job. Read
+`{(work_dir / "reconstruction_job.json").as_posix()}` first and inspect only the
+source image and semantic sidecar named there. Do not load any other slide image
+or full-deck prompt into this context.
+
+Quality target: reproduce the source slide's composition, typography hierarchy,
+spacing, visual density, imagery, and meaningful small details at the level of a
+careful one-slide SkillSet conversion. Rebuild all readable text and structural
+elements as editable native PPTX/HTML objects. Use raster crops only for genuine
+photographic, continuous-tone, or 3D regions; never use the source PNG or a
+near-full-slide crop as the delivered slide surface. Preserve exact copy from the
+semantic sidecar. Do not simplify the source into generic cards or an invented
+template.
+
+Read the renderer Skill, `styles/_schema.md`, `scripts/classify.md`,
+`references/codex-subagents.md`, and `references/hardlock-mode.md`. Measure and
+classify before authoring. Write only inside `{work_dir.as_posix()}`; never edit
+`lib/slides.js`, `styles/`, `assets/`, build scripts, or other slide folders.
+Use an isolated one-slide test render for PPTX and HTML QA. The integrator alone
+will merge accepted fragments into shared files. Store the worker's isolated
+raster/screenshot evidence below `{(work_dir / 'worker_qa').as_posix()}` and
+reference those files from `qa_evidence.json`; do not use the final
+`visual_qa/` directory, which the source-mapped full-deck gate will replace.
+
+Required outputs:
+{required}
+
+`worker_receipt.json` must use `agent: slide_reconstruct_worker`,
+`status: completed`, `sharedFilesEdited: false`, list every produced artifact,
+and include `jobId`, `jobContentHash`, the three receipt-binding hashes from the
+job, plus `artifactHashes` containing the SHA-256 of every listed artifact other
+than the receipt itself. Do not report pass until the isolated source-vs-render
+comparison and editable-object checks have actually passed.
+"""
+
+
+def _validate_worker_outputs(
+    root: Path,
+    job_path: Path,
+    job: dict[str, Any],
+    issues: list[str],
+) -> None:
+    slide = int(job["slide_number"])
+    work_dir = job_path.parent
+    label = f"slide {slide} worker"
+    required = list(job["required_outputs"])
+    for name in required:
+        if not (work_dir / name).is_file():
+            issues.append(f"{label} is missing {name}")
+    if any(not (work_dir / name).is_file() for name in required):
+        return
+
+    measurements = _read_worker_json(work_dir / "measurements.json", issues, label)
+    if measurements is not None:
+        canvas = measurements.get("canvas", measurements)
+        if not isinstance(canvas, dict):
+            issues.append(f"{label} measurements.json canvas must be an object")
+        else:
+            expected_width = job["source_png"]["width"]
+            expected_height = job["source_png"]["height"]
+            if _number(canvas.get("width")) != expected_width:
+                issues.append(
+                    f"{label} measurements canvas width must be {expected_width}"
+                )
+            if _number(canvas.get("height")) != expected_height:
+                issues.append(
+                    f"{label} measurements canvas height must be {expected_height}"
+                )
+
+    profile = _read_worker_json(work_dir / "profile_override.json", issues, label)
+    if profile is not None:
+        if not any(
+            str(profile.get(key, "")).strip() for key in ("profileId", "profile", "id")
+        ):
+            issues.append(f"{label} profile_override.json requires profileId")
+        if not str(profile.get("confidence", "")).strip():
+            issues.append(f"{label} profile_override.json requires confidence")
+
+    crop_plan = _read_worker_json(work_dir / "crop_plan.json", issues, label)
+    if crop_plan is not None:
+        _validate_crops(crop_plan, slide, job["source_png"], issues)
+
+    fragment_path = work_dir / f"s{slide}.fragment.js"
+    try:
+        fragment = fragment_path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        issues.append(f"{label} fragment is not valid UTF-8: {exc}")
+    else:
+        functions = re.findall(
+            r"\bfunction\s+([A-Za-z_$][\w$]*)\s*\(\s*s\s*\)", fragment
+        )
+        if functions != [f"s{slide}"]:
+            issues.append(
+                f"{label} fragment expected exactly one function s{slide}(s), got {functions}"
+            )
+        lowered = fragment.lower()
+        if "require(" in lowered or "require (" in lowered:
+            issues.append(
+                f"{label} fragment must use the shared kit without require(...)"
+            )
+        if (
+            "target ===" in lowered
+            or "target===" in lowered
+            or "pptx" in lowered
+            and "html" in lowered
+            and "if" in lowered
+        ):
+            issues.append(
+                f"{label} fragment contains forbidden backend-specific branching"
+            )
+        source_name = f"slide{slide}.png".lower()
+        if source_name in lowered:
+            issues.append(
+                f"{label} fragment references the full source PNG {source_name}"
+            )
+
+    score = _read_worker_json(work_dir / "reconstruction_score.json", issues, label)
+    if score is not None:
+        if score.get("slide") != slide:
+            issues.append(f"{label} reconstruction_score.slide must be {slide}")
+        if score.get("quality") != "reconstruction" or score.get("status") != "pass":
+            issues.append(
+                f"{label} reconstruction_score must record reconstruction pass"
+            )
+
+    qa_result = _read_worker_json(work_dir / "qa_result.json", issues, label)
+    if qa_result is not None:
+        if qa_result.get("slide") != slide or qa_result.get("status") != "pass":
+            issues.append(f"{label} qa_result.json must record slide {slide} pass")
+        for key in ("visualFidelity", "nativeEditability", "cropPolicy"):
+            if qa_result.get(key) != "pass":
+                issues.append(f"{label} qa_result.{key} must be pass")
+        for key in ("blockingIssues", "noticeableIssues", "minorIssues"):
+            if not isinstance(qa_result.get(key), list):
+                issues.append(f"{label} qa_result.{key} must be an array")
+        if qa_result.get("blockingIssues"):
+            issues.append(f"{label} qa_result.blockingIssues must be empty")
+        evidence_ref = str(
+            qa_result.get("qaEvidence", qa_result.get("evidence", ""))
+        ).replace("\\", "/")
+        if (
+            not evidence_ref.endswith(f"work/slide{slide:02d}/qa_evidence.json")
+            and evidence_ref != "qa_evidence.json"
+        ):
+            issues.append(f"{label} qa_result.json must reference qa_evidence.json")
+
+    evidence = _read_worker_json(work_dir / "qa_evidence.json", issues, label)
+    if evidence is not None:
+        if evidence.get("slide") != slide:
+            issues.append(f"{label} qa_evidence.slide must be {slide}")
+        if evidence.get("sourceHash") != job["source_png"]["sha256"]:
+            issues.append(f"{label} qa_evidence sourceHash must match the selected PNG")
+        visual = evidence.get("visualComparison")
+        if not isinstance(visual, dict) or visual.get("status") != "pass":
+            issues.append(f"{label} qa_evidence visualComparison must record pass")
+        elif not str(visual.get("method", "")).strip():
+            issues.append(f"{label} qa_evidence visualComparison.method is required")
+        if not str(evidence.get("checkedAt", "")).strip():
+            issues.append(f"{label} qa_evidence.checkedAt is required")
+        if not str(evidence.get("checkedBy", "")).strip():
+            issues.append(f"{label} qa_evidence.checkedBy is required")
+        expected_source = root / job["source_png"]["path"]
+        _validate_evidence_file(
+            root,
+            work_dir,
+            evidence,
+            path_key="sourceImage",
+            hash_key="sourceHash",
+            label=label,
+            issues=issues,
+            expected_path=expected_source,
+        )
+        _validate_evidence_file(
+            root,
+            work_dir,
+            evidence,
+            path_key="pptxRaster",
+            hash_key="pptxRasterHash",
+            label=label,
+            issues=issues,
+        )
+        _validate_evidence_file(
+            root,
+            work_dir,
+            evidence,
+            path_key="htmlScreenshot",
+            hash_key="htmlScreenshotHash",
+            label=label,
+            issues=issues,
+        )
+
+    for markdown_name in (
+        "reconstruction_notes.md",
+        "editability_inventory.md",
+        "qa_report.md",
+    ):
+        try:
+            value = (work_dir / markdown_name).read_text(encoding="utf-8")
+        except (OSError, UnicodeError) as exc:
+            issues.append(f"{label} {markdown_name} is not valid UTF-8: {exc}")
+            continue
+        if len(value.strip()) < 20:
+            issues.append(f"{label} {markdown_name} is too short to be evidence")
+        if re.search(
+            r"mostly\s+baked|preservation\s+only|qa\s+pending|not\s+run", value, re.I
+        ):
+            issues.append(f"{label} {markdown_name} contains non-production wording")
+
+    receipt = _read_worker_json(work_dir / "worker_receipt.json", issues, label)
+    if receipt is None:
+        return
+    binding = job["receipt_binding"]
+    expected_fields = {
+        "slide": slide,
+        "agent": "slide_reconstruct_worker",
+        "status": "completed",
+        "sharedFilesEdited": False,
+        "jobId": job["job_id"],
+        "jobContentHash": job["content_hash"],
+        "sourcePngSha256": binding["source_png_sha256"],
+        "imageRequestSha256": binding["image_request_sha256"],
+        "semanticSidecarSha256": binding["semantic_sidecar_sha256"],
+    }
+    for key, value in expected_fields.items():
+        if receipt.get(key) != value:
+            issues.append(f"{label} worker_receipt.{key} must be {value!r}")
+    artifacts = receipt.get("artifacts")
+    if not isinstance(artifacts, list):
+        issues.append(f"{label} worker_receipt.artifacts must be an array")
+        artifacts = []
+    expected_artifacts = [name for name in required if name != "worker_receipt.json"]
+    if sorted(artifacts) != sorted(expected_artifacts):
+        issues.append(f"{label} worker_receipt.artifacts must list every worker output")
+    artifact_hashes = receipt.get("artifactHashes")
+    if not isinstance(artifact_hashes, dict):
+        issues.append(f"{label} worker_receipt.artifactHashes must be an object")
+    else:
+        for name in expected_artifacts:
+            path = work_dir / name
+            if path.is_file() and artifact_hashes.get(name) != _sha256_file(path):
+                issues.append(
+                    f"{label} worker_receipt artifact hash mismatch for {name}"
+                )
+
+
+def _validate_integrated_outputs(
+    root: Path,
+    jobs: list[dict[str, Any]],
+    issues: list[str],
+) -> None:
+    project = root / PROJECT_DIRECTORY
+    slides_path = project / "lib" / "slides.js"
+    report_path = project / "work" / "integration_report.md"
+    crop_plan_path = project / "work" / "crop_plan.json"
+    try:
+        slides_source = slides_path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        issues.append(f"integrator output lib/slides.js cannot be read: {exc}")
+        slides_source = ""
+    if slides_source:
+        expected_functions = [f"s{row['lineage']['slide_number']}" for row in jobs]
+        actual_functions = re.findall(
+            r"\bfunction\s+([A-Za-z_$][\w$]*)\s*\(\s*s\s*\)",
+            slides_source,
+        )
+        for function_name in expected_functions:
+            if actual_functions.count(function_name) != 1:
+                issues.append(
+                    f"integrator output must contain exactly one function {function_name}(s)"
+                )
+        unexpected = sorted(set(actual_functions) - set(expected_functions))
+        if unexpected:
+            issues.append(
+                f"integrator output contains unexpected slide functions {unexpected}"
+            )
+        if "module.exports" not in slides_source:
+            issues.append(
+                "integrator output lib/slides.js must export the slide functions"
+            )
+        for row in jobs:
+            source_name = f"slide{row['lineage']['slide_number']}.png".lower()
+            if source_name in slides_source.lower():
+                issues.append(
+                    f"integrator output references forbidden full source PNG {source_name}"
+                )
+
+    try:
+        report = report_path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        issues.append(f"integrator output integration_report.md cannot be read: {exc}")
+        report = ""
+    if report:
+        if "# Sub-Agent Integration Report" not in report:
+            issues.append(
+                "integration report must be produced by the official integrator"
+            )
+        for row in jobs:
+            slide = row["lineage"]["slide_number"]
+            if f"## s{slide}" not in report:
+                issues.append(f"integration report is missing slide s{slide}")
+        if re.search(r":\s*missing\b", report, re.I):
+            issues.append("integration report contains missing worker artifacts")
+
+    try:
+        crop_plan = read_json(crop_plan_path)
+    except (OSError, ValueError, TypeError) as exc:
+        issues.append(f"integrated crop_plan.json cannot be read: {exc}")
+    else:
+        if not isinstance(crop_plan, dict):
+            issues.append("integrated crop_plan.json must be an object")
+
+
+def _validate_evidence_file(
+    root: Path,
+    work_dir: Path,
+    evidence: dict[str, Any],
+    *,
+    path_key: str,
+    hash_key: str,
+    label: str,
+    issues: list[str],
+    expected_path: Path | None = None,
+) -> None:
+    raw = evidence.get(path_key)
+    if not isinstance(raw, str) or not raw.strip():
+        issues.append(f"{label} qa_evidence.{path_key} is required")
+        return
+    project = root / PROJECT_DIRECTORY
+    candidate = Path(raw)
+    if candidate.is_absolute():
+        path = candidate.resolve()
+    else:
+        project_candidate = (project / candidate).resolve()
+        path = (
+            project_candidate
+            if project_candidate.is_file()
+            else (work_dir / candidate).resolve()
+        )
+    if path != project and not path.is_relative_to(project):
+        issues.append(f"{label} qa_evidence.{path_key} escapes the project")
+        return
+    if expected_path is not None and path != expected_path.resolve():
+        issues.append(f"{label} qa_evidence.{path_key} must match the selected PNG")
+    if not path.is_file():
+        issues.append(f"{label} qa_evidence.{path_key} is missing: {path}")
+        return
+    expected_hash = evidence.get(hash_key)
+    if not isinstance(expected_hash, str) or expected_hash != _sha256_file(path):
+        issues.append(f"{label} qa_evidence {hash_key} mismatch")
+
+
+def _accepted_calls(
+    batch: dict[str, Any], slide_count: int
+) -> dict[int, dict[str, Any]]:
+    if batch.get("schema_name") != "image_generation_batch_manifest":
+        raise _error(
+            "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+            "image generation batch manifest schema_name is invalid",
+        )
+    if batch.get("platform_tool_id") != "image_gen.imagegen":
+        raise _error(
+            "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+            "image generation must use image_gen.imagegen",
+        )
+    if (
+        batch.get("slide_count") != slide_count
+        or batch.get("accepted_count") != slide_count
+    ):
+        raise _error(
+            "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+            "image generation batch must accept exactly one image per slide",
+        )
+    calls: dict[int, dict[str, Any]] = {}
+    for wave in batch.get("waves", []):
+        if not isinstance(wave, dict) or wave.get("concurrent_dispatch") is not True:
+            raise _error(
+                "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+                "every image generation wave must use concurrent_dispatch",
+            )
+        for call in wave.get("calls", []):
+            if not isinstance(call, dict) or call.get("status") != "ACCEPTED":
+                continue
+            slide = call.get("slide_number")
+            if not isinstance(slide, int) or slide in calls:
+                raise _error(
+                    "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+                    "image generation batch contains an invalid or duplicate slide call",
+                )
+            calls[slide] = call
+    if sorted(calls) != list(range(1, slide_count + 1)):
+        raise _error(
+            "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+            f"accepted image calls must cover slides 1..{slide_count}",
+        )
+    return calls
+
+
+def _validate_crops(
+    payload: dict[str, Any],
+    slide: int,
+    source: dict[str, Any],
+    issues: list[str],
+) -> None:
+    raw = payload.get("crops", payload)
+    if isinstance(raw, dict):
+        crops = [
+            dict(value, name=value.get("name", name))
+            for name, value in raw.items()
+            if isinstance(value, dict)
+        ]
+    elif isinstance(raw, list):
+        crops = raw
+    else:
+        issues.append(f"slide {slide} worker crop_plan.json must contain crops")
+        return
+    for index, crop in enumerate(crops):
+        if not isinstance(crop, dict):
+            issues.append(f"slide {slide} worker crop {index} must be an object")
+            continue
+        name = str(crop.get("name", ""))
+        if not name.startswith(f"s{slide}"):
+            issues.append(f"slide {slide} worker crop names must be prefixed s{slide}")
+        if int(_number(crop.get("slide"), default=-1)) != slide:
+            issues.append(f"slide {slide} worker crop {name or index} has wrong slide")
+        values = {
+            key: _number(crop.get(key), default=-1) for key in ("x", "y", "w", "h")
+        }
+        if (
+            any(value < 0 for value in values.values())
+            or values["w"] <= 0
+            or values["h"] <= 0
+        ):
+            issues.append(
+                f"slide {slide} worker crop {name or index} has invalid geometry"
+            )
+            continue
+        area = values["w"] * values["h"]
+        canvas_area = source["width"] * source["height"]
+        if area / canvas_area > 0.45:
+            issues.append(
+                f"slide {slide} worker crop {name or index} exceeds 45% of slide area"
+            )
+        content_type = str(
+            crop.get("content_type", crop.get("contentType", ""))
+        ).strip()
+        reason = str(crop.get("reconstruction_reason", "")).strip()
+        replacement = str(crop.get("editable_replacement", "")).strip()
+        if not content_type or not reason or not replacement:
+            issues.append(
+                f"slide {slide} worker crop {name or index} needs content_type, "
+                "reconstruction_reason, and editable_replacement"
+            )
+
+
+def _read_worker_json(
+    path: Path, issues: list[str], label: str
+) -> dict[str, Any] | None:
+    try:
+        payload = read_json(path)
+    except (OSError, ValueError, TypeError) as exc:
+        issues.append(f"{label} {path.name} is invalid JSON: {exc}")
+        return None
+    if not isinstance(payload, dict):
+        issues.append(f"{label} {path.name} must be an object")
+        return None
+    return payload
+
+
+def _required_artifact_path(root: Path, artifact: Any, label: str) -> Path:
+    if not isinstance(artifact, dict):
+        raise _error(
+            "DC_RECONSTRUCTION_JOB_INPUT_INVALID", f"{label} artifact is missing"
+        )
+    path = _resolve_inside(root, artifact.get("path"), label)
+    if path is None or not path.is_file():
+        raise _error("DC_RECONSTRUCTION_JOB_INPUT_INVALID", f"{label} is missing")
+    actual = _sha256_file(path)
+    if artifact.get("sha256") != actual:
+        raise _error(
+            "DC_RECONSTRUCTION_JOB_INPUT_INVALID", f"{label} sha256 mismatch", path
+        )
+    return path
+
+
+def _resolve_inside(root: Path, value: Any, label: str) -> Path | None:
+    if not isinstance(value, str) or not value.strip():
+        return None
+    candidate = Path(value)
+    path = (
+        candidate.resolve() if candidate.is_absolute() else (root / candidate).resolve()
+    )
+    if path != root and not path.is_relative_to(root):
+        raise _error(
+            "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+            f"{label} must stay inside the workflow runtime",
+            path,
+        )
+    if path.is_symlink():
+        raise _error(
+            "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+            f"{label} must not be a symlink",
+            path,
+        )
+    return path
+
+
+def _png_dimensions(path: Path) -> tuple[int, int]:
+    try:
+        data = path.read_bytes()
+    except OSError as exc:
+        raise _error(
+            "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+            f"source PNG is missing: {path}",
+            path,
+        ) from exc
+    if len(data) < 24 or data[:8] != b"\x89PNG\r\n\x1a\n" or data[12:16] != b"IHDR":
+        raise _error(
+            "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+            f"source image is not a structurally valid PNG: {path}",
+            path,
+        )
+    width, height = struct.unpack(">II", data[16:24])
+    if width <= 0 or height <= 0 or abs((width / height) - (16 / 9)) > 0.02:
+        raise _error(
+            "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+            f"source PNG must be 16:9, got {width}x{height}",
+            path,
+        )
+    return width, height
+
+
+def _artifact(root: Path, path: Path) -> dict[str, str]:
+    resolved = path.resolve()
+    if not resolved.is_file():
+        raise _error(
+            "DC_RECONSTRUCTION_JOB_INPUT_INVALID", f"artifact is missing: {resolved}"
+        )
+    return {
+        "path": resolved.relative_to(root).as_posix(),
+        "sha256": _sha256_file(resolved),
+    }
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def _number(value: Any, *, default: float = 0) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _error(code: str, message: str, path: Path | None = None) -> DeckCompilerError:
+    return DeckCompilerError(
+        code,
+        "general_generate_workflow",
+        message,
+        path.as_posix() if path else None,
+        remediation_hint=(
+            "Re-run deterministic job preparation after ImageGen selection, then execute "
+            "one isolated slide-image-dual-render reconstruction context per job."
+        ),
+    )
+
+
+__all__ = [
+    "JOB_MANIFEST_NAME",
+    "MAX_PARALLEL_WORKERS",
+    "REQUIRED_OUTPUT_NAMES",
+    "ReconstructionJobPreparationResult",
+    "prepare_reconstruction_jobs",
+    "validate_reconstruction_job_bundle",
+]

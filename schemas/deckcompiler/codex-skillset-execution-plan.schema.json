@@ -28,7 +28,7 @@
   ],
   "properties": {
     "schema_name": {"const": "codex_skillset_execution_plan"},
-    "schema_version": {"const": "1.4.0"},
+    "schema_version": {"const": "1.5.0"},
     "workflow_id": {"type": "string", "pattern": "^generate_[0-9a-f]{20}$"},
     "status": {"const": "READY"},
     "skill_root": {"type": "string", "minLength": 1},
@@ -80,6 +80,8 @@
         "crop_generator",
         "slide_pipeline",
         "final_gate",
+        "validate_agent_work",
+        "integrate_subagent_work",
         "rasterize_pptx",
         "capture_html_screenshot",
         "compare_slide_images",
@@ -98,6 +100,8 @@
         "timing_report_path",
         "semantic_sidecar_pattern",
         "per_slide_work_pattern",
+        "reconstruction_job_manifest_path",
+        "integration_report_path",
         "profile_path",
         "slides_source_path",
         "crop_plan_path",
@@ -112,6 +116,8 @@
         "timing_report_path": {"type": "string", "pattern": "execution_timing\\.json$"},
         "semantic_sidecar_pattern": {"type": "string", "pattern": "slide-NNN\\.semantic\\.json$"},
         "per_slide_work_pattern": {"type": "string", "pattern": "slideXX$"},
+        "reconstruction_job_manifest_path": {"type": "string", "pattern": "reconstruction_job_manifest\\.json$"},
+        "integration_report_path": {"type": "string", "pattern": "integration_report\\.md$"},
         "profile_path": {"type": "string", "pattern": "active\\.json$"},
         "slides_source_path": {"type": "string", "pattern": "slides\\.js$"},
         "crop_plan_path": {"type": "string", "pattern": "crop_plan\\.json$"},
@@ -122,7 +128,7 @@
     "environment_template": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["SLIDE_PIPELINE_STRICT", "DECK_PROFILE", "DECK_ASSETS", "DECK_PXW", "DECK_PXH", "CROP_PLAN", "SRC_DIR"],
+      "required": ["SLIDE_PIPELINE_STRICT", "DECK_PROFILE", "DECK_ASSETS", "DECK_PXW", "DECK_PXH", "CROP_PLAN", "SRC_DIR", "WORK_DIR", "SLIDES_OUT", "CROP_PLAN_OUT", "INTEGRATION_REPORT_OUT"],
       "properties": {
         "SLIDE_PIPELINE_STRICT": {"const": "1"},
         "DECK_PROFILE": {"type": "string", "minLength": 1},
@@ -130,7 +136,11 @@
         "DECK_PXW": {"const": "<source-width>"},
         "DECK_PXH": {"const": "<source-height>"},
         "CROP_PLAN": {"type": "string", "pattern": "crop_plan\\.json$"},
-        "SRC_DIR": {"type": "string", "minLength": 1}
+        "SRC_DIR": {"type": "string", "minLength": 1},
+        "WORK_DIR": {"type": "string", "pattern": "work$"},
+        "SLIDES_OUT": {"type": "string", "pattern": "slides\\.js$"},
+        "CROP_PLAN_OUT": {"type": "string", "pattern": "crop_plan\\.json$"},
+        "INTEGRATION_REPORT_OUT": {"type": "string", "pattern": "integration_report\\.md$"}
       }
     },
     "dependency_contract": {
@@ -165,6 +175,7 @@
         "default_design_direction",
         "prompt_policy",
         "image_generation",
+        "reconstruction_authoring",
         "compilation",
         "performance_target"
       ],
@@ -202,6 +213,22 @@
             "max_regenerations_per_slide": {"const": 1},
             "automatic_canary": {"const": false},
             "compile_after_all_images": {"const": true}
+          }
+        },
+        "reconstruction_authoring": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["context_unit", "dispatch_mode", "max_parallel_workers", "shared_file_writer", "worker_scope", "worker_model", "worker_reasoning_effort", "token_policy", "isolated_dual_render_qa_required"],
+          "properties": {
+            "context_unit": {"const": "one_source_slide_per_fresh_context"},
+            "dispatch_mode": {"const": "bounded_parallel_workers"},
+            "max_parallel_workers": {"const": 4},
+            "shared_file_writer": {"const": "integrator_only"},
+            "worker_scope": {"const": "one_slide_work_directory_only"},
+            "worker_model": {"const": "gpt-5.6-sol"},
+            "worker_reasoning_effort": {"const": "medium"},
+            "token_policy": {"const": "compact_job_plus_one_source_slide_no_full_deck_duplication"},
+            "isolated_dual_render_qa_required": {"const": true}
           }
         },
         "compilation": {
@@ -245,7 +272,11 @@
         "unconditional_second_full_deck_compile_forbidden",
         "final_full_deck_qa_required",
         "source_slide_mapping_required",
-        "full_slide_source_raster_forbidden"
+        "full_slide_source_raster_forbidden",
+        "high_fidelity_acceptance_required",
+        "allowed_needs_polish_issue_types",
+        "quality_reference_baseline",
+        "allowed_needs_polish_metric_limits"
       ],
       "properties": {
         "orchestrator_quality_level": {"const": "polish"},
@@ -261,7 +292,28 @@
         "unconditional_second_full_deck_compile_forbidden": {"const": true},
         "final_full_deck_qa_required": {"const": true},
         "source_slide_mapping_required": {"const": true},
-        "full_slide_source_raster_forbidden": {"const": true}
+        "full_slide_source_raster_forbidden": {"const": true},
+        "high_fidelity_acceptance_required": {"const": true},
+        "allowed_needs_polish_issue_types": {
+          "const": ["palette_drift", "pptx_html_edge_mismatch"]
+        },
+        "quality_reference_baseline": {
+          "const": "accepted_one_slide_canary_20260808"
+        },
+        "allowed_needs_polish_metric_limits": {
+          "const": {
+            "palette_drift": {
+              "metric": "color_palette_drift",
+              "maximum": 0.265,
+              "minimum_ssim": 0.70
+            },
+            "pptx_html_edge_mismatch": {
+              "metric": "edge_difference_ratio",
+              "maximum": 0.102,
+              "minimum_ssim": 0.82
+            }
+          }
+        }
       }
     },
     "crop_contract": {
@@ -290,6 +342,11 @@
         "install_node_dependencies",
         "install_hardlock",
         "plan_orchestration",
+        "prepare_reconstruction_jobs",
+        "codex_execute_reconstruction_jobs",
+        "validate_reconstruction_jobs",
+        "validate_agent_work",
+        "integrate_agent_work",
         "prepare_crops",
         "compile_full_deck",
         "gate_full_deck",
@@ -298,6 +355,7 @@
         "compare_full_deck",
         "summarize_full_deck",
         "enforce_full_deck_qa",
+        "enforce_full_deck_quality_acceptance",
         "reconstruct_wave",
         "gate_wave",
         "rasterize_wave",
@@ -305,6 +363,7 @@
         "compare_wave",
         "summarize_wave",
         "enforce_wave_qa",
+        "enforce_wave_quality_acceptance",
         "summarize_backlog",
         "make_repair_wave_plan",
         "generate_repair_prompt",
@@ -316,6 +375,11 @@
         "install_node_dependencies": {"$ref": "#/$defs/command"},
         "install_hardlock": {"$ref": "#/$defs/command"},
         "plan_orchestration": {"$ref": "#/$defs/command"},
+        "prepare_reconstruction_jobs": {"$ref": "#/$defs/command"},
+        "codex_execute_reconstruction_jobs": {"$ref": "#/$defs/command"},
+        "validate_reconstruction_jobs": {"$ref": "#/$defs/command"},
+        "validate_agent_work": {"$ref": "#/$defs/command"},
+        "integrate_agent_work": {"$ref": "#/$defs/command"},
         "prepare_crops": {"$ref": "#/$defs/command"},
         "compile_full_deck": {"$ref": "#/$defs/command"},
         "gate_full_deck": {"$ref": "#/$defs/command"},
@@ -324,6 +388,7 @@
         "compare_full_deck": {"$ref": "#/$defs/command"},
         "summarize_full_deck": {"$ref": "#/$defs/command"},
         "enforce_full_deck_qa": {"$ref": "#/$defs/command"},
+        "enforce_full_deck_quality_acceptance": {"$ref": "#/$defs/command"},
         "reconstruct_wave": {"$ref": "#/$defs/command"},
         "gate_wave": {"$ref": "#/$defs/command"},
         "rasterize_wave": {"$ref": "#/$defs/command"},
@@ -331,6 +396,7 @@
         "compare_wave": {"$ref": "#/$defs/command"},
         "summarize_wave": {"$ref": "#/$defs/command"},
         "enforce_wave_qa": {"$ref": "#/$defs/command"},
+        "enforce_wave_quality_acceptance": {"$ref": "#/$defs/command"},
         "summarize_backlog": {"$ref": "#/$defs/command"},
         "make_repair_wave_plan": {"$ref": "#/$defs/command"},
         "generate_repair_prompt": {"$ref": "#/$defs/command"},
@@ -344,6 +410,7 @@
       "additionalProperties": false,
       "required": [
         "setup",
+        "reconstruction_authoring",
         "single_compile_fast_path",
         "fast_path_acceptance",
         "repair_wave_loop",
@@ -358,7 +425,16 @@
           "const": [
             "install_node_dependencies",
             "install_hardlock",
-            "plan_orchestration",
+            "plan_orchestration"
+          ]
+        },
+        "reconstruction_authoring": {
+          "const": [
+            "prepare_reconstruction_jobs",
+            "codex_execute_reconstruction_jobs",
+            "validate_reconstruction_jobs",
+            "validate_agent_work",
+            "integrate_agent_work",
             "prepare_crops"
           ]
         },
@@ -370,7 +446,8 @@
             "capture_full_html",
             "compare_full_deck",
             "summarize_full_deck",
-            "enforce_full_deck_qa"
+            "enforce_full_deck_qa",
+            "enforce_full_deck_quality_acceptance"
           ]
         },
         "fast_path_acceptance": {"const": ["enforce_orchestration_state"]},
@@ -385,6 +462,7 @@
             "compare_wave",
             "summarize_wave",
             "enforce_wave_qa",
+            "enforce_wave_quality_acceptance",
             "summarize_backlog"
           ]
         },
@@ -397,6 +475,7 @@
             "compare_full_deck",
             "summarize_full_deck",
             "enforce_full_deck_qa",
+            "enforce_full_deck_quality_acceptance",
             "enforce_orchestration_state"
           ]
         },
@@ -415,7 +494,7 @@
         "unconditional_second_full_compile": {"const": false}
       }
     },
-    "required_artifacts": {"type": "array", "minItems": 13, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "required_artifacts": {"type": "array", "minItems": 15, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
     "stop_conditions": {
       "type": "object",
       "additionalProperties": false,

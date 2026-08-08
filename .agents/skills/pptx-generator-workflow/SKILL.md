@@ -189,27 +189,50 @@ sequence and commands in `skillset_execution_plan.json`:
 2. install project-local Node dependencies once with npm's verified local cache
    preferred and audit/fund network chatter disabled, then install hardlock
    templates;
-3. create `styles/active.json`, `lib/slides.js`, and isolated per-slide worker
-   artifacts;
-4. keep `work/crop_plan.json` explicit even when it contains zero crops, run
+3. after all selected PNGs and the batch manifest exist, run
+   `deckcompiler prepare-reconstruction-jobs --runtime <runtime>`. This creates
+   one hash-bound job and compact worker prompt per slide under
+   `work/slideXX/`;
+4. execute each job in a fresh context that can see only one source slide, its
+   job, Semantic Sidecar, and the canonical renderer Skill. Combine profile
+   mapping and reconstruction in that one context to avoid duplicate model
+   passes. Use no more than four workers concurrently. Each worker writes only
+   its assigned `work/slideXX/` artifacts and performs isolated PPTX/HTML QA.
+   Keep those images under `work/slideXX/worker_qa/` so the later full-deck
+   source-mapped `visual_qa/` capture cannot invalidate their evidence hashes;
+5. run `deckcompiler validate-reconstruction-jobs --require-worker-outputs`,
+   then the official `validate_agent_work.js`. Reject stale source hashes,
+   incomplete measurements, generic or backend-branched fragments, missing QA
+   evidence, and receipts that edited shared files;
+6. run the official `integrate_subagent_work.js` with `WORK_DIR`, `SLIDES_OUT`,
+   `CROP_PLAN_OUT`, and `INTEGRATION_REPORT_OUT` from the execution plan. The
+   integrator is the only writer of `lib/slides.js` and the integrated crop
+   plan; parallel workers must never edit shared renderer files;
+7. keep `work/crop_plan.json` explicit even when it contains zero crops, run
    crop preparation so `assets/manifest.json` exists, and do not use
    `--skip-crops` for final delivery;
-5. after all ImageGen references and per-slide artifacts are ready, run one
+8. after all ImageGen references and validated integration artifacts are ready,
+   run one
    all-slide
    `slide-image-dual-render/scripts/slide_pipeline.js` build with
    `--quality reconstruction --require-qa --require-reconstruction`, an
    explicit `--crop-plan`, an explicit project-local `--node-path`, and
    `--allow-large-batch`, writing directly to `deck-final-editable.pptx` and
    `deck-final-editable.html`;
-6. run `slide-image-dual-render/scripts/final_gate.js` with PPTX openability;
-7. run all five `slide-visual-polish-qa` steps once against that full-deck
+9. run `slide-image-dual-render/scripts/final_gate.js` with PPTX openability;
+10. run all five `slide-visual-polish-qa` steps once against that full-deck
    PPTX/HTML, using `--source-slides`;
-8. when fail/blocking counts are zero, take the single-compile fast path and do
+11. run `deckcompiler validate-visual-quality` against the official summary.
+   Only `palette_drift` and `pptx_html_edge_mismatch` may remain as accepted
+   noticeable native-renderer diagnostics. Spacing, hierarchy, typography,
+   clipping, missing content, and meaningful-detail loss require repair;
+12. when fail/blocking counts are zero and the high-fidelity policy accepts the
+   result, take the single-compile fast path and do
    not repeat the all-slide build or QA merely to rename it "final"; run
    `fast_path_acceptance` to enforce the orchestration state;
-9. only when blockers exist, create targeted repair-wave plans, rebuild and QA
+13. only when blockers exist, create targeted repair-wave plans, rebuild and QA
    waves of at most five slides, for at most two iterations;
-10. after any repair, run one conditional all-slide compile, final gate, and
+14. after any repair, run one conditional all-slide compile, final gate, and
     full-deck QA so delivered capture metadata names and hash-binds the repaired
     PPTX/HTML.
 
@@ -223,6 +246,9 @@ Production defaults:
 - PPTX openability required.
 - exact official `slide-image-dual-render` render trace required;
 - initial ImageGen wave size 20 with concurrent dispatch;
+- one source slide per fresh reconstruction context, with at most four workers
+  active and no full-deck context duplicated into worker prompts;
+- official worker validation and integration scripts required before compile;
 - one full-deck `--allow-large-batch` compile on the normal path;
 - repair wave size at most 5, with a single conditional post-repair full-deck
   recompile;
@@ -266,6 +292,9 @@ completion only when:
   more than one targeted regeneration per slide;
 - selected slide references are real, consistently sized 16:9 PNGs rather than
   placeholder bytes;
+- every selected image is bound to exactly one isolated reconstruction job,
+  worker receipt, official integration report, and generated shared
+  `lib/slides.js` output;
 - reconstruction hardlocks and PPTX openability pass;
 - `skillset_execution_plan.json`, orchestration state, the official
   `slide-image-dual-render` render trace, crop plan/manifest, crop coverage, and
@@ -274,7 +303,9 @@ completion only when:
   the approved blueprint, with editable text on every slide;
 - the external visual-QA summary agrees with the sealed fail, blocking, and
   needs-polish counts;
-- visual QA has zero fail/blocking slides;
+- visual QA has zero fail/blocking slides and the high-fidelity issue policy
+  rejects any content, layout, hierarchy, typography, clipping, or detail-loss
+  drift;
 - `execution_timing.json` truthfully records the fast-quality-20 timings and
   full-deck compile count; a zero-repair run must record exactly one full-deck
   compile;
@@ -290,6 +321,7 @@ Deliver at least:
 - final visual QA JSON and Markdown summaries;
 - contact sheet;
 - Image Generation batch manifest;
+- reconstruction job manifest and official integration report;
 - execution timing report;
 - sealed `codex_run.json`.
 

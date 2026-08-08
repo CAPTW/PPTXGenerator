@@ -436,23 +436,36 @@ Workflow ID: `{workflow_id}`
    `pngtopptx-project/src/slideN.png`, preserve exact editable copy in the
    matching Semantic Sidecar, and write
    `image_batches/image_generation_batch_manifest.json`.
-7. Materialize `styles/active.json`, `lib/slides.js`, and per-slide worker
-   artifacts. Record an explicit execute/skip decision for
-   `slide-text-layer-inpaint`.
-8. Wait until every approved image and per-slide reconstruction artifact exists,
-   then execute `setup` and `single_compile_fast_path`: one all-slide
+7. Execute `setup`, record an explicit execute/skip decision for
+   `slide-text-layer-inpaint`, and materialize the hard-locked renderer project.
+8. Execute `reconstruction_authoring` exactly as ordered. First run
+   `deckcompiler prepare-reconstruction-jobs --runtime <runtime>`. Then process
+   each job in one fresh context containing only that source slide, its compact
+   job, and Semantic Sidecar; run no more than four workers concurrently. Each
+   worker writes only its `work/slideXX/` directory and completes isolated PPTX
+   and HTML reconstruction QA. Validate the hash-bound receipts, run the
+   official `validate_agent_work.js`, and let the official
+   `integrate_subagent_work.js` be the sole writer of `lib/slides.js` and the
+   integrated crop plan. Do not hand-author a generic shared slide template.
+9. Wait until every approved image, worker artifact, and official integration
+   output exists, then execute `single_compile_fast_path`: one all-slide
    `slide_pipeline.js --allow-large-batch` invocation, one final gate, and one
    source-mapped full-deck Visual QA chain. Its output names are already the
    final PPTX/HTML names.
-9. If that full-deck QA has zero fail/blocking slides, do not run a second full
+10. Apply the repository high-fidelity acceptance policy after the external
+    visual QA gate. Only the known native-renderer diagnostics `palette_drift`
+    and `pptx_html_edge_mismatch` may remain as `needs_polish`; spacing,
+    hierarchy, typography, clipping, content, or detail loss enters repair.
+11. If that full-deck QA has zero fail/blocking slides and passes high-fidelity
+    acceptance, do not run a second full
    compile or duplicate QA pass; execute `fast_path_acceptance` and seal it. If
    QA fails, skip fast-path acceptance, repair only named blocking slides in
    waves of at most five, for no more than two iterations, then execute
    `post_repair_recompile` once and rerun the full-deck gate/QA.
-10. Never use a full-slide source PNG as the delivered slide surface. Keep
+12. Never use a full-slide source PNG as the delivered slide surface. Keep
     `qa-polish`, hardlocks, openability, editability evidence, and zero
     fail/blocking acceptance unchanged.
-11. Write `execution_timing.json`, seal `codex_run.json`, and register it with
+13. Write `execution_timing.json`, seal `codex_run.json`, and register it with
     `deckcompiler generate --resume`. For 20 slides, record the 120-minute
     baseline, 30-minute target, actual duration, and whether the approximate
     4x target was met; quality gates always take precedence over the time target.

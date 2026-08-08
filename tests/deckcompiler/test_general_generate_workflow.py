@@ -141,7 +141,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 (runtime / "skillset_execution_plan.json").read_text(encoding="utf-8")
             )
             self.assertEqual(plan["status"], "READY")
-            self.assertEqual(plan["schema_version"], "1.4.0")
+            self.assertEqual(plan["schema_version"], "1.5.0")
             repository_architect = (
                 ROOT / ".agents" / "skills" / "pptx-workflow-architect"
             ).resolve()
@@ -160,6 +160,15 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             self.assertEqual(
                 plan["quality_contract"]["renderer_quality"],
                 "reconstruction",
+            )
+            self.assertEqual(
+                plan["quality_contract"]["quality_reference_baseline"],
+                "accepted_one_slide_canary_20260808",
+            )
+            self.assertEqual(
+                plan["quality_contract"]["allowed_needs_polish_metric_limits"]
+                ["pptx_html_edge_mismatch"]["maximum"],
+                0.102,
             )
             self.assertEqual(
                 plan["execution_profile"]["profile_name"], "fast-quality-20"
@@ -204,6 +213,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                     "compare_full_deck",
                     "summarize_full_deck",
                     "enforce_full_deck_qa",
+                    "enforce_full_deck_quality_acceptance",
                 ],
             )
             self.assertEqual(
@@ -220,6 +230,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                     "compare_full_deck",
                     "summarize_full_deck",
                     "enforce_full_deck_qa",
+                    "enforce_full_deck_quality_acceptance",
                     "enforce_orchestration_state",
                 ],
             )
@@ -230,6 +241,35 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 "out/visual_qa_summary_final.md",
                 plan["required_artifacts"],
             )
+            self.assertEqual(
+                plan["execution_contract"]["reconstruction_authoring"],
+                [
+                    "prepare_reconstruction_jobs",
+                    "codex_execute_reconstruction_jobs",
+                    "validate_reconstruction_jobs",
+                    "validate_agent_work",
+                    "integrate_agent_work",
+                    "prepare_crops",
+                ],
+            )
+            self.assertEqual(
+                plan["execution_profile"]["reconstruction_authoring"][
+                    "context_unit"
+                ],
+                "one_source_slide_per_fresh_context",
+            )
+            self.assertEqual(
+                plan["execution_profile"]["reconstruction_authoring"][
+                    "shared_file_writer"
+                ],
+                "integrator_only",
+            )
+            self.assertIn(
+                "reconstruction_job_manifest.json",
+                plan["project_layout"]["reconstruction_job_manifest_path"],
+            )
+            self.assertIn("validate_agent_work", plan["official_entrypoints"])
+            self.assertIn("integrate_subagent_work", plan["official_entrypoints"])
             self.assertTrue((runtime / "pngtopptx-project" / "src").is_dir())
             self.assertTrue((runtime / "image_batches").is_dir())
             crop_plan = json.loads(
@@ -443,9 +483,14 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 ).read_text(encoding="utf-8")
             )
             self.assertEqual(manifest["additional_model_calls"], 0)
+            self.assertEqual(manifest["schema_version"], "1.1.0")
             self.assertEqual(
                 manifest["design_context_mode"],
-                "selected_route_and_layout_cues_only",
+                "compact_architect_context_plus_selected_route_and_layout",
+            )
+            self.assertEqual(
+                manifest["reference_mode"],
+                "content_complete_slide_reference",
             )
             self.assertGreater(manifest["prompt_character_count_total"], 0)
             prompt = json.loads(
@@ -455,8 +500,347 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             )
             self.assertIn("Readiness Topic 1", prompt["prompt_text"])
             self.assertIn("Evidence-backed point 1", prompt["prompt_text"])
+            self.assertIn("Deterministic workflow fixture", prompt["prompt_text"])
+            self.assertIn(
+                "Exact on-slide content (preserve structure):",
+                prompt["prompt_text"],
+            )
+            self.assertNotIn(
+                "Exact on-slide content: Evidence-backed point 1 | Action for operators 1",
+                prompt["prompt_text"],
+            )
+            self.assertEqual(
+                prompt["reference_mode"],
+                "content_complete_slide_reference",
+            )
+            self.assertEqual(prompt["schema_version"], "1.1.0")
+            self.assertEqual(
+                prompt["tool_input"]["tool"],
+                "image_gen.imagegen",
+            )
+            self.assertEqual(prompt["tool_input"]["referenced_image_paths"], [])
             self.assertEqual(prompt["visual_route_id"], "academic-editorial")
             self.assertEqual(prompt["layout_id"], "editorial-evidence")
+
+    def test_reconstruction_jobs_are_one_slide_hash_bound_fresh_context_units(
+        self,
+    ) -> None:
+        from presentation_agent.deckcompiler.orchestration.reconstruction_jobs import (
+            prepare_reconstruction_jobs,
+            validate_reconstruction_job_bundle,
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            started = self._start(runtime)
+            self._build_run_draft(
+                runtime,
+                workflow_id=started.workflow_id,
+                slide_count=2,
+                status="COMPLETED",
+                qa_status="PASS",
+                fail_count=0,
+                blocking_count=0,
+            )
+
+            result = prepare_reconstruction_jobs(runtime)
+            self.assertEqual(result.slide_count, 2)
+            manifest = json.loads(result.manifest_path.read_text(encoding="utf-8"))
+            self.assertEqual(
+                manifest["context_unit"],
+                "one_source_slide_per_fresh_context",
+            )
+            self.assertEqual(manifest["dispatch_mode"], "bounded_parallel_workers")
+            self.assertLessEqual(manifest["max_parallel_workers"], 4)
+            self.assertEqual(
+                [row["slide_number"] for row in manifest["jobs"]],
+                [1, 2],
+            )
+            first_job_path = runtime / manifest["jobs"][0]["job"]["path"]
+            first_job = json.loads(first_job_path.read_text(encoding="utf-8"))
+            self.assertEqual(first_job["slide_number"], 1)
+            self.assertEqual(first_job["source_png"]["sha256"], self._sha256(
+                runtime / "pngtopptx-project" / "src" / "slide1.png"
+            ))
+            self.assertEqual(
+                first_job["context_policy"]["allowed_source_slides"],
+                [1],
+            )
+            self.assertIn("measurements.json", first_job["required_outputs"])
+            self.assertIn("s1.fragment.js", first_job["required_outputs"])
+            self.assertIn("worker_receipt.json", first_job["required_outputs"])
+            self.assertTrue(
+                (first_job_path.parent / "worker_prompt.md").is_file()
+            )
+
+            (first_job_path.parent / "s1.fragment.js").unlink()
+
+            report = validate_reconstruction_job_bundle(
+                runtime,
+                require_worker_outputs=True,
+            )
+            self.assertFalse(report["valid"])
+            self.assertTrue(
+                any("s1.fragment.js" in issue for issue in report["issues"]),
+                report,
+            )
+
+    def test_image_request_preserves_structured_copy_architect_signal_and_assets(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            started = self._start(runtime)
+            self._build_run_draft(
+                runtime,
+                workflow_id=started.workflow_id,
+                slide_count=1,
+                status="COMPLETED",
+                qa_status="PASS",
+                fail_count=0,
+                blocking_count=0,
+            )
+            reference = runtime / "inputs" / "brand-reference.png"
+            reference.parent.mkdir(parents=True, exist_ok=True)
+            self._write_png(reference, 1600, 900, (12, 24, 36))
+
+            workflow_design_path = runtime / "architect" / "workflow_design.json"
+            workflow_design = json.loads(
+                workflow_design_path.read_text(encoding="utf-8")
+            )
+            workflow_design["chosen_workflow"] = {
+                "name": "Evidence-led teaching sequence",
+                "rationale": "Build trust before recommendations",
+            }
+            workflow_design["communication_core"] = {
+                "message": "Evidence must precede action",
+                "key_question": "What proof is sufficient?",
+            }
+            workflow_design_path.write_text(
+                json.dumps(workflow_design), encoding="utf-8"
+            )
+
+            blueprint_path = runtime / "architect" / "blueprint.json"
+            blueprint = json.loads(blueprint_path.read_text(encoding="utf-8"))
+            blueprint["slides"][0]["on_slide_copy"] = {
+                "finding": "Moisture evidence is incomplete",
+                "decision": ["Hold loading", "Request field checks"],
+            }
+            blueprint["slides"][0]["reference_inputs"] = [
+                {
+                    "path": "inputs/brand-reference.png",
+                    "role": "brand_and_composition_reference",
+                }
+            ]
+            blueprint_path.write_text(json.dumps(blueprint), encoding="utf-8")
+
+            prepared = prepare_image_requests(runtime)
+            prompt = json.loads(
+                prepared.prompt_paths[0].read_text(encoding="utf-8")
+            )
+            self.assertIn("Evidence-led teaching sequence", prompt["prompt_text"])
+            self.assertIn("finding:", prompt["prompt_text"])
+            self.assertIn("Moisture evidence is incomplete", prompt["prompt_text"])
+            self.assertIn("decision:", prompt["prompt_text"])
+            self.assertEqual(
+                prompt["tool_input"]["referenced_image_paths"],
+                [reference.resolve().as_posix()],
+            )
+            self.assertEqual(
+                prompt["reference_assets"][0]["sha256"],
+                self._sha256(reference),
+            )
+
+    def test_high_fidelity_policy_allows_known_canary_drift_but_blocks_layout_drift(
+        self,
+    ) -> None:
+        from presentation_agent.deckcompiler.orchestration.quality_acceptance import (
+            evaluate_visual_quality_acceptance,
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            project = Path(tmpdir) / "project"
+            visual = project / "work" / "slide01" / "visual_qa"
+            visual.mkdir(parents=True)
+            summary = project / "out" / "visual_qa_summary.json"
+            summary.parent.mkdir(parents=True)
+            summary.write_text(
+                json.dumps(
+                    {
+                        "project": project.resolve().as_posix(),
+                        "slidesRequested": [1],
+                        "failed": 0,
+                        "blockingIssues": 0,
+                        "needsPolish": 1,
+                        "slides": [{"slide": 1, "status": "needs_polish"}],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            metrics_path = visual / "visual_metrics.json"
+            metrics_path.write_text(
+                json.dumps(
+                    {
+                        "slide": 1,
+                        "status": "needs_polish",
+                        "severity": "noticeable",
+                        "comparisons": {
+                            "pptx_vs_source": {
+                                "approx_ssim": 0.7152,
+                                "color_palette_drift": 0.2221,
+                            },
+                            "html_vs_source": {
+                                "approx_ssim": 0.7390,
+                                "color_palette_drift": 0.2603,
+                            },
+                            "pptx_vs_html": {
+                                "approx_ssim": 0.8429,
+                                "edge_difference_ratio": 0.0996,
+                            },
+                        },
+                        "issues": [
+                            {
+                                "type": "palette_drift",
+                                "severity": "noticeable",
+                                "comparison": "pptx_vs_source",
+                            },
+                            {
+                                "type": "palette_drift",
+                                "severity": "noticeable",
+                                "comparison": "html_vs_source",
+                            },
+                            {
+                                "type": "pptx_html_edge_mismatch",
+                                "severity": "noticeable",
+                                "comparison": "pptx_vs_html",
+                            },
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            accepted = evaluate_visual_quality_acceptance(
+                project=project,
+                summary_path=summary,
+                slides=[1],
+            )
+            self.assertTrue(accepted["accepted"], accepted)
+            self.assertEqual(accepted["allowed_needs_polish_slides"], [1])
+
+            metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
+            metrics["issues"].append(
+                {"type": "spacing", "severity": "noticeable"}
+            )
+            metrics_path.write_text(json.dumps(metrics), encoding="utf-8")
+            rejected = evaluate_visual_quality_acceptance(
+                project=project,
+                summary_path=summary,
+                slides=[1],
+            )
+            self.assertFalse(rejected["accepted"], rejected)
+            self.assertTrue(
+                any("spacing" in issue for issue in rejected["issues"]),
+                rejected,
+            )
+
+            metrics["issues"] = [
+                issue for issue in metrics["issues"] if issue["type"] != "spacing"
+            ]
+            metrics["comparisons"]["pptx_vs_html"]["edge_difference_ratio"] = 0.18
+            metrics_path.write_text(json.dumps(metrics), encoding="utf-8")
+            below_canary = evaluate_visual_quality_acceptance(
+                project=project,
+                summary_path=summary,
+                slides=[1],
+            )
+            self.assertFalse(below_canary["accepted"], below_canary)
+            self.assertTrue(
+                any("canary ceiling" in issue for issue in below_canary["issues"]),
+                below_canary,
+            )
+
+    def test_reconstruction_completion_requires_integrator_owned_shared_outputs(
+        self,
+    ) -> None:
+        from presentation_agent.deckcompiler.orchestration.reconstruction_jobs import (
+            validate_reconstruction_job_bundle,
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            started = self._start(runtime)
+            self._build_run_draft(
+                runtime,
+                workflow_id=started.workflow_id,
+                slide_count=2,
+                status="COMPLETED",
+                qa_status="PASS",
+                fail_count=0,
+                blocking_count=0,
+            )
+
+            accepted = validate_reconstruction_job_bundle(
+                runtime,
+                require_worker_outputs=True,
+                require_integrated_outputs=True,
+            )
+            self.assertTrue(accepted["valid"], accepted)
+
+            slides_js = runtime / "pngtopptx-project" / "lib" / "slides.js"
+            slides_js.write_text(
+                "function s1(s) { bg(s); }\nmodule.exports = { s1 };\n",
+                encoding="utf-8",
+            )
+            rejected = validate_reconstruction_job_bundle(
+                runtime,
+                require_worker_outputs=True,
+                require_integrated_outputs=True,
+            )
+            self.assertFalse(rejected["valid"], rejected)
+            self.assertTrue(
+                any("function s2(s)" in issue for issue in rejected["issues"]),
+                rejected,
+            )
+
+    def test_reconstruction_worker_qa_evidence_is_file_hash_verified(self) -> None:
+        from presentation_agent.deckcompiler.orchestration.reconstruction_jobs import (
+            validate_reconstruction_job_bundle,
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            started = self._start(runtime)
+            self._build_run_draft(
+                runtime,
+                workflow_id=started.workflow_id,
+                slide_count=1,
+                status="COMPLETED",
+                qa_status="PASS",
+                fail_count=0,
+                blocking_count=0,
+            )
+            work = runtime / "pngtopptx-project" / "work" / "slide01"
+            evidence_path = work / "qa_evidence.json"
+            evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+            evidence["pptxRasterHash"] = ZERO_HASH
+            evidence_path.write_text(json.dumps(evidence), encoding="utf-8")
+            receipt_path = work / "worker_receipt.json"
+            receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+            receipt["artifactHashes"]["qa_evidence.json"] = self._sha256(
+                evidence_path
+            )
+            receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+
+            report = validate_reconstruction_job_bundle(
+                runtime,
+                require_worker_outputs=True,
+            )
+            self.assertFalse(report["valid"], report)
+            self.assertTrue(
+                any("pptxRasterHash mismatch" in issue for issue in report["issues"]),
+                report,
+            )
 
     def test_sealer_rejects_generic_prompt_not_derived_from_blueprint(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -769,6 +1153,32 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             with self.assertRaises(DeckCompilerError) as caught:
                 seal_codex_run_manifest(draft, runtime / "codex_run.json")
             self.assertIn("invokedByPipeline", caught.exception.message)
+
+    def test_sealer_rejects_integrated_slides_changed_after_official_render(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            started = self._start(runtime)
+            draft = self._build_run_draft(
+                runtime,
+                workflow_id=started.workflow_id,
+                slide_count=2,
+                status="COMPLETED",
+                qa_status="PASS",
+                fail_count=0,
+                blocking_count=0,
+            )
+            slides_js = runtime / "pngtopptx-project" / "lib" / "slides.js"
+            slides_js.write_text(
+                slides_js.read_text(encoding="utf-8")
+                + "\n// changed after official render\n",
+                encoding="utf-8",
+            )
+
+            with self.assertRaises(DeckCompilerError) as caught:
+                seal_codex_run_manifest(draft, runtime / "codex_run.json")
+            self.assertIn("hashes.slidesJs mismatch", caught.exception.message)
 
     def test_sealer_rejects_non_cli_node_dependency_resolution(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -1262,6 +1672,12 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             ),
             encoding="utf-8",
         )
+        from presentation_agent.deckcompiler.orchestration.reconstruction_jobs import (
+            prepare_reconstruction_jobs,
+        )
+
+        prepared_jobs = prepare_reconstruction_jobs(root)
+        self.assertEqual(prepared_jobs.slide_count, slide_count)
         files["timing"].write_text(
             json.dumps(
                 {
@@ -1390,6 +1806,36 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 encoding="utf-8",
             )
 
+        self._write_reconstruction_worker_outputs(root, slide_count)
+        (project / "lib").mkdir(parents=True, exist_ok=True)
+        (project / "lib" / "slides.js").write_text(
+            "\n\n".join(
+                [
+                    "// Synthetic contract-only integration fixture.",
+                    *[
+                        (work / f"slide{slide_number:02d}" / f"s{slide_number}.fragment.js")
+                        .read_text(encoding="utf-8")
+                        .strip()
+                        for slide_number in range(1, slide_count + 1)
+                    ],
+                    "module.exports = { "
+                    + ", ".join(f"s{number}" for number in range(1, slide_count + 1))
+                    + " };",
+                ]
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        (work / "integration_report.md").write_text(
+            "# Sub-Agent Integration Report\n\n"
+            + "\n".join(
+                f"## s{number}\nfragment: present\nmeasurements.json: present"
+                for number in range(1, slide_count + 1)
+            )
+            + "\n\nmerged_crops: 0\n",
+            encoding="utf-8",
+        )
+
         files["render_trace"].write_text(
             json.dumps(
                 {
@@ -1425,6 +1871,9 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                     "strictMode": True,
                     "invokedByPipeline": True,
                     "enforcementDisabled": False,
+                    "hashes": {
+                        "slidesJs": self._sha256(project / "lib" / "slides.js")
+                    },
                     "validation": {"passed": True},
                     "preflightValidation": {"passed": True},
                     "postbuildValidation": {"passed": True},
@@ -1561,6 +2010,122 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             "path": path.relative_to(root).as_posix(),
             "sha256": ZERO_HASH,
         }
+
+    def _write_reconstruction_worker_outputs(
+        self,
+        root: Path,
+        slide_count: int,
+    ) -> None:
+        project = root / "pngtopptx-project"
+        for slide in range(1, slide_count + 1):
+            work = project / "work" / f"slide{slide:02d}"
+            job = json.loads(
+                (work / "reconstruction_job.json").read_text(encoding="utf-8")
+            )
+            source = project / "src" / f"slide{slide}.png"
+            worker_qa = work / "worker_qa"
+            worker_qa.mkdir(parents=True, exist_ok=True)
+            self._write_png(worker_qa / "pptx_raster.png", 1600, 900, (31, 51, 71))
+            self._write_png(
+                worker_qa / "html_screenshot.png", 1600, 900, (32, 52, 72)
+            )
+            artifacts = {
+                "measurements.json": {
+                    "canvas": {"width": 1600, "height": 900},
+                    "test_scope": "contract_only_synthetic",
+                },
+                "profile_override.json": {
+                    "profileId": "academic-editorial",
+                    "confidence": "high",
+                    "overrides": {},
+                    "exceptions": [],
+                },
+                "crop_plan.json": {"crops": []},
+                "reconstruction_score.json": {
+                    "slide": slide,
+                    "quality": "reconstruction",
+                    "status": "pass",
+                    "test_scope": "contract_only_synthetic",
+                },
+                "qa_result.json": {
+                    "slide": slide,
+                    "status": "pass",
+                    "visualFidelity": "pass",
+                    "nativeEditability": "pass",
+                    "cropPolicy": "pass",
+                    "blockingIssues": [],
+                    "noticeableIssues": [],
+                    "minorIssues": [],
+                    "qaEvidence": f"work/slide{slide:02d}/qa_evidence.json",
+                    "test_scope": "contract_only_synthetic",
+                },
+                "qa_evidence.json": {
+                    "slide": slide,
+                    "sourceImage": f"src/slide{slide}.png",
+                    "sourceHash": self._sha256(source),
+                    "pptxRaster": f"work/slide{slide:02d}/worker_qa/pptx_raster.png",
+                    "pptxRasterHash": self._sha256(worker_qa / "pptx_raster.png"),
+                    "htmlScreenshot": f"work/slide{slide:02d}/worker_qa/html_screenshot.png",
+                    "htmlScreenshotHash": self._sha256(
+                        worker_qa / "html_screenshot.png"
+                    ),
+                    "checkedAt": "2026-01-01T00:00:00Z",
+                    "checkedBy": "synthetic-contract-fixture",
+                    "visualComparison": {
+                        "status": "pass",
+                        "method": "synthetic-contract-only",
+                    },
+                },
+            }
+            for name, value in artifacts.items():
+                (work / name).write_text(json.dumps(value), encoding="utf-8")
+            (work / f"s{slide}.fragment.js").write_text(
+                f"function s{slide}(s) {{\n"
+                "  bg(s);\n"
+                f"  T(s, 'Synthetic contract slide {slide}', 80, 80, 800, 80);\n"
+                "}\n",
+                encoding="utf-8",
+            )
+            (work / "reconstruction_notes.md").write_text(
+                "# Reconstruction Notes\n\nSynthetic contract-only artifact; not visual quality proof.\n",
+                encoding="utf-8",
+            )
+            (work / "editability_inventory.md").write_text(
+                "# Editability Inventory\n\nNative text and structure contract recorded.\n",
+                encoding="utf-8",
+            )
+            (work / "qa_report.md").write_text(
+                "# QA Report\n\nStatus: pass for deterministic contract-fixture coverage.\n",
+                encoding="utf-8",
+            )
+            produced = [
+                name
+                for name in job["required_outputs"]
+                if name != "worker_receipt.json"
+            ]
+            receipt = {
+                "slide": slide,
+                "agent": "slide_reconstruct_worker",
+                "status": "completed",
+                "sharedFilesEdited": False,
+                "jobId": job["job_id"],
+                "jobContentHash": job["content_hash"],
+                "sourcePngSha256": job["receipt_binding"]["source_png_sha256"],
+                "imageRequestSha256": job["receipt_binding"][
+                    "image_request_sha256"
+                ],
+                "semanticSidecarSha256": job["receipt_binding"][
+                    "semantic_sidecar_sha256"
+                ],
+                "artifacts": produced,
+                "artifactHashes": {
+                    name: self._sha256(work / name) for name in produced
+                },
+                "test_scope": "contract_only_synthetic",
+            }
+            (work / "worker_receipt.json").write_text(
+                json.dumps(receipt), encoding="utf-8"
+            )
 
     @staticmethod
     def _sha256(path: Path) -> str:

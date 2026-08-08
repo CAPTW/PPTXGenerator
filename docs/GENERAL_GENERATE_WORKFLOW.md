@@ -12,8 +12,11 @@ pptx-workflow-architect
   -> imagegen / 20-call concurrent waves
   -> slide-editable-deck-orchestrator
   -> slide-text-layer-inpaint decision (execute or skip with reason)
+  -> one fresh slide-image-dual-render context per source PNG (max 4 concurrent)
+  -> official worker validation and integrator-only fragment merge
   -> one all-slide slide-image-dual-render hardlocked compile
   -> one full-deck slide-visual-polish-qa pass with source-slide mapping
+  -> repository high-fidelity issue acceptance
   -> blocker-only repair waves and conditional recompile
   -> sealed editable-PPTX delivery
 ```
@@ -161,38 +164,58 @@ Codex must execute the paths and command templates recorded in
 2. install project hardlocks;
 3. run the orchestrator planner at quality level `polish`, with at most two
    blocker-repair iterations;
-4. materialize a project-local design profile, `lib/slides.js`, and isolated
-   per-slide worker artifacts;
-5. keep `work/crop_plan.json` explicit, including for a zero-crop deck, and run
+4. run `deckcompiler prepare-reconstruction-jobs --runtime <runtime>` after the
+   accepted image batch exists. It writes one compact, hash-bound job per slide;
+5. execute those jobs in fresh contexts, no more than four concurrently. Each
+   context sees one source slide and writes only its `work/slideXX/` folder,
+   including measurements, profile decision, editable fragment, crop decision,
+   dual-render QA evidence under `worker_qa/`, reconstruction score, and
+   hash-bound receipt. The final full-deck gate owns the separate `visual_qa/`
+   directory;
+6. validate all jobs with `deckcompiler validate-reconstruction-jobs
+   --require-worker-outputs`, then run the official `validate_agent_work.js` and
+   `integrate_subagent_work.js`. Only the integrator may write `lib/slides.js`
+   and the shared crop plan;
+7. keep `work/crop_plan.json` explicit, including for a zero-crop deck, and run
    crop preparation so `assets/manifest.json` exists;
-6. after every approved source image and per-slide artifact is ready, run one
+8. after every approved source image and integrated per-slide artifact is ready,
+   run one
    all-slide reconstruction with renderer quality
    `reconstruction`, `--require-qa`, `--require-reconstruction`, explicit crop
    and Node paths, and `--allow-large-batch`, writing directly to the final
    PPTX/HTML names, then run `final_gate.js`;
-7. execute one complete full-deck Visual QA chain: PPTX rasterization,
+9. execute one complete full-deck Visual QA chain: PPTX rasterization,
    HTML capture, comparison, JSON/Markdown summary, and enforcement, all with
    source-slide mapping;
-8. if fail/blocking counts are zero, use that output directly and skip the old
+10. apply `deckcompiler validate-visual-quality`. The accepted one-slide canary
+    permits only `palette_drift` and `pptx_html_edge_mismatch` as noticeable
+    renderer diagnostics; spacing, hierarchy, typography, clipping, content,
+    and detail-loss issues require repair;
+11. if fail/blocking counts are zero and high-fidelity acceptance passes, use
+   that output directly and skip the old
    unconditional second full-deck compile/QA pass, then enforce the orchestration
    state through `fast_path_acceptance`;
-9. only when blockers exist, reconstruct and QA targeted repair waves of at
+12. only when defects exist, reconstruct and QA targeted repair waves of at
    most five slides, for at most two iterations;
-10. after repairs, run one conditional all-slide compile and one final full-deck
+13. after repairs, run one conditional all-slide compile and one final full-deck
     QA chain, binding raster/capture metadata to the repaired PPTX/HTML hashes;
-11. record actual stage timing and the full-deck compile count in
+14. record actual stage timing and the full-deck compile count in
     `execution_timing.json`.
 
 The default quality level is `polish`; `blocking-zero` is the minimum accepted
 production level. The workflow runs:
 
 1. 20-call concurrent ImageGen waves with one inspected reference per slide;
-2. one editable PPTX/HTML full-deck reconstruction on the normal path;
-3. route and reconstruction hardlocks;
-4. PPTX openability validation;
-5. full-deck visual QA against the generated source slides;
-6. blocker-only repair planning and rebuilding when needed;
-7. one conditional post-repair full-deck build and evidence-hash validation.
+2. one fresh reconstruction context per slide with four-worker bounded
+   parallelism and no duplicated full-deck prompt context;
+3. official validation plus integrator-owned shared outputs;
+4. one editable PPTX/HTML full-deck reconstruction on the normal path;
+5. route and reconstruction hardlocks;
+6. PPTX openability validation;
+7. full-deck visual QA and high-fidelity issue acceptance against the generated
+   source slides;
+8. defect-only repair planning and rebuilding when needed;
+9. one conditional post-repair full-deck build and evidence-hash validation.
 
 Completion still requires zero fail/blocking slides. A run that reaches the
 two-iteration cap remains `NEEDS_REPAIR`. For a 20-slide run, the timing report
@@ -230,6 +253,9 @@ The command returns `COMPLETED` only when:
   retry per slide;
 - every selected reference is a real, consistently sized 16:9 PNG with a
   passing inspection record;
+- every selected reference has one hash-bound fresh-context reconstruction job,
+  complete worker receipt, official integration report, and exactly one merged
+  `sN(s)` function in `lib/slides.js`;
 - the PPTX is a valid package whose slide count matches the approved blueprint;
 - the native-object manifest comes from actual render-surface calls and records
   editable text on every slide;
@@ -241,7 +267,8 @@ The command returns `COMPLETED` only when:
 - the exact generated source PNG bytes are not embedded in the PPTX as a
   full-slide raster shortcut;
 - the external visual-QA summary agrees with the sealed counts and has zero
-  fail/blocking slides;
+  fail/blocking slides, and the high-fidelity policy finds no content, layout,
+  hierarchy, typography, clipping, or meaningful-detail defect;
 - a zero-repair run records exactly one full-deck compile in the timing report;
 - the delivered editable PPTX exists and matches its recorded hash.
 

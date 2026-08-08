@@ -16,6 +16,8 @@ from ..identity import content_sha256
 from ..manifest_io import read_json, write_json
 from ..schemas import validator_for
 from .image_requests import validate_image_request_bundle
+from .quality_acceptance import evaluate_visual_quality_acceptance
+from .reconstruction_jobs import validate_reconstruction_job_bundle
 from .skillset_plan import validate_skillset_execution_plan
 
 
@@ -451,6 +453,15 @@ def _execution_artifact_issues(
                 expected_workflow_id=payload["workflow_id"],
             )
         )
+        reconstruction_job_report = validate_reconstruction_job_bundle(
+            execution_plan_path.resolve().parent,
+            require_worker_outputs=True,
+            require_integrated_outputs=True,
+        )
+        issues.extend(
+            f"reconstruction.jobs: {issue}"
+            for issue in reconstruction_job_report["issues"]
+        )
 
     orchestration_state = _json_object(
         artifacts.get("reconstruction.orchestration_state"),
@@ -556,6 +567,18 @@ def _execution_artifact_issues(
             slide_count,
             issues,
         )
+        summary_path = artifacts.get("visual_qa.summary")
+        pptx = artifacts.get("reconstruction.output_pptx")
+        if summary_path is not None and pptx is not None:
+            quality_report = evaluate_visual_quality_acceptance(
+                project=pptx.resolve().parent.parent,
+                summary_path=summary_path,
+                slides=range(1, slide_count + 1),
+            )
+            issues.extend(
+                f"visual_qa.high_fidelity: {issue}"
+                for issue in quality_report["issues"]
+            )
     _png_dimensions(
         artifacts.get("visual_qa.contact_sheet"),
         "visual_qa.contact_sheet",
@@ -1115,6 +1138,15 @@ def _validate_render_trace(
         )
     crop_plan_path = artifacts.get("reconstruction.crop_plan")
     if crop_plan_path is not None:
+        project_root = crop_plan_path.parent.parent.resolve()
+        raw_project_root = trace.get("projectRoot")
+        if (
+            not isinstance(raw_project_root, str)
+            or Path(raw_project_root).resolve() != project_root
+        ):
+            issues.append(
+                "reconstruction.render_trace.projectRoot must match the final project"
+            )
         expected_node_path = crop_plan_path.parent.parent / "node_modules"
         raw_node_path = trace.get("nodePathUsed")
         if (
@@ -1126,6 +1158,14 @@ def _validate_render_trace(
                 "reconstruction.render_trace.nodePathUsed must identify the "
                 "project-local node_modules passed through --node-path"
             )
+        slides_js = project_root / "lib" / "slides.js"
+        trace_hashes = trace.get("hashes")
+        if not isinstance(trace_hashes, dict):
+            issues.append("reconstruction.render_trace.hashes must be an object")
+        elif not slides_js.is_file() or trace_hashes.get("slidesJs") != _sha256_file(
+            slides_js
+        ):
+            issues.append("reconstruction.render_trace.hashes.slidesJs mismatch")
     if slide_count > 5 and trace.get("allowLargeBatch") is not True:
         issues.append(
             "reconstruction.render_trace final build must allow the explicit large batch"

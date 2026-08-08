@@ -130,7 +130,11 @@ repository `fast-quality-20` profile, prepare the whole wave first and dispatch
 up to 20 independent built-in ImageGen calls concurrently. For exactly 20
 slides, all initial calls belong to one wave. For larger decks, use deterministic
 waves of 20 while preserving the Deck Constitution. After all approved source
-images and per-slide artifacts exist, compile all approved slides in one
+images exist, prepare one hash-bound reconstruction job per slide. Execute each
+job in a fresh one-slide context with at most four workers active, then use the
+official PNGtoPPTX validator and integrator to merge their isolated fragments.
+This preserves local visual detail without repeating the full-deck context in
+every worker. After all jobs pass, compile all approved slides in one
 `--allow-large-batch` renderer invocation. Repair waves remain targeted and may
 be smaller.
 

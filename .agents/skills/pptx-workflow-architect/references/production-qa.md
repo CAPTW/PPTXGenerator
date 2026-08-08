@@ -68,6 +68,10 @@ Before calling any deck complete, verify all of these.
 | PPTX readiness | Will this render correctly in PowerPoint? |
 | Google Slides compat | Will layout survive Google Slides import? |
 | Presenter notes | Complete and useful where needed? |
+| Source-image fidelity | Does each reconstructed slide preserve the approved reference's hierarchy, spacing, density, and meaningful detail rather than collapsing into a generic template? |
+| Native editability | Are readable text and structural elements native, with crops limited to justified photoreal/continuous-tone regions? |
+| Per-slide isolation evidence | Does every source image have one hash-bound fresh-context job, worker receipt, and official integration record? |
+| High-fidelity acceptance | Are all remaining Visual QA issues limited to the explicitly allowed native-renderer diagnostics? |
 
 ### Large Deck QA (Additional)
 

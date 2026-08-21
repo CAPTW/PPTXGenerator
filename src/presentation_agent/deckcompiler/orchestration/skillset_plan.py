@@ -151,6 +151,11 @@ _ENTRYPOINTS = {
     ),
 }
 
+_QA_CALIBRATION_PROFILE = (
+    "slide-visual-polish-qa",
+    "slide-visual-polish-qa/assets/calibration/default-visual-qa-profile.json",
+)
+
 NODE_PACKAGES = ("pptxgenjs", "sharp", "react", "react-dom", "react-icons")
 
 
@@ -163,6 +168,7 @@ def required_skillset_paths() -> tuple[str, ...]:
         if distribution == "external"
     ]
     values.extend(relative for _, relative in _ENTRYPOINTS.values())
+    values.append(_QA_CALIBRATION_PROFILE[1])
     return tuple(values)
 
 
@@ -247,6 +253,19 @@ def inspect_skillset(
             "sha256": _sha256_file(path),
         }
 
+    qa_skill_name, qa_profile_relative = _QA_CALIBRATION_PROFILE
+    qa_profile_path = (external_root / qa_profile_relative).resolve()
+    if not qa_profile_path.is_file():
+        missing.append(qa_profile_path.as_posix())
+        qa_calibration_profile: dict[str, str] = {}
+    else:
+        qa_calibration_profile = {
+            "skill_name": qa_skill_name,
+            "path": qa_profile_path.as_posix(),
+            "sha256": _sha256_file(qa_profile_path),
+            "schema_version": "slide-visual-polish-qa.calibration-profile.v1",
+        }
+
     if missing:
         artifact_root = (
             repository_root
@@ -273,6 +292,7 @@ def inspect_skillset(
         "repository_skill_files": repository_files,
         "skills": skills,
         "entrypoints": entrypoints,
+        "qa_calibration_profile": qa_calibration_profile,
     }
 
 
@@ -337,6 +357,8 @@ def build_skillset_execution_plan(
     reconstruction_jobs = (project / "work" / "reconstruction_job_manifest.json").as_posix()
     vector_preflight = (project / "work" / "vector_preflight_manifest.json").as_posix()
     integration_report = (project / "work" / "integration_report.md").as_posix()
+    icon_usage = (project / "work" / "icon_usage.json").as_posix()
+    qa_calibration_profile = inspection["qa_calibration_profile"]["path"]
 
     commands = {
         "install_node_dependencies": [
@@ -615,6 +637,33 @@ def build_skillset_execution_plan(
             crop_plan,
             "--node-path",
             node_modules,
+            "--icon-usage",
+            icon_usage,
+            "--target",
+            "both",
+            "--pptx-out",
+            final_pptx,
+            "--html-out",
+            final_html,
+        ],
+        "compile_one_slide_fast_cached": [
+            "node",
+            ep("slide_pipeline"),
+            "--project",
+            project_value,
+            "--slides",
+            "<single-slide>",
+            "--quality",
+            "reconstruction",
+            "--require-qa",
+            "--require-reconstruction",
+            "--crop-plan",
+            crop_plan,
+            "--node-path",
+            node_modules,
+            "--icon-usage",
+            icon_usage,
+            "--skip-assets",
             "--target",
             "both",
             "--pptx-out",
@@ -684,6 +733,8 @@ def build_skillset_execution_plan(
             work,
             "--out-summary",
             final_summary,
+            "--profile",
+            qa_calibration_profile,
         ],
         "summarize_full_deck": [
             "node",
@@ -736,6 +787,8 @@ def build_skillset_execution_plan(
             crop_plan,
             "--node-path",
             node_modules,
+            "--icon-usage",
+            icon_usage,
             "--target",
             "both",
             "--pptx-out",
@@ -805,6 +858,8 @@ def build_skillset_execution_plan(
             work,
             "--out-summary",
             f"{out}/visual_qa_summary_wave-<wave>.json",
+            "--profile",
+            qa_calibration_profile,
         ],
         "summarize_wave": [
             "node",
@@ -881,6 +936,38 @@ def build_skillset_execution_plan(
             "polish",
             "--require-artifacts",
         ],
+        "probe_one_slide_fast": [
+            "deckcompiler",
+            "probe-one-slide-fast",
+            "--project",
+            project_value,
+            "--slide",
+            "<single-slide>",
+        ],
+        "seal_one_slide_fast": [
+            "deckcompiler",
+            "seal-one-slide-fast",
+            "--project",
+            project_value,
+            "--slide",
+            "<single-slide>",
+            "--pptx",
+            final_pptx,
+            "--html",
+            final_html,
+            "--summary",
+            final_summary,
+            "--qa-profile",
+            qa_calibration_profile,
+        ],
+        "validate_one_slide_fast": [
+            "deckcompiler",
+            "validate-one-slide-fast",
+            "--project",
+            project_value,
+            "--slide",
+            "<single-slide>",
+        ],
         "seal_codex_run": [
             "deckcompiler",
             "seal-codex-run",
@@ -901,7 +988,7 @@ def build_skillset_execution_plan(
 
     payload: dict[str, Any] = {
         "schema_name": PLAN_SCHEMA,
-        "schema_version": "1.6.0",
+        "schema_version": "1.7.0",
         "workflow_id": workflow_id,
         "status": "READY",
         "skill_root": inspection["skill_root"],
@@ -909,6 +996,7 @@ def build_skillset_execution_plan(
         "repository_skill_files": inspection["repository_skill_files"],
         "ordered_skills": inspection["skills"],
         "official_entrypoints": entrypoints,
+        "qa_calibration_profile": inspection["qa_calibration_profile"],
         "project_layout": {
             "project_root": project_value,
             "source_png_pattern": (project / "src" / "slideN.png").as_posix(),
@@ -953,6 +1041,14 @@ def build_skillset_execution_plan(
             "reconstruction_job_manifest_path": reconstruction_jobs,
             "integration_report_path": integration_report,
             "profile_path": (project / "styles" / "active.json").as_posix(),
+            "qa_calibration_profile_path": qa_calibration_profile,
+            "icon_usage_path": icon_usage,
+            "icon_cache_manifest_path": (
+                project / "assets" / "icons" / "manifest.json"
+            ).as_posix(),
+            "background_cache_manifest_path": (
+                project / "assets" / "bg.manifest.json"
+            ).as_posix(),
             "slides_source_path": (project / "lib" / "slides.js").as_posix(),
             "crop_plan_path": crop_plan,
             "crop_manifest_path": (project / "assets" / "manifest.json").as_posix(),
@@ -962,6 +1058,9 @@ def build_skillset_execution_plan(
             "SLIDE_PIPELINE_STRICT": "1",
             "DECK_PROFILE": (project / "styles" / "active.json").as_posix(),
             "DECK_ASSETS": (project / "assets").as_posix(),
+            "DECK_ICON_USAGE": icon_usage,
+            "DECK_ICON_WORKERS": "16",
+            "VISUAL_QA_PROFILE": qa_calibration_profile,
             "DECK_PXW": "<source-width>",
             "DECK_PXH": "<source-height>",
             "CROP_PLAN": crop_plan,
@@ -1094,6 +1193,8 @@ def build_skillset_execution_plan(
             "source_slide_mapping_required": True,
             "full_slide_source_raster_forbidden": True,
             "high_fidelity_acceptance_required": True,
+            "qa_calibration_profile_required": True,
+            "design_profile_as_qa_profile_forbidden": True,
             "allowed_needs_polish_issue_types": [
                 "palette_drift",
                 "pptx_html_edge_mismatch",
@@ -1106,6 +1207,25 @@ def build_skillset_execution_plan(
             "empty_plan_is_valid": True,
             "skip_crops_flag_forbidden_for_final_delivery": True,
             "initial_plan": {"schema_version": "1.0.0", "crops": []},
+        },
+        "one_slide_fast_contract": {
+            "scope": "one_source_slide_only",
+            "cache_manifest_pattern": (
+                project / "work" / "slideXX" / "one_slide_fast_cache.json"
+            ).as_posix(),
+            "probe_before_authoring": True,
+            "cache_hit_reuses_verified_authoring_inputs": True,
+            "final_render_and_visual_qa_always_required": True,
+            "seal_after_final_quality_acceptance": True,
+            "single_process_final_validation": True,
+            "html_capture_cache_contract": (
+                "slide-visual-polish-qa.html-capture-cache.v1"
+            ),
+            "capture_cache_exact_bindings_required": True,
+            "accepted_evidence_binds_both_render_surfaces": True,
+            "cache_hit_compile_command": "compile_one_slide_fast_cached",
+            "skip_assets_allowed_only_after_cache_hit": True,
+            "skip_crops_forbidden": True,
         },
         "command_templates": commands,
         "execution_contract": {
@@ -1152,6 +1272,21 @@ def build_skillset_execution_plan(
                 "enforce_full_deck_quality_acceptance",
             ],
             "fast_path_acceptance": ["enforce_orchestration_state"],
+            "one_slide_fast_preflight": ["probe_one_slide_fast"],
+            "one_slide_fast_cache_hit_render": [
+                "compile_one_slide_fast_cached",
+                "gate_full_deck",
+                "rasterize_full_deck",
+                "capture_full_html",
+                "compare_full_deck",
+                "summarize_full_deck",
+                "enforce_full_deck_qa",
+                "enforce_full_deck_quality_acceptance",
+            ],
+            "one_slide_fast_acceptance": [
+                "seal_one_slide_fast",
+                "validate_one_slide_fast",
+            ],
             "repair_wave_loop": [
                 "make_repair_wave_plan",
                 "generate_repair_prompt",
@@ -1194,9 +1329,18 @@ def build_skillset_execution_plan(
             "work/vector_preflight_manifest.json",
             "work/reconstruction_job_manifest.json",
             "work/integration_report.md",
+            "work/icon_usage.json",
             "work/orchestration_state.json",
+            "work/slideXX/one_slide_fast_cache.json",
+            "work/slideXX/visual_qa/pptx_raster.png",
+            "work/slideXX/visual_qa/pptx_raster_metadata.json",
+            "work/slideXX/visual_qa/html_screenshot.png",
+            "work/slideXX/visual_qa/html_screenshot_metadata.json",
+            "work/slideXX/visual_qa/visual_metrics.json",
             "work/crop_plan.json",
             "assets/manifest.json",
+            "assets/icons/manifest.json",
+            "assets/bg.manifest.json",
             "out/render_trace.json",
             "out/native_object_manifest.json",
             "out/crop_coverage_summary.json",
@@ -1284,6 +1428,37 @@ def validate_skillset_execution_plan(
         )
     for name, row in payload["official_entrypoints"].items():
         _validate_bound_file(row["path"], row["sha256"], f"entrypoint {name}", issues)
+
+    qa_profile = payload["qa_calibration_profile"]
+    _validate_bound_file(
+        qa_profile["path"],
+        qa_profile["sha256"],
+        "QA calibration profile",
+        issues,
+    )
+    try:
+        qa_profile_payload = read_json(qa_profile["path"])
+    except (OSError, ValueError) as exc:
+        issues.append(f"QA calibration profile cannot be read: {exc}")
+    else:
+        if qa_profile_payload.get("schemaVersion") != qa_profile["schema_version"]:
+            issues.append("QA calibration profile schema_version mismatch")
+        for group in (
+            "knownGoodMetricBands",
+            "borderlineMetricBands",
+            "knownBadMetricBands",
+        ):
+            if not isinstance(qa_profile_payload.get(group), dict):
+                issues.append(f"QA calibration profile lacks {group}")
+    project_layout = payload["project_layout"]
+    if Path(project_layout["profile_path"]).resolve() == Path(
+        project_layout["qa_calibration_profile_path"]
+    ).resolve():
+        issues.append("design profile and QA calibration profile must be different files")
+    if Path(project_layout["qa_calibration_profile_path"]).resolve() != Path(
+        qa_profile["path"]
+    ).resolve():
+        issues.append("project QA calibration profile path mismatch")
 
     commands = payload["command_templates"]
     _require_flags(
@@ -1418,6 +1593,7 @@ def validate_skillset_execution_plan(
             "--allow-large-batch",
             "--crop-plan",
             "--node-path",
+            "--icon-usage",
             "--target",
             "both",
         ),
@@ -1472,7 +1648,34 @@ def validate_skillset_execution_plan(
     )
     _require_flags(
         commands["compare_full_deck"],
-        ("--mode", "qa-polish", "--out-summary"),
+        ("--mode", "qa-polish", "--out-summary", "--profile"),
+        "compare_full_deck",
+        issues,
+    )
+    _require_flags(
+        commands["compile_one_slide_fast_cached"],
+        (
+            "<single-slide>",
+            "--quality",
+            "reconstruction",
+            "--require-qa",
+            "--require-reconstruction",
+            "--crop-plan",
+            "--node-path",
+            "--icon-usage",
+            "--skip-assets",
+            "--target",
+            "both",
+        ),
+        "compile_one_slide_fast_cached",
+        issues,
+    )
+    if "--skip-crops" in commands["compile_one_slide_fast_cached"]:
+        issues.append("skillset plan command compile_one_slide_fast_cached must not skip crops")
+    _require_flag_value(
+        commands["compare_full_deck"],
+        "--profile",
+        qa_profile["path"],
         "compare_full_deck",
         issues,
     )
@@ -1509,6 +1712,7 @@ def validate_skillset_execution_plan(
             "--require-reconstruction",
             "--crop-plan",
             "--node-path",
+            "--icon-usage",
             "--target",
             "both",
         ),
@@ -1534,6 +1738,19 @@ def validate_skillset_execution_plan(
         issues,
     )
     _require_flags(
+        commands["compare_wave"],
+        ("--mode", "qa-polish", "--out-summary", "--profile"),
+        "compare_wave",
+        issues,
+    )
+    _require_flag_value(
+        commands["compare_wave"],
+        "--profile",
+        qa_profile["path"],
+        "compare_wave",
+        issues,
+    )
+    _require_flags(
         commands["enforce_wave_quality_acceptance"],
         ("validate-visual-quality", "--project", "--summary", "--slides"),
         "enforce_wave_quality_acceptance",
@@ -1543,6 +1760,39 @@ def validate_skillset_execution_plan(
         commands["enforce_orchestration_state"],
         ("--summary", "--quality-level", "polish", "--require-artifacts"),
         "enforce_orchestration_state",
+        issues,
+    )
+    _require_flags(
+        commands["probe_one_slide_fast"],
+        ("probe-one-slide-fast", "--project", "--slide", "<single-slide>"),
+        "probe_one_slide_fast",
+        issues,
+    )
+    _require_flags(
+        commands["seal_one_slide_fast"],
+        (
+            "seal-one-slide-fast",
+            "--project",
+            "--slide",
+            "--pptx",
+            "--html",
+            "--summary",
+            "--qa-profile",
+        ),
+        "seal_one_slide_fast",
+        issues,
+    )
+    _require_flag_value(
+        commands["seal_one_slide_fast"],
+        "--qa-profile",
+        qa_profile["path"],
+        "seal_one_slide_fast",
+        issues,
+    )
+    _require_flags(
+        commands["validate_one_slide_fast"],
+        ("validate-one-slide-fast", "--project", "--slide"),
+        "validate_one_slide_fast",
         issues,
     )
     return issues
@@ -1557,6 +1807,22 @@ def _require_flags(
     missing = [value for value in values if value not in command]
     if missing:
         issues.append(f"skillset plan command {label} is missing {missing}")
+
+
+def _require_flag_value(
+    command: list[str],
+    flag: str,
+    expected: str,
+    label: str,
+    issues: list[str],
+) -> None:
+    try:
+        actual = command[command.index(flag) + 1]
+    except (ValueError, IndexError):
+        issues.append(f"skillset plan command {label} is missing value for {flag}")
+        return
+    if Path(actual).resolve() != Path(expected).resolve():
+        issues.append(f"skillset plan command {label} {flag} value mismatch")
 
 
 def _require_path_suffixes(

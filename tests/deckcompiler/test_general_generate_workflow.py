@@ -44,7 +44,20 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             path = root / relative
             path.parent.mkdir(parents=True, exist_ok=True)
             if not path.exists():
-                path.write_text(f"fixture: {relative}\n", encoding="utf-8")
+                if path.name == "default-visual-qa-profile.json":
+                    path.write_text(
+                        json.dumps(
+                            {
+                                "schemaVersion": "slide-visual-polish-qa.calibration-profile.v1",
+                                "knownGoodMetricBands": {},
+                                "borderlineMetricBands": {},
+                                "knownBadMetricBands": {},
+                            }
+                        ),
+                        encoding="utf-8",
+                    )
+                else:
+                    path.write_text(f"fixture: {relative}\n", encoding="utf-8")
         return root
 
     @staticmethod
@@ -199,7 +212,35 @@ if __name__ == "__main__":
                 (runtime / "skillset_execution_plan.json").read_text(encoding="utf-8")
             )
             self.assertEqual(plan["status"], "READY")
-            self.assertEqual(plan["schema_version"], "1.6.0")
+            self.assertEqual(plan["schema_version"], "1.7.0")
+            self.assertNotEqual(
+                Path(plan["project_layout"]["profile_path"]).resolve(),
+                Path(plan["project_layout"]["qa_calibration_profile_path"]).resolve(),
+            )
+            self.assertIn("--profile", plan["command_templates"]["compare_full_deck"])
+            self.assertIn("--icon-usage", plan["command_templates"]["compile_full_deck"])
+            self.assertEqual(plan["environment_template"]["DECK_ICON_WORKERS"], "16")
+            self.assertIn(
+                "--skip-assets",
+                plan["command_templates"]["compile_one_slide_fast_cached"],
+            )
+            self.assertNotIn(
+                "--skip-crops",
+                plan["command_templates"]["compile_one_slide_fast_cached"],
+            )
+            self.assertEqual(
+                plan["one_slide_fast_contract"]["html_capture_cache_contract"],
+                "slide-visual-polish-qa.html-capture-cache.v1",
+            )
+            self.assertTrue(
+                plan["one_slide_fast_contract"][
+                    "accepted_evidence_binds_both_render_surfaces"
+                ]
+            )
+            self.assertIn(
+                "work/slideXX/visual_qa/html_screenshot_metadata.json",
+                plan["required_artifacts"],
+            )
             repository_architect = (
                 ROOT / ".agents" / "skills" / "pptx-workflow-architect"
             ).resolve()
@@ -1086,6 +1127,7 @@ if __name__ == "__main__":
             )
             self.assertIn("measurements.json", first_job["required_outputs"])
             self.assertIn("vector_usage.json", first_job["required_outputs"])
+            self.assertIn("icon_usage.json", first_job["required_outputs"])
             self.assertTrue(
                 first_job["authoring_contract"]["measured_coordinates_authoritative"]
             )
@@ -1284,6 +1326,104 @@ if __name__ == "__main__":
             self.assertTrue(
                 any("canary ceiling" in issue for issue in below_canary["issues"]),
                 below_canary,
+            )
+
+    def test_high_fidelity_policy_accepts_spacing_only_inside_fast_cache_floor(
+        self,
+    ) -> None:
+        from presentation_agent.deckcompiler.orchestration.quality_acceptance import (
+            evaluate_visual_quality_acceptance,
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            project = Path(tmpdir) / "project"
+            visual = project / "work" / "slide01" / "visual_qa"
+            visual.mkdir(parents=True)
+            summary = project / "out" / "visual_qa_summary.json"
+            summary.parent.mkdir(parents=True)
+            summary.write_text(
+                json.dumps(
+                    {
+                        "project": project.resolve().as_posix(),
+                        "slidesRequested": [1],
+                        "failed": 0,
+                        "blockingIssues": 0,
+                        "needsPolish": 1,
+                        "slides": [{"slide": 1, "status": "needs_polish"}],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            source_signals = {
+                "withinBorderlineBand": True,
+                "sourceBlockingContext": False,
+                "explicitBlockingContext": False,
+                "knownBadSignals": [],
+            }
+            metrics = {
+                "slide": 1,
+                "status": "needs_polish",
+                "severity": "noticeable",
+                "comparisons": {
+                    "pptx_vs_source": {
+                        "approx_ssim": 0.5788,
+                        "pixel_difference_ratio": 0.1711,
+                        "mean_absolute_error": 0.0782,
+                        "edge_difference_ratio": 0.1206,
+                        "color_palette_drift": 0.1326,
+                        "metricSignals": source_signals,
+                    },
+                    "html_vs_source": {
+                        "approx_ssim": 0.5882,
+                        "pixel_difference_ratio": 0.1624,
+                        "mean_absolute_error": 0.0806,
+                        "edge_difference_ratio": 0.1155,
+                        "color_palette_drift": 0.1835,
+                        "metricSignals": source_signals,
+                    },
+                    "pptx_vs_html": {
+                        "approx_ssim": 0.8348,
+                        "edge_difference_ratio": 0.0738,
+                    },
+                },
+                "issues": [
+                    {
+                        "type": "spacing",
+                        "severity": "noticeable",
+                        "comparison": "pptx_vs_source",
+                    },
+                    {
+                        "type": "spacing",
+                        "severity": "noticeable",
+                        "comparison": "html_vs_source",
+                    },
+                    {
+                        "type": "pptx_html_edge_mismatch",
+                        "severity": "noticeable",
+                        "comparison": "pptx_vs_html",
+                    },
+                ],
+            }
+            metrics_path = visual / "visual_metrics.json"
+            metrics_path.write_text(json.dumps(metrics), encoding="utf-8")
+
+            accepted = evaluate_visual_quality_acceptance(
+                project=project, summary_path=summary, slides=[1]
+            )
+            self.assertTrue(accepted["accepted"], accepted)
+
+            metrics["comparisons"]["pptx_vs_source"][
+                "pixel_difference_ratio"
+            ] = 0.181
+            metrics_path.write_text(json.dumps(metrics), encoding="utf-8")
+            rejected = evaluate_visual_quality_acceptance(
+                project=project, summary_path=summary, slides=[1]
+            )
+            self.assertFalse(rejected["accepted"], rejected)
+            self.assertTrue(
+                any("fast-cache ceiling" in issue for issue in rejected["issues"]),
+                rejected,
             )
 
     def test_reconstruction_completion_requires_integrator_owned_shared_outputs(
@@ -2598,6 +2738,10 @@ if __name__ == "__main__":
                     "usedRegions": [],
                     "deferredRegions": [],
                     "parametricIconUses": [],
+                },
+                "icon_usage.json": {
+                    "schemaVersion": "slide-image-dual-render.icon-usage.v1",
+                    "icons": [],
                 },
                 "profile_override.json": {
                     "profileId": "academic-editorial",

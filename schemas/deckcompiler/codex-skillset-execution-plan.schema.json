@@ -14,6 +14,7 @@
     "repository_skill_files",
     "ordered_skills",
     "official_entrypoints",
+    "qa_calibration_profile",
     "project_layout",
     "environment_template",
     "dependency_contract",
@@ -21,6 +22,7 @@
     "execution_profile",
     "quality_contract",
     "crop_contract",
+    "one_slide_fast_contract",
     "command_templates",
     "execution_contract",
     "required_artifacts",
@@ -29,7 +31,7 @@
   ],
   "properties": {
     "schema_name": {"const": "codex_skillset_execution_plan"},
-    "schema_version": {"const": "1.6.0"},
+    "schema_version": {"const": "1.7.0"},
     "workflow_id": {"type": "string", "pattern": "^generate_[0-9a-f]{20}$"},
     "status": {"const": "READY"},
     "skill_root": {"type": "string", "minLength": 1},
@@ -90,6 +92,7 @@
         "enforce_visual_qa"
       ]
     },
+    "qa_calibration_profile": {"$ref": "#/$defs/calibrationProfile"},
     "project_layout": {
       "type": "object",
       "additionalProperties": false,
@@ -108,6 +111,10 @@
         "reconstruction_job_manifest_path",
         "integration_report_path",
         "profile_path",
+        "qa_calibration_profile_path",
+        "icon_usage_path",
+        "icon_cache_manifest_path",
+        "background_cache_manifest_path",
         "slides_source_path",
         "crop_plan_path",
         "crop_manifest_path",
@@ -128,6 +135,10 @@
         "reconstruction_job_manifest_path": {"type": "string", "pattern": "reconstruction_job_manifest\\.json$"},
         "integration_report_path": {"type": "string", "pattern": "integration_report\\.md$"},
         "profile_path": {"type": "string", "pattern": "active\\.json$"},
+        "qa_calibration_profile_path": {"type": "string", "pattern": "default-visual-qa-profile\\.json$"},
+        "icon_usage_path": {"type": "string", "pattern": "icon_usage\\.json$"},
+        "icon_cache_manifest_path": {"type": "string", "pattern": "icons[\\\\/]manifest\\.json$"},
+        "background_cache_manifest_path": {"type": "string", "pattern": "bg\\.manifest\\.json$"},
         "slides_source_path": {"type": "string", "pattern": "slides\\.js$"},
         "crop_plan_path": {"type": "string", "pattern": "crop_plan\\.json$"},
         "crop_manifest_path": {"type": "string", "pattern": "manifest\\.json$"},
@@ -137,11 +148,14 @@
     "environment_template": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["SLIDE_PIPELINE_STRICT", "DECK_PROFILE", "DECK_ASSETS", "DECK_PXW", "DECK_PXH", "CROP_PLAN", "SRC_DIR", "WORK_DIR", "SLIDES_OUT", "CROP_PLAN_OUT", "INTEGRATION_REPORT_OUT"],
+      "required": ["SLIDE_PIPELINE_STRICT", "DECK_PROFILE", "DECK_ASSETS", "DECK_ICON_USAGE", "DECK_ICON_WORKERS", "VISUAL_QA_PROFILE", "DECK_PXW", "DECK_PXH", "CROP_PLAN", "SRC_DIR", "WORK_DIR", "SLIDES_OUT", "CROP_PLAN_OUT", "INTEGRATION_REPORT_OUT"],
       "properties": {
         "SLIDE_PIPELINE_STRICT": {"const": "1"},
         "DECK_PROFILE": {"type": "string", "minLength": 1},
         "DECK_ASSETS": {"type": "string", "minLength": 1},
+        "DECK_ICON_USAGE": {"type": "string", "pattern": "icon_usage\\.json$"},
+        "DECK_ICON_WORKERS": {"const": "16"},
+        "VISUAL_QA_PROFILE": {"type": "string", "pattern": "default-visual-qa-profile\\.json$"},
         "DECK_PXW": {"const": "<source-width>"},
         "DECK_PXH": {"const": "<source-height>"},
         "CROP_PLAN": {"type": "string", "pattern": "crop_plan\\.json$"},
@@ -442,6 +456,8 @@
         "source_slide_mapping_required",
         "full_slide_source_raster_forbidden",
         "high_fidelity_acceptance_required",
+        "qa_calibration_profile_required",
+        "design_profile_as_qa_profile_forbidden",
         "allowed_needs_polish_issue_types",
         "quality_reference_baseline",
         "allowed_needs_polish_metric_limits"
@@ -463,6 +479,8 @@
         "source_slide_mapping_required": {"const": true},
         "full_slide_source_raster_forbidden": {"const": true},
         "high_fidelity_acceptance_required": {"const": true},
+        "qa_calibration_profile_required": {"const": true},
+        "design_profile_as_qa_profile_forbidden": {"const": true},
         "allowed_needs_polish_issue_types": {
           "const": ["palette_drift", "pptx_html_edge_mismatch"]
         },
@@ -504,6 +522,26 @@
         }
       }
     },
+    "one_slide_fast_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope", "cache_manifest_pattern", "probe_before_authoring", "cache_hit_reuses_verified_authoring_inputs", "final_render_and_visual_qa_always_required", "seal_after_final_quality_acceptance", "single_process_final_validation", "html_capture_cache_contract", "capture_cache_exact_bindings_required", "accepted_evidence_binds_both_render_surfaces", "cache_hit_compile_command", "skip_assets_allowed_only_after_cache_hit", "skip_crops_forbidden"],
+      "properties": {
+        "scope": {"const": "one_source_slide_only"},
+        "cache_manifest_pattern": {"type": "string", "pattern": "slideXX[\\\\/]one_slide_fast_cache\\.json$"},
+        "probe_before_authoring": {"const": true},
+        "cache_hit_reuses_verified_authoring_inputs": {"const": true},
+        "final_render_and_visual_qa_always_required": {"const": true},
+        "seal_after_final_quality_acceptance": {"const": true},
+        "single_process_final_validation": {"const": true},
+        "html_capture_cache_contract": {"const": "slide-visual-polish-qa.html-capture-cache.v1"},
+        "capture_cache_exact_bindings_required": {"const": true},
+        "accepted_evidence_binds_both_render_surfaces": {"const": true},
+        "cache_hit_compile_command": {"const": "compile_one_slide_fast_cached"},
+        "skip_assets_allowed_only_after_cache_hit": {"const": true},
+        "skip_crops_forbidden": {"const": true}
+      }
+    },
     "command_templates": {
       "type": "object",
       "additionalProperties": false,
@@ -535,6 +573,7 @@
         "finalize_source_mapped_qa",
         "validate_reconstruction_qa",
         "compile_full_deck",
+        "compile_one_slide_fast_cached",
         "gate_full_deck",
         "rasterize_full_deck",
         "capture_full_html",
@@ -554,6 +593,9 @@
         "make_repair_wave_plan",
         "generate_repair_prompt",
         "enforce_orchestration_state",
+        "probe_one_slide_fast",
+        "seal_one_slide_fast",
+        "validate_one_slide_fast",
         "seal_codex_run",
         "register_completion"
       ],
@@ -585,6 +627,7 @@
         "finalize_source_mapped_qa": {"$ref": "#/$defs/command"},
         "validate_reconstruction_qa": {"$ref": "#/$defs/command"},
         "compile_full_deck": {"$ref": "#/$defs/command"},
+        "compile_one_slide_fast_cached": {"$ref": "#/$defs/command"},
         "gate_full_deck": {"$ref": "#/$defs/command"},
         "rasterize_full_deck": {"$ref": "#/$defs/command"},
         "capture_full_html": {"$ref": "#/$defs/command"},
@@ -604,6 +647,9 @@
         "make_repair_wave_plan": {"$ref": "#/$defs/command"},
         "generate_repair_prompt": {"$ref": "#/$defs/command"},
         "enforce_orchestration_state": {"$ref": "#/$defs/command"},
+        "probe_one_slide_fast": {"$ref": "#/$defs/command"},
+        "seal_one_slide_fast": {"$ref": "#/$defs/command"},
+        "validate_one_slide_fast": {"$ref": "#/$defs/command"},
         "seal_codex_run": {"$ref": "#/$defs/command"},
         "register_completion": {"$ref": "#/$defs/command"}
       }
@@ -618,6 +664,9 @@
         "shared_preview_qa",
         "final_compile_fast_path",
         "fast_path_acceptance",
+        "one_slide_fast_preflight",
+        "one_slide_fast_cache_hit_render",
+        "one_slide_fast_acceptance",
         "repair_wave_loop",
         "post_repair_recompile",
         "completion",
@@ -679,6 +728,9 @@
           ]
         },
         "fast_path_acceptance": {"const": ["enforce_orchestration_state"]},
+        "one_slide_fast_preflight": {"const": ["probe_one_slide_fast"]},
+        "one_slide_fast_cache_hit_render": {"const": ["compile_one_slide_fast_cached", "gate_full_deck", "rasterize_full_deck", "capture_full_html", "compare_full_deck", "summarize_full_deck", "enforce_full_deck_qa", "enforce_full_deck_quality_acceptance"]},
+        "one_slide_fast_acceptance": {"const": ["seal_one_slide_fast", "validate_one_slide_fast"]},
         "repair_wave_loop": {
           "const": [
             "make_repair_wave_plan",
@@ -773,6 +825,17 @@
         "skill_name": {"type": "string", "minLength": 1},
         "path": {"type": "string", "minLength": 1},
         "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "calibrationProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skill_name", "path", "sha256", "schema_version"],
+      "properties": {
+        "skill_name": {"const": "slide-visual-polish-qa"},
+        "path": {"type": "string", "pattern": "default-visual-qa-profile\\.json$"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "schema_version": {"const": "slide-visual-polish-qa.calibration-profile.v1"}
       }
     },
     "command": {"type": "array", "minItems": 2, "items": {"type": "string", "minLength": 1}}

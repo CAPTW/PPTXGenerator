@@ -62,6 +62,7 @@ EXPECTED_SCHEMA_FILES = {
     "input-request.schema.json",
     "git-object-bundle-fingerprint.schema.json",
     "legacy-bundle-fingerprint-correction.schema.json",
+    "one-slide-fast-cache.schema.json",
     "module-art-directions.schema.json",
     "phase3-evidence-unit-registry.schema.json",
     "phase3-artifact-graph.schema.json",

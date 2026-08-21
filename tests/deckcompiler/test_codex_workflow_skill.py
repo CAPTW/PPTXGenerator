@@ -63,7 +63,15 @@ class CodexWorkflowSkillTests(unittest.TestCase):
             dependencies["completion_requirements"]["visual_qa_blocking_count"],
             0,
         )
-        self.assertEqual(dependencies["schema_version"], "1.6.0")
+        self.assertEqual(dependencies["schema_version"], "1.7.0")
+        self.assertEqual(
+            dependencies["ordered_dependencies"][5]["calibration_profile"],
+            "assets/calibration/default-visual-qa-profile.json",
+        )
+        self.assertEqual(
+            dependencies["execution_profile"]["icon_generation"],
+            "explicit_usage_manifest_with_hash_cache_and_16_bounded_workers",
+        )
         self.assertEqual(
             dependencies["pngtosvg_preflight"]["canonical_renderer"],
             "slide-image-dual-render",

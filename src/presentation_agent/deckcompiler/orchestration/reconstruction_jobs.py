@@ -31,6 +31,7 @@ MAX_PARALLEL_WORKERS = 6
 AUTHORING_OUTPUT_NAMES = (
     "measurements.json",
     "vector_usage.json",
+    "icon_usage.json",
     "profile_override.json",
     "crop_plan.json",
     "s{slide}.fragment.js",
@@ -659,6 +660,12 @@ text, a continuous-tone region, or the complete slide to SVG. The measured
 assets are inputs to the official SkillSet reconstruction, not an alternate
 renderer.
 
+Write every renderer icon requested by the fragment to `icon_usage.json` using
+schemaVersion `slide-image-dual-render.icon-usage.v1` and explicit
+`{{"concept": "...", "color": "..."}}` pairs. Include an empty `icons` array
+when the fragment uses no renderer icons. This manifest is the sole authority
+for on-demand icon generation; do not request the full icon catalog.
+
 Quality target: reproduce the source slide's composition, typography hierarchy,
 spacing, visual density, imagery, and meaningful small details at the level of a
 careful one-slide SkillSet conversion. Rebuild all readable text and structural
@@ -813,6 +820,47 @@ def _validate_worker_outputs(
     vector_usage = _read_worker_json(work_dir / "vector_usage.json", issues, label)
     if vector_usage is not None:
         _validate_vector_usage(vector_usage, job, label, issues)
+
+    icon_usage = _read_worker_json(work_dir / "icon_usage.json", issues, label)
+    if icon_usage is not None:
+        if icon_usage.get("schemaVersion") != "slide-image-dual-render.icon-usage.v1":
+            issues.append(
+                f"{label} icon_usage.schemaVersion must be "
+                "slide-image-dual-render.icon-usage.v1"
+            )
+        icons = icon_usage.get("icons")
+        if not isinstance(icons, list):
+            issues.append(f"{label} icon_usage.icons must be an array")
+        else:
+            seen: set[tuple[str, str]] = set()
+            for index, item in enumerate(icons):
+                if not isinstance(item, dict):
+                    issues.append(f"{label} icon_usage.icons[{index}] must be an object")
+                    continue
+                concept = str(item.get("concept", "")).strip()
+                color = str(item.get("color", "")).strip()
+                if not re.fullmatch(r"[a-z][a-z0-9]*", concept):
+                    issues.append(
+                        f"{label} icon_usage.icons[{index}].concept is invalid"
+                    )
+                if color not in {
+                    "white",
+                    "lblue",
+                    "cyan",
+                    "red",
+                    "green",
+                    "gold",
+                    "blue",
+                }:
+                    issues.append(
+                        f"{label} icon_usage.icons[{index}].color is invalid"
+                    )
+                pair = (concept, color)
+                if pair in seen:
+                    issues.append(
+                        f"{label} icon_usage contains duplicate pair {concept}:{color}"
+                    )
+                seen.add(pair)
 
     profile = _read_worker_json(work_dir / "profile_override.json", issues, label)
     if profile is not None:

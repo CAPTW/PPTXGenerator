@@ -28,6 +28,11 @@ from .orchestration.image_requests import (
     validate_image_request_bundle,
 )
 from .orchestration.quality_acceptance import evaluate_visual_quality_acceptance
+from .orchestration.one_slide_fast import (
+    probe_one_slide_fast_cache,
+    seal_one_slide_fast_cache,
+    validate_one_slide_fast_cache,
+)
 from .orchestration.reconstruction_jobs import (
     prepare_reconstruction_jobs,
     validate_reconstruction_job_bundle,
@@ -273,6 +278,34 @@ def build_parser() -> argparse.ArgumentParser:
     validate_visual_quality_parser.add_argument(
         "--slides", required=True, help="Comma-separated source slide numbers."
     )
+
+    probe_fast = subparsers.add_parser(
+        "probe-one-slide-fast",
+        help="Check whether one slide's hash-bound authoring cache is reusable.",
+    )
+    probe_fast.add_argument("--project", type=Path, required=True)
+    probe_fast.add_argument("--slide", type=int, required=True)
+    probe_fast.add_argument("--cache", type=Path)
+
+    seal_fast = subparsers.add_parser(
+        "seal-one-slide-fast",
+        help="Run one-process package/trace/quality validation and seal the cache.",
+    )
+    seal_fast.add_argument("--project", type=Path, required=True)
+    seal_fast.add_argument("--slide", type=int, required=True)
+    seal_fast.add_argument("--pptx", type=Path, required=True)
+    seal_fast.add_argument("--html", type=Path, required=True)
+    seal_fast.add_argument("--summary", type=Path, required=True)
+    seal_fast.add_argument("--qa-profile", type=Path, required=True)
+    seal_fast.add_argument("--cache", type=Path)
+
+    validate_fast = subparsers.add_parser(
+        "validate-one-slide-fast",
+        help="Validate the sealed cache, PPTX package, trace, and visual QA in one process.",
+    )
+    validate_fast.add_argument("--project", type=Path, required=True)
+    validate_fast.add_argument("--slide", type=int, required=True)
+    validate_fast.add_argument("--cache", type=Path)
 
     seal_codex_run = subparsers.add_parser(
         "seal-codex-run",
@@ -661,6 +694,38 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
         return 0 if report["accepted"] else 1
+    if args.command == "probe-one-slide-fast":
+        report = probe_one_slide_fast_cache(
+            project=args.project,
+            slide=args.slide,
+            cache_path=args.cache,
+        )
+        print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0 if report["cache_hit"] else 1
+    if args.command == "seal-one-slide-fast":
+        try:
+            report = seal_one_slide_fast_cache(
+                project=args.project,
+                slide=args.slide,
+                pptx=args.pptx,
+                html=args.html,
+                summary=args.summary,
+                qa_profile=args.qa_profile,
+                cache_path=args.cache,
+            )
+        except (OSError, ValueError, TypeError, KeyError, json.JSONDecodeError) as exc:
+            print(f"DECKCOMPILER_ONE_SLIDE_FAST_BLOCKED message={exc}")
+            return 1
+        print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+    if args.command == "validate-one-slide-fast":
+        report = validate_one_slide_fast_cache(
+            project=args.project,
+            slide=args.slide,
+            cache_path=args.cache,
+        )
+        print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0 if report["valid"] else 1
     if args.command == "seal-codex-run":
         try:
             payload = seal_codex_run_manifest(args.draft, args.output)

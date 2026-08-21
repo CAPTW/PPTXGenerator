@@ -72,6 +72,9 @@ Before calling any deck complete, verify all of these.
 | Native editability | Are readable text and structural elements native, with crops limited to justified photoreal/continuous-tone regions? |
 | Per-slide isolation evidence | Does every source image have one hash-bound fresh-context job, worker receipt, and official integration record? |
 | High-fidelity acceptance | Are all remaining Visual QA issues limited to the explicitly allowed native-renderer diagnostics? |
+| QA profile identity | Is `default-visual-qa-profile.json` passed explicitly to visual comparison, and kept distinct from the deck design profile in `styles/active.json`? |
+| On-demand icon evidence | Does each isolated worker declare `icon_usage.json`, does the integrator write the union manifest, and does the renderer bind its icon cache manifest? |
+| One-slide fast cache | On a cache hit, are authoring inputs reused only when every hash still matches while final dual render, hardlocks, source-mapped Visual QA, and one-process acceptance validation still run? Does the accepted evidence bind both PPTX raster and HTML screenshot plus their hash-bound metadata? |
 
 ### Large Deck QA (Additional)
 
@@ -174,3 +177,7 @@ Do not:
 - Bury the main message under supporting detail
 - Rely on fragile layout tricks that may break in PowerPoint or Google Slides
 - Output only text when the environment supports a real presentation file
+- Pass a deck design profile to `compare_slide_images.py --profile`; only the
+  hash-bound `slide-visual-polish-qa` calibration profile is valid
+- Treat a one-slide cache hit as permission to skip final PPTX/HTML rendering,
+  PowerPoint openability, hardlocks, or source-mapped Visual QA

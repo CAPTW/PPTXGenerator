@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pptx-generator.local/schemas/deckcompiler/one-slide-fast-cache.schema.json",
+  "title": "One Slide Fast Cache",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_name", "schema_version", "project_root", "slide", "policy", "cache_key", "inputs", "toolchain", "accepted_evidence", "quality_verdict", "content_hash"],
+  "properties": {
+    "schema_name": {"const": "codex_one_slide_fast_cache"},
+    "schema_version": {"const": "1.0.0"},
+    "project_root": {"type": "string", "minLength": 1},
+    "slide": {"type": "integer", "minimum": 1},
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cache_scope", "external_render_and_visual_qa_on_every_final_delivery", "hardlocks_may_not_be_skipped", "cache_miss_on_any_hash_change"],
+      "properties": {
+        "cache_scope": {"const": "authoring_inputs_and_verified_evidence"},
+        "external_render_and_visual_qa_on_every_final_delivery": {"const": true},
+        "hardlocks_may_not_be_skipped": {"const": true},
+        "cache_miss_on_any_hash_change": {"const": true}
+      }
+    },
+    "cache_key": {"$ref": "#/$defs/sha256"},
+    "inputs": {"type": "array", "minItems": 13, "items": {"$ref": "#/$defs/binding"}},
+    "toolchain": {"type": "array", "minItems": 6, "items": {"$ref": "#/$defs/binding"}},
+    "accepted_evidence": {"type": "array", "minItems": 15, "items": {"$ref": "#/$defs/binding"}},
+    "quality_verdict": {
+      "type": "object",
+      "required": ["accepted", "slides", "issues"],
+      "properties": {
+        "accepted": {"const": true},
+        "slides": {"type": "array", "minItems": 1, "maxItems": 1, "items": {"type": "integer", "minimum": 1}},
+        "issues": {"type": "array", "maxItems": 0}
+      }
+    },
+    "content_hash": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "path", "path_scope", "sha256"],
+      "properties": {
+        "role": {"type": "string", "minLength": 1},
+        "path": {"type": "string", "minLength": 1},
+        "path_scope": {"enum": ["project", "absolute"]},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

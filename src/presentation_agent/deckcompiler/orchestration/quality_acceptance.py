@@ -19,6 +19,7 @@ ALLOWED_NOTICEABLE_ISSUE_TYPES = frozenset(
     {
         "palette_drift",
         "pptx_html_edge_mismatch",
+        "spacing",
     }
 )
 CANARY_METRIC_LIMITS = {
@@ -31,6 +32,30 @@ CANARY_METRIC_LIMITS = {
         "metric": "edge_difference_ratio",
         "maximum": 0.102,
         "minimum_ssim": 0.82,
+    },
+}
+
+# ``spacing`` is a broad diagnostic emitted whenever a source/render comparison
+# lands in the calibrated borderline band.  It is safe for the fast cache only
+# when both the objective metrics and the visual-QA signal envelope prove that
+# the slide is at least as close as the accepted high-fidelity Terra canary.
+# These limits do not make a slide pass visual QA: failed/blocking summaries,
+# known-bad signals, clipping, content loss, and layout-break context are still
+# rejected before this exception is considered.
+SPACING_METRIC_LIMITS = {
+    "pptx_vs_source": {
+        "pixel_difference_ratio": 0.18,
+        "mean_absolute_error": 0.085,
+        "edge_difference_ratio": 0.125,
+        "color_palette_drift": 0.20,
+        "minimum_ssim": 0.57,
+    },
+    "html_vs_source": {
+        "pixel_difference_ratio": 0.17,
+        "mean_absolute_error": 0.085,
+        "edge_difference_ratio": 0.12,
+        "color_palette_drift": 0.20,
+        "minimum_ssim": 0.58,
     },
 }
 
@@ -159,6 +184,8 @@ def _canary_metric_issue(
     issue: dict[str, Any],
     issue_type: str,
 ) -> str | None:
+    if issue_type == "spacing":
+        return _spacing_metric_issue(metrics, issue)
     comparison_name = str(issue.get("comparison", "")).strip()
     comparisons = metrics.get("comparisons")
     if not comparison_name or not isinstance(comparisons, dict):
@@ -181,6 +208,63 @@ def _canary_metric_issue(
         return (
             f"{issue_type} falls below the accepted canary floor: "
             f"approx_ssim={ssim_value:.4f} < {float(limit['minimum_ssim']):.4f}"
+        )
+    return None
+
+
+def _spacing_metric_issue(
+    metrics: dict[str, Any], issue: dict[str, Any]
+) -> str | None:
+    comparison_name = str(issue.get("comparison", "")).strip()
+    limit = SPACING_METRIC_LIMITS.get(comparison_name)
+    if limit is None:
+        return (
+            "spacing requires a pptx_vs_source or html_vs_source comparison "
+            "under the fast-cache policy"
+        )
+    comparisons = metrics.get("comparisons")
+    comparison = (
+        comparisons.get(comparison_name) if isinstance(comparisons, dict) else None
+    )
+    if not isinstance(comparison, dict):
+        return f"spacing comparison {comparison_name!r} is missing"
+
+    signals = comparison.get("metricSignals")
+    if not isinstance(signals, dict):
+        return f"spacing comparison {comparison_name!r} lacks metricSignals"
+    if signals.get("withinBorderlineBand") is not True:
+        return f"spacing comparison {comparison_name!r} is outside the calibrated borderline band"
+    if signals.get("sourceBlockingContext") is True or signals.get(
+        "explicitBlockingContext"
+    ) is True:
+        return f"spacing comparison {comparison_name!r} carries blocking context"
+    known_bad = signals.get("knownBadSignals")
+    if not isinstance(known_bad, list) or known_bad:
+        return f"spacing comparison {comparison_name!r} carries known-bad metric signals"
+
+    for metric_name in (
+        "pixel_difference_ratio",
+        "mean_absolute_error",
+        "edge_difference_ratio",
+        "color_palette_drift",
+    ):
+        metric_value = _float(comparison.get(metric_name))
+        maximum = float(limit[metric_name])
+        if metric_value is None:
+            return f"spacing lacks {comparison_name}.{metric_name} evidence"
+        if metric_value > maximum:
+            return (
+                f"spacing exceeds the high-fidelity fast-cache ceiling: "
+                f"{comparison_name}.{metric_name}={metric_value:.4f} > {maximum:.4f}"
+            )
+    ssim_value = _float(comparison.get("approx_ssim"))
+    minimum_ssim = float(limit["minimum_ssim"])
+    if ssim_value is None:
+        return f"spacing lacks {comparison_name}.approx_ssim evidence"
+    if ssim_value < minimum_ssim:
+        return (
+            f"spacing falls below the high-fidelity fast-cache floor: "
+            f"{comparison_name}.approx_ssim={ssim_value:.4f} < {minimum_ssim:.4f}"
         )
     return None
 
@@ -209,5 +293,6 @@ def _report(
 __all__ = [
     "ALLOWED_NOTICEABLE_ISSUE_TYPES",
     "CANARY_METRIC_LIMITS",
+    "SPACING_METRIC_LIMITS",
     "evaluate_visual_quality_acceptance",
 ]

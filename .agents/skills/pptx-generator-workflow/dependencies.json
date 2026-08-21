@@ -1,6 +1,6 @@
 {
   "schema_name": "pptx_generator_codex_skill_dependencies",
-  "schema_version": "1.6.0",
+  "schema_version": "1.7.0",
   "execution_profile": {
     "name": "fast-quality-20",
     "target_model": "gpt-5.6-sol",
@@ -30,7 +30,9 @@
     "reconstruction_dispatch": "streaming_ready_queue_bounded_workers",
     "max_parallel_reconstruction_workers": 6,
     "shared_reconstruction_writer": "integrator_only",
-    "reconstruction_token_policy": "compact_job_plus_one_source_slide_no_full_deck_duplication"
+    "reconstruction_token_policy": "compact_job_plus_one_source_slide_no_full_deck_duplication",
+    "icon_generation": "explicit_usage_manifest_with_hash_cache_and_16_bounded_workers",
+    "one_slide_fast": "probe_then_final_render_qa_hash_bound_surface_evidence_then_single_process_seal"
   },
   "ordered_dependencies": [
     {
@@ -90,7 +92,9 @@
       "skill_name": "slide-visual-polish-qa",
       "skill_path": "${CODEX_HOME}/skills/slide-visual-polish-qa/SKILL.md",
       "qa_mode": "qa-polish",
-      "source_slide_mapping_required": true
+      "source_slide_mapping_required": true,
+      "calibration_profile": "assets/calibration/default-visual-qa-profile.json",
+      "design_profile_as_calibration_profile_forbidden": true
     }
   ],
   "pngtosvg_preflight": {
@@ -138,6 +142,11 @@
     "streaming_overlap_evidence": "PASS",
     "shared_preview_and_final_render_path": "PASS",
     "zero_isolated_per_slide_builds": "PASS",
+    "on_demand_icon_usage_and_cache": "PASS",
+    "one_slide_fast_cache_hash_binding": "PASS",
+    "html_capture_cache_exact_binding": "PASS",
+    "single_process_one_slide_acceptance": "PASS",
+    "single_compile_fast_path_or_conditional_post_repair_recompile": "PASS",
     "source_mapped_visual_qa": "PASS",
     "final_full_deck_visual_qa": "PASS",
     "final_visual_qa_output_hash_binding": "PASS",

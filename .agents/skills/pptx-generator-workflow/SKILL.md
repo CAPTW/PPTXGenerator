@@ -1,6 +1,6 @@
 ---
 name: pptx-generator-workflow
-description: "Run the live Codex prompt/PDF-to-editable-PPTX workflow after mandatory pptx-workflow-architect Gates 1 and 2. Use for any new deck production in this repository. Its fast-quality-20 profile dispatches platform Image Generation in concurrent waves of 20, reconstructs all accepted PNGs in one full-deck CAPTW/pngtopptx compile, runs source-mapped visual QA, repairs only blockers, and seals truthful execution and timing evidence."
+description: "Run the live Codex prompt/PDF-to-editable-PPTX workflow after mandatory pptx-workflow-architect Gates 1 and 2. Use for any new deck production in this repository. Its fast-quality-20 profile dispatches 20 ImageGen calls together, streams each accepted PNG immediately into bounded one-slide reconstruction, reuses two shared full-deck renders for source-mapped QA and final reconstruction gating, repairs only blockers, and seals truthful execution and timing evidence."
 ---
 
 # PPTXGenerator Live Codex Workflow
@@ -154,27 +154,43 @@ multi-image API call.
 
 Use the `fast-quality-20` dispatch profile:
 
-1. Validate the prepared request manifest, then load every Prompt and Semantic
-   Sidecar in the wave before calling the image tool.
-2. Dispatch up to 20 independent initial `image_gen.imagegen` calls as one
-   concurrent wave. A 20-slide deck is one 20-call wave with no serial canary.
-3. Inspect every result for content/evidence integrity, composition,
+1. Validate the prepared request manifest and run
+   `deckcompiler prepare-streaming-execution --runtime <runtime>`.
+2. Load every Prompt and Semantic Sidecar, then dispatch up to 20 independent
+   initial `image_gen.imagegen` calls as one concurrent wave. A 20-slide deck is
+   one 20-call wave with no serial canary. Keep unfinished calls running when an
+   earlier call completes. Treat this as requested dispatch width: record actual
+   call intervals and observed provider concurrency rather than assuming the
+   provider executes all 20 at once. A provider-queued result still enters the
+   reconstruction ready queue immediately.
+3. Inspect each result as it arrives for content/evidence integrity, composition,
    continuity, and usability as an editable-reconstruction reference.
 4. Retry only a slide that fails inspection, at most once. Never restart
    already accepted calls. If the retry still fails, stop that slide as a real
    blocker instead of lowering the acceptance standard.
 5. Save each accepted image as
-   `<runtime>/pngtopptx-project/src/slideN.png` and its per-slide PASS report.
-6. Write `<runtime>/image_batches/image_generation_batch_manifest.json` with
-   deterministic wave membership, one call record per slide, attempt counts,
-   accepted coverage, request ID, prepared Prompt SHA-256, and selected PNG
-   SHA-256.
+   `<runtime>/pngtopptx-project/src/slideN.png` and its per-slide PASS report,
+   then immediately run `deckcompiler accept-streaming-image` with the actual
+   tool-call timestamps. This command hash-binds the result and creates that
+   slide's reconstruction job without waiting for the rest of the wave.
+6. Start ready reconstruction jobs as capacity becomes available and record
+   their STARTED/AUTHORING_COMPLETED transitions. After the last image is
+   accepted, run `deckcompiler finalize-streaming-images`; it writes the
+   canonical batch manifest and full reconstruction-job manifest from the
+   accepted per-slide receipts.
+
+The conservative fast-quality budget remains viable when the platform completes
+about one requested image per minute: six five-minute authoring workers match
+that arrival rate, then two shared full-deck render/QA passes consume the final
+five minutes. Record a miss truthfully when observed latency or quality repairs
+exceed that budget; never reduce fidelity, editability, or QA to force a pass.
 
 All selected source images must share a consistent 16:9 canvas. Normalize by
 aspect-preserving crop or pad only when necessary; never stretch.
 
-Do not compile until every planned slide has a selected, inspected PNG, a
-matching Semantic Sidecar, and a complete batch-manifest record.
+Do not start a shared full-deck compile until every planned slide is accepted.
+One-slide reconstruction authoring must start earlier whenever a validated
+result and worker slot are available.
 
 ### 5. Execute editable reconstruction
 
@@ -189,21 +205,21 @@ sequence and commands in `skillset_execution_plan.json`:
 2. install project-local Node dependencies once with npm's verified local cache
    preferred and audit/fund network chatter disabled, then install hardlock
    templates;
-3. after all selected PNGs and the batch manifest exist, run
-   `deckcompiler prepare-reconstruction-jobs --runtime <runtime>`. This creates
-   one hash-bound job and compact worker prompt per slide under
-   `work/slideXX/`;
-4. execute each job in a fresh context that can see only one source slide, its
-   job, Semantic Sidecar, and the canonical renderer Skill. Combine profile
-   mapping and reconstruction in that one context to avoid duplicate model
-   passes. Use no more than four workers concurrently. Each worker writes only
-   its assigned `work/slideXX/` artifacts and performs isolated PPTX/HTML QA.
-   Keep those images under `work/slideXX/worker_qa/` so the later full-deck
-   source-mapped `visual_qa/` capture cannot invalidate their evidence hashes;
-5. run `deckcompiler validate-reconstruction-jobs --require-worker-outputs`,
-   then the official `validate_agent_work.js`. Reject stale source hashes,
-   incomplete measurements, generic or backend-branched fragments, missing QA
-   evidence, and receipts that edited shared files;
+3. execute each ready job as soon as its source PNG passes inspection, even
+   while later ImageGen calls remain in flight. Use a fresh context containing
+   only one source slide, its job, Semantic Sidecar, and the canonical renderer
+   Skill. Combine profile mapping and reconstruction in that one context and
+   use no more than six workers concurrently. Each worker writes only the
+   authoring artifacts in its assigned `work/slideXX/` directory; it must not
+   edit shared files or run an isolated PPTX/HTML build;
+4. after the last image arrives, run `finalize-streaming-images`, then
+   `validate-streaming-execution --require-complete --require-overlap`. A
+   20-slide fast-quality run is invalid unless real timestamps show that at
+   least one reconstruction started before the last ImageGen call completed;
+5. run `deckcompiler validate-reconstruction-jobs
+   --require-authoring-outputs`, then the official `validate_agent_work.js`.
+   Reject stale source hashes, incomplete measurements, generic or
+   backend-branched fragments, and any worker that edited shared files;
 6. run the official `integrate_subagent_work.js` with `WORK_DIR`, `SLIDES_OUT`,
    `CROP_PLAN_OUT`, and `INTEGRATION_REPORT_OUT` from the execution plan. The
    integrator is the only writer of `lib/slides.js` and the integrated crop
@@ -211,28 +227,29 @@ sequence and commands in `skillset_execution_plan.json`:
 7. keep `work/crop_plan.json` explicit even when it contains zero crops, run
    crop preparation so `assets/manifest.json` exists, and do not use
    `--skip-crops` for final delivery;
-8. after all ImageGen references and validated integration artifacts are ready,
-   run one
-   all-slide
-   `slide-image-dual-render/scripts/slide_pipeline.js` build with
-   `--quality reconstruction --require-qa --require-reconstruction`, an
-   explicit `--crop-plan`, an explicit project-local `--node-path`, and
-   `--allow-large-batch`, writing directly to `deck-final-editable.pptx` and
-   `deck-final-editable.html`;
-9. run `slide-image-dual-render/scripts/final_gate.js` with PPTX openability;
-10. run all five `slide-visual-polish-qa` steps once against that full-deck
-   PPTX/HTML, using `--source-slides`;
-11. run `deckcompiler validate-visual-quality` against the official summary.
+8. run one all-slide shared preview build through the official
+   `slide_pipeline.js` in canary mode. Rasterize the preview PPTX and capture
+   its HTML once, then use `--source-slides` to compare all 20 mapped pages to
+   the selected source PNGs. Do not deliver the preview;
+9. run all five `slide-visual-polish-qa` steps against the shared preview and
+   run `deckcompiler validate-visual-quality` against its official summary.
    Only `palette_drift` and `pptx_html_edge_mismatch` may remain as accepted
    noticeable native-renderer diagnostics. Spacing, hierarchy, typography,
    clipping, missing content, and meaningful-detail loss require repair;
-12. when fail/blocking counts are zero and the high-fidelity policy accepts the
-   result, take the single-compile fast path and do
-   not repeat the all-slide build or QA merely to rename it "final"; run
-   `fast_path_acceptance` to enforce the orchestration state;
-13. only when blockers exist, create targeted repair-wave plans, rebuild and QA
+10. run `deckcompiler finalize-shared-render-qa --runtime <runtime> --summary
+    <preview-summary>` to close each job's QA evidence and hash-bound receipt
+    from the mapped shared-preview pages, then run `validate-reconstruction-jobs
+    --require-worker-outputs`. Per-slide source comparison, native-object,
+    exact-copy, crop, and editability requirements remain mandatory; only the
+    duplicate per-slide build is removed;
+11. run one final all-slide `slide_pipeline.js` build with
+    `--quality reconstruction --require-qa --require-reconstruction`, an
+    explicit crop plan and project-local node path, and `--allow-large-batch`,
+    writing `deck-final-editable.pptx` and `.html`. Run `final_gate.js` with
+    PPTX openability and the final source-mapped Visual QA chain;
+12. only when blockers exist, create targeted repair-wave plans, rebuild and QA
    waves of at most five slides, for at most two iterations;
-14. after any repair, run one conditional all-slide compile, final gate, and
+13. after any repair, run one conditional all-slide compile, final gate, and
     full-deck QA so delivered capture metadata names and hash-binds the repaired
     PPTX/HTML.
 
@@ -246,20 +263,21 @@ Production defaults:
 - PPTX openability required.
 - exact official `slide-image-dual-render` render trace required;
 - initial ImageGen wave size 20 with concurrent dispatch;
-- one source slide per fresh reconstruction context, with at most four workers
+- one source slide per fresh reconstruction context, with at most six workers
   active and no full-deck context duplicated into worker prompts;
 - official worker validation and integration scripts required before compile;
-- one full-deck `--allow-large-batch` compile on the normal path;
+- zero isolated per-slide builds and exactly two shared full-deck renders on the
+  normal path: one preview evidence render and one final reconstruction render;
 - repair wave size at most 5, with a single conditional post-repair full-deck
   recompile;
 - maximum repair iterations 2;
 - project-local Node dependencies and explicit crop plan required.
 
-Run the full-deck reconstruction and source-mapped QA once. Continue into the
-repair path only when the report contains a fail or blocking slide; an
-intermediate repair-wave render is not a deliverable. The time optimization
-must never weaken hardlocks, openability, native editability, evidence binding,
-or the zero fail/blocking completion gate.
+Continue into the repair path only when the report contains a fail or blocking
+slide; neither the shared preview nor an intermediate repair-wave render is a
+deliverable. The time optimization must never weaken hardlocks, openability,
+native editability, evidence binding, per-slide source mapping, or the zero
+fail/blocking completion gate.
 
 If the iteration cap is reached, report `NEEDS_REPAIR`; do not seal the run as
 complete.
@@ -289,7 +307,8 @@ completion only when:
 - `image_gen.imagegen` has one accepted result per blueprint slide;
 - the Image Generation batch manifest proves deterministic waves of at most 20,
   concurrent-wave dispatch, exactly one initial built-in call per slide, and no
-  more than one targeted regeneration per slide;
+  more than one targeted regeneration per slide; `streaming_execution.json`
+  proves real call intervals and reconstruction/ImageGen overlap;
 - selected slide references are real, consistently sized 16:9 PNGs rather than
   placeholder bytes;
 - every selected image is bound to exactly one isolated reconstruction job,
@@ -307,8 +326,8 @@ completion only when:
   rejects any content, layout, hierarchy, typography, clipping, or detail-loss
   drift;
 - `execution_timing.json` truthfully records the fast-quality-20 timings and
-  full-deck compile count; a zero-repair run must record exactly one full-deck
-  compile;
+  full-deck render count; a zero-repair run must record exactly two shared
+  full-deck renders and zero isolated per-slide builds;
 - the delivered PPTX exists and its hash matches the reconstruction output.
 
 ## Final delivery

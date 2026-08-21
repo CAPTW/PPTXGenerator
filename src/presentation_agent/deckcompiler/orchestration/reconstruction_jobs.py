@@ -20,20 +20,23 @@ PROJECT_DIRECTORY = "pngtopptx-project"
 JOB_MANIFEST_NAME = "reconstruction_job_manifest.json"
 JOB_MANIFEST_SCHEMA = "codex_reconstruction_job_manifest"
 JOB_SCHEMA = "codex_slide_reconstruction_job"
-MAX_PARALLEL_WORKERS = 4
-REQUIRED_OUTPUT_NAMES = (
+MAX_PARALLEL_WORKERS = 6
+AUTHORING_OUTPUT_NAMES = (
     "measurements.json",
     "profile_override.json",
     "crop_plan.json",
     "s{slide}.fragment.js",
     "reconstruction_notes.md",
     "editability_inventory.md",
+)
+POST_RENDER_OUTPUT_NAMES = (
     "reconstruction_score.json",
     "qa_report.md",
     "qa_result.json",
     "qa_evidence.json",
     "worker_receipt.json",
 )
+REQUIRED_OUTPUT_NAMES = AUTHORING_OUTPUT_NAMES + POST_RENDER_OUTPUT_NAMES
 
 
 @dataclass(frozen=True, slots=True)
@@ -44,6 +47,15 @@ class ReconstructionJobPreparationResult:
     job_paths: tuple[Path, ...]
     worker_prompt_paths: tuple[Path, ...]
     slide_count: int
+
+
+@dataclass(frozen=True, slots=True)
+class ReconstructionSlideJobPreparationResult:
+    workflow_id: str
+    runtime_root: Path
+    slide_number: int
+    job_path: Path
+    worker_prompt_path: Path
 
 
 def prepare_reconstruction_jobs(
@@ -98,9 +110,34 @@ def prepare_reconstruction_jobs(
     )
 
 
+def prepare_reconstruction_job(
+    runtime_root: Path,
+    *,
+    slide_number: int,
+    accepted_call: dict[str, Any],
+) -> ReconstructionSlideJobPreparationResult:
+    """Prepare one slide immediately, without waiting for the batch barrier."""
+
+    root = runtime_root.resolve()
+    row = _expected_incremental_job(root, slide_number, accepted_call)
+    work_dir = root / row["work_dir"]
+    work_dir.mkdir(parents=True, exist_ok=True)
+    job_path = write_json(work_dir / "reconstruction_job.json", row["job"])
+    prompt_path = work_dir / "worker_prompt.md"
+    prompt_path.write_text(row["worker_prompt"], encoding="utf-8", newline="\n")
+    return ReconstructionSlideJobPreparationResult(
+        workflow_id=row["job"]["workflow_id"],
+        runtime_root=root,
+        slide_number=slide_number,
+        job_path=job_path,
+        worker_prompt_path=prompt_path,
+    )
+
+
 def validate_reconstruction_job_bundle(
     runtime_root: Path,
     *,
+    require_authoring_outputs: bool = False,
     require_worker_outputs: bool = False,
     require_integrated_outputs: bool = False,
 ) -> dict[str, Any]:
@@ -118,6 +155,7 @@ def validate_reconstruction_job_bundle(
             "valid": False,
             "workflow_id": None,
             "slide_count": 0,
+            "authoring_outputs_required": require_authoring_outputs,
             "worker_outputs_required": require_worker_outputs,
             "integrated_outputs_required": require_integrated_outputs,
             "issues": [message],
@@ -184,6 +222,9 @@ def validate_reconstruction_job_bundle(
         if require_worker_outputs:
             job_path = root / expected_row["work_dir"] / "reconstruction_job.json"
             _validate_worker_outputs(root, job_path, expected_row["job"], issues)
+        elif require_authoring_outputs:
+            job_path = root / expected_row["work_dir"] / "reconstruction_job.json"
+            _validate_authoring_outputs(root, job_path, expected_row["job"], issues)
 
     if require_integrated_outputs:
         _validate_integrated_outputs(root, expected["jobs"], issues)
@@ -198,6 +239,7 @@ def validate_reconstruction_job_bundle(
         "valid": not issues,
         "workflow_id": expected_header["workflow_id"],
         "slide_count": len(expected["jobs"]),
+        "authoring_outputs_required": require_authoring_outputs,
         "worker_outputs_required": require_worker_outputs,
         "integrated_outputs_required": require_integrated_outputs,
         "issues": issues,
@@ -205,6 +247,96 @@ def validate_reconstruction_job_bundle(
 
 
 def _expected_bundle(root: Path) -> dict[str, Any]:
+    context = _load_job_context(root)
+    request_path = context["request_path"]
+    request_manifest = context["request_manifest"]
+    workflow_id = context["workflow_id"]
+    plan_path = context["plan_path"]
+    renderer = context["renderer"]
+    execution_profile = context["execution_profile"]
+    batch_path = root / "image_batches" / "image_generation_batch_manifest.json"
+    batch = read_json(batch_path)
+    calls = _accepted_calls(batch, len(request_manifest["slides"]))
+    jobs = [
+        _build_job_row(
+            root,
+            workflow_id=workflow_id,
+            request_row=request_row,
+            call=calls[int(request_row["slide_number"])],
+            renderer=renderer,
+            execution_profile=execution_profile,
+            lineage_path=batch_path,
+        )
+        for request_row in request_manifest["slides"]
+    ]
+
+    header = {
+        "schema_name": JOB_MANIFEST_SCHEMA,
+        "schema_version": "1.1.0",
+        "workflow_id": workflow_id,
+        "context_unit": "one_source_slide_per_fresh_context",
+        "dispatch_mode": "bounded_parallel_workers",
+        "max_parallel_workers": min(
+            int(execution_profile["max_reconstruction_workers"]), len(jobs)
+        ),
+        "shared_file_writer": "integrator_only",
+        "worker_model": execution_profile["target_model"],
+        "worker_reasoning_effort": execution_profile[
+            "target_reasoning_effort"
+        ],
+        "token_policy": "compact_job_plus_one_source_slide_no_full_deck_duplication",
+        "qa_execution": {
+            "authoring_before_integration": True,
+            "isolated_one_slide_builds_required": False,
+            "shared_full_deck_render_passes": 2,
+            "source_mapped_per_slide_qa_required": True,
+            "final_full_deck_gate_required": True,
+        },
+        "source_artifacts": {
+            "image_request_manifest": _artifact(root, request_path),
+            "image_generation_batch_manifest": _artifact(root, batch_path),
+            "skillset_execution_plan": _artifact(root, plan_path),
+        },
+        "slide_count": len(jobs),
+    }
+    return {"header": header, "jobs": jobs}
+
+
+def _expected_incremental_job(
+    root: Path,
+    slide_number: int,
+    accepted_call: dict[str, Any],
+) -> dict[str, Any]:
+    context = _load_job_context(root)
+    request_manifest = context["request_manifest"]
+    request_row = next(
+        (
+            row
+            for row in request_manifest["slides"]
+            if int(row["slide_number"]) == slide_number
+        ),
+        None,
+    )
+    if request_row is None:
+        raise _error(
+            "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+            f"image request manifest has no slide {slide_number}",
+            context["request_path"],
+        )
+    return _build_job_row(
+        root,
+        workflow_id=context["workflow_id"],
+        request_row=request_row,
+        call=accepted_call,
+        renderer=context["renderer"],
+        execution_profile=context["execution_profile"],
+        lineage_path=(
+            root / "image_batches" / "accepted" / f"slide-{slide_number:03d}.json"
+        ),
+    )
+
+
+def _load_job_context(root: Path) -> dict[str, Any]:
     request_path = root / "image_requests" / REQUEST_MANIFEST_NAME
     request_report = validate_image_request_bundle(root, request_path)
     if not request_report["valid"]:
@@ -216,9 +348,6 @@ def _expected_bundle(root: Path) -> dict[str, Any]:
         )
     request_manifest = read_json(request_path)
     workflow_id = str(request_manifest.get("workflow_id", "")).strip()
-    batch_path = root / "image_batches" / "image_generation_batch_manifest.json"
-    batch = read_json(batch_path)
-    calls = _accepted_calls(batch, len(request_manifest["slides"]))
     plan_path = root / "skillset_execution_plan.json"
     plan = read_json(plan_path)
     plan_issues = validate_skillset_execution_plan(
@@ -246,153 +375,183 @@ def _expected_bundle(root: Path) -> dict[str, Any]:
             "skillset execution plan is missing slide-image-dual-render",
             plan_path,
         )
+    return {
+        "request_path": request_path,
+        "request_manifest": request_manifest,
+        "workflow_id": workflow_id,
+        "plan_path": plan_path,
+        "renderer": renderer,
+        "execution_profile": plan["execution_profile"],
+    }
 
+
+def _build_job_row(
+    root: Path,
+    *,
+    workflow_id: str,
+    request_row: dict[str, Any],
+    call: dict[str, Any],
+    renderer: dict[str, Any],
+    execution_profile: dict[str, Any],
+    lineage_path: Path,
+) -> dict[str, Any]:
+    slide = int(request_row["slide_number"])
+    if call.get("status") != "ACCEPTED":
+        raise _error(
+            "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+            f"slide {slide} image call must be ACCEPTED",
+            lineage_path,
+        )
+    prompt_path = _required_artifact_path(root, request_row.get("prompt"), "prompt")
+    sidecar_path = _required_artifact_path(
+        root, request_row.get("semantic_sidecar"), "semantic sidecar"
+    )
     project = root / PROJECT_DIRECTORY
-    jobs: list[dict[str, Any]] = []
-    for request_row in request_manifest["slides"]:
-        slide = int(request_row["slide_number"])
-        call = calls.get(slide)
-        if call is None:
-            raise _error(
-                "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
-                f"image batch has no accepted call for slide {slide}",
-                batch_path,
-            )
-        prompt_path = _required_artifact_path(root, request_row.get("prompt"), "prompt")
-        sidecar_path = _required_artifact_path(
-            root, request_row.get("semantic_sidecar"), "semantic sidecar"
+    source_path = project / "src" / f"slide{slide}.png"
+    width, height = _png_dimensions(source_path)
+    prompt_sha = _sha256_file(prompt_path)
+    sidecar_sha = _sha256_file(sidecar_path)
+    source_sha = _sha256_file(source_path)
+    if call.get("request_id") != request_row.get("request_id"):
+        raise _error(
+            "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+            f"slide {slide} image call request_id mismatch",
+            lineage_path,
         )
-        source_path = project / "src" / f"slide{slide}.png"
-        width, height = _png_dimensions(source_path)
-        prompt_sha = _sha256_file(prompt_path)
-        sidecar_sha = _sha256_file(sidecar_path)
-        source_sha = _sha256_file(source_path)
-        if call.get("request_id") != request_row.get("request_id"):
-            raise _error(
-                "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
-                f"slide {slide} batch request_id mismatch",
-                batch_path,
-            )
-        if call.get("prompt_sha256") != prompt_sha:
-            raise _error(
-                "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
-                f"slide {slide} batch prompt_sha256 mismatch",
-                batch_path,
-            )
-        if call.get("selected_png_sha256") != source_sha:
-            raise _error(
-                "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
-                f"slide {slide} selected_png_sha256 mismatch",
-                batch_path,
-            )
-        job_id = stable_id(
-            "reconstructionjob",
-            workflow_id,
-            request_row["request_id"],
-            source_sha,
-            sidecar_sha,
+    if call.get("prompt_sha256") != prompt_sha:
+        raise _error(
+            "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+            f"slide {slide} image call prompt_sha256 mismatch",
+            lineage_path,
         )
-        work_dir = project / "work" / f"slide{slide:02d}"
-        output_names = [name.format(slide=slide) for name in REQUIRED_OUTPUT_NAMES]
-        job: dict[str, Any] = {
-            "schema_name": JOB_SCHEMA,
-            "schema_version": "1.0.0",
-            "workflow_id": workflow_id,
+    if call.get("selected_png_sha256") != source_sha:
+        raise _error(
+            "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+            f"slide {slide} selected_png_sha256 mismatch",
+            lineage_path,
+        )
+    job_id = stable_id(
+        "reconstructionjob",
+        workflow_id,
+        request_row["request_id"],
+        source_sha,
+        sidecar_sha,
+    )
+    work_dir = project / "work" / f"slide{slide:02d}"
+    authoring_outputs = [
+        name.format(slide=slide) for name in AUTHORING_OUTPUT_NAMES
+    ]
+    post_render_outputs = [
+        name.format(slide=slide) for name in POST_RENDER_OUTPUT_NAMES
+    ]
+    job: dict[str, Any] = {
+        "schema_name": JOB_SCHEMA,
+        "schema_version": "1.1.0",
+        "workflow_id": workflow_id,
+        "job_id": job_id,
+        "slide_number": slide,
+        "slide_id": request_row["slide_id"],
+        "source_png": {
+            **_artifact(root, source_path),
+            "width": width,
+            "height": height,
+        },
+        "image_request": _artifact(root, prompt_path),
+        "semantic_sidecar": _artifact(root, sidecar_path),
+        "request_lineage": {
+            key: request_row[key]
+            for key in (
+                "request_id",
+                "blueprint_entry_sha256",
+                "visual_route_id",
+                "visual_route_sha256",
+                "layout_id",
+                "layout_sha256",
+            )
+        },
+        "context_policy": {
+            "fresh_context_required": True,
+            "allowed_source_slides": [slide],
+            "full_deck_context_forbidden": True,
+            "shared_file_writes_forbidden": True,
+        },
+        "execution_profile": {
+            key: execution_profile[key]
+            for key in (
+                "profile_name",
+                "target_model",
+                "target_reasoning_effort",
+                "fallback_policy",
+                "determinism_contract",
+                "worker_context",
+            )
+        },
+        "authoring_contract": {
+            "renderer_skill": "slide-image-dual-render",
+            "renderer_skill_path": renderer["skill_path"],
+            "quality": "reconstruction",
+            "targets": ["pptx", "html"],
+            "source_image_role": "visual_fidelity_target_not_delivered_slide_surface",
+            "exact_text_source": "semantic_sidecar",
+            "native_text_required": True,
+            "native_structure_required": True,
+            "selective_photoreal_crops_allowed": True,
+            "full_slide_raster_forbidden": True,
+            "backend_branching_forbidden": True,
+        },
+        "execution_phases": {
+            "authoring": "complete_before_integration",
+            "visual_qa": "after_shared_full_deck_preview_render",
+            "final_acceptance": "after_final_full_deck_reconstruction_gate",
+        },
+        "authoring_outputs": authoring_outputs,
+        "post_render_outputs": post_render_outputs,
+        "required_outputs": authoring_outputs + post_render_outputs,
+        "receipt_binding": {
             "job_id": job_id,
+            "source_png_sha256": source_sha,
+            "image_request_sha256": prompt_sha,
+            "semantic_sidecar_sha256": sidecar_sha,
+            "artifact_hashes_required": True,
+        },
+        "content_hash": "0" * 64,
+    }
+    job["content_hash"] = content_sha256(
+        {key: value for key, value in job.items() if key != "content_hash"}
+    )
+    return {
+        "work_dir": work_dir.relative_to(root).as_posix(),
+        "lineage": {
             "slide_number": slide,
             "slide_id": request_row["slide_id"],
-            "source_png": {
-                **_artifact(root, source_path),
-                "width": width,
-                "height": height,
-            },
-            "image_request": _artifact(root, prompt_path),
-            "semantic_sidecar": _artifact(root, sidecar_path),
-            "request_lineage": {
-                key: request_row[key]
-                for key in (
-                    "request_id",
-                    "blueprint_entry_sha256",
-                    "visual_route_id",
-                    "visual_route_sha256",
-                    "layout_id",
-                    "layout_sha256",
-                )
-            },
-            "context_policy": {
-                "fresh_context_required": True,
-                "allowed_source_slides": [slide],
-                "full_deck_context_forbidden": True,
-                "shared_file_writes_forbidden": True,
-            },
-            "authoring_contract": {
-                "renderer_skill": "slide-image-dual-render",
-                "renderer_skill_path": renderer["skill_path"],
-                "quality": "reconstruction",
-                "targets": ["pptx", "html"],
-                "source_image_role": "visual_fidelity_target_not_delivered_slide_surface",
-                "exact_text_source": "semantic_sidecar",
-                "native_text_required": True,
-                "native_structure_required": True,
-                "selective_photoreal_crops_allowed": True,
-                "full_slide_raster_forbidden": True,
-                "backend_branching_forbidden": True,
-            },
-            "required_outputs": output_names,
-            "receipt_binding": {
-                "job_id": job_id,
-                "source_png_sha256": source_sha,
-                "image_request_sha256": prompt_sha,
-                "semantic_sidecar_sha256": sidecar_sha,
-                "artifact_hashes_required": True,
-            },
-            "content_hash": "0" * 64,
-        }
-        job["content_hash"] = content_sha256(
-            {key: value for key, value in job.items() if key != "content_hash"}
-        )
-        worker_prompt = _worker_prompt(root, work_dir, job)
-        jobs.append(
-            {
-                "work_dir": work_dir.relative_to(root).as_posix(),
-                "lineage": {
-                    "slide_number": slide,
-                    "slide_id": request_row["slide_id"],
-                    "job_id": job_id,
-                    "request_id": request_row["request_id"],
-                    "source_png_sha256": source_sha,
-                    "job_content_hash": job["content_hash"],
-                },
-                "job": job,
-                "worker_prompt": worker_prompt,
-            }
-        )
-
-    header = {
-        "schema_name": JOB_MANIFEST_SCHEMA,
-        "schema_version": "1.0.0",
-        "workflow_id": workflow_id,
-        "context_unit": "one_source_slide_per_fresh_context",
-        "dispatch_mode": "bounded_parallel_workers",
-        "max_parallel_workers": min(MAX_PARALLEL_WORKERS, len(jobs)),
-        "shared_file_writer": "integrator_only",
-        "worker_model": "gpt-5.6-sol",
-        "worker_reasoning_effort": "medium",
-        "token_policy": "compact_job_plus_one_source_slide_no_full_deck_duplication",
-        "source_artifacts": {
-            "image_request_manifest": _artifact(root, request_path),
-            "image_generation_batch_manifest": _artifact(root, batch_path),
-            "skillset_execution_plan": _artifact(root, plan_path),
+            "job_id": job_id,
+            "request_id": request_row["request_id"],
+            "source_png_sha256": source_sha,
+            "job_content_hash": job["content_hash"],
         },
-        "slide_count": len(jobs),
+        "job": job,
+        "worker_prompt": _worker_prompt(root, work_dir, job),
     }
-    return {"header": header, "jobs": jobs}
 
 
 def _worker_prompt(root: Path, work_dir: Path, job: dict[str, Any]) -> str:
     slide = job["slide_number"]
-    required = "\n".join(f"- `{name}`" for name in job["required_outputs"])
+    profile = job["execution_profile"]
+    authoring = "\n".join(f"- `{name}`" for name in job["authoring_outputs"])
+    post_render = "\n".join(f"- `{name}`" for name in job["post_render_outputs"])
     return f"""Use `$slide-image-dual-render` for exactly slide {slide}.
+
+Execution profile: `{profile['profile_name']}` = model
+`{profile['target_model']}` with reasoning effort
+`{profile['target_reasoning_effort']}`. Do not silently substitute another
+model or effort. The profile changes worker routing only; the bound prompt,
+Semantic Sidecar, renderer contract, vector policy, compiler, and QA are fixed.
+Any configured fallback is failed-slide-only and may run only after an explicit
+contract or blocking-quality failure.
+
+Launch this fresh worker with the exact `worker_context.codex_argv` stored in
+the job. Do not load the global plugin/Skill catalog. The renderer Skill path
+below is the only Skill instruction path required for this job.
 
 This is one isolated fresh-context reconstruction job. Read
 `{(work_dir / "reconstruction_job.json").as_posix()}` first and inspect only the
@@ -412,22 +571,103 @@ Read the renderer Skill, `styles/_schema.md`, `scripts/classify.md`,
 `references/codex-subagents.md`, and `references/hardlock-mode.md`. Measure and
 classify before authoring. Write only inside `{work_dir.as_posix()}`; never edit
 `lib/slides.js`, `styles/`, `assets/`, build scripts, or other slide folders.
-Use an isolated one-slide test render for PPTX and HTML QA. The integrator alone
-will merge accepted fragments into shared files. Store the worker's isolated
-raster/screenshot evidence below `{(work_dir / 'worker_qa').as_posix()}` and
-reference those files from `qa_evidence.json`; do not use the final
-`visual_qa/` directory, which the source-mapped full-deck gate will replace.
+If a deliberately sparse title slide needs the canonical native-text threshold
+exception, or an image-led slide needs the canonical total-crop exception, record
+it in `profile_override.json.exceptions` with a specific `reason`; do not invent
+exceptions to bypass visual fidelity, editability, largest-crop, text/table-crop,
+or dense-infographic limits.
+The integrator alone will merge accepted fragments into shared files. Complete
+the authoring outputs below as soon as this job arrives, then stop. Do not run an
+isolated one-slide PPTX/HTML build: the workflow renders the integrated deck and
+reuses its source-mapped slide pages for per-slide PPTX and HTML QA, avoiding
+twenty duplicate builds without relaxing fidelity or editability checks.
 
-Required outputs:
-{required}
+Authoring outputs required before integration:
+{authoring}
 
-`worker_receipt.json` must use `agent: slide_reconstruct_worker`,
+Post-render outputs required only after shared preview evidence exists:
+{post_render}
+
+After the shared preview comparison passes, `worker_receipt.json` must use
+`agent: slide_reconstruct_worker`,
 `status: completed`, `sharedFilesEdited: false`, list every produced artifact,
 and include `jobId`, `jobContentHash`, the three receipt-binding hashes from the
 job, plus `artifactHashes` containing the SHA-256 of every listed artifact other
-than the receipt itself. Do not report pass until the isolated source-vs-render
+than the receipt itself. Do not report pass until the source-mapped shared-render
 comparison and editable-object checks have actually passed.
 """
+
+
+def _validate_authoring_outputs(
+    root: Path,
+    job_path: Path,
+    job: dict[str, Any],
+    issues: list[str],
+) -> None:
+    slide = int(job["slide_number"])
+    work_dir = job_path.parent
+    label = f"slide {slide} authoring worker"
+    required = list(job.get("authoring_outputs", []))
+    if required != [name.format(slide=slide) for name in AUTHORING_OUTPUT_NAMES]:
+        issues.append(f"{label} authoring output contract is invalid")
+        return
+    for name in required:
+        if not (work_dir / name).is_file():
+            issues.append(f"{label} is missing {name}")
+    if any(not (work_dir / name).is_file() for name in required):
+        return
+
+    measurements = _read_worker_json(work_dir / "measurements.json", issues, label)
+    if measurements is not None:
+        canvas = measurements.get("canvas", measurements)
+        if not isinstance(canvas, dict):
+            issues.append(f"{label} measurements.json canvas must be an object")
+        else:
+            if _number(canvas.get("width")) != job["source_png"]["width"]:
+                issues.append(f"{label} measurements canvas width mismatch")
+            if _number(canvas.get("height")) != job["source_png"]["height"]:
+                issues.append(f"{label} measurements canvas height mismatch")
+
+    profile = _read_worker_json(work_dir / "profile_override.json", issues, label)
+    if profile is not None:
+        if not any(
+            str(profile.get(key, "")).strip() for key in ("profileId", "profile", "id")
+        ):
+            issues.append(f"{label} profile_override.json requires profileId")
+        if not str(profile.get("confidence", "")).strip():
+            issues.append(f"{label} profile_override.json requires confidence")
+
+    crop_plan = _read_worker_json(work_dir / "crop_plan.json", issues, label)
+    if crop_plan is not None:
+        _validate_crops(crop_plan, slide, job["source_png"], issues)
+
+    fragment_path = work_dir / f"s{slide}.fragment.js"
+    try:
+        fragment = fragment_path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        issues.append(f"{label} fragment is not valid UTF-8: {exc}")
+    else:
+        functions = re.findall(
+            r"\bfunction\s+([A-Za-z_$][\w$]*)\s*\(\s*s\s*\)", fragment
+        )
+        if functions != [f"s{slide}"]:
+            issues.append(
+                f"{label} fragment expected exactly one function s{slide}(s), got {functions}"
+            )
+        lowered = fragment.lower()
+        if "require(" in lowered or "require (" in lowered:
+            issues.append(f"{label} fragment must use the shared kit without require(...)")
+        if f"slide{slide}.png" in lowered:
+            issues.append(f"{label} fragment references the full source PNG")
+
+    for markdown_name in ("reconstruction_notes.md", "editability_inventory.md"):
+        try:
+            value = (work_dir / markdown_name).read_text(encoding="utf-8")
+        except (OSError, UnicodeError) as exc:
+            issues.append(f"{label} {markdown_name} is not valid UTF-8: {exc}")
+            continue
+        if len(value.strip()) < 20:
+            issues.append(f"{label} {markdown_name} is too short to be evidence")
 
 
 def _validate_worker_outputs(
@@ -966,10 +1206,14 @@ def _error(code: str, message: str, path: Path | None = None) -> DeckCompilerErr
 
 
 __all__ = [
+    "AUTHORING_OUTPUT_NAMES",
     "JOB_MANIFEST_NAME",
     "MAX_PARALLEL_WORKERS",
+    "POST_RENDER_OUTPUT_NAMES",
     "REQUIRED_OUTPUT_NAMES",
     "ReconstructionJobPreparationResult",
+    "ReconstructionSlideJobPreparationResult",
+    "prepare_reconstruction_job",
     "prepare_reconstruction_jobs",
     "validate_reconstruction_job_bundle",
 ]

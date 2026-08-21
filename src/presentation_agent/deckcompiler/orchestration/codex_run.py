@@ -19,6 +19,7 @@ from .image_requests import validate_image_request_bundle
 from .quality_acceptance import evaluate_visual_quality_acceptance
 from .reconstruction_jobs import validate_reconstruction_job_bundle
 from .skillset_plan import validate_skillset_execution_plan
+from .streaming_execution import validate_streaming_execution
 
 
 SCHEMA_NAME = "codex_pptx_generation_run"
@@ -156,10 +157,10 @@ def validate_codex_run_manifest_payload(
     if len({row["source_png"]["sha256"] for row in image["slides"]}) != slide_count:
         issues.append("selected source PNG hashes must be unique per slide")
     if qa["repair_iterations"] == 0:
-        if reconstruction["execution_mode"] != "single_compile_fast_path":
+        if reconstruction["execution_mode"] != "shared_preview_final_fast_path":
             issues.append(
                 "zero-repair run must use reconstruction.execution_mode "
-                "single_compile_fast_path"
+                "shared_preview_final_fast_path"
             )
     elif reconstruction["execution_mode"] != "post_repair_recompile":
         issues.append(
@@ -231,6 +232,9 @@ def _artifact_references(
         batch_manifest = image.get("batch_manifest")
         if isinstance(batch_manifest, dict):
             yield "image_generation.batch_manifest", batch_manifest
+        streaming_execution = image.get("streaming_execution")
+        if isinstance(streaming_execution, dict):
+            yield "image_generation.streaming_execution", streaming_execution
         slides = image.get("slides")
         if isinstance(slides, list):
             for index, slide in enumerate(slides):
@@ -418,6 +422,7 @@ def _execution_artifact_issues(
             timing_report,
             payload["reconstruction"]["execution_mode"],
             slide_count,
+            payload["performance"],
             issues,
         )
 
@@ -462,6 +467,40 @@ def _execution_artifact_issues(
             f"reconstruction.jobs: {issue}"
             for issue in reconstruction_job_report["issues"]
         )
+
+    streaming_path = artifacts.get("image_generation.streaming_execution")
+    if streaming_path is not None:
+        streaming_report = validate_streaming_execution(
+            streaming_path.resolve().parent,
+            require_complete=True,
+            require_authoring_complete=True,
+            require_overlap=slide_count > 1,
+        )
+        issues.extend(
+            f"image_generation.streaming_execution: {issue}"
+            for issue in streaming_report["issues"]
+        )
+        if timing_report is not None:
+            if (
+                batch_manifest is not None
+                and timing_report.get("image_generation_max_observed_parallelism")
+                != batch_manifest.get("max_observed_parallelism")
+            ):
+                issues.append(
+                    "performance timing ImageGen parallelism must match the batch manifest"
+                )
+            if timing_report.get("reconstruction_max_observed_parallelism") != (
+                streaming_report["max_observed_reconstruction_parallelism"]
+            ):
+                issues.append(
+                    "performance timing reconstruction parallelism must match streaming state"
+                )
+            if timing_report.get("streaming_overlap_proven") is not streaming_report[
+                "overlap_proven"
+            ]:
+                issues.append(
+                    "performance timing overlap flag must match streaming state"
+                )
 
     orchestration_state = _json_object(
         artifacts.get("reconstruction.orchestration_state"),
@@ -688,8 +727,10 @@ def _validate_image_batch_manifest(
         "platform_tool_id": IMAGE_TOOL,
         "batch_size": 20,
         "dispatch_mode": "concurrent_wave",
+        "acceptance_mode": "streaming_ready_queue",
         "call_strategy": "one_independent_builtin_call_per_slide",
         "slide_count": slide_count,
+        "requested_parallelism": min(20, slide_count),
     }
     for key, expected in expected_values.items():
         if manifest.get(key) != expected:
@@ -711,6 +752,7 @@ def _validate_image_batch_manifest(
 
     attempts_by_slide: dict[int, int] = {}
     total_regenerations = 0
+    timing_intervals: list[tuple[datetime, datetime]] = []
     for index, wave in enumerate(waves, start=1):
         label = f"image_generation.batch_manifest.waves[{index - 1}]"
         if not isinstance(wave, dict):
@@ -743,6 +785,36 @@ def _validate_image_batch_manifest(
             call_slides.append(slide_number)
             if call.get("status") != "ACCEPTED":
                 issues.append(f"{call_label}.status must be ACCEPTED")
+            if not isinstance(call.get("tool_call_id"), str) or not call.get(
+                "tool_call_id", ""
+            ).strip():
+                issues.append(f"{call_label}.tool_call_id is required")
+            parsed_call_times: dict[str, datetime] = {}
+            for time_key in ("queued_at", "started_at", "completed_at"):
+                raw_time = call.get(time_key)
+                if not isinstance(raw_time, str) or not raw_time:
+                    issues.append(f"{call_label}.{time_key} is required")
+                    continue
+                try:
+                    parsed = datetime.fromisoformat(raw_time.replace("Z", "+00:00"))
+                except ValueError:
+                    issues.append(f"{call_label}.{time_key} must be ISO-8601")
+                    continue
+                if parsed.tzinfo is None:
+                    issues.append(f"{call_label}.{time_key} requires a timezone")
+                    continue
+                parsed_call_times[time_key] = parsed
+            if all(
+                key in parsed_call_times
+                for key in ("queued_at", "started_at", "completed_at")
+            ):
+                queued_at = parsed_call_times["queued_at"]
+                started_at = parsed_call_times["started_at"]
+                completed_at = parsed_call_times["completed_at"]
+                if not queued_at <= started_at <= completed_at:
+                    issues.append(f"{call_label} timestamps are not monotonic")
+                else:
+                    timing_intervals.append((started_at, completed_at))
             if not isinstance(attempt_count, int) or attempt_count not in (1, 2):
                 issues.append(f"{call_label}.attempt_count must be 1 or 2")
                 continue
@@ -789,6 +861,20 @@ def _validate_image_batch_manifest(
         issues.append(
             "image_generation.batch_manifest.accepted_count must equal slide_count"
         )
+    timing_events = [
+        event
+        for started_at, completed_at in timing_intervals
+        for event in ((started_at, 1), (completed_at, -1))
+    ]
+    active = 0
+    observed_parallelism = 0
+    for _, delta in sorted(timing_events, key=lambda item: (item[0], item[1])):
+        active += delta
+        observed_parallelism = max(observed_parallelism, active)
+    if manifest.get("max_observed_parallelism") != observed_parallelism:
+        issues.append(
+            "image_generation.batch_manifest.max_observed_parallelism is inconsistent"
+        )
     for slide in image["slides"]:
         slide_number = slide["slide_number"]
         expected_regenerations = attempts_by_slide.get(slide_number, 1) - 1
@@ -803,6 +889,7 @@ def _validate_timing_report(
     report: dict[str, Any],
     execution_mode: str,
     slide_count: int,
+    performance: dict[str, Any],
     issues: list[str],
 ) -> None:
     """Validate measured timing without allowing a speed target to bypass quality."""
@@ -810,10 +897,14 @@ def _validate_timing_report(
     expected_values = {
         "schema_name": "pptx_generation_execution_timing",
         "schema_version": "1.0.0",
-        "profile_name": "fast-quality-20",
+        "profile_name": performance["profile_name"],
         "slide_count": slide_count,
         "target_seconds_20_slides": 1800,
         "quality_gates_take_precedence": True,
+        "image_generation_requested_parallelism": min(20, slide_count),
+        "reconstruction_worker_limit": min(6, slide_count),
+        "streaming_overlap_proven": slide_count > 1,
+        "isolated_per_slide_build_count": 0,
     }
     for key, expected in expected_values.items():
         if report.get(key) != expected:
@@ -861,12 +952,28 @@ def _validate_timing_report(
                 "performance.timing_report.total_seconds must match the timestamp span"
             )
 
-    expected_compile_count = 1 if execution_mode == "single_compile_fast_path" else 2
+    expected_compile_count = (
+        2 if execution_mode == "shared_preview_final_fast_path" else 3
+    )
     if report.get("full_deck_compile_count") != expected_compile_count:
         issues.append(
             "performance.timing_report.full_deck_compile_count must be "
             f"{expected_compile_count} for {execution_mode}"
         )
+    if report.get("shared_full_deck_render_count") != expected_compile_count:
+        issues.append(
+            "performance.timing_report.shared_full_deck_render_count must be "
+            f"{expected_compile_count} for {execution_mode}"
+        )
+    for key, maximum in (
+        ("image_generation_max_observed_parallelism", min(20, slide_count)),
+        ("reconstruction_max_observed_parallelism", min(6, slide_count)),
+    ):
+        value = report.get(key)
+        if not isinstance(value, int) or isinstance(value, bool) or not 1 <= value <= maximum:
+            issues.append(
+                f"performance.timing_report.{key} must be an integer from 1 to {maximum}"
+            )
 
     target_applicable = slide_count == 20
     if report.get("target_applicable") is not target_applicable:

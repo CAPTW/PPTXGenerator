@@ -8,7 +8,7 @@ executed. It is not a request plan.
 ```json
 {
   "schema_name": "codex_pptx_generation_run",
-  "schema_version": "2.3.0",
+  "schema_version": "2.4.0",
   "workflow_id": "generate_...",
   "status": "COMPLETED"
 }
@@ -51,6 +51,8 @@ Record:
   deterministic Blueprint/Design-System adapter;
 - a hash-bound `image_generation_batch_manifest.json` proving deterministic
   concurrent waves of at most 20 independent built-in calls;
+- a hash-bound `streaming_execution.json` proving per-call timestamps and that
+  reconstruction started before the final ImageGen call completed;
 - one ordered slide record per blueprint slide.
 
 Each slide record contains the slide number, stable slide/request IDs, Blueprint
@@ -72,7 +74,7 @@ Record:
 - `renderer_skill: slide-image-dual-render` and the exact three-companion
   Skill list;
 - the explicit execute/skip decision for `slide-text-layer-inpaint`;
-- `execution_mode: single_compile_fast_path` when no repairs were needed, or
+- `execution_mode: shared_preview_final_fast_path` when no repairs were needed, or
   `post_repair_recompile` after targeted repairs;
 - quality level;
 - route hardlock, reconstruction hardlock, and PPTX openability results;
@@ -93,10 +95,11 @@ the official integrator outputs `lib/slides.js` and
 `work/integration_report.md`, with exactly one `sN(s)` function for every
 approved slide. This is execution evidence, not a planning-only declaration.
 
-The normal path compiles all approved slide artifacts in one full-deck
-`--allow-large-batch` invocation and runs one source-mapped full-deck QA chain.
-It does not unconditionally repeat that compile. A second full-deck compile is
-valid only after recorded repair iterations.
+The normal path performs zero isolated per-slide builds. It uses one all-slide
+shared preview to produce mapped PPTX/HTML evidence for every slide, then one
+all-slide `--quality reconstruction --allow-large-batch` final render after the
+QA receipts exist. Both passes use the official renderer. A third full-deck
+render is valid only after recorded repair iterations.
 
 ## Visual QA record
 
@@ -122,10 +125,12 @@ targeted repair loop.
 Record the `fast-quality-20` target model (`gpt-5.6-sol`), reasoning effort
 (`medium`), 120-minute observed baseline, 30-minute target, approximate 4x
 target, and a hash-bound `execution_timing.json`. The timing report includes
-actual total/ImageGen/reconstruction/QA seconds and the full-deck compile count.
+actual total/ImageGen/reconstruction/QA seconds, observed ImageGen parallelism,
+streaming overlap, isolated-build count, and full-deck render count.
 It also records timezone-qualified start/completion timestamps whose span must
 match the reported total duration.
-For a zero-repair run that count must be one. The time target is measured and
+For a zero-repair run the shared full-deck render count must be two and the
+isolated per-slide build count must be zero. The time target is measured and
 reported; it never overrides quality, hardlock, editability, or openability
 gates.
 

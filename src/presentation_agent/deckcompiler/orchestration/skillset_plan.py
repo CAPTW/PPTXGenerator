@@ -12,6 +12,7 @@ from ..identity import content_sha256
 from ..manifest_io import read_json, write_json
 from ..schemas import REPO_ROOT, validator_for
 from .quality_acceptance import CANARY_METRIC_LIMITS
+from .execution_profiles import execution_profile_payload
 
 
 PLAN_NAME = "skillset_execution_plan.json"
@@ -309,10 +310,12 @@ def build_skillset_execution_plan(
     workflow_id: str,
     runtime_root: Path,
     inspection: dict[str, Any],
+    execution_profile_name: str = "sol-medium",
 ) -> dict[str, Any]:
     """Build the exact command and artifact contract used by live Codex production."""
 
     project = (runtime_root / PROJECT_DIRECTORY).resolve()
+    runtime_profile = execution_profile_payload(execution_profile_name)
     entrypoints = inspection["entrypoints"]
 
     def ep(name: str) -> str:
@@ -325,6 +328,10 @@ def build_skillset_execution_plan(
     node_modules = (project / "node_modules").as_posix()
     final_pptx = (project / "out" / "deck-final-editable.pptx").as_posix()
     final_html = (project / "out" / "deck-final-editable.html").as_posix()
+    preview_pptx = (project / "out" / "deck-shared-preview.pptx").as_posix()
+    preview_html = (project / "out" / "deck-shared-preview.html").as_posix()
+    preview_summary = (project / "out" / "visual_qa_summary_preview.json").as_posix()
+    preview_summary_md = (project / "out" / "visual_qa_summary_preview.md").as_posix()
     final_summary = (project / "out" / "visual_qa_summary_final.json").as_posix()
     final_summary_md = (project / "out" / "visual_qa_summary_final.md").as_posix()
     reconstruction_jobs = (project / "work" / "reconstruction_job_manifest.json").as_posix()
@@ -359,6 +366,67 @@ def build_skillset_execution_plan(
             "--max-iterations",
             "2",
         ],
+        "prepare_streaming_execution": [
+            "deckcompiler",
+            "prepare-streaming-execution",
+            "--runtime",
+            runtime_root.resolve().as_posix(),
+        ],
+        "accept_streaming_image": [
+            "deckcompiler",
+            "accept-streaming-image",
+            "--runtime",
+            runtime_root.resolve().as_posix(),
+            "--slide",
+            "<completed-slide>",
+            "--tool-call-id",
+            "<imagegen-tool-call-id>",
+            "--queued-at",
+            "<queued-at>",
+            "--started-at",
+            "<started-at>",
+            "--completed-at",
+            "<completed-at>",
+        ],
+        "record_reconstruction_started": [
+            "deckcompiler",
+            "record-streaming-reconstruction",
+            "--runtime",
+            runtime_root.resolve().as_posix(),
+            "--slide",
+            "<ready-slide>",
+            "--status",
+            "STARTED",
+            "--timestamp",
+            "<started-at>",
+        ],
+        "record_authoring_completed": [
+            "deckcompiler",
+            "record-streaming-reconstruction",
+            "--runtime",
+            runtime_root.resolve().as_posix(),
+            "--slide",
+            "<completed-slide>",
+            "--status",
+            "AUTHORING_COMPLETED",
+            "--timestamp",
+            "<completed-at>",
+        ],
+        "finalize_streaming_images": [
+            "deckcompiler",
+            "finalize-streaming-images",
+            "--runtime",
+            runtime_root.resolve().as_posix(),
+        ],
+        "validate_streaming_execution": [
+            "deckcompiler",
+            "validate-streaming-execution",
+            "--runtime",
+            runtime_root.resolve().as_posix(),
+            "--require-complete",
+            "--require-authoring-complete",
+            "--require-overlap",
+        ],
         "prepare_reconstruction_jobs": [
             "deckcompiler",
             "prepare-reconstruction-jobs",
@@ -367,19 +435,19 @@ def build_skillset_execution_plan(
         ],
         "codex_execute_reconstruction_jobs": [
             "CODEX_AGENT_ACTION",
-            "execute-isolated-reconstruction-jobs",
-            "--manifest",
-            reconstruction_jobs,
+            "execute-ready-reconstruction-jobs",
+            "--state",
+            (runtime_root / "streaming_execution.json").resolve().as_posix(),
             "--fresh-context-per-slide",
             "--max-parallel-workers",
-            "4",
+            str(runtime_profile["max_reconstruction_workers"]),
         ],
         "validate_reconstruction_jobs": [
             "deckcompiler",
             "validate-reconstruction-jobs",
             "--runtime",
             runtime_root.resolve().as_posix(),
-            "--require-worker-outputs",
+            "--require-authoring-outputs",
         ],
         "validate_agent_work": [
             "node",
@@ -394,6 +462,122 @@ def build_skillset_execution_plan(
             ep("integrate_subagent_work"),
         ],
         "prepare_crops": ["python", ep("crop_generator")],
+        "compile_shared_preview": [
+            "node",
+            ep("slide_pipeline"),
+            "--project",
+            project_value,
+            "--slides",
+            "<slides>",
+            "--quality",
+            "canary",
+            "--allow-large-batch",
+            "--crop-plan",
+            crop_plan,
+            "--node-path",
+            node_modules,
+            "--target",
+            "both",
+            "--pptx-out",
+            preview_pptx,
+            "--html-out",
+            preview_html,
+        ],
+        "rasterize_shared_preview": [
+            "python",
+            ep("rasterize_pptx"),
+            "--project",
+            project_value,
+            "--pptx",
+            preview_pptx,
+            "--source-slides",
+            "<slides>",
+            "--out-dir",
+            work,
+        ],
+        "capture_shared_preview_html": [
+            "python",
+            ep("capture_html_screenshot"),
+            "--project",
+            project_value,
+            "--html",
+            preview_html,
+            "--source-slides",
+            "<slides>",
+            "--out-dir",
+            work,
+            "--width",
+            "<source-width>",
+            "--height",
+            "<source-height>",
+        ],
+        "compare_shared_preview": [
+            "python",
+            ep("compare_slide_images"),
+            "--project",
+            project_value,
+            "--slides",
+            "<slides>",
+            "--mode",
+            "qa-polish",
+            "--source-dir",
+            (project / "src").as_posix(),
+            "--qa-dir",
+            work,
+            "--out-summary",
+            preview_summary,
+        ],
+        "summarize_shared_preview": [
+            "node",
+            ep("generate_visual_qa_summary"),
+            "--project",
+            project_value,
+            "--slides",
+            "<slides>",
+            "--out-json",
+            preview_summary,
+            "--out-md",
+            preview_summary_md,
+        ],
+        "enforce_shared_preview_qa": [
+            "node",
+            ep("enforce_visual_qa"),
+            "--project",
+            project_value,
+            "--slides",
+            "<slides>",
+            "--mode",
+            "qa-polish",
+            "--summary",
+            preview_summary,
+            "--require-pptx",
+            "--require-html",
+        ],
+        "enforce_shared_preview_quality_acceptance": [
+            "deckcompiler",
+            "validate-visual-quality",
+            "--project",
+            project_value,
+            "--summary",
+            preview_summary,
+            "--slides",
+            "<slides>",
+        ],
+        "finalize_source_mapped_qa": [
+            "deckcompiler",
+            "finalize-shared-render-qa",
+            "--runtime",
+            runtime_root.resolve().as_posix(),
+            "--summary",
+            preview_summary,
+        ],
+        "validate_reconstruction_qa": [
+            "deckcompiler",
+            "validate-reconstruction-jobs",
+            "--runtime",
+            runtime_root.resolve().as_posix(),
+            "--require-worker-outputs",
+        ],
         "compile_full_deck": [
             "node",
             ep("slide_pipeline"),
@@ -717,6 +901,9 @@ def build_skillset_execution_plan(
             )
             .resolve()
             .as_posix(),
+            "streaming_execution_path": (runtime_root / "streaming_execution.json")
+            .resolve()
+            .as_posix(),
             "timing_report_path": (runtime_root / "execution_timing.json")
             .resolve()
             .as_posix(),
@@ -757,9 +944,7 @@ def build_skillset_execution_plan(
             "hidden_node_path_forbidden": True,
         },
         "execution_profile": {
-            "profile_name": "fast-quality-20",
-            "target_model": "gpt-5.6-sol",
-            "target_reasoning_effort": "medium",
+            **runtime_profile,
             "default_design_direction": [
                 "Academic",
                 "Informative",
@@ -781,28 +966,37 @@ def build_skillset_execution_plan(
             "image_generation": {
                 "batch_size": 20,
                 "dispatch_mode": "concurrent_wave",
+                "acceptance_mode": "streaming_ready_queue",
                 "call_strategy": "one_independent_builtin_call_per_slide",
                 "initial_variants_per_slide": 1,
                 "max_regenerations_per_slide": 1,
                 "automatic_canary": False,
                 "compile_after_all_images": True,
+                "reconstruction_starts_before_all_images_complete": True,
             },
             "reconstruction_authoring": {
                 "context_unit": "one_source_slide_per_fresh_context",
-                "dispatch_mode": "bounded_parallel_workers",
-                "max_parallel_workers": 4,
+                "dispatch_mode": "streaming_ready_queue_bounded_workers",
+                "max_parallel_workers": runtime_profile[
+                    "max_reconstruction_workers"
+                ],
                 "shared_file_writer": "integrator_only",
                 "worker_scope": "one_slide_work_directory_only",
-                "worker_model": "gpt-5.6-sol",
-                "worker_reasoning_effort": "medium",
+                "worker_model": runtime_profile["target_model"],
+                "worker_reasoning_effort": runtime_profile[
+                    "target_reasoning_effort"
+                ],
                 "token_policy": (
                     "compact_job_plus_one_source_slide_no_full_deck_duplication"
                 ),
-                "isolated_dual_render_qa_required": True,
+                "isolated_dual_render_qa_required": False,
+                "shared_render_source_mapped_qa_required": True,
             },
             "compilation": {
-                "single_full_deck_invocation": True,
-                "unconditional_second_full_compile": False,
+                "per_slide_isolated_builds": 0,
+                "shared_preview_full_deck_invocation": True,
+                "final_reconstruction_full_deck_invocation": True,
+                "full_deck_render_count_without_repair": 2,
                 "post_repair_recompile_only": True,
             },
             "performance_target": {
@@ -823,8 +1017,9 @@ def build_skillset_execution_plan(
             "pptx_openability_required": True,
             "zero_fail_required": True,
             "zero_blocking_required": True,
-            "single_full_deck_fast_path_required": True,
-            "unconditional_second_full_deck_compile_forbidden": True,
+            "per_slide_isolated_render_forbidden": True,
+            "shared_preview_render_required": True,
+            "final_reconstruction_render_required": True,
             "final_full_deck_qa_required": True,
             "source_slide_mapping_required": True,
             "full_slide_source_raster_forbidden": True,
@@ -849,15 +1044,33 @@ def build_skillset_execution_plan(
                 "install_hardlock",
                 "plan_orchestration",
             ],
+            "streaming_image_generation": [
+                "prepare_streaming_execution",
+                "accept_streaming_image",
+                "record_reconstruction_started",
+                "record_authoring_completed",
+            ],
             "reconstruction_authoring": [
-                "prepare_reconstruction_jobs",
                 "codex_execute_reconstruction_jobs",
+                "finalize_streaming_images",
+                "validate_streaming_execution",
                 "validate_reconstruction_jobs",
                 "validate_agent_work",
                 "integrate_agent_work",
                 "prepare_crops",
             ],
-            "single_compile_fast_path": [
+            "shared_preview_qa": [
+                "compile_shared_preview",
+                "rasterize_shared_preview",
+                "capture_shared_preview_html",
+                "compare_shared_preview",
+                "summarize_shared_preview",
+                "enforce_shared_preview_qa",
+                "enforce_shared_preview_quality_acceptance",
+                "finalize_source_mapped_qa",
+                "validate_reconstruction_qa",
+            ],
+            "final_compile_fast_path": [
                 "compile_full_deck",
                 "gate_full_deck",
                 "rasterize_full_deck",
@@ -894,14 +1107,16 @@ def build_skillset_execution_plan(
             ],
             "completion": ["seal_codex_run", "register_completion"],
             "repair_exit_codes": {
+                "enforce_shared_preview_qa": [0, 1],
                 "enforce_full_deck_qa_fast_path": [0, 1],
                 "enforce_wave_qa": [0, 1],
                 "enforce_full_deck_qa_post_repair": [0],
             },
             "max_repair_iterations": 2,
-            "unconditional_second_full_compile": False,
+            "full_deck_render_count_without_repair": 2,
         },
         "required_artifacts": [
+            "../streaming_execution.json",
             "../image_requests/image_request_manifest.json",
             "../image_batches/image_generation_batch_manifest.json",
             "../execution_timing.json",
@@ -1011,6 +1226,44 @@ def validate_skillset_execution_plan(
         issues,
     )
     _require_flags(
+        commands["prepare_streaming_execution"],
+        ("prepare-streaming-execution", "--runtime"),
+        "prepare_streaming_execution",
+        issues,
+    )
+    _require_flags(
+        commands["accept_streaming_image"],
+        (
+            "accept-streaming-image",
+            "--runtime",
+            "--slide",
+            "--tool-call-id",
+            "--queued-at",
+            "--started-at",
+            "--completed-at",
+        ),
+        "accept_streaming_image",
+        issues,
+    )
+    _require_flags(
+        commands["finalize_streaming_images"],
+        ("finalize-streaming-images", "--runtime"),
+        "finalize_streaming_images",
+        issues,
+    )
+    _require_flags(
+        commands["validate_streaming_execution"],
+        (
+            "validate-streaming-execution",
+            "--runtime",
+            "--require-complete",
+            "--require-authoring-complete",
+            "--require-overlap",
+        ),
+        "validate_streaming_execution",
+        issues,
+    )
+    _require_flags(
         commands["prepare_reconstruction_jobs"],
         ("prepare-reconstruction-jobs", "--runtime"),
         "prepare_reconstruction_jobs",
@@ -1018,14 +1271,40 @@ def validate_skillset_execution_plan(
     )
     _require_flags(
         commands["codex_execute_reconstruction_jobs"],
-        ("--manifest", "--fresh-context-per-slide", "--max-parallel-workers", "4"),
+        ("--state", "--fresh-context-per-slide", "--max-parallel-workers", "6"),
         "codex_execute_reconstruction_jobs",
         issues,
     )
     _require_flags(
         commands["validate_reconstruction_jobs"],
-        ("validate-reconstruction-jobs", "--runtime", "--require-worker-outputs"),
+        ("validate-reconstruction-jobs", "--runtime", "--require-authoring-outputs"),
         "validate_reconstruction_jobs",
+        issues,
+    )
+    _require_flags(
+        commands["compile_shared_preview"],
+        (
+            "--quality",
+            "canary",
+            "--allow-large-batch",
+            "--crop-plan",
+            "--node-path",
+            "--target",
+            "both",
+        ),
+        "compile_shared_preview",
+        issues,
+    )
+    _require_flags(
+        commands["finalize_source_mapped_qa"],
+        ("finalize-shared-render-qa", "--runtime", "--summary"),
+        "finalize_source_mapped_qa",
+        issues,
+    )
+    _require_flags(
+        commands["validate_reconstruction_qa"],
+        ("validate-reconstruction-jobs", "--runtime", "--require-worker-outputs"),
+        "validate_reconstruction_qa",
         issues,
     )
     _require_flags(

@@ -48,6 +48,7 @@ def prepare_image_requests(runtime_root: Path) -> ImageRequestPreparationResult:
     root = runtime_root.resolve()
     workflow, workflow_design, blueprint, design_system, approval = _load_inputs(root)
     workflow_id = _required_text(workflow.get("workflow_id"), "workflow_id")
+    profile_name = _execution_profile_name(root)
     prepared = _build_payloads(
         runtime_root=root,
         workflow_id=workflow_id,
@@ -94,7 +95,7 @@ def prepare_image_requests(runtime_root: Path) -> ImageRequestPreparationResult:
         "schema_name": REQUEST_MANIFEST_SCHEMA,
         "schema_version": REQUEST_MANIFEST_VERSION,
         "workflow_id": workflow_id,
-        "profile_name": "fast-quality-20",
+        "profile_name": profile_name,
         "generation_strategy": "single_deterministic_preparation_pass",
         "additional_model_calls": 0,
         "design_context_mode": DESIGN_CONTEXT_MODE,
@@ -147,6 +148,7 @@ def validate_image_request_bundle(
         workflow, workflow_design, blueprint, design_system, approval = _load_inputs(root)
         manifest = read_json(manifest_path)
         workflow_id = _required_text(workflow.get("workflow_id"), "workflow_id")
+        profile_name = _execution_profile_name(root)
         source_hashes = _source_hashes(root)
         expected = _build_payloads(
             runtime_root=root,
@@ -171,7 +173,7 @@ def validate_image_request_bundle(
         "schema_name": REQUEST_MANIFEST_SCHEMA,
         "schema_version": REQUEST_MANIFEST_VERSION,
         "workflow_id": workflow_id,
-        "profile_name": "fast-quality-20",
+        "profile_name": profile_name,
         "generation_strategy": "single_deterministic_preparation_pass",
         "additional_model_calls": 0,
         "design_context_mode": DESIGN_CONTEXT_MODE,
@@ -776,6 +778,19 @@ def _unique(values: Iterable[str]) -> list[str]:
             seen.add(value)
             output.append(value)
     return output
+
+
+def _execution_profile_name(root: Path) -> str:
+    plan_path = root / "skillset_execution_plan.json"
+    plan = read_json(plan_path)
+    profile = plan.get("execution_profile")
+    if not isinstance(profile, dict):
+        raise _error(
+            "DC_IMAGE_REQUEST_PROFILE_INVALID",
+            "skillset execution plan is missing execution_profile",
+            plan_path,
+        )
+    return _required_text(profile.get("profile_name"), "execution_profile.profile_name")
 
 
 def _artifact(root: Path, path: Path) -> dict[str, str]:

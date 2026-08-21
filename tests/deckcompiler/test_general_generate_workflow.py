@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shutil
 import struct
 import tempfile
 import unittest
 import zipfile
 import zlib
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from presentation_agent.deckcompiler.errors import DeckCompilerError
@@ -171,7 +173,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 0.102,
             )
             self.assertEqual(
-                plan["execution_profile"]["profile_name"], "fast-quality-20"
+                plan["execution_profile"]["profile_name"], "sol-medium"
             )
             self.assertEqual(plan["execution_profile"]["target_model"], "gpt-5.6-sol")
             self.assertEqual(
@@ -204,7 +206,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 plan["command_templates"]["rasterize_full_deck"],
             )
             self.assertEqual(
-                plan["execution_contract"]["single_compile_fast_path"],
+                plan["execution_contract"]["final_compile_fast_path"],
                 [
                     "compile_full_deck",
                     "gate_full_deck",
@@ -234,8 +236,9 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                     "enforce_orchestration_state",
                 ],
             )
-            self.assertFalse(
-                plan["execution_contract"]["unconditional_second_full_compile"]
+            self.assertEqual(
+                plan["execution_contract"]["full_deck_render_count_without_repair"],
+                2,
             )
             self.assertIn(
                 "out/visual_qa_summary_final.md",
@@ -244,13 +247,40 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             self.assertEqual(
                 plan["execution_contract"]["reconstruction_authoring"],
                 [
-                    "prepare_reconstruction_jobs",
                     "codex_execute_reconstruction_jobs",
+                    "finalize_streaming_images",
+                    "validate_streaming_execution",
                     "validate_reconstruction_jobs",
                     "validate_agent_work",
                     "integrate_agent_work",
                     "prepare_crops",
                 ],
+            )
+            self.assertEqual(
+                plan["execution_contract"]["streaming_image_generation"],
+                [
+                    "prepare_streaming_execution",
+                    "accept_streaming_image",
+                    "record_reconstruction_started",
+                    "record_authoring_completed",
+                ],
+            )
+            self.assertEqual(
+                plan["execution_profile"]["reconstruction_authoring"][
+                    "max_parallel_workers"
+                ],
+                6,
+            )
+            self.assertFalse(
+                plan["execution_profile"]["reconstruction_authoring"][
+                    "isolated_dual_render_qa_required"
+                ]
+            )
+            self.assertEqual(
+                plan["execution_profile"]["compilation"][
+                    "full_deck_render_count_without_repair"
+                ],
+                2,
             )
             self.assertEqual(
                 plan["execution_profile"]["reconstruction_authoring"][
@@ -428,7 +458,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 validation,
             )
 
-    def test_twenty_slide_fast_quality_run_is_one_concurrent_wave_and_one_compile(
+    def test_twenty_slide_fast_quality_run_is_one_wave_and_two_shared_renders(
         self,
     ) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -456,8 +486,421 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             self.assertTrue(batch["waves"][0]["concurrent_dispatch"])
             timing_path = runtime / payload["performance"]["timing_report"]["path"]
             timing = json.loads(timing_path.read_text(encoding="utf-8"))
-            self.assertEqual(timing["full_deck_compile_count"], 1)
+            self.assertEqual(timing["full_deck_compile_count"], 2)
             self.assertTrue(timing["target_met"])
+
+    def test_streaming_accepts_slide_one_and_prepares_its_job_before_slide_twenty(
+        self,
+    ) -> None:
+        from presentation_agent.deckcompiler.orchestration.streaming_execution import (
+            accept_streaming_image,
+            prepare_streaming_execution,
+            record_streaming_reconstruction,
+            validate_streaming_execution,
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            started = self._start(runtime)
+            self._build_run_draft(
+                runtime,
+                workflow_id=started.workflow_id,
+                slide_count=20,
+                status="COMPLETED",
+                qa_status="PASS",
+                fail_count=0,
+                blocking_count=0,
+            )
+            batch_path = (
+                runtime / "image_batches" / "image_generation_batch_manifest.json"
+            )
+            batch_path.unlink()
+            work = runtime / "pngtopptx-project" / "work"
+            (work / "reconstruction_job_manifest.json").unlink()
+            for slide_dir in work.glob("slide[0-9][0-9]"):
+                shutil.rmtree(slide_dir)
+
+            prepared = prepare_streaming_execution(runtime)
+            self.assertEqual(prepared.slide_count, 20)
+            accepted = accept_streaming_image(
+                runtime,
+                slide_number=1,
+                tool_call_id="imagegen-slide-001",
+                queued_at="2026-08-11T00:00:00Z",
+                started_at="2026-08-11T00:00:01Z",
+                completed_at="2026-08-11T00:03:00Z",
+            )
+            self.assertTrue(accepted.job_path.is_file())
+            self.assertTrue(accepted.worker_prompt_path.is_file())
+            self.assertFalse(batch_path.exists())
+
+            record_streaming_reconstruction(
+                runtime,
+                slide_number=1,
+                status="STARTED",
+                timestamp="2026-08-11T00:03:01Z",
+            )
+            state = json.loads(prepared.state_path.read_text(encoding="utf-8"))
+            by_slide = {row["slide_number"]: row for row in state["slides"]}
+            self.assertEqual(by_slide[1]["state"], "RECONSTRUCTION_STARTED")
+            self.assertEqual(
+                [
+                    row["slide_number"]
+                    for row in state["slides"]
+                    if row["state"] == "IMAGE_PENDING"
+                ],
+                list(range(2, 21)),
+            )
+            report = validate_streaming_execution(runtime)
+            self.assertTrue(report["valid"], report)
+            self.assertEqual(report["accepted_count"], 1)
+            self.assertEqual(report["reconstruction_started_count"], 1)
+
+    def test_provider_queued_streaming_schedule_fits_thirty_minutes_without_qa_relaxation(
+        self,
+    ) -> None:
+        from presentation_agent.deckcompiler.orchestration.streaming_execution import (
+            simulate_fast_quality_schedule,
+        )
+
+        schedule = simulate_fast_quality_schedule(
+            image_seconds=[60 * (index + 1) for index in range(20)],
+            reconstruction_seconds=300,
+            reconstruction_workers=6,
+            shared_preview_and_final_qa_seconds=300,
+        )
+        self.assertEqual(schedule["total_seconds"], 1800)
+        self.assertTrue(schedule["reconstruction_overlapped_image_generation"])
+        self.assertEqual(schedule["image_parallelism"], 20)
+        self.assertEqual(schedule["reconstruction_workers"], 6)
+        self.assertEqual(schedule["full_deck_render_count"], 2)
+        self.assertEqual(
+            schedule["quality_hardlocks"],
+            {
+                "one_source_slide_per_fresh_context": True,
+                "native_text_required": True,
+                "native_structure_required": True,
+                "full_slide_raster_forbidden": True,
+                "source_mapped_per_slide_qa_required": True,
+                "final_full_deck_gate_required": True,
+            },
+        )
+
+    def test_streaming_finalization_proves_overlap_and_preserves_canonical_jobs(
+        self,
+    ) -> None:
+        from presentation_agent.deckcompiler.orchestration.reconstruction_jobs import (
+            validate_reconstruction_job_bundle,
+        )
+        from presentation_agent.deckcompiler.orchestration.streaming_execution import (
+            accept_streaming_image,
+            finalize_streaming_images,
+            prepare_streaming_execution,
+            record_streaming_reconstruction,
+            validate_streaming_execution,
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            started = self._start(runtime)
+            self._build_run_draft(
+                runtime,
+                workflow_id=started.workflow_id,
+                slide_count=3,
+                status="COMPLETED",
+                qa_status="PASS",
+                fail_count=0,
+                blocking_count=0,
+            )
+            (runtime / "image_batches" / "image_generation_batch_manifest.json").unlink()
+            work = runtime / "pngtopptx-project" / "work"
+            (work / "reconstruction_job_manifest.json").unlink()
+            for slide_dir in work.glob("slide[0-9][0-9]"):
+                shutil.rmtree(slide_dir)
+            prepare_streaming_execution(runtime)
+
+            completed = {
+                1: "2026-08-11T00:03:00Z",
+                2: "2026-08-11T00:04:00Z",
+                3: "2026-08-11T00:05:00Z",
+            }
+            first_job_hash = None
+            for slide in range(1, 4):
+                accepted = accept_streaming_image(
+                    runtime,
+                    slide_number=slide,
+                    tool_call_id=f"imagegen-slide-{slide:03d}",
+                    queued_at="2026-08-11T00:00:00Z",
+                    started_at="2026-08-11T00:00:01Z",
+                    completed_at=completed[slide],
+                )
+                if slide == 1:
+                    first_job_hash = self._sha256(accepted.job_path)
+                    record_streaming_reconstruction(
+                        runtime,
+                        slide_number=1,
+                        status="STARTED",
+                        timestamp="2026-08-11T00:03:01Z",
+                    )
+
+            finalized = finalize_streaming_images(runtime)
+            self.assertEqual(finalized["max_observed_parallelism"], 3)
+            self.assertEqual(
+                self._sha256(work / "slide01" / "reconstruction_job.json"),
+                first_job_hash,
+            )
+            report = validate_streaming_execution(
+                runtime,
+                require_complete=True,
+                require_overlap=True,
+            )
+            self.assertTrue(report["valid"], report)
+            self.assertTrue(report["overlap_proven"])
+            authoring = validate_reconstruction_job_bundle(
+                runtime,
+                require_authoring_outputs=True,
+            )
+            self.assertFalse(authoring["valid"])
+            self.assertTrue(
+                any("authoring worker is missing" in issue for issue in authoring["issues"]),
+                authoring,
+            )
+
+    def test_twenty_simultaneous_acceptance_callbacks_do_not_lose_state(self) -> None:
+        from concurrent.futures import ThreadPoolExecutor
+
+        from presentation_agent.deckcompiler.orchestration.streaming_execution import (
+            accept_streaming_image,
+            prepare_streaming_execution,
+            validate_streaming_execution,
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            started = self._start(runtime)
+            self._build_run_draft(
+                runtime,
+                workflow_id=started.workflow_id,
+                slide_count=20,
+                status="COMPLETED",
+                qa_status="PASS",
+                fail_count=0,
+                blocking_count=0,
+            )
+            (runtime / "image_batches" / "image_generation_batch_manifest.json").unlink()
+            work = runtime / "pngtopptx-project" / "work"
+            (work / "reconstruction_job_manifest.json").unlink()
+            for slide_dir in work.glob("slide[0-9][0-9]"):
+                shutil.rmtree(slide_dir)
+            prepare_streaming_execution(runtime)
+
+            def accept(slide: int) -> int:
+                result = accept_streaming_image(
+                    runtime,
+                    slide_number=slide,
+                    tool_call_id=f"imagegen-slide-{slide:03d}",
+                    queued_at="2026-08-11T00:00:00Z",
+                    started_at="2026-08-11T00:00:01Z",
+                    completed_at=f"2026-08-11T00:03:{slide:02d}Z",
+                )
+                self.assertTrue(result.job_path.is_file())
+                return result.slide_number
+
+            with ThreadPoolExecutor(max_workers=20) as executor:
+                completed = sorted(executor.map(accept, range(1, 21)))
+            self.assertEqual(completed, list(range(1, 21)))
+            report = validate_streaming_execution(runtime, require_complete=True)
+            self.assertTrue(report["valid"], report)
+            self.assertEqual(report["accepted_count"], 20)
+
+    def test_streaming_rejects_an_uninspected_image_before_job_creation(self) -> None:
+        from presentation_agent.deckcompiler.orchestration.streaming_execution import (
+            accept_streaming_image,
+            prepare_streaming_execution,
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            started = self._start(runtime)
+            self._build_run_draft(
+                runtime,
+                workflow_id=started.workflow_id,
+                slide_count=1,
+                status="COMPLETED",
+                qa_status="PASS",
+                fail_count=0,
+                blocking_count=0,
+            )
+            (runtime / "image_batches" / "image_generation_batch_manifest.json").unlink()
+            work = runtime / "pngtopptx-project" / "work"
+            (work / "reconstruction_job_manifest.json").unlink()
+            shutil.rmtree(work / "slide01")
+            inspection = runtime / "inspections" / "slide-001.json"
+            inspection.write_text(
+                json.dumps({"status": "FAIL", "slide_number": 1}),
+                encoding="utf-8",
+            )
+            prepare_streaming_execution(runtime)
+
+            with self.assertRaises(DeckCompilerError) as caught:
+                accept_streaming_image(
+                    runtime,
+                    slide_number=1,
+                    tool_call_id="imagegen-slide-001",
+                    queued_at="2026-08-11T00:00:00Z",
+                    started_at="2026-08-11T00:00:01Z",
+                    completed_at="2026-08-11T00:03:00Z",
+                )
+            self.assertEqual(caught.exception.code, "DC_STREAMING_IMAGE_REJECTED")
+            self.assertFalse((work / "slide01" / "reconstruction_job.json").exists())
+
+    def test_shared_preview_closes_per_slide_qa_without_an_isolated_build(self) -> None:
+        from presentation_agent.deckcompiler.orchestration.reconstruction_jobs import (
+            POST_RENDER_OUTPUT_NAMES,
+            validate_reconstruction_job_bundle,
+        )
+        from presentation_agent.deckcompiler.orchestration.shared_render_qa import (
+            finalize_shared_render_qa,
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            started = self._start(runtime)
+            self._build_run_draft(
+                runtime,
+                workflow_id=started.workflow_id,
+                slide_count=1,
+                status="COMPLETED",
+                qa_status="PASS",
+                fail_count=0,
+                blocking_count=0,
+            )
+            work = runtime / "pngtopptx-project" / "work" / "slide01"
+            for pattern in POST_RENDER_OUTPUT_NAMES:
+                (work / pattern.format(slide=1)).unlink()
+
+            result = finalize_shared_render_qa(
+                runtime,
+                summary_path=(
+                    runtime
+                    / "pngtopptx-project"
+                    / "out"
+                    / "visual_qa_summary_final.json"
+                ),
+            )
+            self.assertEqual(result.slide_count, 1)
+            evidence = json.loads(
+                (work / "qa_evidence.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(
+                evidence["visualComparison"]["method"],
+                "official-source-mapped-pptx-html-shared-preview",
+            )
+            self.assertIn("visual_qa/pptx_raster.png", evidence["pptxRaster"])
+            report = validate_reconstruction_job_bundle(
+                runtime,
+                require_worker_outputs=True,
+            )
+            self.assertTrue(report["valid"], report)
+
+    def test_shared_preview_honors_canonical_justified_sparse_slide_exception(
+        self,
+    ) -> None:
+        from presentation_agent.deckcompiler.orchestration.reconstruction_jobs import (
+            POST_RENDER_OUTPUT_NAMES,
+        )
+        from presentation_agent.deckcompiler.orchestration.shared_render_qa import (
+            finalize_shared_render_qa,
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            started = self._start(runtime)
+            self._build_run_draft(
+                runtime,
+                workflow_id=started.workflow_id,
+                slide_count=1,
+                status="COMPLETED",
+                qa_status="PASS",
+                fail_count=0,
+                blocking_count=0,
+            )
+            project = runtime / "pngtopptx-project"
+            work = project / "work" / "slide01"
+            for pattern in POST_RENDER_OUTPUT_NAMES:
+                (work / pattern.format(slide=1)).unlink()
+            profile_path = work / "profile_override.json"
+            profile = json.loads(profile_path.read_text(encoding="utf-8"))
+            profile["exceptions"] = [
+                {
+                    "type": "native_text_threshold",
+                    "reason": "The approved source is an intentionally sparse title slide.",
+                }
+            ]
+            profile_path.write_text(json.dumps(profile), encoding="utf-8")
+            native_path = project / "out" / "native_object_manifest.json"
+            native = json.loads(native_path.read_text(encoding="utf-8"))
+            native["slides"]["1"].update(
+                {
+                    "counts": {"text": 2, "panels": 2},
+                    "editableTextLength": 42,
+                    "editableObjectCount": 4,
+                }
+            )
+            native_path.write_text(json.dumps(native), encoding="utf-8")
+
+            finalize_shared_render_qa(
+                runtime,
+                summary_path=project / "out" / "visual_qa_summary_final.json",
+            )
+            score = json.loads(
+                (work / "reconstruction_score.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(score["exceptions"], profile["exceptions"])
+
+    def test_shared_preview_qa_rejects_tampered_mapped_render_hash(self) -> None:
+        from presentation_agent.deckcompiler.orchestration.shared_render_qa import (
+            finalize_shared_render_qa,
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            started = self._start(runtime)
+            self._build_run_draft(
+                runtime,
+                workflow_id=started.workflow_id,
+                slide_count=1,
+                status="COMPLETED",
+                qa_status="PASS",
+                fail_count=0,
+                blocking_count=0,
+            )
+            metrics_path = (
+                runtime
+                / "pngtopptx-project"
+                / "work"
+                / "slide01"
+                / "visual_qa"
+                / "visual_metrics.json"
+            )
+            metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
+            metrics["hashes"]["pptx_raster"] = ZERO_HASH
+            metrics_path.write_text(json.dumps(metrics), encoding="utf-8")
+
+            with self.assertRaises(DeckCompilerError) as caught:
+                finalize_shared_render_qa(
+                    runtime,
+                    summary_path=(
+                        runtime
+                        / "pngtopptx-project"
+                        / "out"
+                        / "visual_qa_summary_final.json"
+                    ),
+                )
+            self.assertEqual(
+                caught.exception.code,
+                "DC_SHARED_RENDER_QA_EVIDENCE_INVALID",
+            )
 
     def test_image_requests_are_deterministically_bound_to_architect_outputs(
         self,
@@ -551,7 +994,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 "one_source_slide_per_fresh_context",
             )
             self.assertEqual(manifest["dispatch_mode"], "bounded_parallel_workers")
-            self.assertLessEqual(manifest["max_parallel_workers"], 4)
+            self.assertLessEqual(manifest["max_parallel_workers"], 6)
             self.assertEqual(
                 [row["slide_number"] for row in manifest["jobs"]],
                 [1, 2],
@@ -951,7 +1394,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             )
             timing_path = runtime / "execution_timing.json"
             timing = json.loads(timing_path.read_text(encoding="utf-8"))
-            timing["full_deck_compile_count"] = 2
+            timing["full_deck_compile_count"] = 3
             timing_path.write_text(json.dumps(timing), encoding="utf-8")
 
             with self.assertRaises(DeckCompilerError) as caught:
@@ -984,7 +1427,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             )
             timing_path = runtime / payload["performance"]["timing_report"]["path"]
             timing = json.loads(timing_path.read_text(encoding="utf-8"))
-            self.assertEqual(timing["full_deck_compile_count"], 2)
+            self.assertEqual(timing["full_deck_compile_count"], 3)
 
     def test_visual_blockers_return_needs_repair_and_repair_action(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -1292,6 +1735,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             "approval_record": architect / "approval_record.json",
             "request_manifest": prompts / "image_request_manifest.json",
             "batch_manifest": image_batches / "image_generation_batch_manifest.json",
+            "streaming_execution": root / "streaming_execution.json",
             "timing": root / "execution_timing.json",
             "pptx": out / "deck-final-editable.pptx",
             "html": out / "deck-final-editable.html",
@@ -1404,19 +1848,34 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
         native_slides = {
             str(slide_number): {
                 "objects": [
-                    {
-                        "type": "text",
-                        "editable": True,
-                        "textLength": 12,
-                        "x": 1,
-                        "y": 1,
-                        "w": 4,
-                        "h": 1,
-                    }
+                    *[
+                        {
+                            "type": "text",
+                            "editable": True,
+                            "textLength": 12,
+                            "x": 1 + index,
+                            "y": 1,
+                            "w": 4,
+                            "h": 1,
+                        }
+                        for index in range(8)
+                    ],
+                    *[
+                        {
+                            "type": "panel",
+                            "editable": True,
+                            "textLength": 0,
+                            "x": 1 + index,
+                            "y": 2,
+                            "w": 4,
+                            "h": 1,
+                        }
+                        for index in range(4)
+                    ],
                 ],
-                "counts": {"text": 1},
-                "editableTextLength": 12,
-                "editableObjectCount": 1,
+                "counts": {"text": 8, "panels": 4},
+                "editableTextLength": 96,
+                "editableObjectCount": 12,
             }
             for slide_number in range(1, slide_count + 1)
         }
@@ -1623,67 +2082,55 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 }
             )
 
-        image_by_number = {row["slide_number"]: row for row in image_rows}
-        waves = []
-        for wave_number, start in enumerate(range(1, slide_count + 1, 20), start=1):
-            wave_slides = list(range(start, min(start + 19, slide_count) + 1))
-            waves.append(
-                {
-                    "wave_number": wave_number,
-                    "concurrent_dispatch": True,
-                    "slides": wave_slides,
-                    "initial_call_count": len(wave_slides),
-                    "regeneration_call_count": 0,
-                    "accepted_count": len(wave_slides),
-                    "calls": [
-                        {
-                            "slide_number": slide_number,
-                            "request_id": image_by_number[slide_number]["request_id"],
-                            "prompt_sha256": self._sha256(
-                                root
-                                / image_by_number[slide_number]["prompt"]["path"]
-                            ),
-                            "selected_png_sha256": self._sha256(
-                                root
-                                / image_by_number[slide_number]["source_png"]["path"]
-                            ),
-                            "status": "ACCEPTED",
-                            "attempt_count": 1,
-                        }
-                        for slide_number in wave_slides
-                    ],
-                }
-            )
-        files["batch_manifest"].write_text(
-            json.dumps(
-                {
-                    "schema_name": "image_generation_batch_manifest",
-                    "schema_version": "1.0.0",
-                    "platform_tool_id": "image_gen.imagegen",
-                    "batch_size": 20,
-                    "dispatch_mode": "concurrent_wave",
-                    "call_strategy": "one_independent_builtin_call_per_slide",
-                    "slide_count": slide_count,
-                    "initial_call_count": slide_count,
-                    "regeneration_call_count": 0,
-                    "accepted_count": slide_count,
-                    "waves": waves,
-                }
-            ),
-            encoding="utf-8",
-        )
-        from presentation_agent.deckcompiler.orchestration.reconstruction_jobs import (
-            prepare_reconstruction_jobs,
+        from presentation_agent.deckcompiler.orchestration.streaming_execution import (
+            accept_streaming_image,
+            finalize_streaming_images,
+            prepare_streaming_execution,
+            record_streaming_reconstruction,
         )
 
-        prepared_jobs = prepare_reconstruction_jobs(root)
-        self.assertEqual(prepared_jobs.slide_count, slide_count)
+        streaming = prepare_streaming_execution(root)
+        self.assertEqual(streaming.slide_count, slide_count)
+        clock = datetime(2026, 1, 1, tzinfo=timezone.utc)
+
+        def stamp(seconds: int) -> str:
+            return (clock + timedelta(seconds=seconds)).isoformat().replace(
+                "+00:00", "Z"
+            )
+
+        for slide_number in range(1, slide_count + 1):
+            accept_streaming_image(
+                root,
+                slide_number=slide_number,
+                tool_call_id=f"imagegen-slide-{slide_number:03d}",
+                queued_at=stamp(0),
+                started_at=stamp(1),
+                completed_at=stamp(180 + slide_number),
+            )
+        for slide_number in range(1, slide_count + 1):
+            worker_slot = (slide_number - 1) % 6
+            worker_wave = (slide_number - 1) // 6
+            reconstruction_started = 181 + worker_slot + worker_wave * 300
+            record_streaming_reconstruction(
+                root,
+                slide_number=slide_number,
+                status="STARTED",
+                timestamp=stamp(reconstruction_started),
+            )
+            record_streaming_reconstruction(
+                root,
+                slide_number=slide_number,
+                status="AUTHORING_COMPLETED",
+                timestamp=stamp(reconstruction_started + 300),
+            )
+        finalized = finalize_streaming_images(root)
+        self.assertTrue(Path(finalized["reconstruction_manifest_path"]).is_file())
         files["timing"].write_text(
             json.dumps(
                 {
                     "schema_name": "pptx_generation_execution_timing",
                     "schema_version": "1.0.0",
-                    "profile_name": "fast-quality-20",
+                    "profile_name": "sol-medium",
                     "slide_count": slide_count,
                     "started_at": "2026-01-01T00:00:00Z",
                     "completed_at": (
@@ -1695,7 +2142,16 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                     "image_generation_seconds": 900 if slide_count == 20 else 60,
                     "reconstruction_seconds": 180 if slide_count == 20 else 30,
                     "visual_qa_seconds": 120 if slide_count == 20 else 30,
-                    "full_deck_compile_count": 2 if repair_iterations else 1,
+                    "image_generation_requested_parallelism": slide_count,
+                    "image_generation_max_observed_parallelism": slide_count,
+                    "reconstruction_worker_limit": min(6, slide_count),
+                    "reconstruction_max_observed_parallelism": min(6, slide_count),
+                    "streaming_overlap_proven": slide_count > 1,
+                    "isolated_per_slide_build_count": 0,
+                    "shared_full_deck_render_count": (
+                        3 if repair_iterations else 2
+                    ),
+                    "full_deck_compile_count": 3 if repair_iterations else 2,
                     "target_seconds_20_slides": 1800,
                     "target_applicable": slide_count == 20,
                     "target_met": True if slide_count == 20 else None,
@@ -1900,7 +2356,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
 
         payload = {
             "schema_name": "codex_pptx_generation_run",
-            "schema_version": "2.3.0",
+            "schema_version": "2.4.0",
             "workflow_id": workflow_id,
             "status": status,
             "architect": {
@@ -1923,14 +2379,19 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 "dispatch_profile": {
                     "batch_size": 20,
                     "dispatch_mode": "concurrent_wave",
+                    "acceptance_mode": "streaming_ready_queue",
                     "call_strategy": "one_independent_builtin_call_per_slide",
                     "initial_variants_per_slide": 1,
                     "max_regenerations_per_slide": 1,
                     "automatic_canary": False,
                     "compile_after_all_images": True,
+                    "reconstruction_starts_before_all_images_complete": True,
                 },
                 "request_manifest": self._artifact(root, files["request_manifest"]),
                 "batch_manifest": self._artifact(root, files["batch_manifest"]),
+                "streaming_execution": self._artifact(
+                    root, files["streaming_execution"]
+                ),
                 "slides": image_rows,
             },
             "reconstruction": {
@@ -1949,7 +2410,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 "execution_mode": (
                     "post_repair_recompile"
                     if repair_iterations
-                    else "single_compile_fast_path"
+                    else "shared_preview_final_fast_path"
                 ),
                 "quality_level": "polish",
                 "route_hardlock": "PASS",
@@ -1981,7 +2442,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 "contact_sheet": self._artifact(root, files["contact"]),
             },
             "performance": {
-                "profile_name": "fast-quality-20",
+                "profile_name": "sol-medium",
                 "target_model": "gpt-5.6-sol",
                 "target_reasoning_effort": "medium",
                 "baseline_minutes_20_slides": 120,

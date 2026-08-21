@@ -97,6 +97,7 @@
         "source_png_pattern",
         "image_batch_manifest_path",
         "image_request_manifest_path",
+        "streaming_execution_path",
         "timing_report_path",
         "semantic_sidecar_pattern",
         "per_slide_work_pattern",
@@ -113,6 +114,7 @@
         "source_png_pattern": {"type": "string", "pattern": "slideN\\.png$"},
         "image_batch_manifest_path": {"type": "string", "pattern": "image_generation_batch_manifest\\.json$"},
         "image_request_manifest_path": {"type": "string", "pattern": "image_request_manifest\\.json$"},
+        "streaming_execution_path": {"type": "string", "pattern": "streaming_execution\\.json$"},
         "timing_report_path": {"type": "string", "pattern": "execution_timing\\.json$"},
         "semantic_sidecar_pattern": {"type": "string", "pattern": "slide-NNN\\.semantic\\.json$"},
         "per_slide_work_pattern": {"type": "string", "pattern": "slideXX$"},
@@ -172,6 +174,11 @@
         "profile_name",
         "target_model",
         "target_reasoning_effort",
+        "max_imagegen_parallel_slides",
+        "max_reconstruction_workers",
+        "fallback_policy",
+        "determinism_contract",
+        "worker_context",
         "default_design_direction",
         "prompt_policy",
         "image_generation",
@@ -180,9 +187,54 @@
         "performance_target"
       ],
       "properties": {
-        "profile_name": {"const": "fast-quality-20"},
-        "target_model": {"const": "gpt-5.6-sol"},
-        "target_reasoning_effort": {"const": "medium"},
+        "profile_name": {"enum": ["sol-medium", "luna-max"]},
+        "target_model": {"enum": ["gpt-5.6-sol", "gpt-5.6-luna"]},
+        "target_reasoning_effort": {"enum": ["medium", "max"]},
+        "max_imagegen_parallel_slides": {"const": 20},
+        "max_reconstruction_workers": {"const": 6},
+        "fallback_policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["profile_name", "scope", "max_attempts", "triggers", "quality_gate_bypass_forbidden"],
+          "properties": {
+            "profile_name": {"enum": [null, "sol-medium"]},
+            "scope": {"const": "failed_slide_only"},
+            "max_attempts": {"enum": [0, 1]},
+            "triggers": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {"enum": ["authoring_contract_failure", "reconstruction_hardlock_failure", "visual_qa_blocking"]}
+            },
+            "quality_gate_bypass_forbidden": {"const": true}
+          }
+        },
+        "determinism_contract": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["architect_blueprint_shared", "image_prompts_shared", "semantic_sidecars_shared", "renderer_contract_shared", "vector_policy_id", "compiler_and_qa_shared"],
+          "properties": {
+            "architect_blueprint_shared": {"const": true},
+            "image_prompts_shared": {"const": true},
+            "semantic_sidecars_shared": {"const": true},
+            "renderer_contract_shared": {"const": true},
+            "vector_policy_id": {"const": "vector-first-v1"},
+            "compiler_and_qa_shared": {"const": true}
+          }
+        },
+        "worker_context": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "codex_argv", "sealed_single_slide_job_only", "full_skill_catalog_forbidden", "explicit_renderer_skill_path_required"],
+          "properties": {
+            "mode": {"const": "minimal_locked"},
+            "codex_argv": {
+              "const": ["--ephemeral", "--ignore-user-config", "--ignore-rules", "--disable", "plugins", "--disable", "apps", "--disable", "memories", "--disable", "multi_agent", "--disable", "image_generation"]
+            },
+            "sealed_single_slide_job_only": {"const": true},
+            "full_skill_catalog_forbidden": {"const": true},
+            "explicit_renderer_skill_path_required": {"const": true}
+          }
+        },
         "default_design_direction": {
           "const": ["Academic", "Informative", "Professional", "Creative"]
         },
@@ -204,40 +256,45 @@
         "image_generation": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["batch_size", "dispatch_mode", "call_strategy", "initial_variants_per_slide", "max_regenerations_per_slide", "automatic_canary", "compile_after_all_images"],
+          "required": ["batch_size", "dispatch_mode", "acceptance_mode", "call_strategy", "initial_variants_per_slide", "max_regenerations_per_slide", "automatic_canary", "compile_after_all_images", "reconstruction_starts_before_all_images_complete"],
           "properties": {
             "batch_size": {"const": 20},
             "dispatch_mode": {"const": "concurrent_wave"},
+            "acceptance_mode": {"const": "streaming_ready_queue"},
             "call_strategy": {"const": "one_independent_builtin_call_per_slide"},
             "initial_variants_per_slide": {"const": 1},
             "max_regenerations_per_slide": {"const": 1},
             "automatic_canary": {"const": false},
-            "compile_after_all_images": {"const": true}
+            "compile_after_all_images": {"const": true},
+            "reconstruction_starts_before_all_images_complete": {"const": true}
           }
         },
         "reconstruction_authoring": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["context_unit", "dispatch_mode", "max_parallel_workers", "shared_file_writer", "worker_scope", "worker_model", "worker_reasoning_effort", "token_policy", "isolated_dual_render_qa_required"],
+          "required": ["context_unit", "dispatch_mode", "max_parallel_workers", "shared_file_writer", "worker_scope", "worker_model", "worker_reasoning_effort", "token_policy", "isolated_dual_render_qa_required", "shared_render_source_mapped_qa_required"],
           "properties": {
             "context_unit": {"const": "one_source_slide_per_fresh_context"},
-            "dispatch_mode": {"const": "bounded_parallel_workers"},
-            "max_parallel_workers": {"const": 4},
+            "dispatch_mode": {"const": "streaming_ready_queue_bounded_workers"},
+            "max_parallel_workers": {"const": 6},
             "shared_file_writer": {"const": "integrator_only"},
             "worker_scope": {"const": "one_slide_work_directory_only"},
-            "worker_model": {"const": "gpt-5.6-sol"},
-            "worker_reasoning_effort": {"const": "medium"},
+            "worker_model": {"enum": ["gpt-5.6-sol", "gpt-5.6-luna"]},
+            "worker_reasoning_effort": {"enum": ["medium", "max"]},
             "token_policy": {"const": "compact_job_plus_one_source_slide_no_full_deck_duplication"},
-            "isolated_dual_render_qa_required": {"const": true}
+            "isolated_dual_render_qa_required": {"const": false},
+            "shared_render_source_mapped_qa_required": {"const": true}
           }
         },
         "compilation": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["single_full_deck_invocation", "unconditional_second_full_compile", "post_repair_recompile_only"],
+          "required": ["per_slide_isolated_builds", "shared_preview_full_deck_invocation", "final_reconstruction_full_deck_invocation", "full_deck_render_count_without_repair", "post_repair_recompile_only"],
           "properties": {
-            "single_full_deck_invocation": {"const": true},
-            "unconditional_second_full_compile": {"const": false},
+            "per_slide_isolated_builds": {"const": 0},
+            "shared_preview_full_deck_invocation": {"const": true},
+            "final_reconstruction_full_deck_invocation": {"const": true},
+            "full_deck_render_count_without_repair": {"const": 2},
             "post_repair_recompile_only": {"const": true}
           }
         },
@@ -253,7 +310,53 @@
             "quality_gates_take_precedence": {"const": true}
           }
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"profile_name": {"const": "sol-medium"}}},
+          "then": {
+            "properties": {
+              "target_model": {"const": "gpt-5.6-sol"},
+              "target_reasoning_effort": {"const": "medium"},
+              "fallback_policy": {
+                "properties": {
+                  "profile_name": {"const": null},
+                  "max_attempts": {"const": 0},
+                  "triggers": {"maxItems": 0}
+                }
+              },
+              "reconstruction_authoring": {
+                "properties": {
+                  "worker_model": {"const": "gpt-5.6-sol"},
+                  "worker_reasoning_effort": {"const": "medium"}
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {"properties": {"profile_name": {"const": "luna-max"}}},
+          "then": {
+            "properties": {
+              "target_model": {"const": "gpt-5.6-luna"},
+              "target_reasoning_effort": {"const": "max"},
+              "fallback_policy": {
+                "properties": {
+                  "profile_name": {"const": "sol-medium"},
+                  "max_attempts": {"const": 1},
+                  "triggers": {"minItems": 3, "maxItems": 3}
+                }
+              },
+              "reconstruction_authoring": {
+                "properties": {
+                  "worker_model": {"const": "gpt-5.6-luna"},
+                  "worker_reasoning_effort": {"const": "max"}
+                }
+              }
+            }
+          }
+        }
+      ]
     },
     "quality_contract": {
       "type": "object",
@@ -268,8 +371,9 @@
         "pptx_openability_required",
         "zero_fail_required",
         "zero_blocking_required",
-        "single_full_deck_fast_path_required",
-        "unconditional_second_full_deck_compile_forbidden",
+        "per_slide_isolated_render_forbidden",
+        "shared_preview_render_required",
+        "final_reconstruction_render_required",
         "final_full_deck_qa_required",
         "source_slide_mapping_required",
         "full_slide_source_raster_forbidden",
@@ -288,8 +392,9 @@
         "pptx_openability_required": {"const": true},
         "zero_fail_required": {"const": true},
         "zero_blocking_required": {"const": true},
-        "single_full_deck_fast_path_required": {"const": true},
-        "unconditional_second_full_deck_compile_forbidden": {"const": true},
+        "per_slide_isolated_render_forbidden": {"const": true},
+        "shared_preview_render_required": {"const": true},
+        "final_reconstruction_render_required": {"const": true},
         "final_full_deck_qa_required": {"const": true},
         "source_slide_mapping_required": {"const": true},
         "full_slide_source_raster_forbidden": {"const": true},
@@ -342,12 +447,27 @@
         "install_node_dependencies",
         "install_hardlock",
         "plan_orchestration",
+        "prepare_streaming_execution",
+        "accept_streaming_image",
+        "record_reconstruction_started",
+        "record_authoring_completed",
+        "finalize_streaming_images",
+        "validate_streaming_execution",
         "prepare_reconstruction_jobs",
         "codex_execute_reconstruction_jobs",
         "validate_reconstruction_jobs",
         "validate_agent_work",
         "integrate_agent_work",
         "prepare_crops",
+        "compile_shared_preview",
+        "rasterize_shared_preview",
+        "capture_shared_preview_html",
+        "compare_shared_preview",
+        "summarize_shared_preview",
+        "enforce_shared_preview_qa",
+        "enforce_shared_preview_quality_acceptance",
+        "finalize_source_mapped_qa",
+        "validate_reconstruction_qa",
         "compile_full_deck",
         "gate_full_deck",
         "rasterize_full_deck",
@@ -375,12 +495,27 @@
         "install_node_dependencies": {"$ref": "#/$defs/command"},
         "install_hardlock": {"$ref": "#/$defs/command"},
         "plan_orchestration": {"$ref": "#/$defs/command"},
+        "prepare_streaming_execution": {"$ref": "#/$defs/command"},
+        "accept_streaming_image": {"$ref": "#/$defs/command"},
+        "record_reconstruction_started": {"$ref": "#/$defs/command"},
+        "record_authoring_completed": {"$ref": "#/$defs/command"},
+        "finalize_streaming_images": {"$ref": "#/$defs/command"},
+        "validate_streaming_execution": {"$ref": "#/$defs/command"},
         "prepare_reconstruction_jobs": {"$ref": "#/$defs/command"},
         "codex_execute_reconstruction_jobs": {"$ref": "#/$defs/command"},
         "validate_reconstruction_jobs": {"$ref": "#/$defs/command"},
         "validate_agent_work": {"$ref": "#/$defs/command"},
         "integrate_agent_work": {"$ref": "#/$defs/command"},
         "prepare_crops": {"$ref": "#/$defs/command"},
+        "compile_shared_preview": {"$ref": "#/$defs/command"},
+        "rasterize_shared_preview": {"$ref": "#/$defs/command"},
+        "capture_shared_preview_html": {"$ref": "#/$defs/command"},
+        "compare_shared_preview": {"$ref": "#/$defs/command"},
+        "summarize_shared_preview": {"$ref": "#/$defs/command"},
+        "enforce_shared_preview_qa": {"$ref": "#/$defs/command"},
+        "enforce_shared_preview_quality_acceptance": {"$ref": "#/$defs/command"},
+        "finalize_source_mapped_qa": {"$ref": "#/$defs/command"},
+        "validate_reconstruction_qa": {"$ref": "#/$defs/command"},
         "compile_full_deck": {"$ref": "#/$defs/command"},
         "gate_full_deck": {"$ref": "#/$defs/command"},
         "rasterize_full_deck": {"$ref": "#/$defs/command"},
@@ -410,15 +545,17 @@
       "additionalProperties": false,
       "required": [
         "setup",
+        "streaming_image_generation",
         "reconstruction_authoring",
-        "single_compile_fast_path",
+        "shared_preview_qa",
+        "final_compile_fast_path",
         "fast_path_acceptance",
         "repair_wave_loop",
         "post_repair_recompile",
         "completion",
         "repair_exit_codes",
         "max_repair_iterations",
-        "unconditional_second_full_compile"
+        "full_deck_render_count_without_repair"
       ],
       "properties": {
         "setup": {
@@ -428,17 +565,39 @@
             "plan_orchestration"
           ]
         },
+        "streaming_image_generation": {
+          "const": [
+            "prepare_streaming_execution",
+            "accept_streaming_image",
+            "record_reconstruction_started",
+            "record_authoring_completed"
+          ]
+        },
         "reconstruction_authoring": {
           "const": [
-            "prepare_reconstruction_jobs",
             "codex_execute_reconstruction_jobs",
+            "finalize_streaming_images",
+            "validate_streaming_execution",
             "validate_reconstruction_jobs",
             "validate_agent_work",
             "integrate_agent_work",
             "prepare_crops"
           ]
         },
-        "single_compile_fast_path": {
+        "shared_preview_qa": {
+          "const": [
+            "compile_shared_preview",
+            "rasterize_shared_preview",
+            "capture_shared_preview_html",
+            "compare_shared_preview",
+            "summarize_shared_preview",
+            "enforce_shared_preview_qa",
+            "enforce_shared_preview_quality_acceptance",
+            "finalize_source_mapped_qa",
+            "validate_reconstruction_qa"
+          ]
+        },
+        "final_compile_fast_path": {
           "const": [
             "compile_full_deck",
             "gate_full_deck",
@@ -483,15 +642,16 @@
         "repair_exit_codes": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["enforce_full_deck_qa_fast_path", "enforce_wave_qa", "enforce_full_deck_qa_post_repair"],
+          "required": ["enforce_shared_preview_qa", "enforce_full_deck_qa_fast_path", "enforce_wave_qa", "enforce_full_deck_qa_post_repair"],
           "properties": {
+            "enforce_shared_preview_qa": {"const": [0, 1]},
             "enforce_full_deck_qa_fast_path": {"const": [0, 1]},
             "enforce_wave_qa": {"const": [0, 1]},
             "enforce_full_deck_qa_post_repair": {"const": [0]}
           }
         },
         "max_repair_iterations": {"const": 2},
-        "unconditional_second_full_compile": {"const": false}
+        "full_deck_render_count_without_repair": {"const": 2}
       }
     },
     "required_artifacts": {"type": "array", "minItems": 15, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},

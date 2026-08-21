@@ -22,7 +22,7 @@
       "const": "codex_pptx_generation_run"
     },
     "schema_version": {
-      "const": "2.3.0"
+      "const": "2.4.0"
     },
     "workflow_id": {
       "type": "string",
@@ -238,6 +238,7 @@
         "dispatch_profile",
         "request_manifest",
         "batch_manifest",
+        "streaming_execution",
         "slides"
       ],
       "properties": {
@@ -264,6 +265,9 @@
           "$ref": "#/$defs/artifact"
         },
         "batch_manifest": {
+          "$ref": "#/$defs/artifact"
+        },
+        "streaming_execution": {
           "$ref": "#/$defs/artifact"
         },
         "slides": {
@@ -323,7 +327,7 @@
           "$ref": "#/$defs/textLayerPreprocessing"
         },
         "execution_mode": {
-          "enum": ["single_compile_fast_path", "post_repair_recompile"]
+          "enum": ["shared_preview_final_fast_path", "post_repair_recompile"]
         },
         "quality_level": {
           "enum": [
@@ -442,14 +446,30 @@
         "timing_report"
       ],
       "properties": {
-        "profile_name": {"const": "fast-quality-20"},
-        "target_model": {"const": "gpt-5.6-sol"},
-        "target_reasoning_effort": {"const": "medium"},
+        "profile_name": {"enum": ["sol-medium", "luna-max"]},
+        "target_model": {"enum": ["gpt-5.6-sol", "gpt-5.6-luna"]},
+        "target_reasoning_effort": {"enum": ["medium", "max"]},
         "baseline_minutes_20_slides": {"const": 120},
         "target_minutes_20_slides": {"const": 30},
         "target_speedup": {"const": 4.0},
         "timing_report": {"$ref": "#/$defs/artifact"}
-      }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "profile_name": {"const": "sol-medium"},
+            "target_model": {"const": "gpt-5.6-sol"},
+            "target_reasoning_effort": {"const": "medium"}
+          }
+        },
+        {
+          "properties": {
+            "profile_name": {"const": "luna-max"},
+            "target_model": {"const": "gpt-5.6-luna"},
+            "target_reasoning_effort": {"const": "max"}
+          }
+        }
+      ]
     },
     "delivery": {
       "type": "object",
@@ -481,20 +501,24 @@
       "required": [
         "batch_size",
         "dispatch_mode",
+        "acceptance_mode",
         "call_strategy",
         "initial_variants_per_slide",
         "max_regenerations_per_slide",
         "automatic_canary",
-        "compile_after_all_images"
+        "compile_after_all_images",
+        "reconstruction_starts_before_all_images_complete"
       ],
       "properties": {
         "batch_size": {"const": 20},
         "dispatch_mode": {"const": "concurrent_wave"},
+        "acceptance_mode": {"const": "streaming_ready_queue"},
         "call_strategy": {"const": "one_independent_builtin_call_per_slide"},
         "initial_variants_per_slide": {"const": 1},
         "max_regenerations_per_slide": {"const": 1},
         "automatic_canary": {"const": false},
-        "compile_after_all_images": {"const": true}
+        "compile_after_all_images": {"const": true},
+        "reconstruction_starts_before_all_images_complete": {"const": true}
       }
     },
     "textLayerPreprocessing": {

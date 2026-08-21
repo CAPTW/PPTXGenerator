@@ -19,6 +19,10 @@ from .orchestration.generate import (
     start_generate_workflow,
     validate_generate_workflow,
 )
+from .orchestration.execution_profiles import (
+    DEFAULT_EXECUTION_PROFILE,
+    EXECUTION_PROFILE_NAMES,
+)
 from .orchestration.image_requests import (
     prepare_image_requests,
     validate_image_request_bundle,
@@ -27,6 +31,14 @@ from .orchestration.quality_acceptance import evaluate_visual_quality_acceptance
 from .orchestration.reconstruction_jobs import (
     prepare_reconstruction_jobs,
     validate_reconstruction_job_bundle,
+)
+from .orchestration.shared_render_qa import finalize_shared_render_qa
+from .orchestration.streaming_execution import (
+    accept_streaming_image,
+    finalize_streaming_images,
+    prepare_streaming_execution,
+    record_streaming_reconstruction,
+    validate_streaming_execution,
 )
 from .orchestration.phase3_runner import run_phase3
 from .pngtopptx_pinning import (
@@ -101,6 +113,15 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         help="Sealed live Codex run evidence to register while resuming.",
     )
+    generate.add_argument(
+        "--execution-profile",
+        choices=EXECUTION_PROFILE_NAMES,
+        default=DEFAULT_EXECUTION_PROFILE,
+        help=(
+            "Explicit reconstruction runtime profile. ImageGen prompts, Semantic "
+            "Sidecars, renderer, compiler, and QA remain identical across profiles."
+        ),
+    )
 
     validate_generate = subparsers.add_parser(
         "validate-generate",
@@ -122,6 +143,54 @@ def build_parser() -> argparse.ArgumentParser:
         help="Validate Blueprint/Design-System lineage for prepared ImageGen requests.",
     )
     validate_image_requests_parser.add_argument("--runtime", type=Path, required=True)
+
+    prepare_streaming_parser = subparsers.add_parser(
+        "prepare-streaming-execution",
+        help=(
+            "Prepare the ImageGen ready queue so each accepted slide can enter "
+            "reconstruction before the remaining calls finish."
+        ),
+    )
+    prepare_streaming_parser.add_argument("--runtime", type=Path, required=True)
+
+    accept_streaming_parser = subparsers.add_parser(
+        "accept-streaming-image",
+        help="Accept one inspected ImageGen PNG and immediately prepare its slide job.",
+    )
+    accept_streaming_parser.add_argument("--runtime", type=Path, required=True)
+    accept_streaming_parser.add_argument("--slide", type=int, required=True)
+    accept_streaming_parser.add_argument("--tool-call-id", required=True)
+    accept_streaming_parser.add_argument("--queued-at", required=True)
+    accept_streaming_parser.add_argument("--started-at", required=True)
+    accept_streaming_parser.add_argument("--completed-at", required=True)
+
+    record_streaming_parser = subparsers.add_parser(
+        "record-streaming-reconstruction",
+        help="Record STARTED or AUTHORING_COMPLETED for one ready reconstruction job.",
+    )
+    record_streaming_parser.add_argument("--runtime", type=Path, required=True)
+    record_streaming_parser.add_argument("--slide", type=int, required=True)
+    record_streaming_parser.add_argument(
+        "--status", choices=("STARTED", "AUTHORING_COMPLETED"), required=True
+    )
+    record_streaming_parser.add_argument("--timestamp", required=True)
+
+    finalize_streaming_parser = subparsers.add_parser(
+        "finalize-streaming-images",
+        help="Seal all per-slide receipts into the canonical ImageGen batch manifest.",
+    )
+    finalize_streaming_parser.add_argument("--runtime", type=Path, required=True)
+
+    validate_streaming_parser = subparsers.add_parser(
+        "validate-streaming-execution",
+        help="Validate streaming lineage, completion, and real timing overlap evidence.",
+    )
+    validate_streaming_parser.add_argument("--runtime", type=Path, required=True)
+    validate_streaming_parser.add_argument("--require-complete", action="store_true")
+    validate_streaming_parser.add_argument(
+        "--require-authoring-complete", action="store_true"
+    )
+    validate_streaming_parser.add_argument("--require-overlap", action="store_true")
 
     prepare_reconstruction_jobs_parser = subparsers.add_parser(
         "prepare-reconstruction-jobs",
@@ -145,8 +214,21 @@ def build_parser() -> argparse.ArgumentParser:
         "--runtime", type=Path, required=True
     )
     validate_reconstruction_jobs_parser.add_argument(
+        "--require-authoring-outputs", action="store_true"
+    )
+    validate_reconstruction_jobs_parser.add_argument(
         "--require-worker-outputs", action="store_true"
     )
+
+    finalize_shared_qa_parser = subparsers.add_parser(
+        "finalize-shared-render-qa",
+        help=(
+            "Close per-slide reconstruction QA receipts from one accepted, "
+            "source-mapped shared preview."
+        ),
+    )
+    finalize_shared_qa_parser.add_argument("--runtime", type=Path, required=True)
+    finalize_shared_qa_parser.add_argument("--summary", type=Path, required=True)
 
     validate_visual_quality_parser = subparsers.add_parser(
         "validate-visual-quality",
@@ -318,6 +400,7 @@ def main(argv: list[str] | None = None) -> int:
                     tone=args.tone or ("professional", "clear"),
                     workflow=args.workflow,
                     skill_root=args.skill_root,
+                    execution_profile=args.execution_profile,
                 )
             else:
                 if (
@@ -326,11 +409,12 @@ def main(argv: list[str] | None = None) -> int:
                     or args.prompt_file is not None
                     or args.pdfs
                     or args.skill_root is not None
+                    or args.execution_profile != DEFAULT_EXECUTION_PROFILE
                 ):
                     raise DeckCompilerError(
                         "DC_GENERATE_INPUT_INVALID",
                         "general_generate_workflow",
-                        "--output-dir, prompt, PDF, and Skill-root inputs cannot be changed while resuming.",
+                        "--output-dir, prompt, PDF, Skill-root, and execution-profile inputs cannot be changed while resuming.",
                     )
                 result = resume_generate_workflow(
                     resume=args.resume,
@@ -384,6 +468,78 @@ def main(argv: list[str] | None = None) -> int:
         report = validate_image_request_bundle(args.runtime)
         print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
         return 0 if report["valid"] else 1
+    if args.command == "prepare-streaming-execution":
+        try:
+            result = prepare_streaming_execution(args.runtime)
+        except (DeckCompilerError, OSError, ValueError, json.JSONDecodeError) as exc:
+            code = getattr(exc, "code", "DC_STREAMING_PREPARATION_FAILED")
+            print(f"DECKCOMPILER_STREAMING_BLOCKED code={code} message={exc}")
+            return 1
+        print(
+            "DECKCOMPILER_STREAMING_READY "
+            f"workflow_id={result.workflow_id} slides={result.slide_count} "
+            f"state={result.state_path.as_posix()}"
+        )
+        return 0
+    if args.command == "accept-streaming-image":
+        try:
+            result = accept_streaming_image(
+                args.runtime,
+                slide_number=args.slide,
+                tool_call_id=args.tool_call_id,
+                queued_at=args.queued_at,
+                started_at=args.started_at,
+                completed_at=args.completed_at,
+            )
+        except (DeckCompilerError, OSError, ValueError, json.JSONDecodeError) as exc:
+            code = getattr(exc, "code", "DC_STREAMING_IMAGE_ACCEPT_FAILED")
+            print(f"DECKCOMPILER_STREAMING_IMAGE_BLOCKED code={code} message={exc}")
+            return 1
+        print(
+            "DECKCOMPILER_STREAMING_IMAGE_READY "
+            f"workflow_id={result.workflow_id} slide={result.slide_number} "
+            f"job={result.job_path.as_posix()}"
+        )
+        return 0
+    if args.command == "record-streaming-reconstruction":
+        try:
+            state_path = record_streaming_reconstruction(
+                args.runtime,
+                slide_number=args.slide,
+                status=args.status,
+                timestamp=args.timestamp,
+            )
+        except (DeckCompilerError, OSError, ValueError, json.JSONDecodeError) as exc:
+            code = getattr(exc, "code", "DC_STREAMING_RECONSTRUCTION_FAILED")
+            print(f"DECKCOMPILER_STREAMING_RECONSTRUCTION_BLOCKED code={code} message={exc}")
+            return 1
+        print(
+            "DECKCOMPILER_STREAMING_RECONSTRUCTION_RECORDED "
+            f"slide={args.slide} status={args.status} state={state_path.as_posix()}"
+        )
+        return 0
+    if args.command == "finalize-streaming-images":
+        try:
+            result = finalize_streaming_images(args.runtime)
+        except (DeckCompilerError, OSError, ValueError, json.JSONDecodeError) as exc:
+            code = getattr(exc, "code", "DC_STREAMING_FINALIZATION_FAILED")
+            print(f"DECKCOMPILER_STREAMING_FINALIZATION_BLOCKED code={code} message={exc}")
+            return 1
+        print(
+            "DECKCOMPILER_STREAMING_IMAGES_FINALIZED "
+            f"parallelism={result['max_observed_parallelism']} "
+            f"batch={Path(result['batch_manifest_path']).as_posix()}"
+        )
+        return 0
+    if args.command == "validate-streaming-execution":
+        report = validate_streaming_execution(
+            args.runtime,
+            require_complete=args.require_complete,
+            require_authoring_complete=args.require_authoring_complete,
+            require_overlap=args.require_overlap,
+        )
+        print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0 if report["valid"] else 1
     if args.command == "prepare-reconstruction-jobs":
         try:
             result = prepare_reconstruction_jobs(args.runtime)
@@ -400,10 +556,27 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "validate-reconstruction-jobs":
         report = validate_reconstruction_job_bundle(
             args.runtime,
+            require_authoring_outputs=args.require_authoring_outputs,
             require_worker_outputs=args.require_worker_outputs,
         )
         print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
         return 0 if report["valid"] else 1
+    if args.command == "finalize-shared-render-qa":
+        try:
+            result = finalize_shared_render_qa(
+                args.runtime,
+                summary_path=args.summary,
+            )
+        except (DeckCompilerError, OSError, ValueError, json.JSONDecodeError) as exc:
+            code = getattr(exc, "code", "DC_SHARED_RENDER_QA_FAILED")
+            print(f"DECKCOMPILER_SHARED_RENDER_QA_BLOCKED code={code} message={exc}")
+            return 1
+        print(
+            "DECKCOMPILER_SHARED_RENDER_QA_READY "
+            f"workflow_id={result.workflow_id} slides={result.slide_count} "
+            f"summary={result.summary_path.as_posix()}"
+        )
+        return 0
     if args.command == "validate-visual-quality":
         try:
             slides = sorted(

@@ -97,13 +97,26 @@ manifest plus `skillset_execution_plan.json`, scaffolds an isolated
 the repository-owned `.agents/skills/pptx-workflow-architect`, regardless of
 prompt wording or input channel.
 After approved Gates 1 and 2, the repo-owned Codex workflow calls
-`image_gen.imagegen` for every approved slide. The default `fast-quality-20`
-profile dispatches 20 independent built-in calls concurrently, then runs one
-fresh, isolated reconstruction context per accepted source slide (at most four
-workers concurrently), validates and integrates those fragments with the
-official PNGtoPPTX scripts, then runs one all-slide compile and one
-source-mapped full-deck QA pass. It enters targeted repair only when the
+`image_gen.imagegen` for every approved slide. The default explicit
+`sol-medium` profile targets GPT-5.6 Sol with medium reasoning; `luna-max`
+targets GPT-5.6 Luna with max reasoning under the same locked blueprint,
+prompts, Semantic Sidecars, renderer, vector policy, compiler, and QA. Luna may
+fall back to Sol only for a failed slide after a named blocking gate. Either
+profile dispatches up to 20 independent built-in calls concurrently, then runs one
+fresh, isolated reconstruction context immediately for each accepted source
+slide while unfinished ImageGen calls continue (at most six workers
+concurrently). It validates and integrates those fragments with the official
+PNGtoPPTX scripts, uses one shared all-slide preview for source-mapped per-slide
+QA, and runs one final all-slide reconstruction render and gate. It enters
+targeted repair only when the
 external gate or the repository high-fidelity issue policy finds a real defect.
+Fresh reconstruction workers use the profile's `minimal_locked` Codex context:
+ephemeral execution, no global user/rule context, and plugins, apps, memories,
+multi-agent, and ImageGen disabled. Each sealed one-slide job supplies its one
+required renderer Skill path explicitly, avoiding repeated full Skill catalogs.
+Concurrent dispatch is requested, while actual provider intervals and observed
+parallelism are recorded. If the platform queues the wave, reconstruction still
+streams behind each completed image instead of waiting for all 20.
 
 `generate` fails closed before intake when any tracked Architect package file,
 required ImageGen/PNGtoPPTX Skill, or official script is absent. The execution
@@ -112,8 +125,9 @@ and entrypoint hashes and spells out the tested companion path:
 conditional text-layer preprocessing, project-local Node dependencies, explicit
 crop plan/manifest, `slide-image-dual-render` reconstruction hardlocks,
 hash-bound per-slide worker receipts, integrator-owned `lib/slides.js`,
-source-mapped PPTX/HTML visual QA, a single-compile fast path, repair waves of at
-most five slides only for defects, and the final openability gate. The profile
+source-mapped PPTX/HTML visual QA, zero isolated per-slide builds, two shared
+full-deck render passes, repair waves of at most five slides only for defects,
+and the final openability gate. The profile
 records a 120-to-30-minute target for 20 slides (approximately 4x) without
 weakening the quality gates. Use `--skill-root <path>` only when the verified
 ImageGen/PNGtoPPTX companions are not under `CODEX_HOME\skills` or

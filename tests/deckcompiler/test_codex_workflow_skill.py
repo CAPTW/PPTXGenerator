@@ -63,13 +63,16 @@ class CodexWorkflowSkillTests(unittest.TestCase):
             dependencies["completion_requirements"]["visual_qa_blocking_count"],
             0,
         )
-        self.assertEqual(dependencies["schema_version"], "1.5.0")
+        self.assertEqual(dependencies["schema_version"], "1.6.0")
         self.assertEqual(
             dependencies["execution_profile"]["default_design_direction"],
             ["Academic", "Informative", "Professional", "Creative"],
         )
-        self.assertFalse(
-            dependencies["execution_profile"]["unconditional_second_full_compile"]
+        self.assertEqual(
+            dependencies["execution_profile"][
+                "full_deck_render_count_without_repair"
+            ],
+            2,
         )
         self.assertEqual(
             dependencies["execution_profile"]["image_request_preparation"],
@@ -81,7 +84,7 @@ class CodexWorkflowSkillTests(unittest.TestCase):
         )
         self.assertEqual(
             dependencies["execution_profile"]["max_parallel_reconstruction_workers"],
-            4,
+            6,
         )
         self.assertEqual(
             ordered[4]["worker_validator"], "scripts/validate_agent_work.js"
@@ -113,9 +116,11 @@ class CodexWorkflowSkillTests(unittest.TestCase):
         self.assertIn("skillset_execution_plan.json", text)
         self.assertIn("--quality reconstruction", text)
         self.assertIn("--source-slides", text)
-        self.assertIn("single-compile fast path", text)
+        self.assertIn("shared preview", text)
+        self.assertIn("zero isolated per-slide builds", text)
         self.assertIn("conditional all-slide compile", text)
-        self.assertIn("prepare-reconstruction-jobs", text)
+        self.assertIn("prepare-streaming-execution", text)
+        self.assertIn("accept-streaming-image", text)
         self.assertIn("one source slide", text)
         self.assertIn("integrate_subagent_work.js", text)
         self.assertIn("validate-visual-quality", text)

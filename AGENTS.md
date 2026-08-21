@@ -52,13 +52,22 @@ is outside this dispatch rule.
   `integrate_subagent_work.js`; render only through
   `slide-image-dual-render/scripts/slide_pipeline.js`; gate with its
   `final_gate.js`; and run `slide-visual-polish-qa` with source-slide mapping.
-- Follow the hash-bound `skillset_execution_plan.json`. Its default
-  `fast-quality-20` profile targets GPT-5.6 Sol at medium reasoning, prepares a
+- Follow the hash-bound `skillset_execution_plan.json`. Its default explicit
+  `sol-medium` profile targets GPT-5.6 Sol at medium reasoning. The optional
+  `luna-max` profile targets GPT-5.6 Luna at max reasoning and may fall back to
+  `sol-medium` only for the failed slide after a named blocking gate. Both
+  profiles bind the same architect blueprint, prompts, Semantic Sidecars,
+  renderer contract, vector policy, compiler, and QA. The workflow prepares a
   full image wave before dispatch, launches up to 20 independent built-in
-  ImageGen calls concurrently, then launches at most four one-slide
+  ImageGen calls concurrently, and starts each accepted image's reconstruction
+  immediately while unfinished calls continue. Launch at most six one-slide
   reconstruction workers concurrently without duplicating the full-deck
-  context. The integrator is the only writer of shared renderer inputs. Compile
-  all accepted slides in one `--allow-large-batch` renderer invocation. Use project-local Node
+  context. Launch workers with the profile's sealed `minimal_locked` Codex
+  arguments and provide only the explicit renderer Skill path required by the
+  job. The integrator is the only writer of shared renderer inputs. Use one
+  all-slide preview for source-mapped evidence and one final
+  `--quality reconstruction --allow-large-batch` renderer invocation; do not
+  run isolated per-slide builds. Use project-local Node
   dependencies, an explicit crop plan and generated asset manifest, renderer
   quality `reconstruction`, and QA mode `qa-polish`.
 - After Architect approval, run `deckcompiler prepare-image-requests` once. It
@@ -70,10 +79,10 @@ is outside this dispatch rule.
   tables, labels, dashboards, card grids, and infographic/poster compositions.
   The default visual direction is Academic, Informative, Professional &
   Creative Design, adapted to the approved content and user direction.
-- Do not run an unconditional second full-deck compile. If the first full-deck
-  gate and source-mapped QA pass with zero fail/blocking slides, seal that
-  output. Only blocker repairs may trigger a second full-deck compile; targeted
-  repair waves remain at most five slides and at most two iterations.
+- The normal path requires two shared full-deck renders: preview evidence and
+  final reconstruction. Only blocker repairs may trigger a third full-deck
+  compile; targeted repair waves remain at most five slides and at most two
+  iterations.
 - Do not use `--skip-crops` for final delivery. A zero-crop deck still carries
   `work/crop_plan.json` and `assets/manifest.json`.
 - Production acceptance requires route hardlock, reconstruction hardlock, PPTX

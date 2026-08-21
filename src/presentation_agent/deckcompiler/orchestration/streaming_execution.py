@@ -15,7 +15,7 @@ from ..errors import DeckCompilerError
 from ..identity import content_sha256
 from ..manifest_io import read_json, write_json
 from .image_requests import REQUEST_MANIFEST_NAME, validate_image_request_bundle
-from .execution_profiles import resolve_execution_profile
+from .execution_profiles import DEFAULT_EXECUTION_PROFILE, resolve_execution_profile
 from .reconstruction_jobs import (
     prepare_reconstruction_job,
     prepare_reconstruction_jobs,
@@ -611,7 +611,7 @@ def simulate_fast_quality_schedule(
     reconstruction_seconds: float,
     reconstruction_workers: int,
     shared_preview_and_final_qa_seconds: float,
-    execution_profile: str = "sol-medium",
+    execution_profile: str = DEFAULT_EXECUTION_PROFILE,
 ) -> dict[str, Any]:
     """Compute a deterministic critical-path budget; this is not a timing claim."""
 

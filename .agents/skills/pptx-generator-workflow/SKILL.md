@@ -40,6 +40,12 @@ Follow any references those Skills mark as required for the active action.
 Never copy or modify the external PNGtoPPTX Skill implementation in this
 repository.
 
+The live fast-path baseline is the canonical `CAPTW/pngtopptx` commit
+`2b6120d39a5a51457615b77521e39cb272344672`; `dependencies.json` records its
+four Skill tree OIDs and combined content aggregate. The generated execution
+plan additionally binds the exact installed Skill and entrypoint hashes for the
+run. Do not substitute the older frozen DevPost demo pin for live production.
+
 ## Workflow
 
 ### 1. Create the runtime intake
@@ -187,6 +193,13 @@ about one requested image per minute: six five-minute authoring workers match
 that arrival rate, then two shared full-deck render/QA passes consume the final
 five minutes. Record a miss truthfully when observed latency or quality repairs
 exceed that budget; never reduce fidelity, editability, or QA to force a pass.
+
+For a single slide, probe the hash-bound `one-slide-fast` cache before starting
+another authoring context. A hit may reuse only verified authoring inputs; final
+PPTX/HTML render surfaces, hardlocks, source comparison, openability, and
+single-process acceptance still run. The verified-authoring target is under
+120 seconds. Never claim that bound for an unseen arbitrary image: a miss or
+quality rejection must return to the full `terra-max` quality lane.
 
 All selected source images must share a consistent 16:9 canvas. Normalize by
 aspect-preserving crop or pad only when necessary; never stretch.

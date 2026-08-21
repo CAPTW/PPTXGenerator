@@ -9,20 +9,30 @@ from presentation_agent.deckcompiler.orchestration.execution_profiles import (
 )
 
 
-def test_sol_medium_is_the_explicit_default_contract() -> None:
+def test_terra_max_is_the_explicit_default_contract() -> None:
     profile = resolve_execution_profile(None)
     payload = profile.payload()
 
     assert (profile.name, profile.model, profile.reasoning_effort) == (
-        "sol-medium",
-        "gpt-5.6-sol",
-        "medium",
+        "terra-max",
+        "gpt-5.6-terra",
+        "max",
     )
     assert payload["max_imagegen_parallel_slides"] == 20
     assert payload["max_reconstruction_workers"] == 6
     assert payload["fallback_policy"]["profile_name"] is None
     assert payload["worker_context"]["mode"] == "minimal_locked"
     assert payload["worker_context"]["full_skill_catalog_forbidden"] is True
+
+
+def test_sol_medium_remains_an_explicit_supported_profile() -> None:
+    profile = resolve_execution_profile("sol-medium")
+    assert (profile.name, profile.model, profile.reasoning_effort) == (
+        "sol-medium",
+        "gpt-5.6-sol",
+        "medium",
+    )
+    assert profile.payload()["fallback_policy"]["profile_name"] is None
 
 
 def test_luna_max_changes_only_runtime_routing_and_failed_slide_fallback() -> None:
@@ -44,7 +54,7 @@ def test_legacy_profile_alias_resolves_but_is_not_a_public_cli_choice() -> None:
     assert resolve_execution_profile("fast-quality-20").name == "sol-medium"
     parser = build_parser()
     parsed = parser.parse_args(["generate", "--prompt", "deck"])
-    assert parsed.execution_profile == "sol-medium"
+    assert parsed.execution_profile == "terra-max"
     parsed = parser.parse_args(
         ["generate", "--prompt", "deck", "--execution-profile", "luna-max"]
     )

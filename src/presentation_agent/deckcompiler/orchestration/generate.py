@@ -18,6 +18,7 @@ from ..manifest_io import read_json, write_json
 from ..provenance import current_source_commit
 from ..schemas import REPO_ROOT, validator_for
 from .codex_run import validate_codex_run_manifest
+from .execution_profiles import DEFAULT_EXECUTION_PROFILE
 from .skillset_plan import (
     PLAN_NAME,
     build_skillset_execution_plan,
@@ -56,7 +57,7 @@ def start_generate_workflow(
     tone: Iterable[str],
     workflow: str,
     skill_root: Path | None = None,
-    execution_profile: str = "sol-medium",
+    execution_profile: str = DEFAULT_EXECUTION_PROFILE,
 ) -> GenerateWorkflowResult:
     """Collect immutable inputs and stop at the mandatory Architect-first gate."""
 

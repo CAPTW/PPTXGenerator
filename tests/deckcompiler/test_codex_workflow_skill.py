@@ -63,7 +63,33 @@ class CodexWorkflowSkillTests(unittest.TestCase):
             dependencies["completion_requirements"]["visual_qa_blocking_count"],
             0,
         )
-        self.assertEqual(dependencies["schema_version"], "1.7.0")
+        self.assertEqual(dependencies["schema_version"], "1.8.0")
+        runtime_pin = dependencies["external_skillset_runtime_pin"]
+        self.assertEqual(
+            runtime_pin["source_commit"],
+            "2b6120d39a5a51457615b77521e39cb272344672",
+        )
+        self.assertEqual(
+            runtime_pin["combined_aggregate_sha256"],
+            "f70e7a5c80ea9bd979eb1bc06a10269844799ac334ea71e4772ce4d39fbe371a",
+        )
+        self.assertEqual(len(runtime_pin["source_tree_oids"]), 4)
+        self.assertTrue(runtime_pin["historical_devpost_demo_pin_unchanged"])
+        self.assertEqual(dependencies["execution_profile"]["name"], "terra-max")
+        self.assertEqual(
+            dependencies["execution_profile"]["target_model"], "gpt-5.6-terra"
+        )
+        self.assertEqual(
+            dependencies["execution_profile"][
+                "one_slide_verified_authoring_target_seconds"
+            ],
+            120,
+        )
+        self.assertFalse(
+            dependencies["execution_profile"][
+                "first_time_arbitrary_authoring_sla_claimed"
+            ]
+        )
         self.assertEqual(
             dependencies["ordered_dependencies"][5]["calibration_profile"],
             "assets/calibration/default-visual-qa-profile.json",

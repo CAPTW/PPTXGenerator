@@ -181,3 +181,6 @@ Do not:
   hash-bound `slide-visual-polish-qa` calibration profile is valid
 - Treat a one-slide cache hit as permission to skip final PPTX/HTML rendering,
   PowerPoint openability, hardlocks, or source-mapped Visual QA
+- Claim the under-two-minute target for a first-time arbitrary-image authoring
+  run; it applies only to hash-verified authoring/cache-hit execution, while a
+  miss returns to the full `terra-max` quality lane

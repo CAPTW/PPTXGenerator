@@ -12,8 +12,8 @@ from dataclasses import dataclass
 from typing import Any
 
 
-DEFAULT_EXECUTION_PROFILE = "sol-medium"
-EXECUTION_PROFILE_NAMES = ("sol-medium", "luna-max")
+DEFAULT_EXECUTION_PROFILE = "terra-max"
+EXECUTION_PROFILE_NAMES = ("terra-max", "sol-medium", "luna-max")
 _LEGACY_ALIASES = {
     "fast-quality-20": "sol-medium",
     "fast-quality-streaming-20": "sol-medium",
@@ -57,7 +57,7 @@ class ExecutionProfile:
                 "image_prompts_shared": True,
                 "semantic_sidecars_shared": True,
                 "renderer_contract_shared": True,
-                "vector_policy_id": "vector-first-v1",
+                "vector_policy_id": "raw-measured-bounded-vector-v1",
                 "compiler_and_qa_shared": True,
             },
             "worker_context": {
@@ -85,6 +85,11 @@ class ExecutionProfile:
 
 
 _PROFILES = {
+    "terra-max": ExecutionProfile(
+        name="terra-max",
+        model="gpt-5.6-terra",
+        reasoning_effort="max",
+    ),
     "sol-medium": ExecutionProfile(
         name="sol-medium",
         model="gpt-5.6-sol",

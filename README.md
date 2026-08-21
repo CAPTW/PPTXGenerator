@@ -98,8 +98,8 @@ the repository-owned `.agents/skills/pptx-workflow-architect`, regardless of
 prompt wording or input channel.
 After approved Gates 1 and 2, the repo-owned Codex workflow calls
 `image_gen.imagegen` for every approved slide. The default explicit
-`sol-medium` profile targets GPT-5.6 Sol with medium reasoning; `luna-max`
-targets GPT-5.6 Luna with max reasoning under the same locked blueprint,
+`terra-max` is the quality-first default proven by the accepted reconstruction;
+`sol-medium` and `luna-max` remain explicit alternatives under the same locked blueprint,
 prompts, Semantic Sidecars, renderer, vector policy, compiler, and QA. Luna may
 fall back to Sol only for a failed slide after a named blocking gate. Either
 profile dispatches up to 20 independent built-in calls concurrently, then runs one
@@ -118,6 +118,19 @@ required renderer Skill path explicitly, avoiding repeated full Skill catalogs.
 Concurrent dispatch is requested, while actual provider intervals and observed
 parallelism are recorded. If the platform queues the wave, reconstruction still
 streams behind each completed image instead of waiting for all 20.
+
+For a hash-verified one-slide reconstruction, the promoted fast lane keeps the
+full render and QA chain while reusing sealed measurement/authoring/capture
+inputs. The measured runs were 42.224 seconds with a cold HTML capture and
+11.762 seconds on an exact-input capture hit, with zero metric drift. A
+first-time arbitrary-image authoring miss remains on the full `terra-max` lane;
+the repository does not claim a two-minute bound for that case.
+
+The live fast-path baseline is canonical `CAPTW/pngtopptx` commit `2b6120d`.
+Its exact four-Skill tree OIDs and combined aggregate are recorded in the
+workflow dependency contract, while each generated run binds the installed
+entrypoint hashes. The separately certified DevPost demo keeps its older
+release pin unchanged as historical evidence.
 
 `generate` fails closed before intake when any tracked Architect package file,
 required ImageGen/PNGtoPPTX Skill, or official script is absent. The execution

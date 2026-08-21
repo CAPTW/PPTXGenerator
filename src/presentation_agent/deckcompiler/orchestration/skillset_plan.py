@@ -12,7 +12,7 @@ from ..identity import content_sha256
 from ..manifest_io import read_json, write_json
 from ..schemas import REPO_ROOT, validator_for
 from .quality_acceptance import CANARY_METRIC_LIMITS
-from .execution_profiles import execution_profile_payload
+from .execution_profiles import DEFAULT_EXECUTION_PROFILE, execution_profile_payload
 
 
 PLAN_NAME = "skillset_execution_plan.json"
@@ -330,7 +330,7 @@ def build_skillset_execution_plan(
     workflow_id: str,
     runtime_root: Path,
     inspection: dict[str, Any],
-    execution_profile_name: str = "sol-medium",
+    execution_profile_name: str = DEFAULT_EXECUTION_PROFILE,
 ) -> dict[str, Any]:
     """Build the exact command and artifact contract used by live Codex production."""
 
@@ -988,7 +988,7 @@ def build_skillset_execution_plan(
 
     payload: dict[str, Any] = {
         "schema_name": PLAN_SCHEMA,
-        "schema_version": "1.7.0",
+        "schema_version": "1.8.0",
         "workflow_id": workflow_id,
         "status": "READY",
         "skill_root": inspection["skill_root"],
@@ -1226,6 +1226,11 @@ def build_skillset_execution_plan(
             "cache_hit_compile_command": "compile_one_slide_fast_cached",
             "skip_assets_allowed_only_after_cache_hit": True,
             "skip_crops_forbidden": True,
+            "verified_authoring_target_seconds": 120,
+            "eligible_state": "hash_verified_authoring_or_cache_hit",
+            "cache_miss_route": "terra-max_full_quality_authoring",
+            "first_time_arbitrary_authoring_sla_claimed": False,
+            "quality_gate_bypass_forbidden": True,
         },
         "command_templates": commands,
         "execution_contract": {

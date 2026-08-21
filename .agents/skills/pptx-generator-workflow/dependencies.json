@@ -1,10 +1,22 @@
 {
   "schema_name": "pptx_generator_codex_skill_dependencies",
-  "schema_version": "1.7.0",
+  "schema_version": "1.8.0",
+  "external_skillset_runtime_pin": {
+    "canonical_repository": "CAPTW/pngtopptx",
+    "source_commit": "2b6120d39a5a51457615b77521e39cb272344672",
+    "combined_aggregate_sha256": "f70e7a5c80ea9bd979eb1bc06a10269844799ac334ea71e4772ce4d39fbe371a",
+    "source_tree_oids": {
+      "slide-editable-deck-orchestrator": "3a12f52757fd1b745c378f6110d18faa12c9517a",
+      "slide-image-dual-render": "e1f9b0391239dc1665bb61418a82b301242248cb",
+      "slide-text-layer-inpaint": "4a34a1312235d6aba68c867efc21197959120e1f",
+      "slide-visual-polish-qa": "12ff59b6f66e6a0a2ca7be9d41b5d4423c8cacc8"
+    },
+    "historical_devpost_demo_pin_unchanged": true
+  },
   "execution_profile": {
-    "name": "fast-quality-20",
-    "target_model": "gpt-5.6-sol",
-    "target_reasoning_effort": "medium",
+    "name": "terra-max",
+    "target_model": "gpt-5.6-terra",
+    "target_reasoning_effort": "max",
     "default_design_direction": [
       "Academic",
       "Informative",
@@ -32,7 +44,10 @@
     "shared_reconstruction_writer": "integrator_only",
     "reconstruction_token_policy": "compact_job_plus_one_source_slide_no_full_deck_duplication",
     "icon_generation": "explicit_usage_manifest_with_hash_cache_and_16_bounded_workers",
-    "one_slide_fast": "probe_then_final_render_qa_hash_bound_surface_evidence_then_single_process_seal"
+    "one_slide_fast": "probe_then_final_render_qa_hash_bound_surface_evidence_then_single_process_seal",
+    "one_slide_verified_authoring_target_seconds": 120,
+    "first_time_arbitrary_authoring_sla_claimed": false,
+    "cache_miss_route": "terra-max-full-quality-lane"
   },
   "ordered_dependencies": [
     {

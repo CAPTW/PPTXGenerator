@@ -110,10 +110,12 @@ After approval, Codex reads:
 ${CODEX_HOME}/skills/.system/imagegen/SKILL.md
 ```
 
-The default `sol-medium` profile targets GPT-5.6 Sol with medium reasoning.
-The optional `luna-max` profile targets GPT-5.6 Luna with max reasoning. Both
+The default `terra-max` profile targets GPT-5.6 Terra with max reasoning and is
+the quality-first route promoted from the accepted one-slide reconstruction.
+The explicit `sol-medium` and `luna-max` alternatives remain available. All
 profiles consume the same architect blueprint, image prompts, Semantic
-Sidecars, renderer inputs, deterministic `vector-first-v1` policy, compiler,
+Sidecars, renderer inputs, deterministic `raw-measured-bounded-vector-v1`
+policy, compiler,
 and QA thresholds. Luna may fall back to Sol only for a failed slide after an
 explicit blocking gate; silent whole-deck fallback is forbidden.
 
@@ -122,8 +124,8 @@ Design**, adapted to the approved user route and slide content. It deliberately
 does not inject one-message, three-element, mandatory three-second, or
 layout-category bans into every image prompt.
 
-Select the profile explicitly with `generate --execution-profile sol-medium`
-or `generate --execution-profile luna-max`. The ImageGen submission cap is 20
+Use the default or select `generate --execution-profile terra-max`,
+`sol-medium`, or `luna-max`. The ImageGen submission cap is 20
 slides for either profile; provider-side queuing may still serialize completion,
 so reconstruction starts as each image arrives instead of waiting for the full
 wave.
@@ -179,6 +181,29 @@ workers keep pace, the twentieth authoring job closes near minute 25, and the tw
 shared render/QA passes use the remaining five minutes. The budget is reported
 as missed rather than weakening a quality gate when calls, repairs, or QA take
 longer.
+
+### Verified one-slide fast lane
+
+For a one-slide rerun, run `probe-one-slide-fast` before authoring. A hit is
+valid only when the source, Semantic Sidecar, measured-vector receipt, editable
+authoring files, crop plan, renderer/QA profiles, and prior accepted evidence
+all match their sealed hashes. The workflow may then reuse those authoring
+inputs, but it still performs final PPTX/HTML rendering, hardlocks,
+source-mapped Visual QA, openability, and single-process acceptance validation.
+The measured target is under 120 seconds: 42.224 seconds with a cold HTML
+capture and 11.762 seconds with exact-input capture reuse, with zero change in
+the accepted comparison metrics. See
+`analysis_runs/20260821-one-slide-fast-benchmark.md`.
+
+This is not an under-two-minute claim for first-time arbitrary-image authoring.
+Any cache miss, input change, or rejected metric returns to the full
+`terra-max` quality lane.
+
+Live production uses canonical `CAPTW/pngtopptx` commit `2b6120d`. Its four
+Skill tree OIDs and combined content aggregate are fixed in
+`.agents/skills/pptx-generator-workflow/dependencies.json`; the generated plan
+then binds the exact installed entrypoint hashes for that run. This live pin is
+separate from the immutable older DevPost demo pin.
 
 ## 4. Reconstruct, compare, and repair
 

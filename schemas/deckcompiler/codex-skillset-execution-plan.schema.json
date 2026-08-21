@@ -31,7 +31,7 @@
   ],
   "properties": {
     "schema_name": {"const": "codex_skillset_execution_plan"},
-    "schema_version": {"const": "1.7.0"},
+    "schema_version": {"const": "1.8.0"},
     "workflow_id": {"type": "string", "pattern": "^generate_[0-9a-f]{20}$"},
     "status": {"const": "READY"},
     "skill_root": {"type": "string", "minLength": 1},
@@ -265,8 +265,8 @@
         "performance_target"
       ],
       "properties": {
-        "profile_name": {"enum": ["sol-medium", "luna-max"]},
-        "target_model": {"enum": ["gpt-5.6-sol", "gpt-5.6-luna"]},
+        "profile_name": {"enum": ["terra-max", "sol-medium", "luna-max"]},
+        "target_model": {"enum": ["gpt-5.6-terra", "gpt-5.6-sol", "gpt-5.6-luna"]},
         "target_reasoning_effort": {"enum": ["medium", "max"]},
         "max_imagegen_parallel_slides": {"const": 20},
         "max_reconstruction_workers": {"const": 6},
@@ -295,7 +295,7 @@
             "image_prompts_shared": {"const": true},
             "semantic_sidecars_shared": {"const": true},
             "renderer_contract_shared": {"const": true},
-            "vector_policy_id": {"const": "vector-first-v1"},
+            "vector_policy_id": {"const": "raw-measured-bounded-vector-v1"},
             "compiler_and_qa_shared": {"const": true}
           }
         },
@@ -357,7 +357,7 @@
             "max_parallel_workers": {"const": 6},
             "shared_file_writer": {"const": "integrator_only"},
             "worker_scope": {"const": "one_slide_work_directory_only"},
-            "worker_model": {"enum": ["gpt-5.6-sol", "gpt-5.6-luna"]},
+            "worker_model": {"enum": ["gpt-5.6-terra", "gpt-5.6-sol", "gpt-5.6-luna"]},
             "worker_reasoning_effort": {"enum": ["medium", "max"]},
             "token_policy": {"const": "compact_job_plus_one_source_slide_no_full_deck_duplication"},
             "isolated_dual_render_qa_required": {"const": false},
@@ -390,6 +390,28 @@
         }
       },
       "allOf": [
+        {
+          "if": {"properties": {"profile_name": {"const": "terra-max"}}},
+          "then": {
+            "properties": {
+              "target_model": {"const": "gpt-5.6-terra"},
+              "target_reasoning_effort": {"const": "max"},
+              "fallback_policy": {
+                "properties": {
+                  "profile_name": {"const": null},
+                  "max_attempts": {"const": 0},
+                  "triggers": {"maxItems": 0}
+                }
+              },
+              "reconstruction_authoring": {
+                "properties": {
+                  "worker_model": {"const": "gpt-5.6-terra"},
+                  "worker_reasoning_effort": {"const": "max"}
+                }
+              }
+            }
+          }
+        },
         {
           "if": {"properties": {"profile_name": {"const": "sol-medium"}}},
           "then": {
@@ -525,7 +547,7 @@
     "one_slide_fast_contract": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["scope", "cache_manifest_pattern", "probe_before_authoring", "cache_hit_reuses_verified_authoring_inputs", "final_render_and_visual_qa_always_required", "seal_after_final_quality_acceptance", "single_process_final_validation", "html_capture_cache_contract", "capture_cache_exact_bindings_required", "accepted_evidence_binds_both_render_surfaces", "cache_hit_compile_command", "skip_assets_allowed_only_after_cache_hit", "skip_crops_forbidden"],
+      "required": ["scope", "cache_manifest_pattern", "probe_before_authoring", "cache_hit_reuses_verified_authoring_inputs", "final_render_and_visual_qa_always_required", "seal_after_final_quality_acceptance", "single_process_final_validation", "html_capture_cache_contract", "capture_cache_exact_bindings_required", "accepted_evidence_binds_both_render_surfaces", "cache_hit_compile_command", "skip_assets_allowed_only_after_cache_hit", "skip_crops_forbidden", "verified_authoring_target_seconds", "eligible_state", "cache_miss_route", "first_time_arbitrary_authoring_sla_claimed", "quality_gate_bypass_forbidden"],
       "properties": {
         "scope": {"const": "one_source_slide_only"},
         "cache_manifest_pattern": {"type": "string", "pattern": "slideXX[\\\\/]one_slide_fast_cache\\.json$"},
@@ -539,7 +561,12 @@
         "accepted_evidence_binds_both_render_surfaces": {"const": true},
         "cache_hit_compile_command": {"const": "compile_one_slide_fast_cached"},
         "skip_assets_allowed_only_after_cache_hit": {"const": true},
-        "skip_crops_forbidden": {"const": true}
+        "skip_crops_forbidden": {"const": true},
+        "verified_authoring_target_seconds": {"const": 120},
+        "eligible_state": {"const": "hash_verified_authoring_or_cache_hit"},
+        "cache_miss_route": {"const": "terra-max_full_quality_authoring"},
+        "first_time_arbitrary_authoring_sla_claimed": {"const": false},
+        "quality_gate_bypass_forbidden": {"const": true}
       }
     },
     "command_templates": {

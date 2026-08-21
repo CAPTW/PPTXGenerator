@@ -212,7 +212,7 @@ if __name__ == "__main__":
                 (runtime / "skillset_execution_plan.json").read_text(encoding="utf-8")
             )
             self.assertEqual(plan["status"], "READY")
-            self.assertEqual(plan["schema_version"], "1.7.0")
+            self.assertEqual(plan["schema_version"], "1.8.0")
             self.assertNotEqual(
                 Path(plan["project_layout"]["profile_path"]).resolve(),
                 Path(plan["project_layout"]["qa_calibration_profile_path"]).resolve(),
@@ -235,6 +235,17 @@ if __name__ == "__main__":
             self.assertTrue(
                 plan["one_slide_fast_contract"][
                     "accepted_evidence_binds_both_render_surfaces"
+                ]
+            )
+            self.assertEqual(
+                plan["one_slide_fast_contract"][
+                    "verified_authoring_target_seconds"
+                ],
+                120,
+            )
+            self.assertFalse(
+                plan["one_slide_fast_contract"][
+                    "first_time_arbitrary_authoring_sla_claimed"
                 ]
             )
             self.assertIn(
@@ -270,11 +281,11 @@ if __name__ == "__main__":
                 0.102,
             )
             self.assertEqual(
-                plan["execution_profile"]["profile_name"], "sol-medium"
+                plan["execution_profile"]["profile_name"], "terra-max"
             )
-            self.assertEqual(plan["execution_profile"]["target_model"], "gpt-5.6-sol")
+            self.assertEqual(plan["execution_profile"]["target_model"], "gpt-5.6-terra")
             self.assertEqual(
-                plan["execution_profile"]["target_reasoning_effort"], "medium"
+                plan["execution_profile"]["target_reasoning_effort"], "max"
             )
             self.assertFalse(
                 plan["execution_profile"]["prompt_policy"][
@@ -2357,7 +2368,7 @@ if __name__ == "__main__":
                 {
                     "schema_name": "pptx_generation_execution_timing",
                     "schema_version": "1.0.0",
-                    "profile_name": "sol-medium",
+                    "profile_name": "terra-max",
                     "slide_count": slide_count,
                     "started_at": "2026-01-01T00:00:00Z",
                     "completed_at": (
@@ -2669,9 +2680,9 @@ if __name__ == "__main__":
                 "contact_sheet": self._artifact(root, files["contact"]),
             },
             "performance": {
-                "profile_name": "sol-medium",
-                "target_model": "gpt-5.6-sol",
-                "target_reasoning_effort": "medium",
+                "profile_name": "terra-max",
+                "target_model": "gpt-5.6-terra",
+                "target_reasoning_effort": "max",
                 "baseline_minutes_20_slides": 120,
                 "target_minutes_20_slides": 30,
                 "target_speedup": 4.0,

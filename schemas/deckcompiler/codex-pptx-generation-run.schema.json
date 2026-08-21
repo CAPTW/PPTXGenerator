@@ -446,8 +446,8 @@
         "timing_report"
       ],
       "properties": {
-        "profile_name": {"enum": ["sol-medium", "luna-max"]},
-        "target_model": {"enum": ["gpt-5.6-sol", "gpt-5.6-luna"]},
+        "profile_name": {"enum": ["terra-max", "sol-medium", "luna-max"]},
+        "target_model": {"enum": ["gpt-5.6-terra", "gpt-5.6-sol", "gpt-5.6-luna"]},
         "target_reasoning_effort": {"enum": ["medium", "max"]},
         "baseline_minutes_20_slides": {"const": 120},
         "target_minutes_20_slides": {"const": 30},
@@ -455,6 +455,13 @@
         "timing_report": {"$ref": "#/$defs/artifact"}
       },
       "oneOf": [
+        {
+          "properties": {
+            "profile_name": {"const": "terra-max"},
+            "target_model": {"const": "gpt-5.6-terra"},
+            "target_reasoning_effort": {"const": "max"}
+          }
+        },
         {
           "properties": {
             "profile_name": {"const": "sol-medium"},

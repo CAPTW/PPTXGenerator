@@ -47,6 +47,62 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 path.write_text(f"fixture: {relative}\n", encoding="utf-8")
         return root
 
+    @staticmethod
+    def _make_raw_pipeline(root: Path) -> Path:
+        scripts = root / "scripts"
+        scripts.mkdir(parents=True, exist_ok=True)
+        (scripts / "svg_icons.py").write_text(
+            '"""Synthetic raw SVG icon library for contract tests."""\nICONS = {}\n',
+            encoding="utf-8",
+        )
+        (scripts / "detect_elements.py").write_text(
+            """from __future__ import annotations
+import argparse
+import json
+import struct
+from pathlib import Path
+from PIL import Image
+
+def get_easyocr_reader():
+    return object()
+
+def build_inventory(image_path, backend="easyocr", canvas="native", reader=None, deep_text=False):
+    data = Path(image_path).read_bytes()
+    width, height = struct.unpack(">II", data[16:24])
+    payload = {
+        "canvas_px": {"w": width, "h": height},
+        "background": {"kind": "synthetic"},
+        "palette": [],
+        "text_blocks": [],
+        "suppressed_text": [],
+        "regions": [],
+        "notes": ["synthetic measured ground truth"],
+    }
+    return payload, Image.open(image_path).convert("RGB")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("image")
+    parser.add_argument("--out", required=True)
+    args, _unknown = parser.parse_known_args()
+    payload, _image = build_inventory(args.image)
+    payload["deep"] = []
+    Path(args.out).parent.mkdir(parents=True, exist_ok=True)
+    Path(args.out).write_text(json.dumps(payload), encoding="utf-8")
+    print("synthetic raw detector complete")
+""",
+            encoding="utf-8",
+        )
+        (scripts / "deep_scan.py").write_text(
+            "def scan_region(_image, region):\n    return {'region': region, 'words': [], 'badges': [], 'pills': []}\n",
+            encoding="utf-8",
+        )
+        (scripts / "pytesseract.py").write_text(
+            "def get_tesseract_version():\n    return 'fixture'\n\ndef get_languages(config=''):\n    return ['eng', 'kor']\n",
+            encoding="utf-8",
+        )
+        return root
+
     def test_start_is_architect_first_and_does_not_run_legacy_production(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             base = Path(tmpdir)
@@ -143,7 +199,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 (runtime / "skillset_execution_plan.json").read_text(encoding="utf-8")
             )
             self.assertEqual(plan["status"], "READY")
-            self.assertEqual(plan["schema_version"], "1.5.0")
+            self.assertEqual(plan["schema_version"], "1.6.0")
             repository_architect = (
                 ROOT / ".agents" / "skills" / "pptx-workflow-architect"
             ).resolve()
@@ -249,12 +305,17 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 [
                     "codex_execute_reconstruction_jobs",
                     "finalize_streaming_images",
+                    "validate_vector_preflight",
                     "validate_streaming_execution",
                     "validate_reconstruction_jobs",
                     "validate_agent_work",
                     "integrate_agent_work",
                     "prepare_crops",
                 ],
+            )
+            self.assertIn(
+                "vector_preflight_manifest.json",
+                plan["project_layout"]["vector_preflight_manifest_path"],
             )
             self.assertEqual(
                 plan["execution_contract"]["streaming_image_generation"],
@@ -522,6 +583,9 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
 
             prepared = prepare_streaming_execution(runtime)
             self.assertEqual(prepared.slide_count, 20)
+            raw_pipeline = self._make_raw_pipeline(
+                runtime.parent / "raw-pipeline-restart"
+            )
             accepted = accept_streaming_image(
                 runtime,
                 slide_number=1,
@@ -529,6 +593,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 queued_at="2026-08-11T00:00:00Z",
                 started_at="2026-08-11T00:00:01Z",
                 completed_at="2026-08-11T00:03:00Z",
+                pipeline_root=raw_pipeline,
             )
             self.assertTrue(accepted.job_path.is_file())
             self.assertTrue(accepted.worker_prompt_path.is_file())
@@ -581,6 +646,8 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 "native_text_required": True,
                 "native_structure_required": True,
                 "full_slide_raster_forbidden": True,
+                "measured_vector_preflight_required": True,
+                "semantic_text_vectorization_forbidden": True,
                 "source_mapped_per_slide_qa_required": True,
                 "final_full_deck_gate_required": True,
             },
@@ -618,6 +685,9 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             for slide_dir in work.glob("slide[0-9][0-9]"):
                 shutil.rmtree(slide_dir)
             prepare_streaming_execution(runtime)
+            raw_pipeline = self._make_raw_pipeline(
+                runtime.parent / "raw-pipeline-restart"
+            )
 
             completed = {
                 1: "2026-08-11T00:03:00Z",
@@ -633,6 +703,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                     queued_at="2026-08-11T00:00:00Z",
                     started_at="2026-08-11T00:00:01Z",
                     completed_at=completed[slide],
+                    pipeline_root=raw_pipeline,
                 )
                 if slide == 1:
                     first_job_hash = self._sha256(accepted.job_path)
@@ -693,6 +764,9 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             for slide_dir in work.glob("slide[0-9][0-9]"):
                 shutil.rmtree(slide_dir)
             prepare_streaming_execution(runtime)
+            raw_pipeline = self._make_raw_pipeline(
+                runtime.parent / "raw-pipeline-concurrent"
+            )
 
             def accept(slide: int) -> int:
                 result = accept_streaming_image(
@@ -702,6 +776,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                     queued_at="2026-08-11T00:00:00Z",
                     started_at="2026-08-11T00:00:01Z",
                     completed_at=f"2026-08-11T00:03:{slide:02d}Z",
+                    pipeline_root=raw_pipeline,
                 )
                 self.assertTrue(result.job_path.is_file())
                 return result.slide_number
@@ -1010,6 +1085,14 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 [1],
             )
             self.assertIn("measurements.json", first_job["required_outputs"])
+            self.assertIn("vector_usage.json", first_job["required_outputs"])
+            self.assertTrue(
+                first_job["authoring_contract"]["measured_coordinates_authoritative"]
+            )
+            self.assertEqual(
+                first_job["vector_preflight"]["policy_id"],
+                "raw-measured-bounded-vector-v1",
+            )
             self.assertIn("s1.fragment.js", first_job["required_outputs"])
             self.assertIn("worker_receipt.json", first_job["required_outputs"])
             self.assertTrue(
@@ -2091,6 +2174,9 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
 
         streaming = prepare_streaming_execution(root)
         self.assertEqual(streaming.slide_count, slide_count)
+        raw_pipeline = self._make_raw_pipeline(
+            root.parent / "raw-pipeline-fixture"
+        )
         clock = datetime(2026, 1, 1, tzinfo=timezone.utc)
 
         def stamp(seconds: int) -> str:
@@ -2106,6 +2192,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 queued_at=stamp(0),
                 started_at=stamp(1),
                 completed_at=stamp(180 + slide_number),
+                pipeline_root=raw_pipeline,
             )
         for slide_number in range(1, slide_count + 1):
             worker_slot = (slide_number - 1) % 6
@@ -2495,6 +2582,23 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                     "canvas": {"width": 1600, "height": 900},
                     "test_scope": "contract_only_synthetic",
                 },
+                "vector_usage.json": {
+                    "slide": slide,
+                    "policyId": job["vector_preflight"]["policy_id"],
+                    "vectorPreflightSha256": job["receipt_binding"][
+                        "vector_preflight_sha256"
+                    ],
+                    "vectorSlideContentHash": job["receipt_binding"][
+                        "vector_slide_content_hash"
+                    ],
+                    "measurementInventorySha256": job["vector_preflight"][
+                        "measurement_inventory"
+                    ]["sha256"],
+                    "measuredCoordinatesAuthoritative": True,
+                    "usedRegions": [],
+                    "deferredRegions": [],
+                    "parametricIconUses": [],
+                },
                 "profile_override.json": {
                     "profileId": "academic-editorial",
                     "confidence": "high",
@@ -2577,6 +2681,12 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 ],
                 "semanticSidecarSha256": job["receipt_binding"][
                     "semantic_sidecar_sha256"
+                ],
+                "vectorPreflightSha256": job["receipt_binding"][
+                    "vector_preflight_sha256"
+                ],
+                "vectorSlideContentHash": job["receipt_binding"][
+                    "vector_slide_content_hash"
                 ],
                 "artifacts": produced,
                 "artifactHashes": {

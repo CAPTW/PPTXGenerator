@@ -274,6 +274,12 @@ def finalize_shared_render_qa(
                 "semanticSidecarSha256": job["receipt_binding"][
                     "semantic_sidecar_sha256"
                 ],
+                "vectorPreflightSha256": job["receipt_binding"][
+                    "vector_preflight_sha256"
+                ],
+                "vectorSlideContentHash": job["receipt_binding"][
+                    "vector_slide_content_hash"
+                ],
                 "artifacts": expected_artifacts,
                 "artifactHashes": {
                     name: _sha256(path) for name, path in produced.items()

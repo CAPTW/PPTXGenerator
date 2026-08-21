@@ -68,6 +68,7 @@ SCHEMA_FILES: dict[str, str] = {
     "phase3_validation_report": "phase3-validation-report.schema.json",
     "module_art_directions": "module-art-directions.schema.json",
     "png_reconstruction_manifest": "png-reconstruction-manifest.schema.json",
+    "pngtosvg_vector_preflight": "pngtosvg-vector-preflight.schema.json",
     "pngtopptx_handoff_manifest": "pngtopptx-handoff-manifest.schema.json",
     "pngtopptx_invocation_plan": "pngtopptx-invocation-plan.schema.json",
     "pngtopptx_project_asset_manifest": "pngtopptx-project-asset-manifest.schema.json",

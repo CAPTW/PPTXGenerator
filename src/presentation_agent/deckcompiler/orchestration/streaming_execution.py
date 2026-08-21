@@ -20,6 +20,10 @@ from .reconstruction_jobs import (
     prepare_reconstruction_job,
     prepare_reconstruction_jobs,
 )
+from .vector_preflight import (
+    prepare_vector_preflight,
+    prepare_vector_preflight_slide,
+)
 
 
 STATE_NAME = "streaming_execution.json"
@@ -31,6 +35,8 @@ QUALITY_HARDLOCKS = {
     "native_text_required": True,
     "native_structure_required": True,
     "full_slide_raster_forbidden": True,
+    "measured_vector_preflight_required": True,
+    "semantic_text_vectorization_forbidden": True,
     "source_mapped_per_slide_qa_required": True,
     "final_full_deck_gate_required": True,
 }
@@ -109,7 +115,7 @@ def prepare_streaming_execution(
             "max_parallel_workers": min(
                 profile.max_reconstruction_workers, len(rows)
             ),
-            "start_condition": "accepted_image_and_passed_inspection",
+            "start_condition": "accepted_image_passed_inspection_and_vector_preflight",
             "batch_barrier_forbidden": True,
             "worker_model": profile.model,
             "worker_reasoning_effort": profile.reasoning_effort,
@@ -142,10 +148,24 @@ def accept_streaming_image(
     queued_at: str,
     started_at: str,
     completed_at: str,
+    pipeline_root: Path | None = None,
+    python_executable: str | None = None,
+    vector_backend: str = "easyocr",
+    vector_deep: bool = True,
 ) -> StreamingImageAcceptanceResult:
-    """Accept one result under a short state lock; rendering remains parallel."""
+    """Measure one result outside the state lock, then make its job ready."""
 
     root = runtime_root.resolve()
+    with _state_lock(root):
+        _validate_streaming_image_preflight_eligibility(root, slide_number)
+    prepare_vector_preflight_slide(
+        root,
+        slide_number=slide_number,
+        pipeline_root=pipeline_root,
+        python_executable=python_executable,
+        backend=vector_backend,
+        deep=vector_deep,
+    )
     with _state_lock(root):
         return _accept_streaming_image_locked(
             root,
@@ -154,6 +174,46 @@ def accept_streaming_image(
             queued_at=queued_at,
             started_at=started_at,
             completed_at=completed_at,
+        )
+
+
+def _validate_streaming_image_preflight_eligibility(
+    root: Path,
+    slide_number: int,
+) -> None:
+    state_path = root / STATE_NAME
+    state = _read_state(state_path)
+    row = _slide_row(state, slide_number)
+    if row["state"] != "IMAGE_PENDING":
+        raise _error(
+            "DC_STREAMING_STATE_INVALID",
+            f"slide {slide_number} cannot be accepted from {row['state']}",
+            state_path,
+        )
+    source = root / "pngtopptx-project" / "src" / f"slide{slide_number}.png"
+    inspection = root / "inspections" / f"slide-{slide_number:03d}.json"
+    try:
+        inspection_payload = read_json(inspection)
+    except (OSError, ValueError, TypeError) as exc:
+        raise _error(
+            "DC_STREAMING_IMAGE_REJECTED",
+            f"slide {slide_number} inspection report is missing or invalid: {exc}",
+            inspection,
+        ) from exc
+    if (
+        str(inspection_payload.get("status", "")).upper() != "PASS"
+        or inspection_payload.get("slide_number") != slide_number
+    ):
+        raise _error(
+            "DC_STREAMING_IMAGE_REJECTED",
+            f"slide {slide_number} must have a matching PASS inspection",
+            inspection,
+        )
+    if not source.is_file():
+        raise _error(
+            "DC_STREAMING_IMAGE_REJECTED",
+            f"slide {slide_number} source PNG is missing",
+            source,
         )
 
 
@@ -407,6 +467,7 @@ def _finalize_streaming_images_locked(
     batch_path = write_json(
         root / "image_batches" / "image_generation_batch_manifest.json", batch
     )
+    prepare_vector_preflight(root)
     prepared = prepare_reconstruction_jobs(root)
     state["image_batch_manifest"] = _artifact(root, batch_path)
     state["reconstruction_job_manifest"] = _artifact(root, prepared.manifest_path)

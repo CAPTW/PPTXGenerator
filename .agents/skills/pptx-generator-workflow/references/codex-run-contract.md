@@ -82,6 +82,9 @@ Record:
 - native-object manifest and openability report.
 
 Also hash-bind the intake-created `skillset_execution_plan.json`,
+`work/vector_preflight_manifest.json`, every per-slide
+`vector_preflight/measurement_inventory.json`, accepted bounded SVG and trace
+report,
 `work/orchestration_state.json`, official `out/render_trace.json`, explicit crop
 plan and generated asset manifest, crop-coverage summary, and objective QA
 evidence summary. HTML is required because the approved renderer is the dual
@@ -89,8 +92,10 @@ PPTX/HTML path.
 
 The sealer also rebuilds and validates
 `work/reconstruction_job_manifest.json`. Every selected PNG must map to one
-fresh-context slide job, complete hash-bound worker outputs, and a receipt that
-proves the worker did not edit shared files. Completion additionally requires
+fresh-context slide job whose identity includes the vector-preflight slide hash,
+complete hash-bound worker outputs, a `vector_usage.json` decision for every
+approved SVG, and a receipt that binds the vector manifest and proves the
+worker did not edit shared files. Completion additionally requires
 the official integrator outputs `lib/slides.js` and
 `work/integration_report.md`, with exactly one `sN(s)` function for every
 approved slide. This is execution evidence, not a planning-only declaration.

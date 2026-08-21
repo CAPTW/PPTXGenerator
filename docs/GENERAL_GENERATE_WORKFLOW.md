@@ -157,8 +157,12 @@ receive one targeted retry. Selected references are stored as:
 The workflow also preserves the Architect-bound request manifest, per-slide
 prompts, exact-text Semantic Sidecars, inspection reports, and
 `streaming_execution.json`. As soon as one inspected PNG is saved, Codex runs
-`deckcompiler accept-streaming-image`; that slide's hash-bound reconstruction
-job becomes ready while the other calls continue. After the last result,
+the external `PPTXlocal/raw` native-canvas measurement and bounded PNG-to-SVG
+preflight, then `deckcompiler accept-streaming-image`; that slide's hash-bound
+reconstruction job becomes ready while the other calls continue. Passed SVGs
+are limited to measured non-text flat regions and are inputs to the official
+SkillSet renderer, never a replacement renderer or full-slide surface. After
+the last result,
 `finalize-streaming-images` seals
 `image_batches/image_generation_batch_manifest.json`. The PNG is a visual
 reconstruction reference, not the final slide background or canonical text
@@ -201,8 +205,10 @@ Codex must execute the paths and command templates recorded in
 2. install project hardlocks;
 3. run the orchestrator planner at quality level `polish`, with at most two
    blocker-repair iterations;
-4. accept each inspected image as it arrives. Its compact, hash-bound job is
-   created immediately without waiting for the final batch manifest;
+4. measure each inspected image as it arrives with `PPTXlocal/raw`, accept only
+   bounded non-text SVG candidates that pass security and fidelity gates, and
+   create its compact hash-bound job immediately without waiting for the final
+   batch manifest;
 5. execute ready jobs in fresh contexts, no more than six concurrently. Each
    context sees one source slide and writes only the authoring artifacts in its
    `work/slideXX/` folder. Record STARTED and AUTHORING_COMPLETED timestamps;

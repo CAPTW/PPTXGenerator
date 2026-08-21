@@ -335,6 +335,7 @@ def build_skillset_execution_plan(
     final_summary = (project / "out" / "visual_qa_summary_final.json").as_posix()
     final_summary_md = (project / "out" / "visual_qa_summary_final.md").as_posix()
     reconstruction_jobs = (project / "work" / "reconstruction_job_manifest.json").as_posix()
+    vector_preflight = (project / "work" / "vector_preflight_manifest.json").as_posix()
     integration_report = (project / "work" / "integration_report.md").as_posix()
 
     commands = {
@@ -387,6 +388,10 @@ def build_skillset_execution_plan(
             "<started-at>",
             "--completed-at",
             "<completed-at>",
+            "--pipeline-root",
+            "<raw-pipeline-root>",
+            "--vector-backend",
+            "easyocr",
         ],
         "record_reconstruction_started": [
             "deckcompiler",
@@ -430,6 +435,22 @@ def build_skillset_execution_plan(
         "prepare_reconstruction_jobs": [
             "deckcompiler",
             "prepare-reconstruction-jobs",
+            "--runtime",
+            runtime_root.resolve().as_posix(),
+        ],
+        "prepare_vector_preflight": [
+            "deckcompiler",
+            "prepare-vector-preflight",
+            "--runtime",
+            runtime_root.resolve().as_posix(),
+            "--backend",
+            "easyocr",
+            "--max-workers",
+            "2",
+        ],
+        "validate_vector_preflight": [
+            "deckcompiler",
+            "validate-vector-preflight",
             "--runtime",
             runtime_root.resolve().as_posix(),
         ],
@@ -880,7 +901,7 @@ def build_skillset_execution_plan(
 
     payload: dict[str, Any] = {
         "schema_name": PLAN_SCHEMA,
-        "schema_version": "1.5.0",
+        "schema_version": "1.6.0",
         "workflow_id": workflow_id,
         "status": "READY",
         "skill_root": inspection["skill_root"],
@@ -913,6 +934,22 @@ def build_skillset_execution_plan(
             .resolve()
             .as_posix(),
             "per_slide_work_pattern": (project / "work" / "slideXX").as_posix(),
+            "vector_preflight_manifest_path": vector_preflight,
+            "measurement_inventory_pattern": (
+                project
+                / "work"
+                / "slideXX"
+                / "vector_preflight"
+                / "measurement_inventory.json"
+            ).as_posix(),
+            "bounded_vector_asset_pattern": (
+                project
+                / "work"
+                / "slideXX"
+                / "vector_preflight"
+                / "vectors"
+                / "RNN.svg"
+            ).as_posix(),
             "reconstruction_job_manifest_path": reconstruction_jobs,
             "integration_report_path": integration_report,
             "profile_path": (project / "styles" / "active.json").as_posix(),
@@ -942,6 +979,39 @@ def build_skillset_execution_plan(
                 "installed Skill node_modules",
             ],
             "hidden_node_path_forbidden": True,
+        },
+        "vector_preflight_contract": {
+            "source_pipeline": "PPTXlocal/raw/pipeline",
+            "resolution_order": [
+                "--pipeline-root",
+                "PPTXLOCAL_RAW_PNGTOSVG_ROOT",
+                "repository ancestor auto-discovery",
+            ],
+            "python_resolution_order": [
+                "--python-executable",
+                "PPTXLOCAL_RAW_PYTHON",
+                "deckcompiler interpreter",
+            ],
+            "reuse_mode": "external_measurement_engine_no_repo_local_fork",
+            "measurement_command": (
+                "raw_measure_batch.py -> detect_elements.build_inventory"
+                "(canvas=native, deep_text=True) + deep_scan"
+            ),
+            "ocr_reader_lifecycle": "one_shared_reader_per_batch_worker",
+            "deep_runtime_requirements": [
+                "pytesseract",
+                "tesseract executable",
+                "eng language pack",
+                "kor language pack",
+            ],
+            "max_parallel_measurement_workers": 2,
+            "additional_model_calls": 0,
+            "maximum_vector_region_area_ratio": 0.35,
+            "semantic_text_vectorization_forbidden": True,
+            "continuous_tone_vectorization_forbidden": True,
+            "full_slide_vectorization_forbidden": True,
+            "svg_security_and_fidelity_gate_required": True,
+            "canonical_renderer_unchanged": "slide-image-dual-render",
         },
         "execution_profile": {
             **runtime_profile,
@@ -1053,6 +1123,7 @@ def build_skillset_execution_plan(
             "reconstruction_authoring": [
                 "codex_execute_reconstruction_jobs",
                 "finalize_streaming_images",
+                "validate_vector_preflight",
                 "validate_streaming_execution",
                 "validate_reconstruction_jobs",
                 "validate_agent_work",
@@ -1120,6 +1191,7 @@ def build_skillset_execution_plan(
             "../image_requests/image_request_manifest.json",
             "../image_batches/image_generation_batch_manifest.json",
             "../execution_timing.json",
+            "work/vector_preflight_manifest.json",
             "work/reconstruction_job_manifest.json",
             "work/integration_report.md",
             "work/orchestration_state.json",
@@ -1139,7 +1211,8 @@ def build_skillset_execution_plan(
         "stop_conditions": {
             "complete": (
                 "single fast-path or conditional post-repair full-deck gate PASS, "
-                "PPTX openable, route and reconstruction hardlocks PASS, "
+                "measured vector preflight and its SVG gates PASS, PPTX openable, "
+                "route and reconstruction hardlocks PASS, "
                 "high-fidelity issue policy accepted, and visual QA fail/blocking "
                 "counts both zero"
             ),
@@ -1241,6 +1314,9 @@ def validate_skillset_execution_plan(
             "--queued-at",
             "--started-at",
             "--completed-at",
+            "--pipeline-root",
+            "--vector-backend",
+            "easyocr",
         ),
         "accept_streaming_image",
         issues,
@@ -1267,6 +1343,25 @@ def validate_skillset_execution_plan(
         commands["prepare_reconstruction_jobs"],
         ("prepare-reconstruction-jobs", "--runtime"),
         "prepare_reconstruction_jobs",
+        issues,
+    )
+    _require_flags(
+        commands["prepare_vector_preflight"],
+        (
+            "prepare-vector-preflight",
+            "--runtime",
+            "--backend",
+            "easyocr",
+            "--max-workers",
+            "2",
+        ),
+        "prepare_vector_preflight",
+        issues,
+    )
+    _require_flags(
+        commands["validate_vector_preflight"],
+        ("validate-vector-preflight", "--runtime"),
+        "validate_vector_preflight",
         issues,
     )
     _require_flags(

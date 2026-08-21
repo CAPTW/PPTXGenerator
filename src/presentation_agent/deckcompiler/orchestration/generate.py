@@ -449,15 +449,19 @@ Workflow ID: `{workflow_id}`
    submit all 20 initial calls together and keep the unfinished calls running.
    Retry only a failed slide, at most once; never restart the whole wave.
 6. As each result completes, inspect it, save it as
-   `pngtopptx-project/src/slideN.png`, then immediately run
-   `deckcompiler accept-streaming-image` with the real tool-call timestamps.
-   A passing slide enters the reconstruction ready queue at once; it must not
-   wait for the other nineteen images or for the final batch manifest.
+   `pngtopptx-project/src/slideN.png`, run the native-canvas `PPTXlocal/raw`
+   measurement and bounded PNG-to-SVG preflight for that slide, then immediately
+   run `deckcompiler accept-streaming-image` with the real tool-call timestamps.
+   Only security/fidelity-gated non-text flat regions may become SVG; semantic
+   text, continuous-tone regions, and the complete slide must remain outside
+   that vector path. A passing slide enters the reconstruction ready queue at
+   once; it must not wait for the other nineteen images or the final batch.
 7. Execute `setup`, record an explicit execute/skip decision for
    `slide-text-layer-inpaint`, and materialize the hard-locked renderer project.
 8. Keep a ready queue of one-slide jobs while ImageGen is still in flight.
    Process each job in one fresh context containing only that source slide, its
-   compact job, and Semantic Sidecar; run no more than six reconstruction
+   authoritative measured geometry/vector inventory, compact job, and Semantic
+   Sidecar; run no more than six reconstruction
    workers concurrently. Each worker writes only its `work/slideXX/` authoring
    artifacts. Do not build an isolated PPTX/HTML for every slide. Record actual
    STARTED and AUTHORING_COMPLETED timestamps in `streaming_execution.json`.

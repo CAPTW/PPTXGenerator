@@ -103,8 +103,9 @@ targets GPT-5.6 Luna with max reasoning under the same locked blueprint,
 prompts, Semantic Sidecars, renderer, vector policy, compiler, and QA. Luna may
 fall back to Sol only for a failed slide after a named blocking gate. Either
 profile dispatches up to 20 independent built-in calls concurrently, then runs one
-fresh, isolated reconstruction context immediately for each accepted source
-slide while unfinished ImageGen calls continue (at most six workers
+hash-bound `PPTXlocal/raw` measurement/bounded-vector preflight and one fresh,
+isolated reconstruction context immediately for each accepted source slide
+while unfinished ImageGen calls continue (at most six workers
 concurrently). It validates and integrates those fragments with the official
 PNGtoPPTX scripts, uses one shared all-slide preview for source-mapped per-slide
 QA, and runs one final all-slide reconstruction render and gate. It enters
@@ -124,7 +125,8 @@ plan binds the four repository Architect files plus installed companion Skill
 and entrypoint hashes and spells out the tested companion path:
 conditional text-layer preprocessing, project-local Node dependencies, explicit
 crop plan/manifest, `slide-image-dual-render` reconstruction hardlocks,
-hash-bound per-slide worker receipts, integrator-owned `lib/slides.js`,
+measured-coordinate and bounded non-text SVG gates, hash-bound per-slide worker
+receipts, integrator-owned `lib/slides.js`,
 source-mapped PPTX/HTML visual QA, zero isolated per-slide builds, two shared
 full-deck render passes, repair waves of at most five slides only for defects,
 and the final openability gate. The profile

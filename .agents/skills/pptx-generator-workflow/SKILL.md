@@ -170,9 +170,12 @@ Use the `fast-quality-20` dispatch profile:
    blocker instead of lowering the acceptance standard.
 5. Save each accepted image as
    `<runtime>/pngtopptx-project/src/slideN.png` and its per-slide PASS report,
-   then immediately run `deckcompiler accept-streaming-image` with the actual
-   tool-call timestamps. This command hash-binds the result and creates that
-   slide's reconstruction job without waiting for the rest of the wave.
+   run the hash-bound `PPTXlocal/raw` measurement and bounded PNG-to-SVG
+   preflight for that slide, then immediately run
+   `deckcompiler accept-streaming-image` with the actual tool-call timestamps.
+   Semantic text, continuous-tone regions, and the complete slide are never
+   vectorized. The accepted measured record creates that slide's reconstruction
+   job without waiting for the rest of the wave.
 6. Start ready reconstruction jobs as capacity becomes available and record
    their STARTED/AUTHORING_COMPLETED transitions. After the last image is
    accepted, run `deckcompiler finalize-streaming-images`; it writes the
@@ -205,9 +208,11 @@ sequence and commands in `skillset_execution_plan.json`:
 2. install project-local Node dependencies once with npm's verified local cache
    preferred and audit/fund network chatter disabled, then install hardlock
    templates;
-3. execute each ready job as soon as its source PNG passes inspection, even
+3. execute each ready job as soon as its source PNG passes inspection and its
+   measured vector preflight passes, even
    while later ImageGen calls remain in flight. Use a fresh context containing
-   only one source slide, its job, Semantic Sidecar, and the canonical renderer
+   only one source slide, its measured geometry/vector inventory, job, Semantic
+   Sidecar, and the canonical renderer
    Skill. Combine profile mapping and reconstruction in that one context and
    use no more than six workers concurrently. Each worker writes only the
    authoring artifacts in its assigned `work/slideXX/` directory; it must not
@@ -259,6 +264,8 @@ Production defaults:
 - minimum acceptable level: `blocking-zero`;
 - no full-slide screenshot/background fallback;
 - native editable semantic text and structured objects;
+- authoritative measured coordinates plus only security/fidelity-gated,
+  bounded non-text SVG assets from `PPTXlocal/raw`;
 - route and reconstruction hardlocks enabled;
 - PPTX openability required.
 - exact official `slide-image-dual-render` render trace required;

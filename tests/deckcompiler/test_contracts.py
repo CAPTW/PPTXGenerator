@@ -91,6 +91,7 @@ EXPECTED_SCHEMA_FILES = {
     "pngtopptx-invocation-plan.schema.json",
     "pngtopptx-project-asset-manifest.schema.json",
     "pngtopptx-project-crop-plan.schema.json",
+    "pngtosvg-vector-preflight.schema.json",
     "qa-dimension-report.schema.json",
     "qa-finding.schema.json",
     "reconstruction-constraints.schema.json",

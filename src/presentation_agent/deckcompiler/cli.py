@@ -28,6 +28,10 @@ from .orchestration.reconstruction_jobs import (
     prepare_reconstruction_jobs,
     validate_reconstruction_job_bundle,
 )
+from .orchestration.vector_preflight import (
+    prepare_vector_preflight,
+    validate_vector_preflight_bundle,
+)
 from .orchestration.phase3_runner import run_phase3
 from .pngtopptx_pinning import (
     PinningError,
@@ -122,6 +126,30 @@ def build_parser() -> argparse.ArgumentParser:
         help="Validate Blueprint/Design-System lineage for prepared ImageGen requests.",
     )
     validate_image_requests_parser.add_argument("--runtime", type=Path, required=True)
+
+    prepare_vector_preflight_parser = subparsers.add_parser(
+        "prepare-vector-preflight",
+        help=(
+            "Run PPTXlocal/raw measurement and trace only bounded, non-text, "
+            "flat PNG regions into gated SVG reconstruction assets."
+        ),
+    )
+    prepare_vector_preflight_parser.add_argument("--runtime", type=Path, required=True)
+    prepare_vector_preflight_parser.add_argument("--pipeline-root", type=Path)
+    prepare_vector_preflight_parser.add_argument("--python-executable")
+    prepare_vector_preflight_parser.add_argument(
+        "--backend", choices=("easyocr", "tesseract"), default="easyocr"
+    )
+    prepare_vector_preflight_parser.add_argument(
+        "--max-workers", type=int, default=2
+    )
+    prepare_vector_preflight_parser.add_argument("--no-deep", action="store_true")
+
+    validate_vector_preflight_parser = subparsers.add_parser(
+        "validate-vector-preflight",
+        help="Validate measured coordinates, lineage, and every bounded SVG gate.",
+    )
+    validate_vector_preflight_parser.add_argument("--runtime", type=Path, required=True)
 
     prepare_reconstruction_jobs_parser = subparsers.add_parser(
         "prepare-reconstruction-jobs",
@@ -382,6 +410,31 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "validate-image-requests":
         report = validate_image_request_bundle(args.runtime)
+        print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0 if report["valid"] else 1
+    if args.command == "prepare-vector-preflight":
+        try:
+            result = prepare_vector_preflight(
+                args.runtime,
+                pipeline_root=args.pipeline_root,
+                python_executable=args.python_executable,
+                backend=args.backend,
+                max_workers=args.max_workers,
+                deep=not args.no_deep,
+            )
+        except (DeckCompilerError, OSError, ValueError, json.JSONDecodeError) as exc:
+            code = getattr(exc, "code", "DC_VECTOR_PREFLIGHT_PREPARATION_FAILED")
+            print(f"DECKCOMPILER_VECTOR_PREFLIGHT_BLOCKED code={code} message={exc}")
+            return 1
+        print(
+            "DECKCOMPILER_VECTOR_PREFLIGHT_READY "
+            f"workflow_id={result.workflow_id} slides={result.slide_count} "
+            f"regions={result.measured_region_count} vectors={result.passed_vector_count} "
+            f"manifest={result.manifest_path.as_posix()}"
+        )
+        return 0
+    if args.command == "validate-vector-preflight":
+        report = validate_vector_preflight_bundle(args.runtime)
         print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
         return 0 if report["valid"] else 1
     if args.command == "prepare-reconstruction-jobs":

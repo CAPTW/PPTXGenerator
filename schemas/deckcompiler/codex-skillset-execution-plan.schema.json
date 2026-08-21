@@ -17,6 +17,7 @@
     "project_layout",
     "environment_template",
     "dependency_contract",
+    "vector_preflight_contract",
     "execution_profile",
     "quality_contract",
     "crop_contract",
@@ -28,7 +29,7 @@
   ],
   "properties": {
     "schema_name": {"const": "codex_skillset_execution_plan"},
-    "schema_version": {"const": "1.5.0"},
+    "schema_version": {"const": "1.6.0"},
     "workflow_id": {"type": "string", "pattern": "^generate_[0-9a-f]{20}$"},
     "status": {"const": "READY"},
     "skill_root": {"type": "string", "minLength": 1},
@@ -100,6 +101,9 @@
         "timing_report_path",
         "semantic_sidecar_pattern",
         "per_slide_work_pattern",
+        "vector_preflight_manifest_path",
+        "measurement_inventory_pattern",
+        "bounded_vector_asset_pattern",
         "reconstruction_job_manifest_path",
         "integration_report_path",
         "profile_path",
@@ -116,6 +120,9 @@
         "timing_report_path": {"type": "string", "pattern": "execution_timing\\.json$"},
         "semantic_sidecar_pattern": {"type": "string", "pattern": "slide-NNN\\.semantic\\.json$"},
         "per_slide_work_pattern": {"type": "string", "pattern": "slideXX$"},
+        "vector_preflight_manifest_path": {"type": "string", "pattern": "vector_preflight_manifest\\.json$"},
+        "measurement_inventory_pattern": {"type": "string", "pattern": "measurement_inventory\\.json$"},
+        "bounded_vector_asset_pattern": {"type": "string", "pattern": "RNN\\.svg$"},
         "reconstruction_job_manifest_path": {"type": "string", "pattern": "reconstruction_job_manifest\\.json$"},
         "integration_report_path": {"type": "string", "pattern": "integration_report\\.md$"},
         "profile_path": {"type": "string", "pattern": "active\\.json$"},
@@ -163,6 +170,63 @@
         },
         "resolution_order": {"type": "array", "minItems": 3, "items": {"type": "string", "minLength": 1}},
         "hidden_node_path_forbidden": {"const": true}
+      }
+    },
+    "vector_preflight_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_pipeline",
+        "resolution_order",
+        "python_resolution_order",
+        "reuse_mode",
+        "measurement_command",
+        "ocr_reader_lifecycle",
+        "deep_runtime_requirements",
+        "max_parallel_measurement_workers",
+        "additional_model_calls",
+        "maximum_vector_region_area_ratio",
+        "semantic_text_vectorization_forbidden",
+        "continuous_tone_vectorization_forbidden",
+        "full_slide_vectorization_forbidden",
+        "svg_security_and_fidelity_gate_required",
+        "canonical_renderer_unchanged"
+      ],
+      "properties": {
+        "source_pipeline": {"const": "PPTXlocal/raw/pipeline"},
+        "resolution_order": {
+          "const": [
+            "--pipeline-root",
+            "PPTXLOCAL_RAW_PNGTOSVG_ROOT",
+            "repository ancestor auto-discovery"
+          ]
+        },
+        "python_resolution_order": {
+          "const": [
+            "--python-executable",
+            "PPTXLOCAL_RAW_PYTHON",
+            "deckcompiler interpreter"
+          ]
+        },
+        "reuse_mode": {"const": "external_measurement_engine_no_repo_local_fork"},
+        "measurement_command": {"const": "raw_measure_batch.py -> detect_elements.build_inventory(canvas=native, deep_text=True) + deep_scan"},
+        "ocr_reader_lifecycle": {"const": "one_shared_reader_per_batch_worker"},
+        "deep_runtime_requirements": {
+          "const": [
+            "pytesseract",
+            "tesseract executable",
+            "eng language pack",
+            "kor language pack"
+          ]
+        },
+        "max_parallel_measurement_workers": {"const": 2},
+        "additional_model_calls": {"const": 0},
+        "maximum_vector_region_area_ratio": {"const": 0.35},
+        "semantic_text_vectorization_forbidden": {"const": true},
+        "continuous_tone_vectorization_forbidden": {"const": true},
+        "full_slide_vectorization_forbidden": {"const": true},
+        "svg_security_and_fidelity_gate_required": {"const": true},
+        "canonical_renderer_unchanged": {"const": "slide-image-dual-render"}
       }
     },
     "execution_profile": {
@@ -342,6 +406,8 @@
         "install_node_dependencies",
         "install_hardlock",
         "plan_orchestration",
+        "prepare_vector_preflight",
+        "validate_vector_preflight",
         "prepare_reconstruction_jobs",
         "codex_execute_reconstruction_jobs",
         "validate_reconstruction_jobs",
@@ -375,6 +441,8 @@
         "install_node_dependencies": {"$ref": "#/$defs/command"},
         "install_hardlock": {"$ref": "#/$defs/command"},
         "plan_orchestration": {"$ref": "#/$defs/command"},
+        "prepare_vector_preflight": {"$ref": "#/$defs/command"},
+        "validate_vector_preflight": {"$ref": "#/$defs/command"},
         "prepare_reconstruction_jobs": {"$ref": "#/$defs/command"},
         "codex_execute_reconstruction_jobs": {"$ref": "#/$defs/command"},
         "validate_reconstruction_jobs": {"$ref": "#/$defs/command"},
@@ -430,6 +498,8 @@
         },
         "reconstruction_authoring": {
           "const": [
+            "prepare_vector_preflight",
+            "validate_vector_preflight",
             "prepare_reconstruction_jobs",
             "codex_execute_reconstruction_jobs",
             "validate_reconstruction_jobs",
@@ -494,7 +564,7 @@
         "unconditional_second_full_compile": {"const": false}
       }
     },
-    "required_artifacts": {"type": "array", "minItems": 15, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "required_artifacts": {"type": "array", "minItems": 16, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
     "stop_conditions": {
       "type": "object",
       "additionalProperties": false,

@@ -1,6 +1,6 @@
 {
   "schema_name": "pptx_generator_codex_skill_dependencies",
-  "schema_version": "1.5.0",
+  "schema_version": "1.6.0",
   "execution_profile": {
     "name": "fast-quality-20",
     "target_model": "gpt-5.6-sol",
@@ -21,6 +21,8 @@
     "target_minutes_20_slides": 30,
     "target_speedup": 4.0,
     "image_request_preparation": "single_deterministic_pass_no_model_call",
+    "vector_preflight": "raw_measured_bounded_svg_no_model_call",
+    "max_parallel_vector_measurement_workers": 2,
     "reconstruction_context_unit": "one_source_slide_per_fresh_context",
     "reconstruction_dispatch": "bounded_parallel_workers",
     "max_parallel_reconstruction_workers": 4,
@@ -87,6 +89,33 @@
       "source_slide_mapping_required": true
     }
   ],
+  "pngtosvg_preflight": {
+    "source_pipeline": "PPTXlocal/raw/pipeline",
+    "resolution_order": [
+      "--pipeline-root",
+      "PPTXLOCAL_RAW_PNGTOSVG_ROOT",
+      "repository ancestor auto-discovery"
+    ],
+    "python_resolution_order": [
+      "--python-executable",
+      "PPTXLOCAL_RAW_PYTHON",
+      "deckcompiler interpreter"
+    ],
+    "detector_mode": "native_canvas_deep_text_and_deep_scan",
+    "measurement_dispatch": "two_bounded_batch_processes_shared_reader_per_worker",
+    "deep_runtime_requirements": [
+      "pytesseract",
+      "tesseract executable",
+      "eng language pack",
+      "kor language pack"
+    ],
+    "reuse_mode": "external_measurement_engine_no_repo_local_fork",
+    "maximum_vector_region_area_ratio": 0.35,
+    "semantic_text_vectorization_forbidden": true,
+    "continuous_tone_vectorization_forbidden": true,
+    "full_slide_vectorization_forbidden": true,
+    "canonical_renderer": "slide-image-dual-render"
+  },
   "completion_requirements": {
     "architect_gate_1": "APPROVED",
     "architect_gate_2": "APPROVED",
@@ -98,6 +127,8 @@
     "explicit_crop_plan_and_manifest": "PASS",
     "image_generation_batch_manifest": "PASS",
     "architect_to_image_request_lineage": "PASS",
+    "raw_pngtosvg_vector_preflight": "PASS",
+    "vector_preflight_hash_binding": "PASS",
     "isolated_reconstruction_job_lineage": "PASS",
     "integrator_owned_shared_outputs": "PASS",
     "single_compile_fast_path_or_conditional_post_repair_recompile": "PASS",

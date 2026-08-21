@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import struct
 import tempfile
 import unittest
@@ -43,6 +44,62 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             path.parent.mkdir(parents=True, exist_ok=True)
             if not path.exists():
                 path.write_text(f"fixture: {relative}\n", encoding="utf-8")
+        return root
+
+    @staticmethod
+    def _make_raw_pipeline(root: Path) -> Path:
+        scripts = root / "scripts"
+        scripts.mkdir(parents=True, exist_ok=True)
+        (scripts / "svg_icons.py").write_text(
+            '"""Synthetic raw SVG icon library for contract tests."""\nICONS = {}\n',
+            encoding="utf-8",
+        )
+        (scripts / "detect_elements.py").write_text(
+            """from __future__ import annotations
+import argparse
+import json
+import struct
+from pathlib import Path
+from PIL import Image
+
+def get_easyocr_reader():
+    return object()
+
+def build_inventory(image_path, backend="easyocr", canvas="native", reader=None, deep_text=False):
+    data = Path(image_path).read_bytes()
+    width, height = struct.unpack(">II", data[16:24])
+    payload = {
+        "canvas_px": {"w": width, "h": height},
+        "background": {"kind": "synthetic"},
+        "palette": [],
+        "text_blocks": [],
+        "suppressed_text": [],
+        "regions": [],
+        "notes": ["synthetic measured ground truth"],
+    }
+    return payload, Image.open(image_path).convert("RGB")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("image")
+    parser.add_argument("--out", required=True)
+    args, _unknown = parser.parse_known_args()
+    payload, _image = build_inventory(args.image)
+    payload["deep"] = []
+    Path(args.out).parent.mkdir(parents=True, exist_ok=True)
+    Path(args.out).write_text(json.dumps(payload), encoding="utf-8")
+    print("synthetic raw detector complete")
+""",
+            encoding="utf-8",
+        )
+        (scripts / "deep_scan.py").write_text(
+            "def scan_region(_image, region):\n    return {'region': region, 'words': [], 'badges': [], 'pills': []}\n",
+            encoding="utf-8",
+        )
+        (scripts / "pytesseract.py").write_text(
+            "def get_tesseract_version():\n    return 'fixture'\n\ndef get_languages(config=''):\n    return ['eng', 'kor']\n",
+            encoding="utf-8",
+        )
         return root
 
     def test_start_is_architect_first_and_does_not_run_legacy_production(self) -> None:
@@ -141,7 +198,7 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 (runtime / "skillset_execution_plan.json").read_text(encoding="utf-8")
             )
             self.assertEqual(plan["status"], "READY")
-            self.assertEqual(plan["schema_version"], "1.5.0")
+            self.assertEqual(plan["schema_version"], "1.6.0")
             repository_architect = (
                 ROOT / ".agents" / "skills" / "pptx-workflow-architect"
             ).resolve()
@@ -244,6 +301,8 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             self.assertEqual(
                 plan["execution_contract"]["reconstruction_authoring"],
                 [
+                    "prepare_vector_preflight",
+                    "validate_vector_preflight",
                     "prepare_reconstruction_jobs",
                     "codex_execute_reconstruction_jobs",
                     "validate_reconstruction_jobs",
@@ -263,6 +322,10 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                     "shared_file_writer"
                 ],
                 "integrator_only",
+            )
+            self.assertIn(
+                "vector_preflight_manifest.json",
+                plan["project_layout"]["vector_preflight_manifest_path"],
             )
             self.assertIn(
                 "reconstruction_job_manifest.json",
@@ -567,6 +630,17 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 [1],
             )
             self.assertIn("measurements.json", first_job["required_outputs"])
+            self.assertIn("vector_usage.json", first_job["required_outputs"])
+            self.assertTrue(
+                first_job["authoring_contract"]["measured_coordinates_authoritative"]
+            )
+            self.assertEqual(
+                first_job["vector_preflight"]["policy_id"],
+                "raw-measured-bounded-vector-v1",
+            )
+            self.assertIn(
+                "available_parametric_icon_names", first_job["vector_preflight"]
+            )
             self.assertIn("s1.fragment.js", first_job["required_outputs"])
             self.assertIn("worker_receipt.json", first_job["required_outputs"])
             self.assertTrue(
@@ -583,6 +657,74 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             self.assertTrue(
                 any("s1.fragment.js" in issue for issue in report["issues"]),
                 report,
+            )
+
+    @unittest.skipUnless(
+        os.environ.get("PPTXLOCAL_REAL_RAW_INTEGRATION_IMAGE")
+        and os.environ.get("PPTXLOCAL_REAL_RAW_PIPELINE_ROOT"),
+        "set the real raw integration image and pipeline root for this canary",
+    )
+    def test_real_raw_pipeline_canary_binds_preflight_to_reconstruction(self) -> None:
+        from presentation_agent.deckcompiler.orchestration.reconstruction_jobs import (
+            prepare_reconstruction_jobs,
+            validate_reconstruction_job_bundle,
+        )
+        from presentation_agent.deckcompiler.orchestration.vector_preflight import (
+            prepare_vector_preflight,
+            validate_vector_preflight_bundle,
+        )
+
+        source_image = Path(
+            os.environ["PPTXLOCAL_REAL_RAW_INTEGRATION_IMAGE"]
+        ).resolve()
+        raw_root = Path(os.environ["PPTXLOCAL_REAL_RAW_PIPELINE_ROOT"]).resolve()
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runtime = Path(tmpdir) / "runtime"
+            started = self._start(runtime)
+            self._build_run_draft(
+                runtime,
+                workflow_id=started.workflow_id,
+                slide_count=1,
+                status="COMPLETED",
+                qa_status="PASS",
+                fail_count=0,
+                blocking_count=0,
+            )
+            selected = runtime / "pngtopptx-project" / "src" / "slide1.png"
+            selected.write_bytes(source_image.read_bytes())
+            batch_path = (
+                runtime / "image_batches" / "image_generation_batch_manifest.json"
+            )
+            batch = json.loads(batch_path.read_text(encoding="utf-8"))
+            batch["waves"][0]["calls"][0]["selected_png_sha256"] = self._sha256(
+                selected
+            )
+            batch_path.write_text(json.dumps(batch), encoding="utf-8")
+
+            result = prepare_vector_preflight(
+                runtime,
+                pipeline_root=raw_root,
+                backend="easyocr",
+                max_workers=1,
+                deep=os.environ.get("PPTXLOCAL_REAL_RAW_DEEP") == "1",
+            )
+            self.assertEqual(result.slide_count, 1)
+            self.assertGreater(result.measured_region_count, 0)
+            self.assertTrue(validate_vector_preflight_bundle(runtime)["valid"])
+            prepare_reconstruction_jobs(runtime)
+            self.assertTrue(validate_reconstruction_job_bundle(runtime)["valid"])
+            job = json.loads(
+                (
+                    runtime
+                    / "pngtopptx-project"
+                    / "work"
+                    / "slide01"
+                    / "reconstruction_job.json"
+                ).read_text(encoding="utf-8")
+            )
+            self.assertIn(
+                "shield",
+                job["vector_preflight"]["available_parametric_icon_names"],
             )
 
     def test_image_request_preserves_structured_copy_architect_signal_and_assets(
@@ -1672,6 +1814,20 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
             ),
             encoding="utf-8",
         )
+        from presentation_agent.deckcompiler.orchestration.vector_preflight import (
+            prepare_vector_preflight,
+            validate_vector_preflight_bundle,
+        )
+
+        prepared_vectors = prepare_vector_preflight(
+            root,
+            pipeline_root=self._make_raw_pipeline(root.parent / "raw-pipeline-fixture"),
+            backend="tesseract",
+            max_workers=2,
+            deep=True,
+        )
+        self.assertEqual(prepared_vectors.slide_count, slide_count)
+        self.assertTrue(validate_vector_preflight_bundle(root)["valid"])
         from presentation_agent.deckcompiler.orchestration.reconstruction_jobs import (
             prepare_reconstruction_jobs,
         )
@@ -2034,6 +2190,23 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                     "canvas": {"width": 1600, "height": 900},
                     "test_scope": "contract_only_synthetic",
                 },
+                "vector_usage.json": {
+                    "slide": slide,
+                    "policyId": job["vector_preflight"]["policy_id"],
+                    "vectorPreflightSha256": job["receipt_binding"][
+                        "vector_preflight_sha256"
+                    ],
+                    "vectorSlideContentHash": job["receipt_binding"][
+                        "vector_slide_content_hash"
+                    ],
+                    "measurementInventorySha256": job["vector_preflight"][
+                        "measurement_inventory"
+                    ]["sha256"],
+                    "measuredCoordinatesAuthoritative": True,
+                    "usedRegions": [],
+                    "deferredRegions": [],
+                    "parametricIconUses": [],
+                },
                 "profile_override.json": {
                     "profileId": "academic-editorial",
                     "confidence": "high",
@@ -2116,6 +2289,12 @@ class GeneralGenerateWorkflowTests(unittest.TestCase):
                 ],
                 "semanticSidecarSha256": job["receipt_binding"][
                     "semantic_sidecar_sha256"
+                ],
+                "vectorPreflightSha256": job["receipt_binding"][
+                    "vector_preflight_sha256"
+                ],
+                "vectorSlideContentHash": job["receipt_binding"][
+                    "vector_slide_content_hash"
                 ],
                 "artifacts": produced,
                 "artifactHashes": {

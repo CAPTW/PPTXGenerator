@@ -63,7 +63,16 @@ class CodexWorkflowSkillTests(unittest.TestCase):
             dependencies["completion_requirements"]["visual_qa_blocking_count"],
             0,
         )
-        self.assertEqual(dependencies["schema_version"], "1.5.0")
+        self.assertEqual(dependencies["schema_version"], "1.6.0")
+        self.assertEqual(
+            dependencies["pngtosvg_preflight"]["canonical_renderer"],
+            "slide-image-dual-render",
+        )
+        self.assertTrue(
+            dependencies["pngtosvg_preflight"][
+                "semantic_text_vectorization_forbidden"
+            ]
+        )
         self.assertEqual(
             dependencies["execution_profile"]["default_design_direction"],
             ["Academic", "Informative", "Professional", "Creative"],

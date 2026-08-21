@@ -439,11 +439,18 @@ Workflow ID: `{workflow_id}`
 7. Execute `setup`, record an explicit execute/skip decision for
    `slide-text-layer-inpaint`, and materialize the hard-locked renderer project.
 8. Execute `reconstruction_authoring` exactly as ordered. First run
-   `deckcompiler prepare-reconstruction-jobs --runtime <runtime>`. Then process
-   each job in one fresh context containing only that source slide, its compact
-   job, and Semantic Sidecar; run no more than four workers concurrently. Each
-   worker writes only its `work/slideXX/` directory and completes isolated PPTX
-   and HTML reconstruction QA. Validate the hash-bound receipts, run the
+   `deckcompiler prepare-vector-preflight --runtime <runtime>` and
+   `deckcompiler validate-vector-preflight --runtime <runtime>`. This reuses the
+   external `PPTXlocal/raw` detector at native canvas, performs deep measurement
+   without another model call, and traces only bounded non-text flat regions
+   that pass SVG security and fidelity gates. It is not a renderer: never
+   vectorize semantic text, continuous-tone regions, or the whole slide. Then
+   run `deckcompiler prepare-reconstruction-jobs --runtime <runtime>` and
+   process each job in one fresh context containing only that source slide, its
+   measured/hash-bound vector inventory, compact job, and Semantic Sidecar; run
+   no more than four workers concurrently. Each worker writes only its
+   `work/slideXX/` directory and completes isolated PPTX and HTML reconstruction
+   QA. Validate the hash-bound receipts and vector-usage decisions, run the
    official `validate_agent_work.js`, and let the official
    `integrate_subagent_work.js` be the sole writer of `lib/slides.js` and the
    integrated crop plan. Do not hand-author a generic shared slide template.

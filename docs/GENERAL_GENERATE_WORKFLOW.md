@@ -164,58 +164,72 @@ Codex must execute the paths and command templates recorded in
 2. install project hardlocks;
 3. run the orchestrator planner at quality level `polish`, with at most two
    blocker-repair iterations;
-4. run `deckcompiler prepare-reconstruction-jobs --runtime <runtime>` after the
-   accepted image batch exists. It writes one compact, hash-bound job per slide;
-5. execute those jobs in fresh contexts, no more than four concurrently. Each
+4. run `deckcompiler prepare-vector-preflight --runtime <runtime>` and
+   `deckcompiler validate-vector-preflight --runtime <runtime>` after the
+   accepted image batch exists. The external `PPTXlocal/raw/pipeline` detector
+   measures native-canvas geometry with deep text/region scanning and at most
+   two batch workers and one shared OCR reader per worker, while the repository
+   gate traces only bounded, non-text flat regions. It adds no model call,
+   avoids per-slide OCR-model reloads, and is not a PPTX renderer;
+   use `--python-executable` or `PPTXLOCAL_RAW_PYTHON` for the prepared raw
+   environment. Deep mode fails fast unless pytesseract, Tesseract, and the
+   `eng`/`kor` language packs are available;
+5. run `deckcompiler prepare-reconstruction-jobs --runtime <runtime>`. It writes
+   one compact, hash-bound job per slide and binds the measurement inventory,
+   safe SVG assets, and preflight manifest;
+6. execute those jobs in fresh contexts, no more than four concurrently. Each
    context sees one source slide and writes only its `work/slideXX/` folder,
    including measurements, profile decision, editable fragment, crop decision,
    dual-render QA evidence under `worker_qa/`, reconstruction score, and
    hash-bound receipt. The final full-deck gate owns the separate `visual_qa/`
    directory;
-6. validate all jobs with `deckcompiler validate-reconstruction-jobs
+7. validate all jobs with `deckcompiler validate-reconstruction-jobs
    --require-worker-outputs`, then run the official `validate_agent_work.js` and
    `integrate_subagent_work.js`. Only the integrator may write `lib/slides.js`
    and the shared crop plan;
-7. keep `work/crop_plan.json` explicit, including for a zero-crop deck, and run
+8. keep `work/crop_plan.json` explicit, including for a zero-crop deck, and run
    crop preparation so `assets/manifest.json` exists;
-8. after every approved source image and integrated per-slide artifact is ready,
+9. after every approved source image and integrated per-slide artifact is ready,
    run one
    all-slide reconstruction with renderer quality
    `reconstruction`, `--require-qa`, `--require-reconstruction`, explicit crop
    and Node paths, and `--allow-large-batch`, writing directly to the final
    PPTX/HTML names, then run `final_gate.js`;
-9. execute one complete full-deck Visual QA chain: PPTX rasterization,
+10. execute one complete full-deck Visual QA chain: PPTX rasterization,
    HTML capture, comparison, JSON/Markdown summary, and enforcement, all with
    source-slide mapping;
-10. apply `deckcompiler validate-visual-quality`. The accepted one-slide canary
+11. apply `deckcompiler validate-visual-quality`. The accepted one-slide canary
     permits only `palette_drift` and `pptx_html_edge_mismatch` as noticeable
     renderer diagnostics; spacing, hierarchy, typography, clipping, content,
     and detail-loss issues require repair;
-11. if fail/blocking counts are zero and high-fidelity acceptance passes, use
+12. if fail/blocking counts are zero and high-fidelity acceptance passes, use
    that output directly and skip the old
    unconditional second full-deck compile/QA pass, then enforce the orchestration
    state through `fast_path_acceptance`;
-12. only when defects exist, reconstruct and QA targeted repair waves of at
+13. only when defects exist, reconstruct and QA targeted repair waves of at
    most five slides, for at most two iterations;
-13. after repairs, run one conditional all-slide compile and one final full-deck
+14. after repairs, run one conditional all-slide compile and one final full-deck
     QA chain, binding raster/capture metadata to the repaired PPTX/HTML hashes;
-14. record actual stage timing and the full-deck compile count in
+15. record actual stage timing and the full-deck compile count in
     `execution_timing.json`.
 
 The default quality level is `polish`; `blocking-zero` is the minimum accepted
 production level. The workflow runs:
 
 1. 20-call concurrent ImageGen waves with one inspected reference per slide;
-2. one fresh reconstruction context per slide with four-worker bounded
+2. one native-canvas `PPTXlocal/raw` measurement/SVG-preflight pass with no
+   model call, two-worker bounded parallelism, a 35% region ceiling, and strict
+   text/continuous-tone/full-slide exclusions;
+3. one fresh reconstruction context per slide with four-worker bounded
    parallelism and no duplicated full-deck prompt context;
-3. official validation plus integrator-owned shared outputs;
-4. one editable PPTX/HTML full-deck reconstruction on the normal path;
-5. route and reconstruction hardlocks;
-6. PPTX openability validation;
-7. full-deck visual QA and high-fidelity issue acceptance against the generated
+4. official validation plus integrator-owned shared outputs;
+5. one editable PPTX/HTML full-deck reconstruction on the normal path;
+6. route and reconstruction hardlocks;
+7. PPTX openability validation;
+8. full-deck visual QA and high-fidelity issue acceptance against the generated
    source slides;
-8. defect-only repair planning and rebuilding when needed;
-9. one conditional post-repair full-deck build and evidence-hash validation.
+9. defect-only repair planning and rebuilding when needed;
+10. one conditional post-repair full-deck build and evidence-hash validation.
 
 Completion still requires zero fail/blocking slides. A run that reaches the
 two-iteration cap remains `NEEDS_REPAIR`. For a 20-slide run, the timing report
@@ -254,6 +268,7 @@ The command returns `COMPLETED` only when:
 - every selected reference is a real, consistently sized 16:9 PNG with a
   passing inspection record;
 - every selected reference has one hash-bound fresh-context reconstruction job,
+  a validated raw-measurement inventory, hash-bound bounded-SVG decisions,
   complete worker receipt, official integration report, and exactly one merged
   `sN(s)` function in `lib/slides.js`;
 - the PPTX is a valid package whose slide count matches the approved blueprint;

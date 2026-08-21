@@ -46,9 +46,11 @@ is outside this dispatch rule.
 - The live reconstruction path must use the installed
   `slide-editable-deck-orchestrator` and its companion Skills.
 - The companion path is explicit: record the conditional
-  `slide-text-layer-inpaint` decision; prepare one hash-bound reconstruction job
-  per accepted source PNG; execute each slide in a fresh context; validate and
-  merge only through the official `validate_agent_work.js` and
+  `slide-text-layer-inpaint` decision; run the hash-bound
+  `prepare-vector-preflight` and `validate-vector-preflight` stages against all
+  accepted source PNGs; prepare one hash-bound reconstruction job per PNG;
+  execute each slide in a fresh context; validate and merge only through the
+  official `validate_agent_work.js` and
   `integrate_subagent_work.js`; render only through
   `slide-image-dual-render/scripts/slide_pipeline.js`; gate with its
   `final_gate.js`; and run `slide-visual-polish-qa` with source-slide mapping.
@@ -65,6 +67,15 @@ is outside this dispatch rule.
   must deterministically derive every Prompt and Semantic Sidecar from the
   approved Blueprint and Design System, with no additional model call. Do not
   hand-author a second prompt set or dispatch an unbound generic prompt.
+- After the accepted ImageGen batch exists, reuse `PPTXlocal/raw/pipeline` as
+  the external native-canvas measurement engine. Its detector/deep scan and
+  SVG icon library are hash-bound inputs; they are not copied, forked, or used
+  as an alternate PPTX renderer. Trace only measured flat/line regions no
+  larger than 35% of the slide and accept them only after SVG security and
+  raster-fidelity gates. Never vectorize semantic text, continuous-tone
+  imagery, or a full slide. Pass the resulting inventory and bounded SVG assets
+  to the canonical `slide-image-dual-render` reconstruction jobs so workers do
+  not spend model tokens re-measuring geometry.
 - Do not add unrequested hard prompt rules such as one-message-per-slide, three
   body elements, a mandatory three-second test, or category bans on body copy,
   tables, labels, dashboards, card grids, and infographic/poster compositions.

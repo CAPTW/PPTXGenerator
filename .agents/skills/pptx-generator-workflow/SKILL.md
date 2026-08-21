@@ -190,28 +190,47 @@ sequence and commands in `skillset_execution_plan.json`:
    preferred and audit/fund network chatter disabled, then install hardlock
    templates;
 3. after all selected PNGs and the batch manifest exist, run
-   `deckcompiler prepare-reconstruction-jobs --runtime <runtime>`. This creates
-   one hash-bound job and compact worker prompt per slide under
-   `work/slideXX/`;
-4. execute each job in a fresh context that can see only one source slide, its
-   job, Semantic Sidecar, and the canonical renderer Skill. Combine profile
-   mapping and reconstruction in that one context to avoid duplicate model
+   `deckcompiler prepare-vector-preflight --runtime <runtime>`. Resolve the
+   external `PPTXlocal/raw/pipeline` through `--pipeline-root`,
+   `PPTXLOCAL_RAW_PNGTOSVG_ROOT`, or repository-ancestor discovery. The stage
+   invokes the external detector/deep scan in at most two batch workers with
+   one shared OCR reader per worker, native canvas, deep text, and no model
+   call. This avoids reloading OCR weights for every slide. Select a prepared
+   raw Python through `--python-executable` or `PPTXLOCAL_RAW_PYTHON` when it is
+   different from the DeckCompiler interpreter. Deep mode fails before model
+   loading unless `pytesseract`, Tesseract, and both `eng`/`kor` packs exist;
+4. run `deckcompiler validate-vector-preflight --runtime <runtime>`. Measured
+   coordinates are authoritative. Only non-text `flat_shape`/`line` regions at
+   or below 35% of the slide may become SVG, and only after security,
+   portability, and raster-fidelity gates. Never vectorize semantic text,
+   continuous-tone imagery, or the complete slide. This stage supplies
+   reconstruction evidence/assets and never replaces the canonical renderer;
+5. run `deckcompiler prepare-reconstruction-jobs --runtime <runtime>`. This
+   creates one hash-bound job and compact worker prompt per slide under
+   `work/slideXX/`, binding the measurement inventory, bounded SVG decisions,
+   and vector-preflight manifest;
+6. execute each job in a fresh context that can see only one source slide, its
+   job, Semantic Sidecar, measured vector inventory, and the canonical renderer
+   Skill. Combine profile mapping and reconstruction in that one context to
+   avoid duplicate model
    passes. Use no more than four workers concurrently. Each worker writes only
    its assigned `work/slideXX/` artifacts and performs isolated PPTX/HTML QA.
    Keep those images under `work/slideXX/worker_qa/` so the later full-deck
-   source-mapped `visual_qa/` capture cannot invalidate their evidence hashes;
-5. run `deckcompiler validate-reconstruction-jobs --require-worker-outputs`,
+   source-mapped `visual_qa/` capture cannot invalidate their evidence hashes.
+   Each worker must record every approved SVG as used or deliberately deferred
+   in `vector_usage.json`;
+7. run `deckcompiler validate-reconstruction-jobs --require-worker-outputs`,
    then the official `validate_agent_work.js`. Reject stale source hashes,
    incomplete measurements, generic or backend-branched fragments, missing QA
    evidence, and receipts that edited shared files;
-6. run the official `integrate_subagent_work.js` with `WORK_DIR`, `SLIDES_OUT`,
+8. run the official `integrate_subagent_work.js` with `WORK_DIR`, `SLIDES_OUT`,
    `CROP_PLAN_OUT`, and `INTEGRATION_REPORT_OUT` from the execution plan. The
    integrator is the only writer of `lib/slides.js` and the integrated crop
    plan; parallel workers must never edit shared renderer files;
-7. keep `work/crop_plan.json` explicit even when it contains zero crops, run
+9. keep `work/crop_plan.json` explicit even when it contains zero crops, run
    crop preparation so `assets/manifest.json` exists, and do not use
    `--skip-crops` for final delivery;
-8. after all ImageGen references and validated integration artifacts are ready,
+10. after all ImageGen references and validated integration artifacts are ready,
    run one
    all-slide
    `slide-image-dual-render/scripts/slide_pipeline.js` build with
@@ -219,20 +238,20 @@ sequence and commands in `skillset_execution_plan.json`:
    explicit `--crop-plan`, an explicit project-local `--node-path`, and
    `--allow-large-batch`, writing directly to `deck-final-editable.pptx` and
    `deck-final-editable.html`;
-9. run `slide-image-dual-render/scripts/final_gate.js` with PPTX openability;
-10. run all five `slide-visual-polish-qa` steps once against that full-deck
+11. run `slide-image-dual-render/scripts/final_gate.js` with PPTX openability;
+12. run all five `slide-visual-polish-qa` steps once against that full-deck
    PPTX/HTML, using `--source-slides`;
-11. run `deckcompiler validate-visual-quality` against the official summary.
+13. run `deckcompiler validate-visual-quality` against the official summary.
    Only `palette_drift` and `pptx_html_edge_mismatch` may remain as accepted
    noticeable native-renderer diagnostics. Spacing, hierarchy, typography,
    clipping, missing content, and meaningful-detail loss require repair;
-12. when fail/blocking counts are zero and the high-fidelity policy accepts the
+14. when fail/blocking counts are zero and the high-fidelity policy accepts the
    result, take the single-compile fast path and do
    not repeat the all-slide build or QA merely to rename it "final"; run
    `fast_path_acceptance` to enforce the orchestration state;
-13. only when blockers exist, create targeted repair-wave plans, rebuild and QA
+15. only when blockers exist, create targeted repair-wave plans, rebuild and QA
    waves of at most five slides, for at most two iterations;
-14. after any repair, run one conditional all-slide compile, final gate, and
+16. after any repair, run one conditional all-slide compile, final gate, and
     full-deck QA so delivered capture metadata names and hash-binds the repaired
     PPTX/HTML.
 
@@ -246,6 +265,8 @@ Production defaults:
 - PPTX openability required.
 - exact official `slide-image-dual-render` render trace required;
 - initial ImageGen wave size 20 with concurrent dispatch;
+- external `PPTXlocal/raw` native-canvas measurement with at most two workers,
+  zero model calls, and hash-bound bounded-SVG gates before reconstruction;
 - one source slide per fresh reconstruction context, with at most four workers
   active and no full-deck context duplicated into worker prompts;
 - official worker validation and integration scripts required before compile;
@@ -292,6 +313,10 @@ completion only when:
   more than one targeted regeneration per slide;
 - selected slide references are real, consistently sized 16:9 PNGs rather than
   placeholder bytes;
+- `work/vector_preflight_manifest.json` validates the external raw detector
+  hash, every native-canvas measurement inventory, and every bounded SVG
+  security/fidelity gate without semantic-text, continuous-tone, or full-slide
+  vectorization;
 - every selected image is bound to exactly one isolated reconstruction job,
   worker receipt, official integration report, and generated shared
   `lib/slides.js` output;
@@ -321,6 +346,7 @@ Deliver at least:
 - final visual QA JSON and Markdown summaries;
 - contact sheet;
 - Image Generation batch manifest;
+- PNG-to-SVG vector-preflight manifest and per-slide usage decisions;
 - reconstruction job manifest and official integration report;
 - execution timing report;
 - sealed `codex_run.json`.

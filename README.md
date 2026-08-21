@@ -45,7 +45,8 @@ flowchart LR
     B --> C["Evidence Units<br/>29 records"]
     C --> D["Presentation Architecture<br/>3 modules · 3 batches · 6 slides"]
     D --> E["Semantic Sidecars<br/>+ Visual Targets"]
-    E --> F["Editable reconstruction<br/>PPTX + HTML"]
+    E --> V["Measured PNG→SVG preflight<br/>bounded non-text regions"]
+    V --> F["Editable reconstruction<br/>PPTX + HTML"]
     F --> G["PowerPoint + Chromium<br/>real render evidence"]
     G --> H["Composite QA<br/>+ bounded repair"]
     H --> I["Verified delivery ZIP"]
@@ -99,11 +100,23 @@ prompt wording or input channel.
 After approved Gates 1 and 2, the repo-owned Codex workflow calls
 `image_gen.imagegen` for every approved slide. The default `fast-quality-20`
 profile dispatches 20 independent built-in calls concurrently, then runs one
-fresh, isolated reconstruction context per accepted source slide (at most four
-workers concurrently), validates and integrates those fragments with the
+native-canvas measurement/SVG-preflight pass through the external
+`PPTXlocal/raw/pipeline` (at most two batch workers, one shared OCR reader per
+worker, and no model call). Only bounded,
+non-text flat regions that pass security and raster-fidelity gates become SVG
+assets; semantic text, continuous-tone imagery, and full-slide vectorization
+are forbidden. The profile then runs one fresh, isolated reconstruction context
+per accepted source slide (at most four workers concurrently), binds the
+measurement/SVG inventory into each job, validates and integrates those fragments with the
 official PNGtoPPTX scripts, then runs one all-slide compile and one
 source-mapped full-deck QA pass. It enters targeted repair only when the
 external gate or the repository high-fidelity issue policy finds a real defect.
+
+If the raw pipeline uses a separate prepared interpreter, set
+`PPTXLOCAL_RAW_PYTHON` or pass `--python-executable`; set
+`PPTXLOCAL_RAW_PNGTOSVG_ROOT` or pass `--pipeline-root` when ancestor discovery
+does not find `raw/pipeline`. Deep measurement fails fast unless pytesseract,
+Tesseract, and both `eng`/`kor` language packs are present.
 
 `generate` fails closed before intake when any tracked Architect package file,
 required ImageGen/PNGtoPPTX Skill, or official script is absent. The execution
@@ -111,7 +124,8 @@ plan binds the four repository Architect files plus installed companion Skill
 and entrypoint hashes and spells out the tested companion path:
 conditional text-layer preprocessing, project-local Node dependencies, explicit
 crop plan/manifest, `slide-image-dual-render` reconstruction hardlocks,
-hash-bound per-slide worker receipts, integrator-owned `lib/slides.js`,
+hash-bound raw measurement/vector manifests, per-slide SVG usage decisions and
+worker receipts, integrator-owned `lib/slides.js`,
 source-mapped PPTX/HTML visual QA, a single-compile fast path, repair waves of at
 most five slides only for defects, and the final openability gate. The profile
 records a 120-to-30-minute target for 20 slides (approximately 4x) without

@@ -14,6 +14,11 @@ from ..identity import content_sha256, stable_id
 from ..manifest_io import read_json, write_json
 from .image_requests import REQUEST_MANIFEST_NAME, validate_image_request_bundle
 from .skillset_plan import validate_skillset_execution_plan
+from .vector_preflight import (
+    MANIFEST_NAME as VECTOR_PREFLIGHT_MANIFEST_NAME,
+    POLICY_ID as VECTOR_PREFLIGHT_POLICY_ID,
+    validate_vector_preflight_bundle,
+)
 
 
 PROJECT_DIRECTORY = "pngtopptx-project"
@@ -23,6 +28,7 @@ JOB_SCHEMA = "codex_slide_reconstruction_job"
 MAX_PARALLEL_WORKERS = 4
 REQUIRED_OUTPUT_NAMES = (
     "measurements.json",
+    "vector_usage.json",
     "profile_override.json",
     "crop_plan.json",
     "s{slide}.fragment.js",
@@ -248,6 +254,19 @@ def _expected_bundle(root: Path) -> dict[str, Any]:
         )
 
     project = root / PROJECT_DIRECTORY
+    vector_preflight_path = project / "work" / VECTOR_PREFLIGHT_MANIFEST_NAME
+    vector_report = validate_vector_preflight_bundle(root)
+    if not vector_report["valid"]:
+        raise _error(
+            "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+            "PNG-to-SVG vector preflight is invalid: "
+            + "; ".join(vector_report["issues"][:6]),
+            vector_preflight_path,
+        )
+    vector_preflight = read_json(vector_preflight_path)
+    vector_by_slide = {
+        int(row["slide_number"]): row for row in vector_preflight["slides"]
+    }
     jobs: list[dict[str, Any]] = []
     for request_row in request_manifest["slides"]:
         slide = int(request_row["slide_number"])
@@ -267,6 +286,13 @@ def _expected_bundle(root: Path) -> dict[str, Any]:
         prompt_sha = _sha256_file(prompt_path)
         sidecar_sha = _sha256_file(sidecar_path)
         source_sha = _sha256_file(source_path)
+        vector_row = vector_by_slide.get(slide)
+        if vector_row is None:
+            raise _error(
+                "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
+                f"vector preflight has no measured record for slide {slide}",
+                vector_preflight_path,
+            )
         if call.get("request_id") != request_row.get("request_id"):
             raise _error(
                 "DC_RECONSTRUCTION_JOB_INPUT_INVALID",
@@ -291,12 +317,13 @@ def _expected_bundle(root: Path) -> dict[str, Any]:
             request_row["request_id"],
             source_sha,
             sidecar_sha,
+            vector_row["slide_content_hash"],
         )
         work_dir = project / "work" / f"slide{slide:02d}"
         output_names = [name.format(slide=slide) for name in REQUIRED_OUTPUT_NAMES]
         job: dict[str, Any] = {
             "schema_name": JOB_SCHEMA,
-            "schema_version": "1.0.0",
+            "schema_version": "1.1.0",
             "workflow_id": workflow_id,
             "job_id": job_id,
             "slide_number": slide,
@@ -308,6 +335,20 @@ def _expected_bundle(root: Path) -> dict[str, Any]:
             },
             "image_request": _artifact(root, prompt_path),
             "semantic_sidecar": _artifact(root, sidecar_path),
+            "vector_preflight": {
+                "policy_id": VECTOR_PREFLIGHT_POLICY_ID,
+                "manifest": _artifact(root, vector_preflight_path),
+                "slide_content_hash": vector_row["slide_content_hash"],
+                "measurement_inventory": vector_row["measurement_inventory"],
+                "detector_record": vector_row["detector_record"],
+                "regions": vector_row["regions"],
+                "parametric_icon_library": vector_preflight[
+                    "pipeline_provenance"
+                ]["svg_icon_library"],
+                "available_parametric_icon_names": vector_preflight[
+                    "pipeline_provenance"
+                ]["svg_icon_names"],
+            },
             "request_lineage": {
                 key: request_row[key]
                 for key in (
@@ -332,6 +373,11 @@ def _expected_bundle(root: Path) -> dict[str, Any]:
                 "targets": ["pptx", "html"],
                 "source_image_role": "visual_fidelity_target_not_delivered_slide_surface",
                 "exact_text_source": "semantic_sidecar",
+                "measured_geometry_source": "vector_preflight.measurement_inventory",
+                "measured_coordinates_authoritative": True,
+                "bounded_svg_assets_preferred_when_gate_passed": True,
+                "semantic_text_vectorization_forbidden": True,
+                "full_slide_vectorization_forbidden": True,
                 "native_text_required": True,
                 "native_structure_required": True,
                 "selective_photoreal_crops_allowed": True,
@@ -344,6 +390,8 @@ def _expected_bundle(root: Path) -> dict[str, Any]:
                 "source_png_sha256": source_sha,
                 "image_request_sha256": prompt_sha,
                 "semantic_sidecar_sha256": sidecar_sha,
+                "vector_preflight_sha256": _sha256_file(vector_preflight_path),
+                "vector_slide_content_hash": vector_row["slide_content_hash"],
                 "artifact_hashes_required": True,
             },
             "content_hash": "0" * 64,
@@ -361,6 +409,7 @@ def _expected_bundle(root: Path) -> dict[str, Any]:
                     "job_id": job_id,
                     "request_id": request_row["request_id"],
                     "source_png_sha256": source_sha,
+                    "vector_slide_content_hash": vector_row["slide_content_hash"],
                     "job_content_hash": job["content_hash"],
                 },
                 "job": job,
@@ -370,7 +419,7 @@ def _expected_bundle(root: Path) -> dict[str, Any]:
 
     header = {
         "schema_name": JOB_MANIFEST_SCHEMA,
-        "schema_version": "1.0.0",
+        "schema_version": "1.1.0",
         "workflow_id": workflow_id,
         "context_unit": "one_source_slide_per_fresh_context",
         "dispatch_mode": "bounded_parallel_workers",
@@ -383,6 +432,7 @@ def _expected_bundle(root: Path) -> dict[str, Any]:
             "image_request_manifest": _artifact(root, request_path),
             "image_generation_batch_manifest": _artifact(root, batch_path),
             "skillset_execution_plan": _artifact(root, plan_path),
+            "vector_preflight_manifest": _artifact(root, vector_preflight_path),
         },
         "slide_count": len(jobs),
     }
@@ -399,6 +449,17 @@ This is one isolated fresh-context reconstruction job. Read
 source image and semantic sidecar named there. Do not load any other slide image
 or full-deck prompt into this context.
 
+Treat `vector_preflight.measurement_inventory` as authoritative geometry. Do
+not spend model tokens re-measuring detected regions. Use each passed
+`bounded_svg_asset` directly when it preserves the intended editable structure;
+record every used or deliberately deferred measured region in
+`vector_usage.json`. The hash-bound raw `parametric_icon_library` may replace a
+measured simple icon only when one of its declared names is an exact semantic
+match; record that decision in `parametricIconUses`. Never convert semantic
+text, a continuous-tone region, or
+the complete slide to SVG. The measured assets are inputs to this official
+SkillSet reconstruction, not an alternate renderer.
+
 Quality target: reproduce the source slide's composition, typography hierarchy,
 spacing, visual density, imagery, and meaningful small details at the level of a
 careful one-slide SkillSet conversion. Rebuild all readable text and structural
@@ -409,8 +470,10 @@ semantic sidecar. Do not simplify the source into generic cards or an invented
 template.
 
 Read the renderer Skill, `styles/_schema.md`, `scripts/classify.md`,
-`references/codex-subagents.md`, and `references/hardlock-mode.md`. Measure and
-classify before authoring. Write only inside `{work_dir.as_posix()}`; never edit
+`references/codex-subagents.md`, and `references/hardlock-mode.md`. Populate the
+required measurements from the authoritative inventory and classify before
+authoring; measure pixels again only when the inventory explicitly leaves a
+region unresolved. Write only inside `{work_dir.as_posix()}`; never edit
 `lib/slides.js`, `styles/`, `assets/`, build scripts, or other slide folders.
 Use an isolated one-slide test render for PPTX and HTML QA. The integrator alone
 will merge accepted fragments into shared files. Store the worker's isolated
@@ -423,10 +486,11 @@ Required outputs:
 
 `worker_receipt.json` must use `agent: slide_reconstruct_worker`,
 `status: completed`, `sharedFilesEdited: false`, list every produced artifact,
-and include `jobId`, `jobContentHash`, the three receipt-binding hashes from the
-job, plus `artifactHashes` containing the SHA-256 of every listed artifact other
-than the receipt itself. Do not report pass until the isolated source-vs-render
-comparison and editable-object checks have actually passed.
+and include `jobId`, `jobContentHash`, all five receipt-binding hashes from the
+job, plus `artifactHashes`
+containing the SHA-256 of every listed artifact other than the receipt itself.
+Do not report pass until the isolated source-vs-render comparison and
+editable-object checks have actually passed.
 """
 
 
@@ -462,6 +526,10 @@ def _validate_worker_outputs(
                 issues.append(
                     f"{label} measurements canvas height must be {expected_height}"
                 )
+
+    vector_usage = _read_worker_json(work_dir / "vector_usage.json", issues, label)
+    if vector_usage is not None:
+        _validate_vector_usage(vector_usage, job, label, issues)
 
     profile = _read_worker_json(work_dir / "profile_override.json", issues, label)
     if profile is not None:
@@ -616,6 +684,8 @@ def _validate_worker_outputs(
         "sourcePngSha256": binding["source_png_sha256"],
         "imageRequestSha256": binding["image_request_sha256"],
         "semanticSidecarSha256": binding["semantic_sidecar_sha256"],
+        "vectorPreflightSha256": binding["vector_preflight_sha256"],
+        "vectorSlideContentHash": binding["vector_slide_content_hash"],
     }
     for key, value in expected_fields.items():
         if receipt.get(key) != value:
@@ -704,6 +774,101 @@ def _validate_integrated_outputs(
     else:
         if not isinstance(crop_plan, dict):
             issues.append("integrated crop_plan.json must be an object")
+
+
+def _validate_vector_usage(
+    payload: dict[str, Any],
+    job: dict[str, Any],
+    label: str,
+    issues: list[str],
+) -> None:
+    preflight = job["vector_preflight"]
+    binding = job["receipt_binding"]
+    expected_fields = {
+        "slide": job["slide_number"],
+        "policyId": preflight["policy_id"],
+        "vectorPreflightSha256": binding["vector_preflight_sha256"],
+        "vectorSlideContentHash": binding["vector_slide_content_hash"],
+        "measurementInventorySha256": preflight["measurement_inventory"]["sha256"],
+        "measuredCoordinatesAuthoritative": True,
+    }
+    for key, value in expected_fields.items():
+        if payload.get(key) != value:
+            issues.append(f"{label} vector_usage.{key} must be {value!r}")
+
+    candidates = {
+        region["region_id"]: region
+        for region in preflight["regions"]
+        if region.get("disposition") == "bounded_svg_asset"
+    }
+    used = payload.get("usedRegions")
+    deferred = payload.get("deferredRegions")
+    icon_uses = payload.get("parametricIconUses")
+    if not isinstance(used, list):
+        issues.append(f"{label} vector_usage.usedRegions must be an array")
+        used = []
+    if not isinstance(deferred, list):
+        issues.append(f"{label} vector_usage.deferredRegions must be an array")
+        deferred = []
+    if not isinstance(icon_uses, list):
+        issues.append(f"{label} vector_usage.parametricIconUses must be an array")
+        icon_uses = []
+    accounted: list[str] = []
+    for row in used:
+        if not isinstance(row, dict) or not str(row.get("regionId", "")).strip():
+            issues.append(f"{label} vector_usage used region must name regionId")
+            continue
+        region_id = str(row["regionId"])
+        accounted.append(region_id)
+        candidate = candidates.get(region_id)
+        if candidate is None:
+            issues.append(f"{label} vector_usage uses non-approved SVG region {region_id}")
+            continue
+        if row.get("assetSha256") != candidate["vector_svg"]["sha256"]:
+            issues.append(f"{label} vector_usage asset hash mismatch for {region_id}")
+    for row in deferred:
+        if not isinstance(row, dict) or not str(row.get("regionId", "")).strip():
+            issues.append(f"{label} vector_usage deferred region must name regionId")
+            continue
+        region_id = str(row["regionId"])
+        accounted.append(region_id)
+        if region_id not in candidates:
+            issues.append(f"{label} vector_usage defers non-approved SVG region {region_id}")
+        if len(str(row.get("reason", "")).strip()) < 8:
+            issues.append(f"{label} vector_usage deferred region {region_id} needs a reason")
+    if sorted(accounted) != sorted(candidates):
+        issues.append(
+            f"{label} vector_usage must use or defer every approved bounded SVG region"
+        )
+    if len(accounted) != len(set(accounted)):
+        issues.append(f"{label} vector_usage contains duplicate region decisions")
+    measured_regions = {
+        region["region_id"]: region for region in preflight["regions"]
+    }
+    allowed_icons = set(preflight["available_parametric_icon_names"])
+    icon_region_ids: list[str] = []
+    for row in icon_uses:
+        if not isinstance(row, dict):
+            issues.append(f"{label} vector_usage parametric icon use must be an object")
+            continue
+        name = str(row.get("name", ""))
+        region_id = str(row.get("regionId", ""))
+        region = measured_regions.get(region_id)
+        icon_region_ids.append(region_id)
+        if name not in allowed_icons:
+            issues.append(f"{label} vector_usage uses unknown parametric icon {name}")
+        if region is None:
+            issues.append(f"{label} vector_usage icon {name} has unknown region {region_id}")
+            continue
+        if region.get("semantic_text_overlap_ids"):
+            issues.append(f"{label} vector_usage icon {name} overlaps semantic text")
+        if region.get("area_ratio", 1) > 0.35 or region.get("kind_hint") == "photo":
+            issues.append(f"{label} vector_usage icon {name} is not a bounded icon region")
+        color = str(row.get("color", ""))
+        if not re.fullmatch(r"#[0-9A-Fa-f]{6}", color):
+            issues.append(f"{label} vector_usage icon {name} needs a #RRGGBB color")
+    if len(icon_region_ids) != len(set(icon_region_ids)):
+        issues.append(f"{label} vector_usage duplicates a parametric icon region")
 
 
 def _validate_evidence_file(

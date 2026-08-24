@@ -22,10 +22,10 @@ EXPECTED_SKILLS: tuple[str, ...] = (
 )
 
 KNOWN_SKILL_HASHES: dict[str, str] = {
-    "slide-editable-deck-orchestrator": "b8d157acf6179197401b053b52b730c8d605fc877cc8b087d99f2c13a4964b7d",
-    "slide-text-layer-inpaint": "e433ca0a9357f9b721866c33021db57d7ebbb6cb53b368b7500496140058720e",
-    "slide-image-dual-render": "8b5ae4a3d4624222fc0779014f79be6679e904356777558f1dfde8f72a4c3ba9",
-    "slide-visual-polish-qa": "4c3ff087e112ad2742d276b53480b62158852a8c9fbc8ddb487c9dbeec9db50a",
+    "slide-editable-deck-orchestrator": "1861d6f14af847004758ab27abd1df3a0750e12176d1b000604b656cc52a7554",
+    "slide-text-layer-inpaint": "2160cc435cae98294542d5b6c7a68d1fbf111c65f659875fcaca0b7ce6cae29e",
+    "slide-image-dual-render": "b6ed33b1f305142b4c3f6814037eec9767aeff970e3be6a940746788028c483f",
+    "slide-visual-polish-qa": "9df491768af56d5f896ba15bc6aed9dd7c066bfdc8dbb65501a30e5688494c7e",
 }
 
 CANONICAL_REPOSITORY = "CAPTW/pngtopptx"
@@ -576,13 +576,19 @@ def validate_external_skillset_pin(
     installation_root: str | Path,
     payload: Mapping[str, Any],
     *,
-    expected_skill_hashes: Mapping[str, str] = KNOWN_SKILL_HASHES,
+    expected_skill_hashes: Mapping[str, str] | None = None,
 ) -> dict[str, Any]:
     validate_pin_claims(payload)
     if payload.get("pin_hash") != _pin_hash(payload):
         raise PinningError("PIN_HASH_MISMATCH", "pin artifact self-hash does not verify")
+    resolved_skill_hashes = expected_skill_hashes
+    if resolved_skill_hashes is None:
+        recorded = payload.get("known_skill_md_hashes")
+        resolved_skill_hashes = (
+            recorded if isinstance(recorded, Mapping) else KNOWN_SKILL_HASHES
+        )
     current = build_installation_inventory(
-        installation_root, expected_skill_hashes=expected_skill_hashes
+        installation_root, expected_skill_hashes=resolved_skill_hashes
     )
     if current["combined_aggregate_sha256"] != payload.get("combined_aggregate_sha256"):
         raise PinningError(

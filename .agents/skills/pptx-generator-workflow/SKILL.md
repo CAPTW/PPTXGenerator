@@ -41,7 +41,7 @@ Never copy or modify the external PNGtoPPTX Skill implementation in this
 repository.
 
 The live fast-path baseline is the canonical `CAPTW/pngtopptx` commit
-`2b6120d39a5a51457615b77521e39cb272344672`; `dependencies.json` records its
+`d414d45a3c4e5881ac3262c451d4f84fd98d4c19`; `dependencies.json` records its
 four Skill tree OIDs and combined content aggregate. The generated execution
 plan additionally binds the exact installed Skill and entrypoint hashes for the
 run. Do not substitute the older frozen DevPost demo pin for live production.
@@ -57,8 +57,8 @@ copies and fingerprints inputs and writes:
 - `codex_dispatch.json`
 - `CODEX_WORKFLOW.md`
 - `skillset_execution_plan.json`
-- an isolated `pngtopptx-project/` scaffold with an explicit empty
-  `work/crop_plan.json`
+- an isolated `pngtopptx-project/` scaffold with explicit empty
+  `work/crop_plan.json` and `work/font_usage.json` manifests
 
 The expected status is `AWAITING_WORKFLOW_ARCHITECT`. If the command enters
 image generation or produces a PPTX, treat that as a contract violation.
@@ -240,34 +240,41 @@ sequence and commands in `skillset_execution_plan.json`:
    backend-branched fragments, and any worker that edited shared files;
 6. run the official `integrate_subagent_work.js` with `WORK_DIR`, `SLIDES_OUT`,
    `CROP_PLAN_OUT`, and `INTEGRATION_REPORT_OUT` from the execution plan. The
-   integrator is the only writer of `lib/slides.js` and the integrated crop
-   plan; parallel workers must never edit shared renderer files;
-7. keep `work/crop_plan.json` explicit even when it contains zero crops, run
+   integrator is the only writer of `lib/slides.js`, the integrated crop plan,
+   and the merged original-font inventory; parallel workers must never edit
+   shared renderer files;
+7. run the official `font_preflight.js` before rendering. It must collect the
+   original fonts, scan system and per-user font locations, use an exact family
+   when installed, and write `out/font_resolution_manifest.json` with every
+   Original -> Resolved mapping. It must never install automatically. Exit code
+   `3` means pause and ask the user; after `installed`, `declined`, or
+   `unavailable`, rerun and continue with exact fonts or documented fallbacks;
+8. keep `work/crop_plan.json` explicit even when it contains zero crops, run
    crop preparation so `assets/manifest.json` exists, and do not use
    `--skip-crops` for final delivery;
-8. run one all-slide shared preview build through the official
+9. run one all-slide shared preview build through the official
    `slide_pipeline.js` in canary mode. Rasterize the preview PPTX and capture
    its HTML once, then use `--source-slides` to compare all 20 mapped pages to
    the selected source PNGs. Do not deliver the preview;
-9. run all five `slide-visual-polish-qa` steps against the shared preview and
+10. run all five `slide-visual-polish-qa` steps against the shared preview and
    run `deckcompiler validate-visual-quality` against its official summary.
    Only `palette_drift` and `pptx_html_edge_mismatch` may remain as accepted
    noticeable native-renderer diagnostics. Spacing, hierarchy, typography,
    clipping, missing content, and meaningful-detail loss require repair;
-10. run `deckcompiler finalize-shared-render-qa --runtime <runtime> --summary
+11. run `deckcompiler finalize-shared-render-qa --runtime <runtime> --summary
     <preview-summary>` to close each job's QA evidence and hash-bound receipt
     from the mapped shared-preview pages, then run `validate-reconstruction-jobs
     --require-worker-outputs`. Per-slide source comparison, native-object,
     exact-copy, crop, and editability requirements remain mandatory; only the
     duplicate per-slide build is removed;
-11. run one final all-slide `slide_pipeline.js` build with
+12. run one final all-slide `slide_pipeline.js` build with
     `--quality reconstruction --require-qa --require-reconstruction`, an
     explicit crop plan and project-local node path, and `--allow-large-batch`,
     writing `deck-final-editable.pptx` and `.html`. Run `final_gate.js` with
     PPTX openability and the final source-mapped Visual QA chain;
-12. only when blockers exist, create targeted repair-wave plans, rebuild and QA
+13. only when blockers exist, create targeted repair-wave plans, rebuild and QA
    waves of at most five slides, for at most two iterations;
-13. after any repair, run one conditional all-slide compile, final gate, and
+14. after any repair, run one conditional all-slide compile, final gate, and
     full-deck QA so delivered capture metadata names and hash-binds the repaired
     PPTX/HTML.
 
@@ -286,6 +293,9 @@ Production defaults:
 - one source slide per fresh reconstruction context, with at most six workers
   active and no full-deck context duplicated into worker prompts;
 - official worker validation and integration scripts required before compile;
+- exact installed-font resolution preferred, no automatic font installation,
+  user approval required before any installation, and Original -> Resolved
+  mappings required even when fallback is used;
 - zero isolated per-slide builds and exactly two shared full-deck renders on the
   normal path: one preview evidence render and one final reconstruction render;
 - repair wave size at most 5, with a single conditional post-repair full-deck
@@ -337,7 +347,8 @@ completion only when:
 - reconstruction hardlocks and PPTX openability pass;
 - `skillset_execution_plan.json`, orchestration state, the official
   `slide-image-dual-render` render trace, crop plan/manifest, crop coverage, and
-  objective QA evidence are all hash-bound to the run;
+  objective QA evidence are all hash-bound to the run; the render trace must
+  also prove font-resolution PASS and zero automatic installation attempts;
 - the PPTX package slide count and actual-render native-object manifest match
   the approved blueprint, with editable text on every slide;
 - the external visual-QA summary agrees with the sealed fail, blocking, and

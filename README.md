@@ -126,18 +126,26 @@ inputs. The measured runs were 42.224 seconds with a cold HTML capture and
 first-time arbitrary-image authoring miss remains on the full `terra-max` lane;
 the repository does not claim a two-minute bound for that case.
 
-The live fast-path baseline is canonical `CAPTW/pngtopptx` commit `2b6120d`.
+The live fast-path baseline is canonical `CAPTW/pngtopptx` commit `d414d45`.
 Its exact four-Skill tree OIDs and combined aggregate are recorded in the
 workflow dependency contract, while each generated run binds the installed
 entrypoint hashes. The separately certified DevPost demo keeps its older
 release pin unchanged as historical evidence.
+
+Before either shared render, the workflow merges each slide's original-font
+inventory and scans both system and per-user font locations. Exact installed
+families are used first. Missing fonts never trigger automatic installation:
+the run emits an install request and pauses for the user's decision, then
+continues with the installed font or a documented fallback. The final evidence
+always includes an Original -> Resolved font mapping.
 
 `generate` fails closed before intake when any tracked Architect package file,
 required ImageGen/PNGtoPPTX Skill, or official script is absent. The execution
 plan binds the four repository Architect files plus installed companion Skill
 and entrypoint hashes and spells out the tested companion path:
 conditional text-layer preprocessing, project-local Node dependencies, explicit
-crop plan/manifest, `slide-image-dual-render` reconstruction hardlocks,
+crop plan/manifest, original-font preflight and mapping,
+`slide-image-dual-render` reconstruction hardlocks,
 measured-coordinate and bounded non-text SVG gates, hash-bound per-slide worker
 receipts, integrator-owned `lib/slides.js`,
 source-mapped PPTX/HTML visual QA, zero isolated per-slide builds, two shared

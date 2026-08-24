@@ -119,6 +119,8 @@ def seal_one_slide_fast_cache(
         ("native_object_manifest", root / "out" / "native_object_manifest.json"),
         ("crop_coverage_summary", root / "out" / "crop_coverage_summary.json"),
         ("qa_evidence_summary", root / "out" / "qa_evidence_summary.json"),
+        ("font_resolution_manifest", root / "out" / "font_resolution_manifest.json"),
+        ("font_install_request", root / "out" / "font_install_request.json"),
         ("icon_cache_manifest", root / "assets" / "icons" / "manifest.json"),
         ("background_cache_manifest", root / "assets" / "bg.manifest.json"),
         (
@@ -228,10 +230,12 @@ def _input_paths(root: Path, slide: int) -> Iterable[tuple[str, Path]]:
         ("design_profile", root / "styles" / "active.json"),
         ("deck_crop_plan", root / "work" / "crop_plan.json"),
         ("deck_icon_usage", root / "work" / "icon_usage.json"),
+        ("deck_font_usage", root / "work" / "font_usage.json"),
         ("reconstruction_job", work / "reconstruction_job.json"),
         ("measurements", work / "measurements.json"),
         ("vector_usage", work / "vector_usage.json"),
         ("slide_icon_usage", work / "icon_usage.json"),
+        ("slide_font_usage", work / "font_usage.json"),
         ("profile_override", work / "profile_override.json"),
         ("slide_crop_plan", work / "crop_plan.json"),
         ("fragment", work / f"s{slide}.fragment.js"),
@@ -257,6 +261,13 @@ def _validate_render_trace(trace: dict[str, Any], slide: int) -> None:
         raise ValueError("render trace does not include the requested slide")
     if trace.get("qaSummary", {}).get("passed") is not True:
         raise ValueError("render trace qaSummary.passed must be true")
+    font_resolution = trace.get("fontResolution")
+    if not isinstance(font_resolution, dict) or font_resolution.get("status") != "PASS":
+        raise ValueError("render trace fontResolution.status must be PASS")
+    if font_resolution.get("automaticInstallationAttempted") is not False:
+        raise ValueError(
+            "render trace must prove automatic font installation was not attempted"
+        )
     if trace.get("enforcementDisabled") is True:
         raise ValueError("render trace shows enforcement disabled")
 
@@ -268,6 +279,7 @@ def _trace_toolchain_paths(trace: dict[str, Any]) -> Iterable[tuple[str, Path]]:
         "renderer_kit": "kitJsPath",
         "renderer_atoms_pptx": "atomsPptxPath",
         "renderer_atoms_html": "atomsHtmlPath",
+        "font_preflight": "fontPreflightPath",
     }
     for role, field in fields.items():
         raw = trace.get(field)

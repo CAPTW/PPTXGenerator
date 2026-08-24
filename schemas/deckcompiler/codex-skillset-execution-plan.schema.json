@@ -19,6 +19,7 @@
     "environment_template",
     "dependency_contract",
     "vector_preflight_contract",
+    "font_contract",
     "execution_profile",
     "quality_contract",
     "crop_contract",
@@ -31,7 +32,7 @@
   ],
   "properties": {
     "schema_name": {"const": "codex_skillset_execution_plan"},
-    "schema_version": {"const": "1.8.0"},
+    "schema_version": {"const": "1.9.0"},
     "workflow_id": {"type": "string", "pattern": "^generate_[0-9a-f]{20}$"},
     "status": {"const": "READY"},
     "skill_root": {"type": "string", "minLength": 1},
@@ -80,6 +81,7 @@
         "detect_residual_text",
         "enforce_text_layer",
         "install_hardlock",
+        "font_preflight",
         "crop_generator",
         "slide_pipeline",
         "final_gate",
@@ -113,6 +115,10 @@
         "profile_path",
         "qa_calibration_profile_path",
         "icon_usage_path",
+        "font_usage_path",
+        "per_slide_font_usage_pattern",
+        "font_resolution_manifest_path",
+        "font_install_request_path",
         "icon_cache_manifest_path",
         "background_cache_manifest_path",
         "slides_source_path",
@@ -137,6 +143,10 @@
         "profile_path": {"type": "string", "pattern": "active\\.json$"},
         "qa_calibration_profile_path": {"type": "string", "pattern": "default-visual-qa-profile\\.json$"},
         "icon_usage_path": {"type": "string", "pattern": "icon_usage\\.json$"},
+        "font_usage_path": {"type": "string", "pattern": "font_usage\\.json$"},
+        "per_slide_font_usage_pattern": {"type": "string", "pattern": "slideXX[\\\\/]font_usage\\.json$"},
+        "font_resolution_manifest_path": {"type": "string", "pattern": "font_resolution_manifest\\.json$"},
+        "font_install_request_path": {"type": "string", "pattern": "font_install_request\\.json$"},
         "icon_cache_manifest_path": {"type": "string", "pattern": "icons[\\\\/]manifest\\.json$"},
         "background_cache_manifest_path": {"type": "string", "pattern": "bg\\.manifest\\.json$"},
         "slides_source_path": {"type": "string", "pattern": "slides\\.js$"},
@@ -148,13 +158,17 @@
     "environment_template": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["SLIDE_PIPELINE_STRICT", "DECK_PROFILE", "DECK_ASSETS", "DECK_ICON_USAGE", "DECK_ICON_WORKERS", "VISUAL_QA_PROFILE", "DECK_PXW", "DECK_PXH", "CROP_PLAN", "SRC_DIR", "WORK_DIR", "SLIDES_OUT", "CROP_PLAN_OUT", "INTEGRATION_REPORT_OUT"],
+      "required": ["SLIDE_PIPELINE_STRICT", "DECK_PROFILE", "DECK_ASSETS", "DECK_ICON_USAGE", "DECK_ICON_WORKERS", "DECK_FONT_USAGE", "DECK_FONT_INSTALL_DECISION", "DECK_FONT_RESOLUTION_MANIFEST", "DECK_FONT_INSTALL_REQUEST", "VISUAL_QA_PROFILE", "DECK_PXW", "DECK_PXH", "CROP_PLAN", "SRC_DIR", "WORK_DIR", "SLIDES_OUT", "CROP_PLAN_OUT", "INTEGRATION_REPORT_OUT"],
       "properties": {
         "SLIDE_PIPELINE_STRICT": {"const": "1"},
         "DECK_PROFILE": {"type": "string", "minLength": 1},
         "DECK_ASSETS": {"type": "string", "minLength": 1},
         "DECK_ICON_USAGE": {"type": "string", "pattern": "icon_usage\\.json$"},
         "DECK_ICON_WORKERS": {"const": "16"},
+        "DECK_FONT_USAGE": {"type": "string", "pattern": "font_usage\\.json$"},
+        "DECK_FONT_INSTALL_DECISION": {"const": "ask"},
+        "DECK_FONT_RESOLUTION_MANIFEST": {"type": "string", "pattern": "font_resolution_manifest\\.json$"},
+        "DECK_FONT_INSTALL_REQUEST": {"type": "string", "pattern": "font_install_request\\.json$"},
         "VISUAL_QA_PROFILE": {"type": "string", "pattern": "default-visual-qa-profile\\.json$"},
         "DECK_PXW": {"const": "<source-width>"},
         "DECK_PXH": {"const": "<source-height>"},
@@ -243,6 +257,24 @@
         "full_slide_vectorization_forbidden": {"const": true},
         "svg_security_and_fidelity_gate_required": {"const": true},
         "canonical_renderer_unchanged": {"const": "slide-image-dual-render"}
+      }
+    },
+    "font_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["original_font_collection_required", "system_and_user_font_scan_required", "exact_font_preferred", "automatic_installation_forbidden", "default_install_decision", "missing_font_exit_code", "missing_font_action", "post_decision_values", "fallback_after_declined_or_unavailable", "original_to_resolved_mapping_required", "conversion_continues_after_decision"],
+      "properties": {
+        "original_font_collection_required": {"const": true},
+        "system_and_user_font_scan_required": {"const": true},
+        "exact_font_preferred": {"const": true},
+        "automatic_installation_forbidden": {"const": true},
+        "default_install_decision": {"const": "ask"},
+        "missing_font_exit_code": {"const": 3},
+        "missing_font_action": {"const": "pause_and_ask_user"},
+        "post_decision_values": {"const": ["installed", "declined", "unavailable"]},
+        "fallback_after_declined_or_unavailable": {"const": true},
+        "original_to_resolved_mapping_required": {"const": true},
+        "conversion_continues_after_decision": {"const": true}
       }
     },
     "execution_profile": {
@@ -589,6 +621,7 @@
         "validate_reconstruction_jobs",
         "validate_agent_work",
         "integrate_agent_work",
+        "preflight_fonts",
         "prepare_crops",
         "compile_shared_preview",
         "rasterize_shared_preview",
@@ -643,6 +676,7 @@
         "validate_reconstruction_jobs": {"$ref": "#/$defs/command"},
         "validate_agent_work": {"$ref": "#/$defs/command"},
         "integrate_agent_work": {"$ref": "#/$defs/command"},
+        "preflight_fonts": {"$ref": "#/$defs/command"},
         "prepare_crops": {"$ref": "#/$defs/command"},
         "compile_shared_preview": {"$ref": "#/$defs/command"},
         "rasterize_shared_preview": {"$ref": "#/$defs/command"},
@@ -726,6 +760,7 @@
             "validate_reconstruction_jobs",
             "validate_agent_work",
             "integrate_agent_work",
+            "preflight_fonts",
             "prepare_crops"
           ]
         },
@@ -806,10 +841,11 @@
     "stop_conditions": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["complete", "needs_repair", "blocked"],
+      "required": ["complete", "needs_repair", "user_decision_required", "blocked"],
       "properties": {
         "complete": {"type": "string", "minLength": 1},
         "needs_repair": {"type": "string", "minLength": 1},
+        "user_decision_required": {"type": "string", "minLength": 1},
         "blocked": {"type": "string", "minLength": 1}
       }
     },

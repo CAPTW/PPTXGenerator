@@ -90,10 +90,12 @@ class OneSlideFastTests(unittest.TestCase):
             project / "styles" / "active.json": json.dumps({"profileId": "academic"}),
             project / "work" / "crop_plan.json": json.dumps({"schema_version": "1.0.0", "crops": []}),
             project / "work" / "icon_usage.json": json.dumps({"schemaVersion": "slide-image-dual-render.icon-usage.v1", "icons": []}),
+            project / "work" / "font_usage.json": json.dumps({"schemaVersion": "slide-image-dual-render.font-usage.v1", "fonts": [{"originalFont": "Pretendard"}]}),
             work / "reconstruction_job.json": "{}",
             work / "measurements.json": "{}",
             work / "vector_usage.json": "{}",
             work / "icon_usage.json": json.dumps({"schemaVersion": "slide-image-dual-render.icon-usage.v1", "icons": []}),
+            work / "font_usage.json": json.dumps({"schemaVersion": "slide-image-dual-render.font-usage.v1", "fonts": [{"originalFont": "Pretendard"}]}),
             work / "profile_override.json": "{}",
             work / "crop_plan.json": "{}",
             work / "s1.fragment.js": "function s1(s) {}\n",
@@ -102,6 +104,8 @@ class OneSlideFastTests(unittest.TestCase):
             project / "out" / "native_object_manifest.json": "{}",
             project / "out" / "crop_coverage_summary.json": "{}",
             project / "out" / "qa_evidence_summary.json": "{}",
+            project / "out" / "font_resolution_manifest.json": json.dumps({"schemaVersion": "slide-image-dual-render.font-resolution-manifest.v1", "status": "PASS", "automaticInstallationAttempted": False, "mappings": [{"original": "Pretendard", "resolved": "Pretendard"}]}),
+            project / "out" / "font_install_request.json": json.dumps({"schemaVersion": "slide-image-dual-render.font-install-request.v1", "status": "NOT_REQUIRED", "automaticInstallationAttempted": False, "requestedFonts": []}),
             project / "out" / "pptx_openability_debug" / "pptx_package_validation.json": json.dumps({"passed": True}),
             project / "assets" / "icons" / "manifest.json": "{}",
             project / "assets" / "bg.manifest.json": "{}",
@@ -177,7 +181,7 @@ class OneSlideFastTests(unittest.TestCase):
         toolchain = root / "toolchain"
         toolchain.mkdir()
         tools = {}
-        for name in ("build.js", "kit.js", "atoms_pptx.js", "atoms_html.js"):
+        for name in ("build.js", "kit.js", "atoms_pptx.js", "atoms_html.js", "font_preflight.js"):
             path = toolchain / name
             path.write_text(name, encoding="utf-8")
             tools[name] = path
@@ -194,6 +198,15 @@ class OneSlideFastTests(unittest.TestCase):
             "kitJsPath": tools["kit.js"].as_posix(),
             "atomsPptxPath": tools["atoms_pptx.js"].as_posix(),
             "atomsHtmlPath": tools["atoms_html.js"].as_posix(),
+            "fontPreflightPath": tools["font_preflight.js"].as_posix(),
+            "fontResolution": {
+                "status": "PASS",
+                "originalFontCount": 1,
+                "exactCount": 1,
+                "fallbackCount": 0,
+                "approvalRequiredCount": 0,
+                "automaticInstallationAttempted": False,
+            },
         }
         (project / "out" / "render_trace.json").write_text(json.dumps(trace), encoding="utf-8")
         qa_profile = root / "default-visual-qa-profile.json"

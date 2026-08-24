@@ -109,6 +109,10 @@ _ENTRYPOINTS = {
         "slide-image-dual-render",
         "slide-image-dual-render/scripts/install_hardlock.js",
     ),
+    "font_preflight": (
+        "slide-image-dual-render",
+        "slide-image-dual-render/scripts/font_preflight.js",
+    ),
     "crop_generator": (
         "slide-image-dual-render",
         "slide-image-dual-render/scripts/make_crops.py",
@@ -314,6 +318,10 @@ def scaffold_runtime_project(runtime_root: Path) -> Path:
         project / "work" / "crop_plan.json",
         {"schema_version": "1.0.0", "crops": []},
     )
+    write_json(
+        project / "work" / "font_usage.json",
+        {"schemaVersion": "slide-image-dual-render.font-usage.v1", "fonts": []},
+    )
     for relative in (
         "architect",
         "image_batches",
@@ -358,6 +366,9 @@ def build_skillset_execution_plan(
     vector_preflight = (project / "work" / "vector_preflight_manifest.json").as_posix()
     integration_report = (project / "work" / "integration_report.md").as_posix()
     icon_usage = (project / "work" / "icon_usage.json").as_posix()
+    font_usage = (project / "work" / "font_usage.json").as_posix()
+    font_resolution = (project / "out" / "font_resolution_manifest.json").as_posix()
+    font_install_request = (project / "out" / "font_install_request.json").as_posix()
     qa_calibration_profile = inspection["qa_calibration_profile"]["path"]
 
     commands = {
@@ -504,6 +515,18 @@ def build_skillset_execution_plan(
             "node",
             ep("integrate_subagent_work"),
         ],
+        "preflight_fonts": [
+            "node",
+            ep("font_preflight"),
+            "--project",
+            project_value,
+            "--font-usage",
+            font_usage,
+            "--manifest",
+            font_resolution,
+            "--install-request",
+            font_install_request,
+        ],
         "prepare_crops": ["python", ep("crop_generator")],
         "compile_shared_preview": [
             "node",
@@ -517,6 +540,10 @@ def build_skillset_execution_plan(
             "--allow-large-batch",
             "--crop-plan",
             crop_plan,
+            "--font-usage",
+            font_usage,
+            "--font-install-decision",
+            "<font-install-decision>",
             "--node-path",
             node_modules,
             "--target",
@@ -639,6 +666,10 @@ def build_skillset_execution_plan(
             node_modules,
             "--icon-usage",
             icon_usage,
+            "--font-usage",
+            font_usage,
+            "--font-install-decision",
+            "<font-install-decision>",
             "--target",
             "both",
             "--pptx-out",
@@ -663,6 +694,10 @@ def build_skillset_execution_plan(
             node_modules,
             "--icon-usage",
             icon_usage,
+            "--font-usage",
+            font_usage,
+            "--font-install-decision",
+            "<font-install-decision>",
             "--skip-assets",
             "--target",
             "both",
@@ -789,6 +824,10 @@ def build_skillset_execution_plan(
             node_modules,
             "--icon-usage",
             icon_usage,
+            "--font-usage",
+            font_usage,
+            "--font-install-decision",
+            "<font-install-decision>",
             "--target",
             "both",
             "--pptx-out",
@@ -988,7 +1027,7 @@ def build_skillset_execution_plan(
 
     payload: dict[str, Any] = {
         "schema_name": PLAN_SCHEMA,
-        "schema_version": "1.8.0",
+        "schema_version": "1.9.0",
         "workflow_id": workflow_id,
         "status": "READY",
         "skill_root": inspection["skill_root"],
@@ -1043,6 +1082,12 @@ def build_skillset_execution_plan(
             "profile_path": (project / "styles" / "active.json").as_posix(),
             "qa_calibration_profile_path": qa_calibration_profile,
             "icon_usage_path": icon_usage,
+            "font_usage_path": font_usage,
+            "per_slide_font_usage_pattern": (
+                project / "work" / "slideXX" / "font_usage.json"
+            ).as_posix(),
+            "font_resolution_manifest_path": font_resolution,
+            "font_install_request_path": font_install_request,
             "icon_cache_manifest_path": (
                 project / "assets" / "icons" / "manifest.json"
             ).as_posix(),
@@ -1060,6 +1105,10 @@ def build_skillset_execution_plan(
             "DECK_ASSETS": (project / "assets").as_posix(),
             "DECK_ICON_USAGE": icon_usage,
             "DECK_ICON_WORKERS": "16",
+            "DECK_FONT_USAGE": font_usage,
+            "DECK_FONT_INSTALL_DECISION": "ask",
+            "DECK_FONT_RESOLUTION_MANIFEST": font_resolution,
+            "DECK_FONT_INSTALL_REQUEST": font_install_request,
             "VISUAL_QA_PROFILE": qa_calibration_profile,
             "DECK_PXW": "<source-width>",
             "DECK_PXH": "<source-height>",
@@ -1111,6 +1160,19 @@ def build_skillset_execution_plan(
             "full_slide_vectorization_forbidden": True,
             "svg_security_and_fidelity_gate_required": True,
             "canonical_renderer_unchanged": "slide-image-dual-render",
+        },
+        "font_contract": {
+            "original_font_collection_required": True,
+            "system_and_user_font_scan_required": True,
+            "exact_font_preferred": True,
+            "automatic_installation_forbidden": True,
+            "default_install_decision": "ask",
+            "missing_font_exit_code": 3,
+            "missing_font_action": "pause_and_ask_user",
+            "post_decision_values": ["installed", "declined", "unavailable"],
+            "fallback_after_declined_or_unavailable": True,
+            "original_to_resolved_mapping_required": True,
+            "conversion_continues_after_decision": True,
         },
         "execution_profile": {
             **runtime_profile,
@@ -1253,6 +1315,7 @@ def build_skillset_execution_plan(
                 "validate_reconstruction_jobs",
                 "validate_agent_work",
                 "integrate_agent_work",
+                "preflight_fonts",
                 "prepare_crops",
             ],
             "shared_preview_qa": [
@@ -1335,6 +1398,8 @@ def build_skillset_execution_plan(
             "work/reconstruction_job_manifest.json",
             "work/integration_report.md",
             "work/icon_usage.json",
+            "work/font_usage.json",
+            "work/slideXX/font_usage.json",
             "work/orchestration_state.json",
             "work/slideXX/one_slide_fast_cache.json",
             "work/slideXX/visual_qa/pptx_raster.png",
@@ -1350,6 +1415,8 @@ def build_skillset_execution_plan(
             "out/native_object_manifest.json",
             "out/crop_coverage_summary.json",
             "out/qa_evidence_summary.json",
+            "out/font_resolution_manifest.json",
+            "out/font_install_request.json",
             "out/pptx_openability_debug/pptx_package_validation.json",
             "out/visual_qa_summary_final.json",
             "out/visual_qa_summary_final.md",
@@ -1366,6 +1433,10 @@ def build_skillset_execution_plan(
                 "counts both zero"
             ),
             "needs_repair": "any visual QA fail or blocking slide remains",
+            "user_decision_required": (
+                "font preflight exits 3 for a missing original font; automatic installation "
+                "is forbidden and the user must choose installed, declined, or unavailable"
+            ),
             "blocked": "missing Skill, Skill bug, hardlock failure, or PPTX openability failure",
         },
         "content_hash": "0" * 64,
@@ -1563,6 +1634,8 @@ def validate_skillset_execution_plan(
             "canary",
             "--allow-large-batch",
             "--crop-plan",
+            "--font-usage",
+            "--font-install-decision",
             "--node-path",
             "--target",
             "both",
@@ -1589,6 +1662,12 @@ def validate_skillset_execution_plan(
         issues,
     )
     _require_flags(
+        commands["preflight_fonts"],
+        ("--project", "--font-usage", "--manifest", "--install-request"),
+        "preflight_fonts",
+        issues,
+    )
+    _require_flags(
         commands["compile_full_deck"],
         (
             "--quality",
@@ -1599,6 +1678,8 @@ def validate_skillset_execution_plan(
             "--crop-plan",
             "--node-path",
             "--icon-usage",
+            "--font-usage",
+            "--font-install-decision",
             "--target",
             "both",
         ),
@@ -1668,6 +1749,8 @@ def validate_skillset_execution_plan(
             "--crop-plan",
             "--node-path",
             "--icon-usage",
+            "--font-usage",
+            "--font-install-decision",
             "--skip-assets",
             "--target",
             "both",
@@ -1718,6 +1801,8 @@ def validate_skillset_execution_plan(
             "--crop-plan",
             "--node-path",
             "--icon-usage",
+            "--font-usage",
+            "--font-install-decision",
             "--target",
             "both",
         ),

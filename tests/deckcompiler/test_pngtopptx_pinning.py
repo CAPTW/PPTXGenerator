@@ -246,6 +246,11 @@ class PNGtoPPTXPinningTests(unittest.TestCase):
         self.assertEqual(before, after)
         self.assertTrue(payload["external_skill_modified"] is False)
 
+    def test_18_validation_uses_the_hashes_recorded_in_the_pin(self) -> None:
+        payload = self._pin()
+        result = validate_external_skillset_pin(self.installation, payload)
+        self.assertTrue(result["valid"])
+
 
 if __name__ == "__main__":
     unittest.main()

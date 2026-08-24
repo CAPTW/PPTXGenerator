@@ -63,15 +63,15 @@ class CodexWorkflowSkillTests(unittest.TestCase):
             dependencies["completion_requirements"]["visual_qa_blocking_count"],
             0,
         )
-        self.assertEqual(dependencies["schema_version"], "1.8.0")
+        self.assertEqual(dependencies["schema_version"], "1.9.0")
         runtime_pin = dependencies["external_skillset_runtime_pin"]
         self.assertEqual(
             runtime_pin["source_commit"],
-            "2b6120d39a5a51457615b77521e39cb272344672",
+            "d414d45a3c4e5881ac3262c451d4f84fd98d4c19",
         )
         self.assertEqual(
             runtime_pin["combined_aggregate_sha256"],
-            "f70e7a5c80ea9bd979eb1bc06a10269844799ac334ea71e4772ce4d39fbe371a",
+            "7cce8f28a8ebc92b1ade1e33df10adc054066693243755c8f6d6c711722950b4",
         )
         self.assertEqual(len(runtime_pin["source_tree_oids"]), 4)
         self.assertTrue(runtime_pin["historical_devpost_demo_pin_unchanged"])

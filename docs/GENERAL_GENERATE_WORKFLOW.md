@@ -199,7 +199,7 @@ This is not an under-two-minute claim for first-time arbitrary-image authoring.
 Any cache miss, input change, or rejected metric returns to the full
 `terra-max` quality lane.
 
-Live production uses canonical `CAPTW/pngtopptx` commit `2b6120d`. Its four
+Live production uses canonical `CAPTW/pngtopptx` commit `d414d45`. Its four
 Skill tree OIDs and combined content aggregate are fixed in
 `.agents/skills/pptx-generator-workflow/dependencies.json`; the generated plan
 then binds the exact installed entrypoint hashes for that run. This live pin is
@@ -241,33 +241,39 @@ Codex must execute the paths and command templates recorded in
    `validate-streaming-execution --require-complete
    --require-authoring-complete --require-overlap`, then validate jobs with
    `deckcompiler validate-reconstruction-jobs --require-authoring-outputs` and
-   run the official `validate_agent_work.js` and
-   `integrate_subagent_work.js`. Only the integrator may write `lib/slides.js`
-   and the shared crop plan;
-7. keep `work/crop_plan.json` explicit, including for a zero-crop deck, and run
+    run the official `validate_agent_work.js` and
+    `integrate_subagent_work.js`. Only the integrator may write `lib/slides.js`,
+    the shared crop plan, and the merged `work/font_usage.json`;
+7. run the official `font_preflight.js`. It collects original font families,
+   scans system and per-user font locations, resolves exact installed fonts
+   first, and writes both the Original -> Resolved mapping and installation
+   request evidence. It never installs automatically. Exit code `3` pauses the
+   run so the user can choose `installed`, `declined`, or `unavailable`; after
+   that decision, rerun and continue with exact fonts or documented fallbacks;
+8. keep `work/crop_plan.json` explicit, including for a zero-crop deck, and run
    crop preparation so `assets/manifest.json` exists;
-8. run one official all-slide shared preview. Rasterize its PPTX and capture its
+9. run one official all-slide shared preview. Rasterize its PPTX and capture its
    HTML once, then reuse the mapped slide pages for every per-slide comparison;
-9. execute the complete Visual QA chain on the preview: PPTX rasterization,
+10. execute the complete Visual QA chain on the preview: PPTX rasterization,
    HTML capture, comparison, JSON/Markdown summary, and enforcement, all with
    source-slide mapping;
-10. apply `deckcompiler validate-visual-quality`. The accepted one-slide canary
+11. apply `deckcompiler validate-visual-quality`. The accepted one-slide canary
     permits only `palette_drift` and `pptx_html_edge_mismatch` as noticeable
     renderer diagnostics; spacing, hierarchy, typography, clipping, content,
     and detail-loss issues require repair;
-11. run `deckcompiler finalize-shared-render-qa --runtime <runtime> --summary
+12. run `deckcompiler finalize-shared-render-qa --runtime <runtime> --summary
    <preview-summary>` to finalize reconstruction QA receipts from the
    source-mapped preview and validate `--require-worker-outputs`, then run one
    final all-slide renderer
    build with `--quality reconstruction --require-qa
    --require-reconstruction --allow-large-batch`, writing the final PPTX/HTML;
-12. run `final_gate.js`, openability, and the final source-mapped Visual QA
+13. run `final_gate.js`, openability, and the final source-mapped Visual QA
    chain against the delivered files;
-13. only when defects exist, reconstruct and QA targeted repair waves of at
+14. only when defects exist, reconstruct and QA targeted repair waves of at
    most five slides, for at most two iterations;
-14. after repairs, run one conditional all-slide compile and one final full-deck
+15. after repairs, run one conditional all-slide compile and one final full-deck
     QA chain, binding raster/capture metadata to the repaired PPTX/HTML hashes;
-15. record actual call intervals, observed parallelism, overlap, zero isolated
+16. record actual call intervals, observed parallelism, overlap, zero isolated
     builds, and the shared full-deck render count in `execution_timing.json`.
 
 The default quality level is `polish`; `blocking-zero` is the minimum accepted

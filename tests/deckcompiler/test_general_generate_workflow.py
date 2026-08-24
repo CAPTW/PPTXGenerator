@@ -212,14 +212,23 @@ if __name__ == "__main__":
                 (runtime / "skillset_execution_plan.json").read_text(encoding="utf-8")
             )
             self.assertEqual(plan["status"], "READY")
-            self.assertEqual(plan["schema_version"], "1.8.0")
+            self.assertEqual(plan["schema_version"], "1.9.0")
             self.assertNotEqual(
                 Path(plan["project_layout"]["profile_path"]).resolve(),
                 Path(plan["project_layout"]["qa_calibration_profile_path"]).resolve(),
             )
             self.assertIn("--profile", plan["command_templates"]["compare_full_deck"])
             self.assertIn("--icon-usage", plan["command_templates"]["compile_full_deck"])
+            self.assertIn("--font-usage", plan["command_templates"]["compile_full_deck"])
+            self.assertIn(
+                "--font-install-decision",
+                plan["command_templates"]["compile_full_deck"],
+            )
             self.assertEqual(plan["environment_template"]["DECK_ICON_WORKERS"], "16")
+            self.assertEqual(
+                plan["environment_template"]["DECK_FONT_INSTALL_DECISION"], "ask"
+            )
+            self.assertTrue(plan["font_contract"]["automatic_installation_forbidden"])
             self.assertIn(
                 "--skip-assets",
                 plan["command_templates"]["compile_one_slide_fast_cached"],
@@ -362,6 +371,7 @@ if __name__ == "__main__":
                     "validate_reconstruction_jobs",
                     "validate_agent_work",
                     "integrate_agent_work",
+                    "preflight_fonts",
                     "prepare_crops",
                 ],
             )
@@ -1139,6 +1149,7 @@ if __name__ == "__main__":
             self.assertIn("measurements.json", first_job["required_outputs"])
             self.assertIn("vector_usage.json", first_job["required_outputs"])
             self.assertIn("icon_usage.json", first_job["required_outputs"])
+            self.assertIn("font_usage.json", first_job["required_outputs"])
             self.assertTrue(
                 first_job["authoring_contract"]["measured_coordinates_authoritative"]
             )
@@ -2753,6 +2764,10 @@ if __name__ == "__main__":
                 "icon_usage.json": {
                     "schemaVersion": "slide-image-dual-render.icon-usage.v1",
                     "icons": [],
+                },
+                "font_usage.json": {
+                    "schemaVersion": "slide-image-dual-render.font-usage.v1",
+                    "fonts": [{"originalFont": "Pretendard", "role": "body"}],
                 },
                 "profile_override.json": {
                     "profileId": "academic-editorial",

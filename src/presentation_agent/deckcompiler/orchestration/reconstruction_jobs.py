@@ -32,6 +32,7 @@ AUTHORING_OUTPUT_NAMES = (
     "measurements.json",
     "vector_usage.json",
     "icon_usage.json",
+    "font_usage.json",
     "profile_override.json",
     "crop_plan.json",
     "s{slide}.fragment.js",
@@ -666,6 +667,14 @@ schemaVersion `slide-image-dual-render.icon-usage.v1` and explicit
 when the fragment uses no renderer icons. This manifest is the sole authority
 for on-demand icon generation; do not request the full icon catalog.
 
+Collect every original font family identified from the source, semantic sidecar,
+or authored fragment in `font_usage.json` using schemaVersion
+`slide-image-dual-render.font-usage.v1`. Each `fonts` row must contain
+`originalFont` and may record `role` and `source`; use an empty array only when no
+font can be identified. Do not install fonts or silently rewrite original font
+names. The integrator and font preflight own exact resolution, user approval,
+fallback, and the final Original -> Resolved mapping.
+
 Quality target: reproduce the source slide's composition, typography hierarchy,
 spacing, visual density, imagery, and meaningful small details at the level of a
 careful one-slide SkillSet conversion. Rebuild all readable text and structural
@@ -861,6 +870,37 @@ def _validate_worker_outputs(
                         f"{label} icon_usage contains duplicate pair {concept}:{color}"
                     )
                 seen.add(pair)
+
+    font_usage = _read_worker_json(work_dir / "font_usage.json", issues, label)
+    if font_usage is not None:
+        if font_usage.get("schemaVersion") != "slide-image-dual-render.font-usage.v1":
+            issues.append(
+                f"{label} font_usage.schemaVersion must be "
+                "slide-image-dual-render.font-usage.v1"
+            )
+        fonts = font_usage.get("fonts")
+        if not isinstance(fonts, list):
+            issues.append(f"{label} font_usage.fonts must be an array")
+        else:
+            seen_fonts: set[str] = set()
+            for index, item in enumerate(fonts):
+                if not isinstance(item, dict):
+                    issues.append(
+                        f"{label} font_usage.fonts[{index}] must be an object"
+                    )
+                    continue
+                original = str(item.get("originalFont", "")).strip()
+                if not original:
+                    issues.append(
+                        f"{label} font_usage.fonts[{index}] requires originalFont"
+                    )
+                    continue
+                key = re.sub(r"\s+", " ", original).casefold()
+                if key in seen_fonts:
+                    issues.append(
+                        f"{label} font_usage contains duplicate original font {original}"
+                    )
+                seen_fonts.add(key)
 
     profile = _read_worker_json(work_dir / "profile_override.json", issues, label)
     if profile is not None:

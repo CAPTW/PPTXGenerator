@@ -27,9 +27,10 @@
 
 ## Font result
 
-- Original font: `Pretendard`.
-- Resolved font: `Pretendard` from the per-user font inventory.
-- Resolution: exact.
+- Original -> Resolved mappings:
+  - `Pretendard` -> `Pretendard` (exact, per-user font inventory).
+  - `Noto Sans CJK KR` -> `Noto Sans CJK KR` (exact).
+  - `system-ui` -> `system-ui` (exact).
 - Automatic installation attempted: false.
 - The conversion emitted `font_resolution_manifest.json` and continued without
   fallback because the exact family was installed.

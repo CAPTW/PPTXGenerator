@@ -32,6 +32,22 @@ class OneSlideFastTests(unittest.TestCase):
             validation = validate_one_slide_fast_cache(project=project, slide=1)
             self.assertTrue(validation["valid"], validation)
 
+            policy_path = project / "config" / "font_install_policy.json"
+            policy_text = policy_path.read_text(encoding="utf-8")
+            policy = json.loads(policy_text)
+            policy["authorization"] = "ask"
+            policy_path.write_text(json.dumps(policy), encoding="utf-8")
+            policy_miss = probe_one_slide_fast_cache(project=project, slide=1)
+            self.assertFalse(policy_miss["cache_hit"])
+            self.assertTrue(
+                any("font_install_policy" in issue for issue in policy_miss["issues"]),
+                policy_miss,
+            )
+            policy_path.write_text(policy_text, encoding="utf-8")
+            self.assertTrue(
+                probe_one_slide_fast_cache(project=project, slide=1)["cache_hit"]
+            )
+
             (project / "lib" / "slides.js").write_text("changed\n", encoding="utf-8")
             miss = probe_one_slide_fast_cache(project=project, slide=1)
             self.assertFalse(miss["cache_hit"])
@@ -88,6 +104,16 @@ class OneSlideFastTests(unittest.TestCase):
             project / "src" / "slide1.png": "source",
             project / "lib" / "slides.js": "function s1() {}\n",
             project / "styles" / "active.json": json.dumps({"profileId": "academic"}),
+            project / "config" / "font_install_policy.json": json.dumps(
+                {
+                    "schemaVersion": "slide-image-dual-render.font-install-policy.v1",
+                    "authorization": "always",
+                    "userPromptRequired": False,
+                    "installation": {"allowed": True, "trustedSourcesOnly": True},
+                    "unavailableAction": "fallback-and-continue",
+                    "conversionMustContinue": True,
+                }
+            ),
             project / "work" / "crop_plan.json": json.dumps({"schema_version": "1.0.0", "crops": []}),
             project / "work" / "icon_usage.json": json.dumps({"schemaVersion": "slide-image-dual-render.icon-usage.v1", "icons": []}),
             project / "work" / "font_usage.json": json.dumps({"schemaVersion": "slide-image-dual-render.font-usage.v1", "fonts": [{"originalFont": "Pretendard"}]}),

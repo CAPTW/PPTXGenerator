@@ -212,7 +212,7 @@ if __name__ == "__main__":
                 (runtime / "skillset_execution_plan.json").read_text(encoding="utf-8")
             )
             self.assertEqual(plan["status"], "READY")
-            self.assertEqual(plan["schema_version"], "1.9.0")
+            self.assertEqual(plan["schema_version"], "1.10.0")
             self.assertNotEqual(
                 Path(plan["project_layout"]["profile_path"]).resolve(),
                 Path(plan["project_layout"]["qa_calibration_profile_path"]).resolve(),
@@ -226,9 +226,16 @@ if __name__ == "__main__":
             )
             self.assertEqual(plan["environment_template"]["DECK_ICON_WORKERS"], "16")
             self.assertEqual(
-                plan["environment_template"]["DECK_FONT_INSTALL_DECISION"], "ask"
+                plan["environment_template"]["DECK_FONT_INSTALL_DECISION"], "approved"
             )
-            self.assertTrue(plan["font_contract"]["automatic_installation_forbidden"])
+            self.assertFalse(plan["font_contract"]["user_prompt_required"])
+            self.assertTrue(plan["font_contract"]["trusted_sources_only"])
+            self.assertTrue(
+                plan["font_contract"]["resolver_automatic_installation_forbidden"]
+            )
+            self.assertEqual(
+                plan["font_contract"]["default_install_decision"], "approved"
+            )
             self.assertIn(
                 "--skip-assets",
                 plan["command_templates"]["compile_one_slide_fast_cached"],
@@ -431,6 +438,22 @@ if __name__ == "__main__":
                 )
             )
             self.assertEqual(crop_plan, {"schema_version": "1.0.0", "crops": []})
+            font_policy = json.loads(
+                (
+                    runtime
+                    / "pngtopptx-project"
+                    / "config"
+                    / "font_install_policy.json"
+                ).read_text(encoding="utf-8")
+            )
+            self.assertEqual(
+                font_policy["schemaVersion"],
+                "slide-image-dual-render.font-install-policy.v1",
+            )
+            self.assertEqual(font_policy["authorization"], "always")
+            self.assertFalse(font_policy["userPromptRequired"])
+            self.assertTrue(font_policy["installation"]["trustedSourcesOnly"])
+            self.assertEqual(font_policy["unavailableAction"], "fallback-and-continue")
             self.assertFalse((runtime / "phase3").exists())
             self.assertFalse((runtime / "phase4_preparation").exists())
             self.assertFalse(

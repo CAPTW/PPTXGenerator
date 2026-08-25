@@ -231,6 +231,7 @@ def _input_paths(root: Path, slide: int) -> Iterable[tuple[str, Path]]:
         ("deck_crop_plan", root / "work" / "crop_plan.json"),
         ("deck_icon_usage", root / "work" / "icon_usage.json"),
         ("deck_font_usage", root / "work" / "font_usage.json"),
+        ("font_install_policy", root / "config" / "font_install_policy.json"),
         ("reconstruction_job", work / "reconstruction_job.json"),
         ("measurements", work / "measurements.json"),
         ("vector_usage", work / "vector_usage.json"),
@@ -266,7 +267,7 @@ def _validate_render_trace(trace: dict[str, Any], slide: int) -> None:
         raise ValueError("render trace fontResolution.status must be PASS")
     if font_resolution.get("automaticInstallationAttempted") is not False:
         raise ValueError(
-            "render trace must prove automatic font installation was not attempted"
+            "render trace must prove resolver-side font installation was not attempted"
         )
     if trace.get("enforcementDisabled") is True:
         raise ValueError("render trace shows enforcement disabled")

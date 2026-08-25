@@ -41,7 +41,7 @@ Never copy or modify the external PNGtoPPTX Skill implementation in this
 repository.
 
 The live fast-path baseline is the canonical `CAPTW/pngtopptx` commit
-`d414d45a3c4e5881ac3262c451d4f84fd98d4c19`; `dependencies.json` records its
+`8d5d0c04f2e1f655678d73f05e1f73925eabd287`; `dependencies.json` records its
 four Skill tree OIDs and combined content aggregate. The generated execution
 plan additionally binds the exact installed Skill and entrypoint hashes for the
 run. Do not substitute the older frozen DevPost demo pin for live production.
@@ -246,9 +246,13 @@ sequence and commands in `skillset_execution_plan.json`:
 7. run the official `font_preflight.js` before rendering. It must collect the
    original fonts, scan system and per-user font locations, use an exact family
    when installed, and write `out/font_resolution_manifest.json` with every
-   Original -> Resolved mapping. It must never install automatically. Exit code
-   `3` means pause and ask the user; after `installed`, `declined`, or
-   `unavailable`, rerun and continue with exact fonts or documented fallbacks;
+   Original -> Resolved mapping. The generated
+   `config/font_install_policy.json` permanently preauthorizes installation
+   from official vendors, licensed embedded fonts, or user-provided trusted
+   local files, so exit code `3` with `INSTALL_AUTHORIZED` must not ask the user
+   again. Install outside the resolver, record source URL and SHA-256, rescan,
+   and rerun with `installed`; if installation is unavailable, rerun with
+   `unavailable`, apply the documented fallback, and continue;
 8. keep `work/crop_plan.json` explicit even when it contains zero crops, run
    crop preparation so `assets/manifest.json` exists, and do not use
    `--skip-crops` for final delivery;
@@ -293,9 +297,12 @@ Production defaults:
 - one source slide per fresh reconstruction context, with at most six workers
   active and no full-deck context duplicated into worker prompts;
 - official worker validation and integration scripts required before compile;
-- exact installed-font resolution preferred, no automatic font installation,
-  user approval required before any installation, and Original -> Resolved
-  mappings required even when fallback is used;
+- exact installed-font resolution preferred, trusted-source installation
+  preauthorized without repeat prompts, resolver-side downloading forbidden,
+  installation provenance required, and Original -> Resolved mappings required
+  even when fallback is used;
+- browser-measured PowerPoint text fitting replayed through the renderer's
+  fingerprinted `text_fit_manifest.json` cache;
 - zero isolated per-slide builds and exactly two shared full-deck renders on the
   normal path: one preview evidence render and one final reconstruction render;
 - repair wave size at most 5, with a single conditional post-repair full-deck
@@ -348,7 +355,8 @@ completion only when:
 - `skillset_execution_plan.json`, orchestration state, the official
   `slide-image-dual-render` render trace, crop plan/manifest, crop coverage, and
   objective QA evidence are all hash-bound to the run; the render trace must
-  also prove font-resolution PASS and zero automatic installation attempts;
+  also prove font-resolution PASS, resolver-side installation attempts zero,
+  and source/hash provenance for any externally installed font;
 - the PPTX package slide count and actual-render native-object manifest match
   the approved blueprint, with editable text on every slide;
 - the external visual-QA summary agrees with the sealed fail, blocking, and

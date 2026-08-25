@@ -24,7 +24,7 @@ EXPECTED_SKILLS: tuple[str, ...] = (
 KNOWN_SKILL_HASHES: dict[str, str] = {
     "slide-editable-deck-orchestrator": "1861d6f14af847004758ab27abd1df3a0750e12176d1b000604b656cc52a7554",
     "slide-text-layer-inpaint": "2160cc435cae98294542d5b6c7a68d1fbf111c65f659875fcaca0b7ce6cae29e",
-    "slide-image-dual-render": "b6ed33b1f305142b4c3f6814037eec9767aeff970e3be6a940746788028c483f",
+    "slide-image-dual-render": "4a9281ea1305dbfe4e5d9206c200d7661de10eafb98ab8e3d987a51658fb373d",
     "slide-visual-polish-qa": "9df491768af56d5f896ba15bc6aed9dd7c066bfdc8dbb65501a30e5688494c7e",
 }
 
@@ -215,10 +215,15 @@ def build_installation_inventory(
         expected_hash = expected_skill_hashes.get(skill_name)
         if expected_hash is None:
             raise PinningError("MISSING_EXPECTED_HASH", f"no expected SKILL.md hash for {skill_name}")
-        if skill_md["sha256"] != expected_hash:
+        if (
+            skill_md["sha256"] != expected_hash
+            and skill_md["canonical_text_linkage_sha256"] != expected_hash
+        ):
             raise PinningError(
                 "SKILL_HASH_MISMATCH",
-                f"{skill_name} expected {expected_hash}, got {skill_md['sha256']}",
+                f"{skill_name} expected {expected_hash}, got raw "
+                f"{skill_md['sha256']} and canonical "
+                f"{skill_md['canonical_text_linkage_sha256']}",
             )
         aggregate_records = [
             {

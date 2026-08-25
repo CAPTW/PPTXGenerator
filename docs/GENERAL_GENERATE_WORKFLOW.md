@@ -199,7 +199,7 @@ This is not an under-two-minute claim for first-time arbitrary-image authoring.
 Any cache miss, input change, or rejected metric returns to the full
 `terra-max` quality lane.
 
-Live production uses canonical `CAPTW/pngtopptx` commit `d414d45`. Its four
+Live production uses canonical `CAPTW/pngtopptx` commit `8d5d0c0`. Its four
 Skill tree OIDs and combined content aggregate are fixed in
 `.agents/skills/pptx-generator-workflow/dependencies.json`; the generated plan
 then binds the exact installed entrypoint hashes for that run. This live pin is
@@ -247,9 +247,12 @@ Codex must execute the paths and command templates recorded in
 7. run the official `font_preflight.js`. It collects original font families,
    scans system and per-user font locations, resolves exact installed fonts
    first, and writes both the Original -> Resolved mapping and installation
-   request evidence. It never installs automatically. Exit code `3` pauses the
-   run so the user can choose `installed`, `declined`, or `unavailable`; after
-   that decision, rerun and continue with exact fonts or documented fallbacks;
+   request evidence. The scaffolded `config/font_install_policy.json`
+   preauthorizes trusted-source installation without another user question.
+   Exit code `3` with `INSTALL_AUTHORIZED` triggers an external install from an
+   official, licensed, or user-provided trusted source with source URL and
+   SHA-256 evidence; if unavailable, select fallback and continue. The resolver
+   itself never downloads fonts;
 8. keep `work/crop_plan.json` explicit, including for a zero-crop deck, and run
    crop preparation so `assets/manifest.json` exists;
 9. run one official all-slide shared preview. Rasterize its PPTX and capture its
@@ -261,7 +264,8 @@ Codex must execute the paths and command templates recorded in
     permits only `palette_drift` and `pptx_html_edge_mismatch` as noticeable
     renderer diagnostics; spacing, hierarchy, typography, clipping, content,
     and detail-loss issues require repair;
-12. run `deckcompiler finalize-shared-render-qa --runtime <runtime> --summary
+12. replay browser-measured text-fit sizes through the renderer's fingerprinted
+   `text_fit_manifest.json` cache, then run `deckcompiler finalize-shared-render-qa --runtime <runtime> --summary
    <preview-summary>` to finalize reconstruction QA receipts from the
    source-mapped preview and validate `--require-worker-outputs`, then run one
    final all-slide renderer

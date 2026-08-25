@@ -63,15 +63,15 @@ class CodexWorkflowSkillTests(unittest.TestCase):
             dependencies["completion_requirements"]["visual_qa_blocking_count"],
             0,
         )
-        self.assertEqual(dependencies["schema_version"], "1.9.0")
+        self.assertEqual(dependencies["schema_version"], "1.10.0")
         runtime_pin = dependencies["external_skillset_runtime_pin"]
         self.assertEqual(
             runtime_pin["source_commit"],
-            "d414d45a3c4e5881ac3262c451d4f84fd98d4c19",
+            "8d5d0c04f2e1f655678d73f05e1f73925eabd287",
         )
         self.assertEqual(
             runtime_pin["combined_aggregate_sha256"],
-            "7cce8f28a8ebc92b1ade1e33df10adc054066693243755c8f6d6c711722950b4",
+            "56abfb146c7ce34106efa4cad40e09896c21f24e544275162b6500b809ca5f47",
         )
         self.assertEqual(len(runtime_pin["source_tree_oids"]), 4)
         self.assertTrue(runtime_pin["historical_devpost_demo_pin_unchanged"])
@@ -97,6 +97,15 @@ class CodexWorkflowSkillTests(unittest.TestCase):
         self.assertEqual(
             dependencies["execution_profile"]["icon_generation"],
             "explicit_usage_manifest_with_hash_cache_and_16_bounded_workers",
+        )
+        self.assertEqual(
+            dependencies["execution_profile"]["font_installation"],
+            "trusted_source_preauthorized_external_agent_with_provenance",
+        )
+        self.assertFalse(
+            dependencies["ordered_dependencies"][4]["font_install_policy"][
+                "user_prompt_required"
+            ]
         )
         self.assertEqual(
             dependencies["pngtosvg_preflight"]["canonical_renderer"],

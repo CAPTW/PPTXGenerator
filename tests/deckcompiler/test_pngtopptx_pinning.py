@@ -251,6 +251,15 @@ class PNGtoPPTXPinningTests(unittest.TestCase):
         result = validate_external_skillset_pin(self.installation, payload)
         self.assertTrue(result["valid"])
 
+    def test_19_windows_crlf_skill_manifests_match_canonical_known_hashes(self) -> None:
+        for skill in EXPECTED_SKILLS:
+            path = self.installation / skill / "SKILL.md"
+            path.write_bytes(path.read_bytes().replace(b"\n", b"\r\n"))
+        inventory = build_installation_inventory(
+            self.installation, expected_skill_hashes=self.expected_hashes
+        )
+        self.assertTrue(inventory["known_skill_hashes_match"])
+
 
 if __name__ == "__main__":
     unittest.main()

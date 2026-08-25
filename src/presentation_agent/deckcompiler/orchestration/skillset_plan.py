@@ -309,6 +309,7 @@ def scaffold_runtime_project(runtime_root: Path) -> Path:
         "styles",
         "lib",
         "assets",
+        "config",
         "work",
         "out",
         "out/qa",
@@ -321,6 +322,37 @@ def scaffold_runtime_project(runtime_root: Path) -> Path:
     write_json(
         project / "work" / "font_usage.json",
         {"schemaVersion": "slide-image-dual-render.font-usage.v1", "fonts": []},
+    )
+    write_json(
+        project / "config" / "font_install_policy.json",
+        {
+            "schemaVersion": "slide-image-dual-render.font-install-policy.v1",
+            "authorization": "always",
+            "userPromptRequired": False,
+            "searchOrder": [
+                "system-fonts",
+                "user-fonts",
+                "user-provided-local-font-files",
+                "official-vendor-download",
+                "licensed-embedded-font",
+            ],
+            "installation": {
+                "allowed": True,
+                "preferredScope": "current-user",
+                "trustedSourcesOnly": True,
+                "recordSourceUrl": True,
+                "recordPackageSha256": True,
+            },
+            "unavailableAction": "fallback-and-continue",
+            "requiredEvidence": [
+                "original-font",
+                "resolved-font",
+                "exact-or-fallback",
+                "installation-attempt",
+                "source-and-sha256-when-installed",
+            ],
+            "conversionMustContinue": True,
+        },
     )
     for relative in (
         "architect",
@@ -367,6 +399,7 @@ def build_skillset_execution_plan(
     integration_report = (project / "work" / "integration_report.md").as_posix()
     icon_usage = (project / "work" / "icon_usage.json").as_posix()
     font_usage = (project / "work" / "font_usage.json").as_posix()
+    font_install_policy = (project / "config" / "font_install_policy.json").as_posix()
     font_resolution = (project / "out" / "font_resolution_manifest.json").as_posix()
     font_install_request = (project / "out" / "font_install_request.json").as_posix()
     qa_calibration_profile = inspection["qa_calibration_profile"]["path"]
@@ -543,7 +576,7 @@ def build_skillset_execution_plan(
             "--font-usage",
             font_usage,
             "--font-install-decision",
-            "<font-install-decision>",
+            "approved",
             "--node-path",
             node_modules,
             "--target",
@@ -669,7 +702,7 @@ def build_skillset_execution_plan(
             "--font-usage",
             font_usage,
             "--font-install-decision",
-            "<font-install-decision>",
+            "approved",
             "--target",
             "both",
             "--pptx-out",
@@ -697,7 +730,7 @@ def build_skillset_execution_plan(
             "--font-usage",
             font_usage,
             "--font-install-decision",
-            "<font-install-decision>",
+            "approved",
             "--skip-assets",
             "--target",
             "both",
@@ -827,7 +860,7 @@ def build_skillset_execution_plan(
             "--font-usage",
             font_usage,
             "--font-install-decision",
-            "<font-install-decision>",
+            "approved",
             "--target",
             "both",
             "--pptx-out",
@@ -1027,7 +1060,7 @@ def build_skillset_execution_plan(
 
     payload: dict[str, Any] = {
         "schema_name": PLAN_SCHEMA,
-        "schema_version": "1.9.0",
+        "schema_version": "1.10.0",
         "workflow_id": workflow_id,
         "status": "READY",
         "skill_root": inspection["skill_root"],
@@ -1083,6 +1116,7 @@ def build_skillset_execution_plan(
             "qa_calibration_profile_path": qa_calibration_profile,
             "icon_usage_path": icon_usage,
             "font_usage_path": font_usage,
+            "font_install_policy_path": font_install_policy,
             "per_slide_font_usage_pattern": (
                 project / "work" / "slideXX" / "font_usage.json"
             ).as_posix(),
@@ -1106,7 +1140,7 @@ def build_skillset_execution_plan(
             "DECK_ICON_USAGE": icon_usage,
             "DECK_ICON_WORKERS": "16",
             "DECK_FONT_USAGE": font_usage,
-            "DECK_FONT_INSTALL_DECISION": "ask",
+            "DECK_FONT_INSTALL_DECISION": "approved",
             "DECK_FONT_RESOLUTION_MANIFEST": font_resolution,
             "DECK_FONT_INSTALL_REQUEST": font_install_request,
             "VISUAL_QA_PROFILE": qa_calibration_profile,
@@ -1165,10 +1199,18 @@ def build_skillset_execution_plan(
             "original_font_collection_required": True,
             "system_and_user_font_scan_required": True,
             "exact_font_preferred": True,
-            "automatic_installation_forbidden": True,
-            "default_install_decision": "ask",
+            "policy_schema_version": "slide-image-dual-render.font-install-policy.v1",
+            "policy_path": font_install_policy,
+            "installation_authority": "project_preauthorized_by_user",
+            "user_prompt_required": False,
+            "trusted_source_installation_allowed": True,
+            "trusted_sources_only": True,
+            "preferred_install_scope": "current-user",
+            "resolver_automatic_installation_forbidden": True,
+            "installation_provenance_required": True,
+            "default_install_decision": "approved",
             "missing_font_exit_code": 3,
-            "missing_font_action": "pause_and_ask_user",
+            "missing_font_action": "install_trusted_source_or_fallback_without_repeat_prompt",
             "post_decision_values": ["installed", "declined", "unavailable"],
             "fallback_after_declined_or_unavailable": True,
             "original_to_resolved_mapping_required": True,
@@ -1399,6 +1441,7 @@ def build_skillset_execution_plan(
             "work/integration_report.md",
             "work/icon_usage.json",
             "work/font_usage.json",
+            "config/font_install_policy.json",
             "work/slideXX/font_usage.json",
             "work/orchestration_state.json",
             "work/slideXX/one_slide_fast_cache.json",
@@ -1434,8 +1477,9 @@ def build_skillset_execution_plan(
             ),
             "needs_repair": "any visual QA fail or blocking slide remains",
             "user_decision_required": (
-                "font preflight exits 3 for a missing original font; automatic installation "
-                "is forbidden and the user must choose installed, declined, or unavailable"
+                "not used by the default font path: a missing original font is already "
+                "authorized for trusted-source installation; if installation fails, record "
+                "unavailable, apply fallback, and continue without another user prompt"
             ),
             "blocked": "missing Skill, Skill bug, hardlock failure, or PPTX openability failure",
         },

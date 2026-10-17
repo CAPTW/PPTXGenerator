@@ -1251,12 +1251,14 @@ def _svg_icon_names(path: Path) -> list[str]:
 
 
 def _resolve_python_executable(value: str) -> str:
+    # Keep the selected launch path: resolving a venv Python symlink bypasses
+    # its pyvenv.cfg and silently launches the base interpreter instead.
     candidate = Path(value).expanduser()
     if candidate.is_file():
-        return candidate.resolve().as_posix()
+        return candidate.absolute().as_posix()
     discovered = shutil.which(value)
     if discovered:
-        return Path(discovered).resolve().as_posix()
+        return Path(discovered).absolute().as_posix()
     raise _error(
         "DC_VECTOR_PREFLIGHT_PYTHON_MISSING",
         f"raw measurement Python executable was not found: {value}",

@@ -307,6 +307,12 @@ def validate_vector_preflight_slide_bundle(
         )
         _validate_internal_artifact(
             root,
+            record.get("measurement_batch_job"),
+            f"slide {slide_number} measurement_batch_job",
+            issues,
+        )
+        _validate_internal_artifact(
+            root,
             record.get("detector_record"),
             f"slide {slide_number} detector_record",
             issues,
@@ -364,8 +370,13 @@ def prepare_vector_preflight(
     backend: str = "easyocr",
     max_workers: int = DEFAULT_MAX_WORKERS,
     deep: bool = True,
+    require_cached: bool = False,
 ) -> VectorPreflightPreparationResult:
-    """Measure all selected PNGs once and trace safe, bounded flat regions."""
+    """Measure selected PNGs, or consolidate verified receipts without remeasurement.
+
+    Streaming finalization uses require_cached to preserve accepted worker inputs.
+    Standalone callers retain the existing explicit/default measurement behavior.
+    """
 
     if backend not in {"easyocr", "tesseract"}:
         raise ValueError("backend must be easyocr or tesseract")
@@ -414,6 +425,11 @@ def prepare_vector_preflight(
         records.append(receipt["slide"])
 
     if not receipts_reused:
+        if require_cached:
+            raise _error(
+                "DC_VECTOR_PREFLIGHT_CACHE_INVALID",
+                "accepted slide preflight receipts are missing, stale, or use a different measurement configuration",
+            )
         measurements = _run_measurement_batches(
             root=root,
             project=project,

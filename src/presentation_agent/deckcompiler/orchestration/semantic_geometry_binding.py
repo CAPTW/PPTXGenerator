@@ -124,7 +124,7 @@ def bind_semantic_geometry(root: Path, job: dict[str, Any], work_dir: Path) -> d
             bound["content_identity"] = {"pointer": identity_pointer, "value": identity}
         output.append(bound)
 
-    return {
+    result = {
         "status": "EXPLICIT_ASSOCIATIONS_BOUND",
         "association_artifact": association_ref,
         "semantic_sidecar": copy.deepcopy(job["semantic_sidecar"]),
@@ -134,6 +134,11 @@ def bind_semantic_geometry(root: Path, job: dict[str, Any], work_dir: Path) -> d
         "coverage": "explicit_associations_only",
         "authoring_and_render_qa_required": True,
     }
+
+    if "vsc_identity_review" in association:
+        from .vsc_measurement_links import consume_vsc_review
+        result["vsc_identity_evidence"] = consume_vsc_review(root, job, association["vsc_identity_review"], entries)
+    return result
 
 
 def _pointer(document: Any, pointer: Any, label: str, path: Path) -> Any:

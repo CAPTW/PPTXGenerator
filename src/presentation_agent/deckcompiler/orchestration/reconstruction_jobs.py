@@ -14,6 +14,7 @@ from ..identity import content_sha256, stable_id
 from ..manifest_io import read_json, write_json
 from .image_requests import REQUEST_MANIFEST_NAME, validate_image_request_bundle
 from .skillset_plan import validate_skillset_execution_plan
+from .semantic_geometry_binding import bind_semantic_geometry
 from .vector_preflight import (
     MANIFEST_NAME as VECTOR_PREFLIGHT_MANIFEST_NAME,
     POLICY_ID as VECTOR_PREFLIGHT_POLICY_ID,
@@ -218,6 +219,12 @@ def validate_reconstruction_job_bundle(
                 except (OSError, ValueError, TypeError) as exc:
                     issues.append(f"{label} job is invalid JSON: {exc}")
                     continue
+                if "semantic_geometry_binding" not in actual_value:
+                    issues.append(
+                        f"{label} legacy job is missing semantic_geometry_binding; "
+                        "regenerate reconstruction jobs and rerun affected workers; "
+                        "old worker receipts cannot be reused"
+                    )
             else:
                 try:
                     actual_value = path.read_text(encoding="utf-8")
@@ -607,6 +614,7 @@ def _build_job_row(
         },
         "content_hash": "0" * 64,
     }
+    job["semantic_geometry_binding"] = bind_semantic_geometry(root, job, work_dir)
     job["content_hash"] = content_sha256(
         {key: value for key, value in job.items() if key != "content_hash"}
     )
@@ -649,6 +657,17 @@ This is one isolated fresh-context reconstruction job. Read
 `{(work_dir / "reconstruction_job.json").as_posix()}` first and inspect only the
 source image and semantic sidecar named there. Do not load any other slide image
 or full-deck prompt into this context.
+
+Content-to-geometry association status:
+`{job['semantic_geometry_binding']['status']}`. Read `semantic_geometry_binding`
+in the job. For each explicit association, use the lossless `content_value` from
+the approved sidecar and the referenced object in the unchanged measurement
+inventory. Preserve any existing content identity. OCR text is observation
+evidence and cannot replace approved copy. Structured values must remain
+structured; never flatten them into one text box. The associations cover only
+their explicit references. UNRESOLVED or omitted content still requires review;
+no mapping is implied by array order, OCR similarity, or nearest coordinates.
+This binding does not establish authoring, editability, or rendered-quality pass.
 
 Treat `vector_preflight.measurement_inventory` as authoritative geometry. Do
 not spend model tokens re-measuring detected regions. Use each passed

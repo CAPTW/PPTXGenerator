@@ -314,7 +314,11 @@ def _build_payloads(
         title = _required_text(slide.get("title"), f"slide {slide_number} title")
         copy = slide.get("on_slide_copy")
         copy_text = _flatten_copy(copy)
-        if not copy_text:
+        # An explicit empty container means the required exact title is the
+        # complete on-slide content. Missing/null/blank copy remains invalid;
+        # do not synthesize a subtitle or duplicate the title to pass intake.
+        title_only = isinstance(copy, (dict, list)) and not copy
+        if not copy_text and not title_only:
             raise _error(
                 "DC_ARCHITECT_BLUEPRINT_INVALID",
                 f"slide {slide_number} on_slide_copy must contain exact editable content",

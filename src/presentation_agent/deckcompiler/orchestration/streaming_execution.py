@@ -23,6 +23,8 @@ from .reconstruction_jobs import (
 from .vector_preflight import (
     prepare_vector_preflight,
     prepare_vector_preflight_slide,
+    slide_preflight_path,
+    validate_vector_preflight_slide_bundle,
 )
 
 
@@ -431,6 +433,7 @@ def _finalize_streaming_images_locked(
             "all slides must have an accepted image before batch finalization",
             state_path,
         )
+    configuration = _accepted_preflight_configuration(root, state)
     calls = [dict(row["image_call"]) for row in state["slides"]]
     calls.sort(key=lambda row: int(row["slide_number"]))
     max_parallelism = _max_parallelism(calls)
@@ -467,7 +470,7 @@ def _finalize_streaming_images_locked(
     batch_path = write_json(
         root / "image_batches" / "image_generation_batch_manifest.json", batch
     )
-    prepare_vector_preflight(root)
+    prepare_vector_preflight(root, **configuration, require_cached=True)
     prepared = prepare_reconstruction_jobs(root)
     state["image_batch_manifest"] = _artifact(root, batch_path)
     state["reconstruction_job_manifest"] = _artifact(root, prepared.manifest_path)
@@ -478,6 +481,110 @@ def _finalize_streaming_images_locked(
         "reconstruction_manifest_path": prepared.manifest_path,
         "max_observed_parallelism": max_parallelism,
     }
+
+
+
+def _accepted_preflight_configuration(root: Path, state: dict[str, Any]) -> dict[str, Any]:
+    """Recover only the configuration bound to every durable accepted job."""
+
+    state_path = root / STATE_NAME
+    report = validate_streaming_execution(root, require_complete=True)
+    if not report["valid"]:
+        raise _error("DC_STREAMING_ACCEPTANCE_INVALID", "; ".join(report["issues"][:6]), state_path)
+    request = read_json(root / "image_requests" / REQUEST_MANIFEST_NAME)
+    if (
+        state.get("workflow_id") != request.get("workflow_id")
+        or sorted(row["slide_number"] for row in state["slides"])
+        != sorted(row["slide_number"] for row in request["slides"])
+    ):
+        raise _error("DC_STREAMING_ACCEPTANCE_INVALID", "accepted slide coverage/workflow mismatch", state_path)
+
+    configuration = None
+    for row in state["slides"]:
+        slide = row["slide_number"]
+        label = f"accepted slide {slide}"
+        try:
+            if (row.get("state") not in {"RECONSTRUCTION_READY", "RECONSTRUCTION_STARTED", "AUTHORING_COMPLETED"}
+                or row["image_call"].get("status") != "ACCEPTED"
+                or row["image_call"].get("slide_number") != slide
+                or row["image_call"].get("request_id") != row["request_id"]):
+                raise ValueError("image call is not an accepted call for this slide")
+            acceptance_path = _artifact_path(root, row.get("accepted_receipt"), label + " receipt")
+            if acceptance_path != root / ACCEPTED_DIRECTORY / f"slide-{slide:03d}.json":
+                raise ValueError("acceptance receipt path mismatch")
+            acceptance = _read_sealed_acceptance_payload(acceptance_path)
+            if (acceptance.get("schema_name") != "image_generation_acceptance_receipt"
+                or acceptance.get("schema_version") != "1.0.0"
+                or acceptance.get("workflow_id") != state["workflow_id"]
+                or any(acceptance.get(key) != value for key, value in row["image_call"].items())):
+                raise ValueError("acceptance receipt does not match the accepted image call")
+            for key, call_key in (("source_png", "selected_png_sha256"), ("inspection_report", "inspection_sha256")):
+                _artifact_path(root, acceptance.get(key), label + " " + key)
+                if acceptance[key]["sha256"] != row["image_call"].get(call_key):
+                    raise ValueError(f"{key} does not match the accepted image call")
+            job_path = _artifact_path(root, row.get("reconstruction_job"), label + " job")
+            if acceptance.get("reconstruction_job") != row.get("reconstruction_job"):
+                raise ValueError("acceptance receipt job binding mismatch")
+            _artifact_path(root, acceptance.get("worker_prompt"), label + " worker prompt")
+            job = _read_sealed_acceptance_payload(job_path)
+            if (job.get("schema_name") != "codex_slide_reconstruction_job"
+                or job.get("workflow_id") != state["workflow_id"]
+                or job.get("slide_number") != slide
+                or job.get("slide_id") != row["slide_id"]
+                or job.get("request_lineage", {}).get("request_id") != row["request_id"]):
+                raise ValueError("accepted job identity mismatch")
+            preflight_path = _artifact_path(root, job["vector_preflight"]["manifest"], label + " preflight")
+            if preflight_path != slide_preflight_path(root, slide):
+                raise ValueError("accepted job preflight path mismatch")
+            if job["receipt_binding"]["vector_preflight_sha256"] != _sha256(preflight_path):
+                raise ValueError("accepted job preflight binding mismatch")
+            preflight_report = validate_vector_preflight_slide_bundle(root, slide)
+            if not preflight_report["valid"]:
+                raise ValueError("; ".join(preflight_report["issues"][:6]))
+            preflight = read_json(preflight_path)
+            execution = preflight["execution"]
+            provenance = preflight["pipeline_provenance"]
+            backend, deep = execution["backend"], execution["deep_scan"]
+            executable, pipeline = execution["python_executable"], provenance["root"]
+            if backend not in {"easyocr", "tesseract"} or type(deep) is not bool:
+                raise ValueError("accepted measurement backend/deep_scan is invalid")
+            if (not isinstance(executable, str) or not Path(executable).is_absolute()
+                or not Path(executable).is_file()
+                or not isinstance(pipeline, str) or not Path(pipeline).is_absolute()):
+                raise ValueError("accepted measurement Python/pipeline is missing or invalid")
+            if Path(provenance["detector"]["path"]).resolve() != (Path(pipeline) / "scripts/detect_elements.py").resolve():
+                raise ValueError("accepted pipeline root does not match its detector")
+            record = preflight["slide"]
+            detector_path = _artifact_path(root, record["detector_record"], label + " detector record")
+            detector = _read_sealed_acceptance_payload(detector_path)
+            batch_path = _artifact_path(root, record["measurement_batch_job"], label + " measurement batch")
+            command = [executable, provenance["batch_adapter"]["path"], "--pipeline-root", pipeline,
+                       "--job-file", batch_path.as_posix(), "--backend", backend]
+            if deep:
+                command.append("--deep")
+            if (detector.get("slide_number") != slide or detector.get("exit_code") != 0
+                or detector.get("backend") != backend or type(detector.get("deep_scan")) is not bool
+                or detector["deep_scan"] != deep or detector.get("command") != command):
+                raise ValueError("accepted measurement configuration disagrees with detector execution")
+            selected = {"pipeline_root": Path(pipeline), "python_executable": executable,
+                        "backend": backend, "deep": deep}
+            if configuration is not None and selected != configuration:
+                raise ValueError("accepted slides use mixed measurement configurations")
+            configuration = selected
+        except (OSError, ValueError, TypeError, KeyError, AttributeError) as exc:
+            raise _error("DC_STREAMING_ACCEPTANCE_INVALID", f"{label}: {exc}", state_path) from exc
+    if configuration is None:
+        raise _error("DC_STREAMING_ACCEPTANCE_INVALID", "accepted measurement configuration is missing", state_path)
+    return configuration
+
+
+def _read_sealed_acceptance_payload(path: Path) -> dict[str, Any]:
+    payload = read_json(path)
+    if not isinstance(payload, dict) or payload.get("content_hash") != content_sha256(
+        {key: value for key, value in payload.items() if key != "content_hash"}
+    ):
+        raise ValueError(f"accepted artifact content_hash mismatch: {path.name}")
+    return payload
 
 
 def validate_streaming_execution(

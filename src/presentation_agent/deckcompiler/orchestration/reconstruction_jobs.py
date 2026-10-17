@@ -668,6 +668,11 @@ structured; never flatten them into one text box. The associations cover only
 their explicit references. UNRESOLVED or omitted content still requires review;
 no mapping is implied by array order, OCR similarity, or nearest coordinates.
 This binding does not establish authoring, editability, or rendered-quality pass.
+If `vsc_identity_evidence` is present, consume its reviewed links as identity
+evidence only. Its unbound measured text IDs remain UNRESOLVED and are not
+semantically admitted. Keep all raw observations; do not treat unbound IDs as
+verified false detections. VSC sampling envelopes are not native geometry, glyph
+erase masks, style approval, native admission, or visual-quality approval.
 
 Treat `vector_preflight.measurement_inventory` as authoritative geometry. Do
 not spend model tokens re-measuring detected regions. Use each passed

@@ -64,9 +64,18 @@ is outside this dispatch rule.
   ImageGen calls concurrently, and starts each accepted image's reconstruction
   immediately while unfinished calls continue. Launch at most six one-slide
   reconstruction workers concurrently without duplicating the full-deck
-  context. Launch workers with the profile's sealed `minimal_locked` Codex
-  arguments and provide only the explicit renderer Skill path required by the
-  job. The integrator is the only writer of shared renderer inputs. Use one
+  context. CLI profiles launch workers with the sealed `minimal_locked` Codex
+  arguments. The explicit opt-in `native-inherited-xhigh` profile instead uses
+  `collaboration.spawn_agent`, `fork_turns=none`, requested effort `xhigh`, and
+  no model override. Its model selector `inherited` is not an actual backend
+  identity. Native isolation covers conversation history only; do not claim
+  CLI flags ran or that tools/plugins were disabled. Record requested settings
+  separately from actual model/effort, which remain null when the executor
+  does not report them. Record the actual launch agent ID without claiming
+  independent model attestation. Both routes' task handoffs provide only the
+  explicit renderer Skill path required by the job and preserve identical
+  content, geometry, renderer, and QA contracts. The integrator is the only writer of shared
+  renderer inputs. Use one
   all-slide preview for source-mapped evidence and one final
   `--quality reconstruction --allow-large-batch` renderer invocation; do not
   run isolated per-slide builds. Use project-local Node

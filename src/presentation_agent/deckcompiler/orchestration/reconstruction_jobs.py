@@ -518,6 +518,8 @@ def _build_job_row(
     authoring_outputs = [
         name.format(slide=slide) for name in AUTHORING_OUTPUT_NAMES
     ]
+    if execution_profile["profile_name"] == "native-inherited-xhigh":
+        authoring_outputs.append("worker_execution.json")
     post_render_outputs = [
         name.format(slide=slide) for name in POST_RENDER_OUTPUT_NAMES
     ]
@@ -639,6 +641,28 @@ def _worker_prompt(root: Path, work_dir: Path, job: dict[str, Any]) -> str:
     profile = job["execution_profile"]
     authoring = "\n".join(f"- `{name}`" for name in job["authoring_outputs"])
     post_render = "\n".join(f"- `{name}`" for name in job["post_render_outputs"])
+    launch_instruction = """Launch this fresh worker with the exact `worker_context.codex_argv` stored in
+the job. Do not load the global plugin/Skill catalog. The renderer Skill path
+below is the only Skill instruction path required for this job."""
+    if profile["profile_name"] == "native-inherited-xhigh":
+        launch_instruction = """Launch one native worker through `collaboration.spawn_agent`, with
+`fork_turns=none`, requested `reasoning_effort=xhigh`, and no model override.
+The model value `inherited` is a routing selector, not an actual model identity.
+The executor isolates conversation history only; no Codex CLI flags ran and no
+claim is made that plugins, tools, or configuration were disabled. Restrict work
+to this sealed single-slide job and do not load the global plugin/Skill catalog.
+The renderer Skill path below is the only Skill instruction path required.
+
+During authoring, write `worker_execution.json` with the following exact fields:
+executor `collaboration.spawn_agent`, requested_model null,
+requested_reasoning_effort `xhigh`, fork_turns `none`, actual_model null,
+actual_reasoning_effort null, model_attestation `unavailable`, and the actual
+launch_agent_id returned by the native tool, plus job_id and job_content_hash
+from this job. The shared-render QA finalizer consumes this file and includes
+it as `workerExecution` in its receipt after QA. Null actual fields mean the executor
+did not report backend identity/effort. This record is declared launch provenance,
+not independent model attestation. Do not invent actual model metadata or claim
+that requested effort was independently observed."""
     return f"""Use `$slide-image-dual-render` for exactly slide {slide}.
 
 Execution profile: `{profile['profile_name']}` = model
@@ -649,9 +673,7 @@ Semantic Sidecar, renderer contract, vector policy, compiler, and QA are fixed.
 Any configured fallback is failed-slide-only and may run only after an explicit
 contract or blocking-quality failure.
 
-Launch this fresh worker with the exact `worker_context.codex_argv` stored in
-the job. Do not load the global plugin/Skill catalog. The renderer Skill path
-below is the only Skill instruction path required for this job.
+{launch_instruction}
 
 This is one isolated fresh-context reconstruction job. Read
 `{(work_dir / "reconstruction_job.json").as_posix()}` first and inspect only the
@@ -751,7 +773,11 @@ def _validate_authoring_outputs(
     work_dir = job_path.parent
     label = f"slide {slide} authoring worker"
     required = list(job.get("authoring_outputs", []))
-    if required != [name.format(slide=slide) for name in AUTHORING_OUTPUT_NAMES]:
+    expected_outputs = [name.format(slide=slide) for name in AUTHORING_OUTPUT_NAMES]
+    native = job["execution_profile"]["profile_name"] == "native-inherited-xhigh"
+    if native:
+        expected_outputs.append("worker_execution.json")
+    if required != expected_outputs:
         issues.append(f"{label} authoring output contract is invalid")
         return
     for name in required:
@@ -759,6 +785,10 @@ def _validate_authoring_outputs(
             issues.append(f"{label} is missing {name}")
     if any(not (work_dir / name).is_file() for name in required):
         return
+
+    if native:
+        record = _read_worker_json(work_dir / "worker_execution.json", issues, label)
+        _validate_worker_execution({"workerExecution": record}, job, label, issues)
 
     measurements = _read_worker_json(work_dir / "measurements.json", issues, label)
     if measurements is not None:
@@ -1068,6 +1098,11 @@ def _validate_worker_outputs(
     receipt = _read_worker_json(work_dir / "worker_receipt.json", issues, label)
     if receipt is None:
         return
+    _validate_worker_execution(receipt, job, label, issues)
+    if job["execution_profile"]["profile_name"] == "native-inherited-xhigh":
+        record = _read_worker_json(work_dir / "worker_execution.json", issues, label)
+        if receipt.get("workerExecution") != record:
+            issues.append(f"{label} workerExecution does not match worker_execution.json")
     binding = job["receipt_binding"]
     expected_fields = {
         "slide": slide,
@@ -1102,6 +1137,42 @@ def _validate_worker_outputs(
                 issues.append(
                     f"{label} worker_receipt artifact hash mismatch for {name}"
                 )
+
+
+def _validate_worker_execution(
+    receipt: dict[str, Any],
+    job: dict[str, Any],
+    label: str,
+    issues: list[str],
+) -> None:
+    """Validate declared native launch provenance, never attest an unseen model."""
+    native = job["execution_profile"]["profile_name"] == "native-inherited-xhigh"
+    record = receipt.get("workerExecution")
+    if not native:
+        if isinstance(record, dict) and record.get("executor") == "collaboration.spawn_agent":
+            issues.append(f"{label} workerExecution native executor conflicts with sealed CLI profile")
+        return
+    expected = {
+        "job_id": job["job_id"],
+        "job_content_hash": job["content_hash"],
+        "executor": "collaboration.spawn_agent",
+        "requested_model": None,
+        "requested_reasoning_effort": job["execution_profile"]["target_reasoning_effort"],
+        "fork_turns": "none",
+        "actual_model": None,
+        "actual_reasoning_effort": None,
+        "model_attestation": "unavailable",
+    }
+    if not isinstance(record, dict):
+        issues.append(f"{label} workerExecution is required for the native profile")
+        return
+    if set(record) != set(expected) | {"launch_agent_id"}:
+        issues.append(f"{label} workerExecution has missing or unsupported fields")
+    for key, value in expected.items():
+        if key not in record or record[key] != value:
+            issues.append(f"{label} workerExecution.{key} must be {value!r}")
+    if not isinstance(record.get("launch_agent_id"), str) or not record["launch_agent_id"].strip():
+        issues.append(f"{label} workerExecution.launch_agent_id must record the native tool result")
 
 
 def _validate_vector_usage(

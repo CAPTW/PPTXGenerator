@@ -13,7 +13,7 @@ from typing import Any
 
 
 DEFAULT_EXECUTION_PROFILE = "terra-max"
-EXECUTION_PROFILE_NAMES = ("terra-max", "sol-medium", "luna-max")
+EXECUTION_PROFILE_NAMES = ("terra-max", "sol-medium", "luna-max", "native-inherited-xhigh")
 _LEGACY_ALIASES = {
     "fast-quality-20": "sol-medium",
     "fast-quality-streaming-20": "sol-medium",
@@ -39,7 +39,7 @@ class ExecutionProfile:
             if self.fallback_profile
             else []
         )
-        return {
+        payload = {
             "profile_name": self.name,
             "target_model": self.model,
             "target_reasoning_effort": self.reasoning_effort,
@@ -82,6 +82,18 @@ class ExecutionProfile:
                 "explicit_renderer_skill_path_required": True,
             },
         }
+        if self.name == "native-inherited-xhigh":
+            payload["worker_context"] = {
+                "mode": "native_fresh_context",
+                "executor": "collaboration.spawn_agent",
+                "fork_turns": "none",
+                "model_selection": "inherit",
+                "isolation_scope": "conversation_history_only",
+                "sealed_single_slide_job_only": True,
+                "full_skill_catalog_forbidden": True,
+                "explicit_renderer_skill_path_required": True,
+            }
+        return payload
 
 
 _PROFILES = {
@@ -100,6 +112,12 @@ _PROFILES = {
         model="gpt-5.6-luna",
         reasoning_effort="max",
         fallback_profile="sol-medium",
+    ),
+    # An explicit native executor route, not a claim about the backend model.
+    "native-inherited-xhigh": ExecutionProfile(
+        name="native-inherited-xhigh",
+        model="inherited",
+        reasoning_effort="xhigh",
     ),
 }
 

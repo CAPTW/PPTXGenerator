@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 from dataclasses import dataclass
+from fractions import Fraction
 from pathlib import Path
 from typing import Any
 
@@ -18,6 +19,11 @@ from ..errors import DeckCompilerError
 from ..identity import content_sha256, stable_id
 from ..manifest_io import read_json, write_json
 from .contracts import hash_bound_payload, verify_hash_bound_payload
+
+
+# Match Pillow's default decompression-bomb warning boundary, but reject before
+# allocation: a narrow source must not expand into an unbounded padded canvas.
+_MAX_CONTAIN_CANVAS_PIXELS = 89_478_485
 
 
 @dataclass(frozen=True, slots=True)
@@ -85,8 +91,34 @@ def _inspect_image(path: Path) -> dict[str, Any]:
     }
 
 
-def normalize_generated_image(original_path: Path, normalized_path: Path) -> dict[str, Any]:
-    """Create an exact 16:9 PNG without non-uniform scaling or overwrite."""
+def normalize_generated_image(
+    original_path: Path,
+    normalized_path: Path,
+    *,
+    mode: str = "crop",
+    padding_color: tuple[int, int, int] | None = None,
+) -> dict[str, Any]:
+    """Create an exact 16:9 PNG without non-uniform scaling or overwrite.
+
+    The default retains the legacy center-crop behavior. ``contain`` is an
+    explicit opt-in: preserve the complete source on a centered 16:9 canvas,
+    then uniformly resize when required by the existing minimum resolution.
+    Callers must choose the RGB padding color; it is never inferred from pixels.
+    Its hash-bound edge-coordinate mapping is normalization provenance, not
+    detected semantic geometry or a visual-quality approval.
+    """
+
+    if mode not in ("crop", "contain"):
+        raise _error("DC_PHASE4_NORMALIZATION_MODE", "Normalization mode must be crop or contain.")
+    if mode == "contain":
+        if (
+            not isinstance(padding_color, tuple)
+            or len(padding_color) != 3
+            or any(type(channel) is not int or not 0 <= channel <= 255 for channel in padding_color)
+        ):
+            raise _error("DC_PHASE4_PADDING_COLOR", "Contain mode requires an explicit RGB tuple of three integers in 0..255.")
+    elif padding_color is not None:
+        raise _error("DC_PHASE4_PADDING_COLOR", "Padding color is only valid in contain mode.")
 
     original = Path(original_path).resolve()
     normalized = Path(normalized_path).resolve()
@@ -97,6 +129,9 @@ def normalize_generated_image(original_path: Path, normalized_path: Path) -> dic
     original_info = _inspect_image(original)
     width = original_info["dimensions"]["width"]
     height = original_info["dimensions"]["height"]
+
+    if mode == "contain":
+        return _normalize_contained_image(original, normalized, original_info, padding_color)
 
     scale = min(width // 16, height // 9)
     if scale < 1:
@@ -151,6 +186,86 @@ def normalize_generated_image(original_path: Path, normalized_path: Path) -> dic
             "uniform_resize_to": list(final_size) if requires_resize else None,
             "stretch_used": False,
             "nonuniform_resize_used": False,
+        },
+    }
+
+
+def _normalize_contained_image(
+    original: Path,
+    normalized: Path,
+    original_info: dict[str, Any],
+    padding_color: tuple[int, int, int],
+) -> dict[str, Any]:
+    width = original_info["dimensions"]["width"]
+    height = original_info["dimensions"]["height"]
+    # Integer canvas dimensions keep the scale identical on both axes.
+    units = max((width + 15) // 16, (height + 8) // 9)
+    canvas_size = (units * 16, units * 9)
+    if canvas_size[0] * canvas_size[1] > _MAX_CONTAIN_CANVAS_PIXELS:
+        raise _error("DC_PHASE4_IMAGE_DIMENSIONS", "Contained canvas exceeds the safe allocation limit.", path=original)
+    left, top = (canvas_size[0] - width) // 2, (canvas_size[1] - height) // 2
+    final_size = (1600, 900) if units < 100 else canvas_size
+    scale = Fraction(final_size[0], canvas_size[0])
+    normalized.parent.mkdir(parents=True, exist_ok=True)
+    with Image.open(original) as image:
+        source_mode = "RGBA" if "A" in image.getbands() or "transparency" in image.info else "RGB"
+        source = image.convert(source_mode)
+        color = (*padding_color, 255) if source_mode == "RGBA" else padding_color
+        output = Image.new(source_mode, canvas_size, color)
+        # A new canvas otherwise drops the source color profile and metadata.
+        # Transparency has already been converted into the source alpha channel.
+        output.info.update({key: value for key, value in source.info.items() if key != "transparency"})
+        # No mask: copying RGBA preserves the source alpha instead of flattening it.
+        output.paste(source, (left, top))
+        if final_size != canvas_size:
+            output = output.resize(final_size, Image.Resampling.LANCZOS)
+        output.save(normalized, format="PNG", optimize=True)
+
+    normalized_info = _inspect_image(normalized)
+    if normalized_info["dimensions"] != {"width": final_size[0], "height": final_size[1]}:
+        normalized.unlink(missing_ok=True)
+        raise _error("DC_PHASE4_IMAGE_DIMENSIONS", "Contained output dimensions do not match its transform.", path=normalized)
+
+    def rational(value: Fraction) -> list[int]:
+        return [value.numerator, value.denominator]
+
+    mapping = hash_bound_payload({
+        "schema_name": "image_normalization_geometry",
+        "schema_version": "1.0.0",
+        "coordinate_convention": "pixel_edges_xyxy",
+        "source_sha256": original_info["sha256"],
+        "source_dimensions": original_info["dimensions"],
+        "normalized_sha256": normalized_info["sha256"],
+        "normalized_dimensions": normalized_info["dimensions"],
+        "source_box": [0, 0, width, height],
+        "padded_canvas_dimensions": {"width": canvas_size[0], "height": canvas_size[1]},
+        "source_box_on_padded_canvas": [left, top, left + width, top + height],
+        "uniform_scale": rational(scale),
+        "translation": {"x": rational(left * scale), "y": rational(top * scale)},
+        "source_box_on_normalized_canvas": [rational(edge * scale) for edge in (left, top, left + width, top + height)],
+        "full_source_retained": True,
+        "semantic_geometry_authority": False,
+    }, "mapping_sha256")
+    return {
+        "original_format": original_info["format"],
+        "original_dimensions": original_info["dimensions"],
+        "original_file_size_bytes": original_info["file_size_bytes"],
+        "original_sha256": original_info["sha256"],
+        "normalized_format": normalized_info["format"],
+        "normalized_dimensions": normalized_info["dimensions"],
+        "normalized_file_size_bytes": normalized_info["file_size_bytes"],
+        "normalized_sha256": normalized_info["sha256"],
+        "transformation": {
+            "type": "aspect_preserving_pad_and_uniform_resize" if final_size != canvas_size else "aspect_preserving_pad",
+            "mode": "contain",
+            "crop_box": [0, 0, width, height],
+            "padding_color_rgb": list(padding_color),
+            "padding_px": {"left": left, "top": top, "right": canvas_size[0] - width - left, "bottom": canvas_size[1] - height - top},
+            "uniform_resize_to": list(final_size) if final_size != canvas_size else None,
+            "resampling": "LANCZOS" if final_size != canvas_size else None,
+            "stretch_used": False,
+            "nonuniform_resize_used": False,
+            "geometry_mapping": mapping,
         },
     }
 

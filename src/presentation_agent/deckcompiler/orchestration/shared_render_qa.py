@@ -289,6 +289,11 @@ def finalize_shared_render_qa(
                 "reconstructionScore": _relative(project, score_path),
                 "qaResult": _relative(project, qa_result_path),
                 "qaReport": _relative(project, report_path),
+                **(
+                    {"workerExecution": read_json(work_dir / "worker_execution.json")}
+                    if job["execution_profile"]["profile_name"] == "native-inherited-xhigh"
+                    else {}
+                ),
             },
         )
         receipt_paths.append(receipt_path)

@@ -521,7 +521,11 @@ def build_skillset_execution_plan(
             runtime_root.resolve().as_posix(),
         ],
         "codex_execute_reconstruction_jobs": [
-            "CODEX_AGENT_ACTION",
+            (
+                "NATIVE_AGENT_ACTION"
+                if runtime_profile["worker_context"]["mode"] == "native_fresh_context"
+                else "CODEX_AGENT_ACTION"
+            ),
             "execute-ready-reconstruction-jobs",
             "--state",
             (runtime_root / "streaming_execution.json").resolve().as_posix(),
@@ -1332,7 +1336,11 @@ def build_skillset_execution_plan(
             "skip_crops_forbidden": True,
             "verified_authoring_target_seconds": 120,
             "eligible_state": "hash_verified_authoring_or_cache_hit",
-            "cache_miss_route": "terra-max_full_quality_authoring",
+            "cache_miss_route": (
+                "native-inherited-xhigh_full_quality_authoring"
+                if runtime_profile["worker_context"]["mode"] == "native_fresh_context"
+                else "terra-max_full_quality_authoring"
+            ),
             "first_time_arbitrary_authoring_sla_claimed": False,
             "quality_gate_bypass_forbidden": True,
         },
@@ -1581,6 +1589,20 @@ def validate_skillset_execution_plan(
         issues.append("project QA calibration profile path mismatch")
 
     commands = payload["command_templates"]
+    expected_action = (
+        "NATIVE_AGENT_ACTION"
+        if payload["execution_profile"]["worker_context"]["mode"] == "native_fresh_context"
+        else "CODEX_AGENT_ACTION"
+    )
+    if commands["codex_execute_reconstruction_jobs"][0] != expected_action:
+        issues.append("reconstruction dispatch action conflicts with execution profile")
+    expected_miss_route = (
+        "native-inherited-xhigh_full_quality_authoring"
+        if expected_action == "NATIVE_AGENT_ACTION"
+        else "terra-max_full_quality_authoring"
+    )
+    if payload["one_slide_fast_contract"]["cache_miss_route"] != expected_miss_route:
+        issues.append("authoring cache-miss route conflicts with execution profile")
     _require_flags(
         commands["install_node_dependencies"],
         ("--prefer-offline", "--no-audit", "--no-fund"),

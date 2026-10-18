@@ -40,6 +40,51 @@ class ReconstructionCropContractTests(unittest.TestCase):
             _validate_crops(payload, 1, {"width": 1600, "height": 900}, issues)
             self.assertEqual(issues, [])
 
+    def test_named_crop_mapping_entries_cannot_be_silently_discarded(self):
+        for value in (None, "not a crop", 17, False, []):
+            for wrapped in (False, True):
+                with self.subTest(value=value, wrapped=wrapped):
+                    mapping = {"s1_missing": value}
+                    payload = {"crops": mapping} if wrapped else mapping
+                    issues = []
+                    _validate_crops(payload, 1, {"width": 1600, "height": 900}, issues)
+                    self.assertEqual(issues, ["slide 1 worker crop s1_missing must be an object"])
+
+    def test_public_gates_reject_malformed_named_crops_without_losing_valid_controls(self):
+        from test_general_generate_workflow import GeneralGenerateWorkflowTests
+
+        fixture = GeneralGenerateWorkflowTests()
+        with tempfile.TemporaryDirectory() as directory:
+            runtime = Path(directory) / "runtime"
+            started = fixture._start(runtime)
+            fixture._build_run_draft(
+                runtime, workflow_id=started.workflow_id, slide_count=1,
+                status="COMPLETED", qa_status="PASS", fail_count=0, blocking_count=0,
+            )
+            work = runtime / "pngtopptx-project/work/slide01"
+            crop_path = work / "crop_plan.json"
+            receipt_path = work / "worker_receipt.json"
+            cases = (
+                ({"crops": {"s1_photo": self.crop()}}, True),
+                ({"crops": [self.crop()]}, True),
+                ({"crops": {}}, True),
+                ({"crops": []}, True),
+                ({"crops": {"s1_missing": None}}, False),
+                ({"crops": {"s1_photo": self.crop(), "s1_missing": None}}, False),
+                ({"crops": [{"name": "s1_missing"}]}, False),
+            )
+            for payload, valid in cases:
+                write_json(crop_path, payload)
+                receipt = read_json(receipt_path)
+                receipt["artifactHashes"]["crop_plan.json"] = fixture._sha256(crop_path)
+                write_json(receipt_path, receipt)
+                for flag in ("require_authoring_outputs", "require_worker_outputs"):
+                    with self.subTest(payload=payload, gate=flag):
+                        report = validate_reconstruction_job_bundle(runtime, **{flag: True})
+                        self.assertEqual(report["valid"], valid, report)
+                        if not valid:
+                            self.assertTrue(any("worker crop" in issue for issue in report["issues"]), report)
+
     def test_finite_numeric_strings_and_fractional_pixels_remain_valid(self):
         self.assertEqual(self.validate(self.crop(slide="1.0", x="1499.4", y=799.4, w=100.4, h=100.4)), [])
 

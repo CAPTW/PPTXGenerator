@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import ast
 import hashlib
+import math
 import os
 import shutil
 import subprocess
@@ -323,9 +324,24 @@ def validate_vector_preflight_slide_bundle(
                 inventory = read_json(inventory_path)
             except (OSError, ValueError, TypeError) as exc:
                 issues.append(f"slide {slide_number} inventory is invalid: {exc}")
-        semantic_boxes = _semantic_boxes(inventory)
-        width = int(record.get("source_png", {}).get("width", 0))
-        height = int(record.get("source_png", {}).get("height", 0))
+        try:
+            width, height = _png_size(source)
+        except (OSError, ValueError) as exc:
+            issues.append(f"slide {slide_number} source PNG is invalid: {exc}")
+            width = height = 0
+        source_record = record.get("source_png")
+        if not isinstance(source_record, dict) or any(
+            type(source_record.get(key)) is not int or source_record.get(key) != value
+            for key, value in (("width", width), ("height", height))
+        ):
+            issues.append(f"slide {slide_number} source dimensions must match the actual PNG")
+        if inventory.get("canvas_px") != {"w": width, "h": height}:
+            issues.append(f"slide {slide_number} inventory must use native {width}x{height} canvas")
+        try:
+            semantic_boxes = _semantic_boxes(inventory, width, height)
+        except DeckCompilerError as exc:
+            issues.append(f"slide {slide_number} inventory is invalid: {exc.message}")
+            semantic_boxes = []
         regions = record.get("regions")
         if not isinstance(regions, list):
             issues.append("slide vector preflight regions must be an array")
@@ -661,7 +677,11 @@ def validate_vector_preflight_bundle(runtime_root: Path) -> dict[str, Any]:
             continue
         if canvas != {"w": width, "h": height}:
             issues.append(f"{label} inventory must use native {width}x{height} canvas")
-        semantic_boxes = _semantic_boxes(inventory)
+        try:
+            semantic_boxes = _semantic_boxes(inventory, width, height)
+        except DeckCompilerError as exc:
+            issues.append(f"{label} inventory is invalid: {exc.message}")
+            semantic_boxes = []
         regions = row.get("regions") if isinstance(row.get("regions"), list) else []
         measured_count += len(regions)
         for region in regions:
@@ -992,7 +1012,7 @@ def _build_slide_record(
     }
     detector_record["content_hash"] = content_sha256(detector_record)
     detector_record_path = write_json(slide_dir / "detector_record.json", detector_record)
-    semantic_boxes = _semantic_boxes(inventory)
+    semantic_boxes = _semantic_boxes(inventory, width, height)
     rows: list[dict[str, Any]] = []
     source_image = Image.open(source).convert("RGBA")
     for index, measured in enumerate(inventory.get("regions", []), start=1):
@@ -1177,16 +1197,43 @@ def _validate_region(
                         )
 
 
-def _semantic_boxes(inventory: dict[str, Any]) -> list[dict[str, Any]]:
+def _semantic_boxes(
+    inventory: dict[str, Any], width: int, height: int
+) -> list[dict[str, Any]]:
+    """Fail closed if any protected-text geometry is unusable; never round it."""
     result: list[dict[str, Any]] = []
     for key in ("text_blocks", "suppressed_text"):
-        for index, row in enumerate(inventory.get(key, []), start=1):
-            if not isinstance(row, dict) or not isinstance(row.get("bbox_px"), dict):
-                continue
+        rows = inventory.get(key, [] if key == "suppressed_text" else None)
+        if not isinstance(rows, list):
+            raise _error(
+                "DC_VECTOR_PREFLIGHT_MEASUREMENT_INVALID", f"{key} must be an array"
+            )
+        for index, row in enumerate(rows, start=1):
+            label = f"{key}[{index - 1}]"
+            bbox = row.get("bbox_px") if isinstance(row, dict) else None
+            if not isinstance(bbox, dict) or any(
+                type(bbox.get(axis)) not in (int, float)
+                or (type(bbox[axis]) is float and not math.isfinite(bbox[axis]))
+                for axis in ("x", "y", "w", "h")
+            ):
+                raise _error(
+                    "DC_VECTOR_PREFLIGHT_MEASUREMENT_INVALID",
+                    f"{label} requires a finite numeric bbox_px",
+                )
+            x, y, w, h = (bbox[axis] for axis in ("x", "y", "w", "h"))
+            if (
+                x < 0 or y < 0 or w <= 0 or h <= 0
+                or x > width or y > height or w > width or h > height
+                or x + w > width or y + h > height
+            ):
+                raise _error(
+                    "DC_VECTOR_PREFLIGHT_MEASUREMENT_INVALID",
+                    f"{label} bbox_px must be positive and inside the native canvas",
+                )
             result.append(
                 {
                     "id": str(row.get("id") or f"{key}-{index}"),
-                    "bbox_px": row["bbox_px"],
+                    "bbox_px": bbox,
                 }
             )
     return result

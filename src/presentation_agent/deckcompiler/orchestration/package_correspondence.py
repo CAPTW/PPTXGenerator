@@ -31,6 +31,9 @@ from .source_ref_authoring import AUTHORITY, bind_source_ref_authoring
 REQUEST_NAME = 'package_correspondence.json'
 PROFILE = 'direct-text-shape-raster-v1'
 PRODUCER = 'pngtopptx-pr1-pr6-source-refs-v1'
+GEOMETRY_PROFILE = 'direct-text-shape-raster-lines-v2'
+GEOMETRY_PRODUCER = 'pngtopptx-pr1-pr6-emitter-geometry-v1'
+PROFILE_PRODUCERS = {PROFILE:PRODUCER, GEOMETRY_PROFILE:GEOMETRY_PRODUCER}
 MAX_ARCHIVE_BYTES = 64 * 1024 * 1024
 MAX_EXPANDED_BYTES = 128 * 1024 * 1024
 MAX_MEMBER_BYTES = 16 * 1024 * 1024
@@ -79,12 +82,16 @@ def bind_package_correspondence(root, job, work_dir):
     try:
         raw=_local(path,root,65536);request=_json_object(raw)
         _exact(request,{'schema_name','schema_version','profile','enabled'},'package correspondence request')
-        if request!={'schema_name':'codex_package_correspondence_request','schema_version':'1.0.0','profile':PROFILE,'enabled':True} or request['enabled'] is not True:
+        profile=request['profile']
+        if (profile not in PROFILE_PRODUCERS
+                or request!={'schema_name':'codex_package_correspondence_request','schema_version':'1.0.0','profile':profile,'enabled':True}
+                or request['enabled'] is not True):
             raise ValueError('request schema/profile/enabled is invalid')
         authoring=job.get('source_ref_authoring',{})
-        if authoring.get('renderer_capability',{}).get('bundle_id')!=PRODUCER:
-            raise ValueError('package audit requires the recognized combined PR1+PR6 authoring bundle')
-        return {'schema_version':'1.0.0','profile':PROFILE,'producer_bundle':PRODUCER,
+        producer=PROFILE_PRODUCERS[profile]
+        if authoring.get('renderer_capability',{}).get('bundle_id')!=producer:
+            raise ValueError('package audit profile requires its exact recognized combined producer bundle')
+        return {'schema_version':'1.0.0','profile':profile,'producer_bundle':producer,
                 'request':{'path':path.relative_to(root).as_posix(),'sha256':_sha(raw)},'authority':AUTHORITY.copy()}
     except (OSError,ValueError,TypeError,KeyError) as exc:_fail('INVALID_INPUT',str(exc))
 
@@ -255,6 +262,58 @@ def _emu(value, extent, pixels):
     return math.floor((thousandths/1000)*914400+0.5)
 
 
+def _qualified_geometry(obj, slide):
+    """Exact producer projection only; diagnostic bboxes cannot recover it.
+
+    The recognized renderer adds this field only to tagged primitives and
+    records the numeric arguments actually passed to its 4.0.1 emitter. This
+    validates consistency, not signed provenance or original line direction.
+    In particular, safeLineGeom's existing zero-axis inflation is preserved.
+    """
+    category={
+        'surface.txt':('text','none'), 'surface.img':('image','none'),
+        'surface.rrect':('panel','none'), 'surface.ell':('shape','none'),
+        'surface.chev':('shape','none'), 'surface.ln':('rule','safe-line-geom-v1'),
+    }.get(obj.get('source'))
+    if category is None:_fail('UNSUPPORTED_PROFILE','unsupported geometry producer primitive')
+    if obj.get('type')!=category[0]:raise ValueError('primitive native category does not match producer')
+    refs=obj.get('sourceRefs')
+    if (not isinstance(refs,dict) or refs.get('schemaVersion')!='slide-image-dual-render.source-refs.v1'
+            or type(refs.get('slide')) is not int or refs['slide']!=slide):
+        raise ValueError('qualified geometry requires the producer sourceRefs slide/schema')
+    # These fields remain diagnostic, not a projection input or direction test.
+    if any(type(obj.get(k)) not in (int,float) or not math.isfinite(obj[k]) for k in ('x','y','w','h')):
+        raise ValueError('invalid diagnostic source geometry')
+    evidence=obj.get('emitterGeometry')
+    _exact(evidence,{'schemaVersion','emitterVersion','units','status','reason','sourceNormalization','transform'},'emitter geometry')
+    if (any(type(evidence[k]) is not str for k in ('schemaVersion','units','status','sourceNormalization'))
+            or (evidence['emitterVersion'] is not None and type(evidence['emitterVersion']) is not str)
+            or (evidence['reason'] is not None and type(evidence['reason']) is not str)):
+        raise ValueError('invalid emitter geometry qualifier types')
+    if (evidence['schemaVersion']!='slide-image-dual-render.emitter-geometry.v1'
+            or evidence['emitterVersion']!='4.0.1'):
+        _fail('UNSUPPORTED_PROFILE','unqualified emitter geometry schema/version')
+    if evidence['units']!='EMU' or evidence['sourceNormalization']!=category[1]:
+        raise ValueError('emitter geometry units/normalization does not match producer')
+    if evidence['status']=='UNSUPPORTED':_fail('UNSUPPORTED_PROFILE','producer geometry is unsupported')
+    if evidence['status']!='PROJECTED' or evidence['reason'] is not None:
+        raise ValueError('invalid qualified emitter geometry status/reason')
+    transform=evidence['transform']
+    _exact(transform,{'x','y','cx','cy','flipH','flipV','rotation'},'emitter transform')
+    # The exact producer excludes >=100-inch numeric inputs, but rounding a
+    # value just below that bound can legitimately produce exactly 91440000 EMU.
+    # bool is an int subclass in Python; accept JSON integers only, never bool
+    # or integral floats, and never round purported expected coordinates.
+    if (any(type(transform[k]) is not int or not 0<=transform[k]<=91440000 for k in ('x','y','cx','cy'))
+            or transform['cx']==0 or transform['cy']==0
+            or type(transform['flipH']) is not bool or type(transform['flipV']) is not bool
+            or type(transform['rotation']) is not int):
+        raise ValueError('invalid exact integer EMU geometry or transform flag types')
+    if transform['flipH'] or transform['flipV'] or transform['rotation']!=0:
+        _fail('UNSUPPORTED_PROFILE','flipped/rotated geometry is not qualified by this producer')
+    return [transform[k] for k in ('x','y','cx','cy')]
+
+
 def _paragraph_text(body):
     """Only direct a:p / a:r / a:t and direct a:br produce text in v1.
 
@@ -290,9 +349,16 @@ def _paragraph_text(body):
     return '\n'.join(paragraphs)
 
 
-def inspect_package(raw, manifest, *, slide, physical_index, canvas):
+def inspect_package(raw, manifest, *, slide, physical_index, canvas, profile=PROFILE, producer_bundle=None):
     """Pure bounded verifier; ordinal correspondence only, no geometry search."""
     try:
+        if profile not in PROFILE_PRODUCERS:_fail('UNSUPPORTED_PROFILE','unknown package correspondence profile')
+        # Legacy pure callers may omit the v1 producer. V2 must explicitly
+        # name its qualified bundle; the public job boundary rehashes the actual
+        # whole bundle before calling this pure parser. A field alone is not it.
+        if ((profile==GEOMETRY_PROFILE or producer_bundle is not None)
+                and producer_bundle!=PROFILE_PRODUCERS[profile]):
+            _fail('UNSUPPORTED_PROFILE','package profile does not match its qualified producer bundle')
         if (type(slide) is not int or slide<=0 or type(physical_index) is not int or physical_index<=0
                 or len(canvas)!=2 or any(type(v) is not int or not 0<v<=2**31-1 for v in canvas)):
             raise ValueError('invalid source/physical slide or canvas')
@@ -335,11 +401,14 @@ def inspect_package(raw, manifest, *, slide, physical_index, canvas):
         result=[]
         for index,(obj,shape) in enumerate(zip(expected,shapes)):
             if not isinstance(obj,dict):raise ValueError('manifest object must be an object')
-            box=[obj[k] for k in ('x','y','w','h')]
-            if (any(type(v) not in (int,float) or not math.isfinite(v) or v<0 or int(v)!=v or v>2**31-1 for v in box)
-                    or obj.get('source')=='surface.ln'):_fail('UNSUPPORTED_PROFILE','v1 requires nonnegative integer non-line boxes')
-            if box[2]<=0 or box[3]<=0:_fail('UNSUPPORTED_PROFILE','zero-extent boxes are unsupported')
-            geometry=[_emu(v,13.333 if i%2==0 else 7.5,canvas[i%2]) for i,v in enumerate(box)]
+            if profile==GEOMETRY_PROFILE:
+                geometry=_qualified_geometry(obj,slide)
+            else:
+                box=[obj[k] for k in ('x','y','w','h')]
+                if (any(type(v) not in (int,float) or not math.isfinite(v) or v<0 or int(v)!=v or v>2**31-1 for v in box)
+                        or obj.get('source')=='surface.ln'):_fail('UNSUPPORTED_PROFILE','v1 requires nonnegative integer non-line boxes')
+                if box[2]<=0 or box[3]<=0:_fail('UNSUPPORTED_PROFILE','zero-extent boxes are unsupported')
+                geometry=[_emu(v,13.333 if i%2==0 else 7.5,canvas[i%2]) for i,v in enumerate(box)]
             transform=_one(shape,'p:spPr/a:xfrm')
             if transform.attrib:_fail('UNSUPPORTED_PROFILE','rotated/flipped/transformed primitive is unsupported')
             off=_one(transform,'a:off');ext=_one(transform,'a:ext')
@@ -347,7 +416,7 @@ def inspect_package(raw, manifest, *, slide, physical_index, canvas):
             if geometry!=actual:_fail('CORRESPONDENCE_MISMATCH',f'geometry mismatch at ordinal {index}')
             body=shape.find('p:txBody',NS)
             if body is not None:body=_one(shape,'p:txBody')
-            if obj.get('type') not in ('text','shape','panel','image','icon'):_fail('UNSUPPORTED_PROFILE','unsupported manifest object type')
+            if obj.get('type') not in (('text','shape','panel','image','rule') if profile==GEOMETRY_PROFILE else ('text','shape','panel','image','icon')):_fail('UNSUPPORTED_PROFILE','unsupported manifest object type')
             kind='image' if shape.tag=='{'+P+'}pic' else 'text' if body is not None else 'shape'
             expected_kind='image' if obj['type'] in ('image','icon') else 'text' if obj['type']=='text' else 'shape'
             if kind!=expected_kind:_fail('CORRESPONDENCE_MISMATCH',f'native kind mismatch at ordinal {index}')
@@ -369,12 +438,14 @@ def inspect_package(raw, manifest, *, slide, physical_index, canvas):
                 content=_sha(parts[media])
                 if obj.get('imageFileSha256')!=content:_fail('CORRESPONDENCE_MISMATCH',f'image content mismatch at ordinal {index}')
             else:
-                preset={'surface.ell':'ellipse','surface.chev':'chevron','surface.rrect':'roundRect'}.get(obj.get('source'))
+                presets={'surface.ell':'ellipse','surface.chev':'chevron','surface.rrect':'roundRect'}
+                if profile==GEOMETRY_PROFILE:presets['surface.ln']='line'
+                preset=presets.get(obj.get('source'))
                 if preset is None:_fail('UNSUPPORTED_PROFILE','unsupported native shape source')
                 if _one(shape,'p:spPr/a:prstGeom').get('prst')!=preset:_fail('CORRESPONDENCE_MISMATCH',f'shape preset mismatch at ordinal {index}')
             result.append({'manifest_pointer':f'/slides/{slide}/objects/{index}','manifest_row_sha256':content_sha256(obj),
                 'package_ordinal':index,'kind':kind,'geometry_emu':actual,**({'content_sha256':content} if content is not None else {})})
-        return {'schema_version':'1.0.0','profile':PROFILE,'status':'CORRESPONDENCE_VERIFIED','representation_status':'NOT_ESTABLISHED',
+        return {'schema_version':'1.0.0','profile':profile,'status':'CORRESPONDENCE_VERIFIED','representation_status':'NOT_ESTABLISHED',
             'authority':AUTHORITY.copy(),'source_slide_order':order,'source_slide':slide,'physical_slide_index':physical_index,'slide_part':part,
             'object_count':len(result),'objects':result}
     except DeckCompilerError:raise
@@ -416,9 +487,10 @@ def audit_job_package(root, job, work_dir):
             if not isinstance(selected,str) or not re.fullmatch(r'[1-9][0-9]*(?:,[1-9][0-9]*)*',selected):raise ValueError('invalid selected source slides')
             values=[int(x) for x in selected.split(',')]
             if len(values)!=len(set(values)) or sorted(values)!=sorted(map(int,native['slides'])):raise ValueError('selected source-slide set mismatch')
-        result=inspect_package(raw,native,slide=job['slide_number'],physical_index=metadata['physicalSlideIndex'],canvas=(canvas['width'],canvas['height']))
+        result=inspect_package(raw,native,slide=job['slide_number'],physical_index=metadata['physicalSlideIndex'],canvas=(canvas['width'],canvas['height']),
+                               profile=requested['profile'],producer_bundle=requested['producer_bundle'])
         result['bindings']={'job_content_hash':job['content_hash'],'request_sha256':requested['request']['sha256'],
-            'producer_bundle':PRODUCER,'renderer_capability_sha256':content_sha256(capability),
+            'producer_bundle':requested['producer_bundle'],'renderer_capability_sha256':content_sha256(capability),
             'package_path':path.relative_to(root).as_posix(),'package_sha256':_sha(raw),'native_manifest_sha256':_sha(native_raw),
             'render_trace_sha256':_sha(trace_raw),'raster_metadata_sha256':_sha(metadata_raw),'integrated_slides_sha256':_sha(integrated)}
         return result

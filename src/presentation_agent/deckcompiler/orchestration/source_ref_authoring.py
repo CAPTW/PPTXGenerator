@@ -31,6 +31,14 @@ REVIEWED_BUNDLES = {
         'atoms_pptx.js':'a01757a582fede4540116940316c171518246f13499f84f0de595e9068ab28da',
         'atoms_html.js':'b487d59a25c14a872eb803c3d0a6e0e801135f05be2fdd40cd38c59b26b32acb',
     },
+    # Independently reviewed emitter-geometry v1 compatibility bundle. The
+    # versioned package profile qualifies its evidence separately; this is not
+    # a canonical renderer pin, signature or later runtime attestation.
+    'pngtopptx-pr1-pr6-emitter-geometry-v1': {
+        'object_manifest.js':'f850cb73728cd1d3808a65506f4f00a9354d6f4897962b07895f6772b192a4a5',
+        'atoms_pptx.js':'3262e57a847ae4c6fc30e52582bf004975af048c33feb0f512cf41f6623d9ad7',
+        'atoms_html.js':'b487d59a25c14a872eb803c3d0a6e0e801135f05be2fdd40cd38c59b26b32acb',
+    },
 }
 MODULE_NAMES = ('object_manifest.js', 'atoms_pptx.js', 'atoms_html.js')
 AUTHORITY = {k: False for k in ('semantic_truth', 'text_removal', 'native_admission', 'vector_eligibility', 'quality_accepted')}

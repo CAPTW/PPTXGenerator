@@ -28,7 +28,8 @@ from ..manifest_io import read_json, write_json
 from ..schemas import REPO_ROOT, validator_for
 from ..vectorization import trace_png_to_svg, validate_svg
 from .image_requests import REQUEST_MANIFEST_NAME, validate_image_request_bundle
-from .raw_measure_batch import validate_ocr_inventory, validate_region_candidate_evidence
+from .raw_measure_batch import (validate_ocr_inventory, validate_region_candidate_evidence,
+    validate_text_alternative_evidence, _validate_text_alternative_contract, TEXT_ALTERNATIVE_COLLECTION)
 from .skillset_plan import validate_skillset_execution_plan
 
 
@@ -116,11 +117,16 @@ def prepare_vector_preflight_slide(
     backend: str = "easyocr",
     deep: bool = True,
     preserve_region_candidates: bool = False,
+    preserve_text_alternatives: bool = False,
 ) -> VectorSlidePreflightPreparationResult:
     """Measure and gate one accepted PNG without waiting for the image batch."""
 
     if type(preserve_region_candidates) is not bool:
         raise ValueError("preserve_region_candidates must be a boolean")
+    if type(preserve_text_alternatives) is not bool:
+        raise ValueError("preserve_text_alternatives must be a boolean")
+    if preserve_text_alternatives and backend != "easyocr":
+        raise ValueError("preserve_text_alternatives requires easyocr")
     if backend not in {"easyocr", "tesseract"}:
         raise ValueError("backend must be easyocr or tesseract")
     if slide_number < 1:
@@ -167,6 +173,7 @@ def prepare_vector_preflight_slide(
             and payload["execution"]["backend"] == backend
             and bool(payload["execution"]["deep_scan"]) == deep
             and payload["execution"].get("preserve_region_candidates", False) == preserve_region_candidates
+            and payload["execution"].get("preserve_text_alternatives", False) == preserve_text_alternatives
         ):
             return VectorSlidePreflightPreparationResult(
                 workflow_id=inputs["workflow_id"],
@@ -193,6 +200,7 @@ def prepare_vector_preflight_slide(
         deep=deep,
         max_workers=1,
         preserve_region_candidates=preserve_region_candidates,
+        preserve_text_alternatives=preserve_text_alternatives,
     )[slide_number]
     record = _build_slide_record(
         root=root,
@@ -207,6 +215,7 @@ def prepare_vector_preflight_slide(
         stderr=measured["stderr"],
         batch_job_path=measured["batch_job_path"],
         preserve_region_candidates=preserve_region_candidates,
+        preserve_text_alternatives=preserve_text_alternatives,
     )
     manifest_path = _write_slide_preflight_receipt(
         root=root,
@@ -217,6 +226,7 @@ def prepare_vector_preflight_slide(
         deep=deep,
         record=record,
         preserve_region_candidates=preserve_region_candidates,
+        preserve_text_alternatives=preserve_text_alternatives,
     )
     report = validate_vector_preflight_slide_bundle(root, slide_number)
     if not report["valid"]:
@@ -403,6 +413,7 @@ def prepare_vector_preflight(
     deep: bool = True,
     require_cached: bool = False,
     preserve_region_candidates: bool = False,
+    preserve_text_alternatives: bool = False,
 ) -> VectorPreflightPreparationResult:
     """Measure selected PNGs, or consolidate verified receipts without remeasurement.
 
@@ -412,6 +423,10 @@ def prepare_vector_preflight(
 
     if type(preserve_region_candidates) is not bool:
         raise ValueError("preserve_region_candidates must be a boolean")
+    if type(preserve_text_alternatives) is not bool:
+        raise ValueError("preserve_text_alternatives must be a boolean")
+    if preserve_text_alternatives and backend != "easyocr":
+        raise ValueError("preserve_text_alternatives requires easyocr")
     if backend not in {"easyocr", "tesseract"}:
         raise ValueError("backend must be easyocr or tesseract")
     if not 1 <= max_workers <= 4:
@@ -452,6 +467,7 @@ def prepare_vector_preflight(
             or receipt["execution"]["backend"] != backend
             or bool(receipt["execution"]["deep_scan"]) != deep
             or receipt["execution"].get("preserve_region_candidates", False) != preserve_region_candidates
+            or receipt["execution"].get("preserve_text_alternatives", False) != preserve_text_alternatives
             or receipt["execution"]["python_executable"] != executable
         ):
             receipts_reused = False
@@ -475,6 +491,7 @@ def prepare_vector_preflight(
             deep=deep,
             max_workers=max_workers,
             preserve_region_candidates=preserve_region_candidates,
+            preserve_text_alternatives=preserve_text_alternatives,
         )
 
         def build(row: dict[str, Any]) -> dict[str, Any]:
@@ -495,6 +512,7 @@ def prepare_vector_preflight(
                 stderr=measured["stderr"],
                 batch_job_path=measured["batch_job_path"],
                 preserve_region_candidates=preserve_region_candidates,
+                preserve_text_alternatives=preserve_text_alternatives,
             )
             _write_slide_preflight_receipt(
                 root=root,
@@ -505,6 +523,7 @@ def prepare_vector_preflight(
                 deep=deep,
                 record=record,
                 preserve_region_candidates=preserve_region_candidates,
+                preserve_text_alternatives=preserve_text_alternatives,
             )
             return record
 
@@ -541,6 +560,7 @@ def prepare_vector_preflight(
             "deep_text": True,
             "deep_scan": deep,
             **({"preserve_region_candidates": True} if preserve_region_candidates else {}),
+            **({"preserve_text_alternatives": True} if preserve_text_alternatives else {}),
             "max_parallel_measurement_workers": min(max_workers, len(records)),
             "ocr_reader_initializations_maximum": min(max_workers, len(records)),
             "measurement_dispatch": "bounded_batch_processes_shared_reader_per_worker",
@@ -752,6 +772,16 @@ def _validate_candidate_capture(
                 or command.count("--preserve-region-candidates") != int(capture)):
                 raise ValueError("capture mode disagrees with detector execution")
         validate_region_candidate_evidence(inventory, source, required=capture)
+        alternatives = execution.get("preserve_text_alternatives", False)
+        if type(alternatives) is not bool or (alternatives and execution.get("backend") != "easyocr"):
+            raise ValueError("preserve_text_alternatives must be a boolean with easyocr when enabled")
+        if detector_record_path is not None:
+            actual = detector.get("preserve_text_alternatives", False)
+            if type(actual) is not bool or actual != alternatives or command.count("--preserve-text-alternatives") != int(alternatives):
+                raise ValueError("text alternative mode disagrees with detector execution")
+        validate_text_alternative_evidence(inventory, source, required=alternatives)
+        if "text_alternative_evidence" in inventory and not alternatives:
+            raise ValueError("text_alternative_evidence requires explicit preserve_text_alternatives mode")
     except (OSError, ValueError, TypeError) as exc:
         issues.append(f"{label} region candidate evidence is invalid: {exc}")
 
@@ -801,6 +831,7 @@ def _write_slide_preflight_receipt(
     deep: bool,
     record: dict[str, Any],
     preserve_region_candidates: bool = False,
+    preserve_text_alternatives: bool = False,
 ) -> Path:
     slide_number = int(record["slide_number"])
     detector = (pipeline / "scripts" / "detect_elements.py").resolve()
@@ -830,6 +861,7 @@ def _write_slide_preflight_receipt(
             "deep_text": True,
             "deep_scan": deep,
             **({"preserve_region_candidates": True} if preserve_region_candidates else {}),
+            **({"preserve_text_alternatives": True} if preserve_text_alternatives else {}),
             "additional_model_calls": 0,
         },
         "quality_contract": {
@@ -912,6 +944,7 @@ def _run_measurement_batches(
     deep: bool,
     max_workers: int,
     preserve_region_candidates: bool = False,
+    preserve_text_alternatives: bool = False,
 ) -> dict[int, dict[str, Any]]:
     worker_count = min(max_workers, len(rows))
     chunks: list[list[dict[str, Any]]] = [[] for _ in range(worker_count)]
@@ -965,6 +998,8 @@ def _run_measurement_batches(
             command.append("--deep")
         if preserve_region_candidates:
             command.append("--preserve-region-candidates")
+        if preserve_text_alternatives:
+            command.append("--preserve-text-alternatives")
         batch_specs.append((batch_path, chunk, command))
 
     def execute(
@@ -1036,6 +1071,7 @@ def _build_slide_record(
     stderr: str,
     batch_job_path: Path,
     preserve_region_candidates: bool = False,
+    preserve_text_alternatives: bool = False,
 ) -> dict[str, Any]:
     slide = int(request_row["slide_number"])
     width, height = _png_size(source)
@@ -1048,6 +1084,9 @@ def _build_slide_record(
     semantic_boxes = _semantic_boxes(inventory, width, height)
     try:
         validate_region_candidate_evidence(inventory, source, required=preserve_region_candidates)
+        validate_text_alternative_evidence(inventory, source, required=preserve_text_alternatives)
+        if "text_alternative_evidence" in inventory and not preserve_text_alternatives:
+            raise ValueError("text_alternative_evidence requires explicit preserve_text_alternatives mode")
     except (OSError, ValueError, TypeError) as exc:
         raise _error("DC_VECTOR_PREFLIGHT_MEASUREMENT_INVALID", str(exc), inventory_path) from exc
     slide_dir = inventory_path.parent
@@ -1058,6 +1097,7 @@ def _build_slide_record(
         "backend": backend,
         "deep_scan": deep,
         **({"preserve_region_candidates": True} if preserve_region_candidates else {}),
+        **({"preserve_text_alternatives": True} if preserve_text_alternatives else {}),
         "command": command,
         "exit_code": 0,
         "stdout_tail": stdout[-2000:],
@@ -1331,6 +1371,7 @@ def _semantic_boxes(
     """Fail closed if any protected-text geometry is unusable; never round it."""
     try:
         validate_ocr_inventory(inventory)
+        _validate_text_alternative_contract(inventory, width, height)
     except ValueError as exc:
         raise _error("DC_VECTOR_PREFLIGHT_MEASUREMENT_INVALID", str(exc)) from exc
     result: list[dict[str, Any]] = []
@@ -1368,6 +1409,9 @@ def _semantic_boxes(
                     "bbox_px": bbox,
                 }
             )
+    for row in inventory.get("text_alternative_evidence", {}).get("observations", []):
+        result.append({"id": TEXT_ALTERNATIVE_COLLECTION + ":" + row["observation_id"],
+                       "bbox_px": row["bbox_px"]})
     return result
 
 

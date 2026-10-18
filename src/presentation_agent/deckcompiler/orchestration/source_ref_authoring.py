@@ -127,6 +127,13 @@ def source_ref_authoring_prompt(job: dict) -> str:
             for row in review['decisions'] if row['review_status']=='recorded' and row['role'] in ('text','graphic')],
         'unresolved_observations':review['coverage']['needs_review'],
     }
+    review_only = ""
+    if "text_alternatives" in job:
+        collection = "text_alternative_evidence.observations"
+        identities["unresolved_observations"] = [row for row in identities["unresolved_observations"]
+            if row["collection"] != collection]
+        review_only = "\nText-alternative observation IDs are review-only and unsupported by renderer sourceRefs. " \
+            "Do not tag them or use them as glyphMembers; their accounting remains unresolved.\n"
     return f'''
 This job explicitly opts into source-reference provenance. Its installed surface
 module bundle matched reviewed bytes during preparation and job validation.
@@ -149,7 +156,7 @@ source {{collection, observation_id}}, glyphMembers [], and disposition
 
 ```json
 {json.dumps(identities, indent=2)}
-```
+```{review_only}
 
 Recorded roles above remain advisory, not semantic truth or native/vector
 admission. A linked claim still needs the existing independent classification

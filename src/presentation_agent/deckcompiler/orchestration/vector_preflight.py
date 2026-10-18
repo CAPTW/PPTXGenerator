@@ -35,10 +35,12 @@ from .skillset_plan import validate_skillset_execution_plan
 PROJECT_DIRECTORY = "pngtopptx-project"
 MANIFEST_NAME = "vector_preflight_manifest.json"
 MANIFEST_SCHEMA = "pngtosvg_vector_preflight"
-MANIFEST_VERSION = "1.0.0"
+# 1.1.0 invalidates receipts produced before conservative pixel enclosure.
+# Even integral 1.0.0 receipts rebuild once; their format cannot attest the policy.
+MANIFEST_VERSION = "1.1.0"
 SLIDE_MANIFEST_NAME = "slide_vector_preflight.json"
 SLIDE_MANIFEST_SCHEMA = "pngtosvg_vector_preflight_slide"
-SLIDE_MANIFEST_VERSION = "1.0.0"
+SLIDE_MANIFEST_VERSION = "1.1.0"
 POLICY_ID = "raw-measured-bounded-vector-v1"
 MAX_VECTOR_REGION_AREA_RATIO = 0.35
 DEFAULT_MAX_WORKERS = 2

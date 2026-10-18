@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import math
 import tempfile
 from fractions import Fraction
 from pathlib import Path
@@ -89,7 +90,8 @@ def consume_vsc_review(root: Path, job: dict[str, Any], review_ref: dict[str, An
         raise _error('VSC review requires inspected crop references')
     for crop in crops:
         _read_bound_artifact(root, crop, 'reviewed_crop', json_object=False)
-    if vsc.get('capability') != 'reviewed_observations_core_inventory_v1':
+    if (vsc.get('capability') != 'reviewed_observations_core_inventory_v1'
+            or type(vsc.get('version')) is not int or vsc['version'] != 1):
         raise _error('unsupported VSC inventory capability; retain UNRESOLVED')
     transform = _verified_transform(root, job, artifacts['canvas_png'], receipt)
     width, height = receipt['canvas']['size_px']
@@ -120,15 +122,47 @@ def consume_vsc_review(root: Path, job: dict[str, Any], review_ref: dict[str, An
             raise _error('VSC block/observation/region identity must uniquely identify an unused existing observation')
         observation = matches[0]
         blocks = [row for row in vsc['inventory'].get('text_blocks', []) if row.get('id') == observation['block_id']]
-        if len(blocks) != 1 or not any(member.get('observation_id') == observation['observation_id'] for member in blocks[0].get('members', [])):
+        if len(blocks) != 1:
             raise _error('VSC block/member identity closure mismatch')
+        # This exact inventory capability assembles each observation separately.
+        # It does not support regrouped chunks or a detached sampling envelope.
+        members = blocks[0].get('members')
+        if (not isinstance(members, list) or len(members) != 1
+                or not isinstance(members[0], dict)
+                or members[0].get('observation_id') != observation['observation_id']
+                or sum(row.get('observation_id') == observation['observation_id'] for row in rows) != 1):
+            raise _error('VSC single-observation block/member identity closure mismatch')
+        raw = observation.get('raw')
+        text = raw.get('text') if isinstance(raw, dict) else None
+        if (not isinstance(text, str) or not text
+                or any(blocks[0].get(key) != text for key in ('text', 'text_raw'))
+                or members[0].get('text') != text):
+            raise _error('VSC observation/block/member exact text closure mismatch')
+        polygon = observation.get('polygon_canvas_px')
+        if (not isinstance(polygon, list) or len(polygon) != 4
+                or any(not isinstance(point, list) or len(point) != 2
+                       or any(type(value) not in (int, float)
+                              or not 0 <= value <= (width, height)[axis]
+                              or not math.isfinite(value) for axis, value in enumerate(point))
+                       for point in polygon)):
+            raise _error('VSC observation polygon sampling geometry is invalid')
+        x0 = math.floor(min(point[0] for point in polygon))
+        y0 = math.floor(min(point[1] for point in polygon))
+        x1 = math.ceil(max(point[0] for point in polygon))
+        y1 = math.ceil(max(point[1] for point in polygon))
+        expected_envelope = {'x': x0, 'y': y0, 'w': x1 - x0, 'h': y1 - y0}
+        envelope = observation.get('sampling_bbox_px')
+        for box in (envelope, blocks[0].get('bbox_px'), members[0].get('bbox_px')):
+            _validate_bbox(box, width, height, root)
+        if (envelope != expected_envelope or blocks[0]['bbox_px'] != envelope
+                or members[0]['bbox_px'] != envelope):
+            raise _error('VSC block/member sampling geometry differs from its observation envelope')
         measured = [row for row in native_rows if row.get('id') == binding['measurement_id']]
         if len(measured) != 1 or binding['measurement_id'] in used_measurements:
             raise _error('review must select one unused existing canonical measured text ID')
         _validate_bbox(measured[0].get('bbox_px'), job['source_png']['width'], job['source_png']['height'], root)
-        _validate_bbox(observation.get('sampling_bbox_px'), width, height, root)
         # Consistency only. Never copy this envelope into canonical geometry.
-        bbox = measured[0]['bbox_px']; envelope = observation['sampling_bbox_px']
+        bbox = measured[0]['bbox_px']
         sx, sy, left, top = transform
         edges = (Fraction(bbox['x'])*sx+left, Fraction(bbox['y'])*sy+top,
                  Fraction(bbox['x']+bbox['w'])*sx+left, Fraction(bbox['y']+bbox['h'])*sy+top)

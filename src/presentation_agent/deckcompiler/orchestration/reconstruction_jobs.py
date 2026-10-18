@@ -21,6 +21,7 @@ from .region_classification_review import bind_region_classification_review
 from .surface_call_accounting import ACCOUNTING_NAME
 from .source_ref_derivation import validate_source_ref_accounting
 from .source_ref_authoring import bind_source_ref_authoring, source_ref_authoring_prompt
+from .package_correspondence import bind_package_correspondence, audit_job_package
 from .vector_preflight import (
     MANIFEST_NAME as VECTOR_PREFLIGHT_MANIFEST_NAME,
     POLICY_ID as VECTOR_PREFLIGHT_POLICY_ID,
@@ -629,6 +630,9 @@ def _build_job_row(
     source_ref_authoring = bind_source_ref_authoring(root, job, work_dir, renderer)
     if source_ref_authoring is not None:
         job["source_ref_authoring"] = source_ref_authoring
+    package_audit = bind_package_correspondence(root, job, work_dir)
+    if package_audit is not None:
+        job["package_correspondence"] = package_audit
     job["content_hash"] = content_sha256(
         {key: value for key, value in job.items() if key != "content_hash"}
     )
@@ -1230,6 +1234,15 @@ def _validate_worker_outputs(
                 issues.append(f"{label} worker_receipt.surfaceCallAccounting does not match the current ledger")
         elif "surfaceCallAccounting" in receipt:
             issues.append(f"{label} worker_receipt claims a missing surface-call accounting artifact")
+    except DeckCompilerError as exc:
+        issues.append(f"{label} {exc}")
+    try:
+        package_audit = audit_job_package(root, job, work_dir)
+        if package_audit is not None:
+            if content_sha256(receipt.get("packageCorrespondence")) != content_sha256(package_audit):
+                issues.append(f"{label} worker_receipt.packageCorrespondence does not match the current package")
+        elif "packageCorrespondence" in receipt:
+            issues.append(f"{label} worker_receipt claims an unrequested package audit")
     except DeckCompilerError as exc:
         issues.append(f"{label} {exc}")
     if sorted(artifacts) != sorted(expected_artifacts):

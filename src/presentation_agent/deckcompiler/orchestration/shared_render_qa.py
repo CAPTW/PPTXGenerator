@@ -13,6 +13,7 @@ from ..errors import DeckCompilerError
 from ..manifest_io import read_json, write_json
 from .quality_acceptance import evaluate_visual_quality_acceptance
 from .surface_call_accounting import ACCOUNTING_NAME
+from .package_correspondence import audit_job_package
 from .source_ref_derivation import (
     prepare_surface_call_accounting, source_ref_accounting_transaction, write_source_ref_receipt,
 )
@@ -115,6 +116,13 @@ def _finalize_shared_render_qa(runtime_root: Path, *, summary_path: Path) -> Sha
             "native and crop summaries must contain per-slide evidence",
             project / "out",
         )
+
+    # Validate every opted-in package before any ledger/QA/receipt writes.
+    package_audits = {}
+    for row in manifest["jobs"]:
+        bound_path = _artifact_path(root, row.get("job"), "package audit job")
+        bound_job = _read_object(bound_path, "package audit job")
+        package_audits[int(row["slide_number"])] = audit_job_package(root, bound_job, bound_path.parent)
 
     receipt_paths: list[Path] = []
     for manifest_row in manifest["jobs"]:
@@ -301,6 +309,7 @@ def _finalize_shared_render_qa(runtime_root: Path, *, summary_path: Path) -> Sha
                 "qaResult": _relative(project, qa_result_path),
                 "qaReport": _relative(project, report_path),
                 **({"surfaceCallAccounting": accounting} if accounting is not None else {}),
+                **({"packageCorrespondence": package_audits[slide]} if package_audits[slide] is not None else {}),
                 **(
                     {"workerExecution": read_json(work_dir / "worker_execution.json")}
                     if job["execution_profile"]["profile_name"] == "native-inherited-xhigh"

@@ -350,6 +350,9 @@ def validate_vector_preflight_slide_bundle(
         if not isinstance(regions, list):
             issues.append("slide vector preflight regions must be an array")
             regions = []
+        _validate_region_inventory_binding(
+            regions, inventory, width, height, f"slide {slide_number}", issues
+        )
         for region in regions:
             _validate_region(
                 root,
@@ -687,6 +690,7 @@ def validate_vector_preflight_bundle(runtime_root: Path) -> dict[str, Any]:
             issues.append(f"{label} inventory is invalid: {exc.message}")
             semantic_boxes = []
         regions = row.get("regions") if isinstance(row.get("regions"), list) else []
+        _validate_region_inventory_binding(regions, inventory, width, height, label, issues)
         measured_count += len(regions)
         for region in regions:
             _validate_region(root, region, width, height, semantic_boxes, label, issues)
@@ -1015,24 +1019,17 @@ def _build_slide_record(
     for index, measured in enumerate(inventory.get("regions", []), start=1):
         if not isinstance(measured, dict):
             continue
-        region_id = str(measured.get("id") or f"R{index:02d}")
-        bbox = _validated_bbox(measured.get("bbox_px"), width, height, region_id)
+        measured_fields = _measured_region_fields(measured, index, width, height)
+        region_id = measured_fields["region_id"]
+        bbox = measured_fields["bbox_px"]
         area_ratio = round((bbox["w"] * bbox["h"]) / (width * height), 8)
         overlap_ids = [
             box["id"] for box in semantic_boxes if _boxes_overlap(bbox, box["bbox_px"])
         ]
-        # Integer crop geometry is a conservative enclosure, not a rounded-away
-        # measurement. Keep legacy normalization only when its geometry is unchanged.
-        bounds_changed = any(bbox[key] != measured["bbox_px"][key] for key in bbox)
-        bbox_norm = None if bounds_changed else measured.get("bbox_norm")
         row: dict[str, Any] = {
-            "region_id": region_id,
-            "kind_hint": str(measured.get("kind_hint", "unknown")),
-            "bbox_px": bbox,
-            "bbox_norm": bbox_norm or _norm_bbox(bbox, width, height),
+            **measured_fields,
             "area_ratio": area_ratio,
             "semantic_text_overlap_ids": overlap_ids,
-            "measurement_confidence": measured.get("confidence"),
             "disposition": "native_rebuild_or_skill_review",
             "reason": "region_not_flat_vector_candidate",
         }
@@ -1111,6 +1108,85 @@ def _build_slide_record(
         {key: value for key, value in result.items() if key != "slide_content_hash"}
     )
     return result
+
+
+def _measured_region_fields(
+    measured: dict[str, Any], index: int, width: int, height: int
+) -> dict[str, Any]:
+    """Project authoritative measured fields identically for production and caches."""
+    region_id = str(measured.get("id") or f"R{index:02d}")
+    bbox = _validated_bbox(measured.get("bbox_px"), width, height, region_id)
+    # Integer crop geometry conservatively encloses the original measurement.
+    # Preserve supplied normalization only when that geometry is unchanged.
+    bounds_changed = any(bbox[key] != measured["bbox_px"][key] for key in bbox)
+    bbox_norm = None if bounds_changed else measured.get("bbox_norm")
+    return {
+        "region_id": region_id,
+        "kind_hint": str(measured.get("kind_hint", "unknown")),
+        "bbox_px": bbox,
+        "bbox_norm": bbox_norm or _norm_bbox(bbox, width, height),
+        "measurement_confidence": measured.get("confidence"),
+    }
+
+
+def _validate_region_inventory_binding(
+    regions: list[Any], inventory: dict[str, Any], width: int, height: int,
+    label: str, issues: list[str],
+) -> None:
+    """Require exactly one stored row per unambiguous measured region identity."""
+    measured_regions = inventory.get("regions", [])
+    if not isinstance(measured_regions, list):
+        issues.append(f"{label} measurement inventory regions must be an array")
+        return
+    expected: dict[str, dict[str, Any]] = {}
+    for index, measured in enumerate(measured_regions, start=1):
+        # Match the producer's longstanding skipped-row and positional-ID rules.
+        if not isinstance(measured, dict):
+            continue
+        try:
+            fields = _measured_region_fields(measured, index, width, height)
+        except DeckCompilerError as exc:
+            issues.append(f"{label} measurement inventory region is invalid: {exc.message}")
+            continue
+        region_id = fields["region_id"]
+        if region_id in expected:
+            issues.append(f"{label} measurement inventory has duplicate region ID {region_id}")
+        expected[region_id] = fields
+    if len(regions) != len(expected):
+        issues.append(f"{label} region count does not match measurement inventory")
+    seen: set[str] = set()
+    for region in regions:
+        if not isinstance(region, dict):
+            continue  # The ordinary region validator reports malformed stored rows.
+        region_id = region.get("region_id")
+        if not isinstance(region_id, str) or region_id not in expected:
+            issues.append(f"{label} stored region ID is absent from measurement inventory")
+            continue
+        if region_id in seen:
+            issues.append(f"{label} duplicates measurement inventory region {region_id}")
+        seen.add(region_id)
+        for key, value in expected[region_id].items():
+            if key not in region or not _same_measured_json_value(region[key], value):
+                issues.append(f"{label} region {region_id} {key} differs from measurement inventory")
+    if seen != set(expected):
+        issues.append(f"{label} stored regions do not cover measurement inventory")
+
+
+def _same_measured_json_value(left: Any, right: Any) -> bool:
+    """Compare JSON values without treating booleans as numeric measurements."""
+    if type(left) in (int, float) and type(right) in (int, float):
+        return left == right
+    if type(left) is not type(right):
+        return False
+    if isinstance(left, dict):
+        return left.keys() == right.keys() and all(
+            _same_measured_json_value(left[key], right[key]) for key in left
+        )
+    if isinstance(left, list):
+        return len(left) == len(right) and all(
+            _same_measured_json_value(a, b) for a, b in zip(left, right)
+        )
+    return left == right
 
 
 def _validate_region(

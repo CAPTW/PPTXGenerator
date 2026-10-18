@@ -58,7 +58,7 @@ REVIEWED_BUNDLES = {
         'text_content.js':'2637a8b0a6b70aaafd1e909486cd1eaa4e43d803697e773257e6973e0e20dd98',
     },
 }
-REVIEWED_BUNDLES[dependency.BUNDLE] = dependency.REVIEWED_MODULES.copy()
+REVIEWED_BUNDLES.update({key:value.copy() for key,value in dependency.REVIEWED_BUNDLES.items()})
 MODULE_NAMES = ('object_manifest.js', 'atoms_pptx.js', 'atoms_html.js')
 AUTHORITY = {k: False for k in ('semantic_truth', 'text_removal', 'native_admission', 'vector_eligibility', 'quality_accepted')}
 
@@ -118,7 +118,7 @@ def bind_source_ref_authoring(root: Path, job: dict, work_dir: Path, renderer: d
             complete = dict(modules)
             for name in hashes:
                 if name not in complete:
-                    module = base / dependency.MODULE_PATHS[name] if bundle_id == dependency.BUNDLE else base / 'scripts' / 'lib' / name
+                    module = base / dependency.MODULE_PATHS[name] if bundle_id in dependency.REVIEWED_BUNDLES else base / 'scripts' / 'lib' / name
                     complete[name] = {'path': module.as_posix(), 'sha256': hashlib.sha256(_regular_bytes(module, base)).hexdigest()}
             if {name: data['sha256'] for name, data in complete.items()} == hashes:
                 recognized, modules = bundle_id, complete
@@ -126,8 +126,8 @@ def bind_source_ref_authoring(root: Path, job: dict, work_dir: Path, renderer: d
         if recognized is None:
             raise ValueError('installed renderer does not match a whole reviewed sourceRefs bundle')
         dependency_binding = {}
-        if recognized == dependency.BUNDLE:
-            dependency_binding['pptxgenjs_dependency'] = dependency.bind_dependency(root, modules)
+        if recognized in dependency.REVIEWED_BUNDLES:
+            dependency_binding['pptxgenjs_dependency'] = dependency.bind_dependency(root, modules, recognized)
         elif dependency.request_present(root):
             raise ValueError('dependency profile requires the exact optional-loader bundle')
         return {

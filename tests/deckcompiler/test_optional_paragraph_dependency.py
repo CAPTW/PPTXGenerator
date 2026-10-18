@@ -21,7 +21,7 @@ sha=lambda b:hashlib.sha256(b).hexdigest()
 class OptionalParagraphDependencyTests(unittest.TestCase):
  def setUp(self):self.dep=importlib.import_module('presentation_agent.deckcompiler.orchestration.pptxgenjs_dependency')
  def install(self,root,skill,patched=True,actual=None):
-  project=root/'pngtopptx-project'; hashes={}
+  project=root/'pngtopptx-project'; hashes={};bundle_id=getattr(self,'bundle_id',NEW)
   for name,relative in self.dep.MODULE_PATHS.items():
    path=skill.parent/relative;path.parent.mkdir(parents=True,exist_ok=True)
    raw=(actual['skill_root']/relative).read_bytes() if actual else (path.read_bytes() if name=='slide_pipeline.js' and path.exists() else f'// Inert synthetic dependency fixture: {name}\n'.encode())
@@ -29,7 +29,9 @@ class OptionalParagraphDependencyTests(unittest.TestCase):
   if not actual:
    for key,value in [('BASE_SHA',sha(BASE)),('RESULT_SHA',sha(RESULT)),('PATCH_SHA',hashes['patches/pptxgenjs-4.0.1-paragraph-properties.patch']),('LICENSE_SHA',hashes['patches/PptxGenJS-LICENSE'])]:
     guard=patch.object(self.dep,key,value);guard.start();self.addCleanup(guard.stop)
-  guard=patch.object(cap,'REVIEWED_BUNDLES',{NEW:hashes});guard.start();self.addCleanup(guard.stop)
+  # Both production registries use the same explicit synthetic whole bundle.
+  guard=patch.object(cap,'REVIEWED_BUNDLES',{bundle_id:hashes});guard.start();self.addCleanup(guard.stop)
+  guard=patch.object(self.dep,'REVIEWED_BUNDLES',{bundle_id:hashes});guard.start();self.addCleanup(guard.stop)
   original=project/self.dep.ORIGINAL_REL;original.parent.mkdir(parents=True,exist_ok=True);original.write_bytes(BASE if not actual else actual['base_bytes'])
   request=project/self.dep.REQUEST_REL;request.parent.mkdir(parents=True,exist_ok=True)
   if patched:write_json(request,REQUEST)

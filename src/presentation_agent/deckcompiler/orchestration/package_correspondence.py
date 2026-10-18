@@ -39,7 +39,7 @@ GEOMETRY_PRODUCER = 'pngtopptx-pr1-pr6-emitter-geometry-v1'
 # unchanged v2 parser accepts only PROJECTED nonflipped records. The text
 # preparation bundle also requires its fourth helper module in capability binding.
 PROFILE_PRODUCERS = {PROFILE:(PRODUCER,), GEOMETRY_PROFILE:(GEOMETRY_PRODUCER,
-    'pngtopptx-pr6-signed-line-renderer-v1', 'pngtopptx-pr6-text-preservation-v1', dependency.BUNDLE)}
+    'pngtopptx-pr6-signed-line-renderer-v1', 'pngtopptx-pr6-text-preservation-v1', dependency.BUNDLE, dependency.BUILTIN_IMPORT_BUNDLE)}
 MAX_ARCHIVE_BYTES = 64 * 1024 * 1024
 MAX_EXPANDED_BYTES = 128 * 1024 * 1024
 MAX_MEMBER_BYTES = 16 * 1024 * 1024
@@ -463,7 +463,7 @@ def audit_job_package(root, job, work_dir):
     """Recompute before receipt write and again at public completion. No writes."""
     requested=bind_package_correspondence(root,job,work_dir)
     capability=job.get('source_ref_authoring',{}).get('renderer_capability',{})
-    dependency_active=capability.get('bundle_id')==dependency.BUNDLE or dependency.request_present(root)
+    dependency_active=capability.get('bundle_id') in dependency.REVIEWED_BUNDLES or dependency.request_present(root)
     if requested is None and not dependency_active:
         if 'package_correspondence' in job:_fail('INVALID_INPUT','bound package audit request is missing')
         return None
@@ -475,7 +475,7 @@ def audit_job_package(root, job, work_dir):
         if content_sha256(current)!=content_sha256(job['source_ref_authoring']):raise ValueError('stale producer capability')
         dependency_result=None
         if dependency_active:
-            if capability.get('bundle_id')!=dependency.BUNDLE:raise ValueError('unbound optional dependency profile')
+            if capability.get('bundle_id') not in dependency.REVIEWED_BUNDLES:raise ValueError('unbound optional dependency profile')
             dependency_result=dependency.validate_dependency_completion(root,capability)
         # This mandatory dependency check also runs without a package-audit request.
         if requested is None:return None

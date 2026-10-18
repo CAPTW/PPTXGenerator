@@ -15,6 +15,7 @@ from ..errors import DeckCompilerError
 from .region_classification_review import _exact, _json_object
 
 BUNDLE = 'pngtopptx-pr6-optional-paragraph-loader-v1'
+BUILTIN_IMPORT_BUNDLE = 'pngtopptx-pr6-optional-paragraph-builtin-import-v1'
 PROFILE = 'pptxgenjs-4.0.1-paragraph-properties-v1'
 REQUEST_REL = Path('analysis/pptxgenjs_dependency.json')
 ORIGINAL_REL = Path('node_modules/pptxgenjs/dist/pptxgen.cjs.js')
@@ -35,6 +36,12 @@ REVIEWED_MODULES = {
  'patches/PptxGenJS-LICENSE':LICENSE_SHA,
 }
 MODULE_PATHS = {name:('scripts/'+name if name in ('build.js','slide_pipeline.js') else 'scripts/lib/'+name) for name in REVIEWED_MODULES}
+# PR6 c295ac62: exact loader repair only. Runtime Node availability/warnings are
+# not attested by Python byte recognition; no runtime-capability claim is added.
+REVIEWED_BUNDLES = {BUNDLE:REVIEWED_MODULES.copy(), BUILTIN_IMPORT_BUNDLE:{
+    **REVIEWED_MODULES,
+    'pptxgenjs_dependency.js':'0f15a0de0dead168308511d376e7c2d04a69eb7b9932f21e40c7f98311671ca8',
+}}
 
 
 def _sha(raw):return hashlib.sha256(raw).hexdigest()
@@ -84,7 +91,14 @@ def _verified(path, anchor, limit, expected):
     return {'path':str(path),'sha256':digest}
 
 
-def bind_dependency(root, modules):
+def _validate_bundle_modules(modules, bundle_id):
+    expected=REVIEWED_BUNDLES.get(bundle_id)
+    if expected is None or {name:item['sha256'] for name,item in modules.items()}!=expected:
+        raise ValueError('dependency modules do not match the exact selected bundle')
+
+
+def bind_dependency(root, modules, bundle_id=BUNDLE):
+    _validate_bundle_modules(modules,bundle_id)
     project=Path(root)/'pngtopptx-project'
     original=_verified(project/ORIGINAL_REL,project,1024*1024,BASE_SHA)
     validator={'path':str(VALIDATOR_PATH),'sha256':_sha(_read(VALIDATOR_PATH,VALIDATOR_PATH.parent,65536))}
@@ -114,6 +128,7 @@ def bind_dependency(root, modules):
 
 def expected_descriptor(capability):
     bound=capability['pptxgenjs_dependency'];modules=capability['modules']
+    _validate_bundle_modules(modules,capability['bundle_id'])
     if bound['mode']!='PATCHED_EXACT_CJS':raise ValueError('unpatched default has no patched descriptor')
     return {'schemaVersion':'slide-image-dual-render.pptxgenjs-dependency.v1','profile':PROFILE,
         'qualification':'exact-cjs-bytes-only','projectRoot':bound['project_path'],
@@ -130,7 +145,7 @@ def expected_descriptor(capability):
 def validate_dependency_completion(root, capability):
     """Recheck bound local identity and all three receipts, without JS or writes."""
     bound=capability['pptxgenjs_dependency'];modules=capability['modules']
-    current=bind_dependency(root,modules)
+    current=bind_dependency(root,modules,capability['bundle_id'])
     if content_sha256(current)!=content_sha256(bound):raise ValueError('stale dependency selection binding')
     project=Path(root)/'pngtopptx-project'
     paths={'build':project/'out/build_trace.json','trace':project/'out/render_trace.json','native':project/'out/native_object_manifest.json'}

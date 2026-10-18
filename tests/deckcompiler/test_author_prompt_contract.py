@@ -24,6 +24,7 @@ class AuthorPromptContractTests(unittest.TestCase):
         self.inventory_path = write_json(self.root / "inventory.json", {})
         self.job = {
             "slide_number": 7,
+            "source_png": {"width": 1600, "height": 900},
             "execution_profile": execution_profile_payload("sol-medium"),
             "semantic_geometry_binding": {"status": "UNRESOLVED"},
             "authoring_outputs": [name.format(slide=7) for name in AUTHORING_OUTPUT_NAMES],
@@ -52,6 +53,63 @@ class AuthorPromptContractTests(unittest.TestCase):
         issues = []
         _validate_vector_usage(payload, self.job, "synthetic slide", issues)
         return issues
+
+    def canvas_starter(self, prompt):
+        payloads = [json.loads(block) for block in re.findall(r"```json\n(\{.*?\})\n```", prompt, re.DOTALL)]
+        canvas = next((payload for payload in payloads if "canvas" in payload), None)
+        self.assertIsNotNone(canvas, "worker prompt must specify measurements.json canvas width/height")
+        return canvas
+
+    def test_measurements_canvas_prompt_uses_job_dimensions_for_cli_and_native(self):
+        for profile, width, height in (("sol-medium", 1920, 1080), ("native-inherited-xhigh", 1280, 720)):
+            with self.subTest(profile=profile):
+                self.job["execution_profile"] = execution_profile_payload(profile)
+                self.job["source_png"] = {"width": width, "height": height}
+                prompt = self.prompt()
+                self.assertEqual(self.canvas_starter(prompt), {"canvas": {"width": width, "height": height}})
+                self.assertIn("source-pixel", prompt)
+                self.assertIn("`w`/`h`", prompt)
+                self.assertIn("Keep the remaining measured evidence", prompt)
+
+    def test_public_measurements_canvas_example_passes_and_wrong_keys_still_fail(self):
+        from test_general_generate_workflow import GeneralGenerateWorkflowTests
+
+        fixture = GeneralGenerateWorkflowTests()
+        runtime = self.root / "canvas-public-flow"
+        started = fixture._start(runtime)
+        fixture._build_run_draft(
+            runtime, workflow_id=started.workflow_id, slide_count=1,
+            status="COMPLETED", qa_status="PASS", fail_count=0, blocking_count=0,
+        )
+        work = runtime / "pngtopptx-project/work/slide01"
+        example = self.canvas_starter((work / "worker_prompt.md").read_text(encoding="utf-8"))
+        job = read_json(work / "reconstruction_job.json")
+        width, height = job["source_png"]["width"], job["source_png"]["height"]
+        self.assertEqual(example, {"canvas": {"width": width, "height": height}})
+        original = read_json(work / "measurements.json")
+        receipt_path = work / "worker_receipt.json"
+        cases = [
+            (example, True),
+            ({"canvas": {"w": width, "h": height}}, False),
+            ({"canvas": {"width": width + 1, "height": height}}, False),
+            ({"canvas": {"width": width, "height": height + 1}}, False),
+            ({"canvas": {"width": width}}, False),
+            ({"canvas": {"height": height}}, False),
+            ({"width": width, "height": height}, True),
+        ]
+        for payload, valid in cases:
+            measurements = {key: value for key, value in original.items() if key != "canvas"}
+            measurements.update(payload)
+            write_json(work / "measurements.json", measurements)
+            receipt = read_json(receipt_path)
+            receipt["artifactHashes"]["measurements.json"] = fixture._sha256(work / "measurements.json")
+            write_json(receipt_path, receipt)
+            for flag in ("require_authoring_outputs", "require_worker_outputs"):
+                with self.subTest(payload=payload, gate=flag):
+                    report = validate_reconstruction_job_bundle(runtime, **{flag: True})
+                    self.assertEqual(report["valid"], valid, report)
+                    if not valid:
+                        self.assertTrue(any("measurements canvas" in issue for issue in report["issues"]), report)
 
     def add_regions(self):
         self.job["vector_preflight"]["regions"] = [

@@ -170,6 +170,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--max-workers", type=int, default=2
     )
     prepare_vector_preflight_parser.add_argument("--no-deep", action="store_true")
+    prepare_vector_preflight_parser.add_argument("--preserve-region-candidates", action="store_true")
 
     validate_vector_preflight_parser = subparsers.add_parser(
         "validate-vector-preflight",
@@ -202,6 +203,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--vector-backend", choices=("easyocr", "tesseract"), default="easyocr"
     )
     accept_streaming_parser.add_argument("--no-vector-deep", action="store_true")
+    accept_streaming_parser.add_argument("--preserve-region-candidates", action="store_true")
 
     record_streaming_parser = subparsers.add_parser(
         "record-streaming-reconstruction",
@@ -544,6 +546,7 @@ def main(argv: list[str] | None = None) -> int:
                 backend=args.backend,
                 max_workers=args.max_workers,
                 deep=not args.no_deep,
+                preserve_region_candidates=args.preserve_region_candidates,
             )
         except (DeckCompilerError, OSError, ValueError, json.JSONDecodeError) as exc:
             code = getattr(exc, "code", "DC_VECTOR_PREFLIGHT_PREPARATION_FAILED")
@@ -586,6 +589,7 @@ def main(argv: list[str] | None = None) -> int:
                 python_executable=args.python_executable,
                 vector_backend=args.vector_backend,
                 vector_deep=not args.no_vector_deep,
+                preserve_region_candidates=args.preserve_region_candidates,
             )
         except (DeckCompilerError, OSError, ValueError, json.JSONDecodeError) as exc:
             code = getattr(exc, "code", "DC_STREAMING_IMAGE_ACCEPT_FAILED")

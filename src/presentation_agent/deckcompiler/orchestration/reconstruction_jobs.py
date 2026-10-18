@@ -17,6 +17,7 @@ from ..manifest_io import read_json, write_json
 from .image_requests import REQUEST_MANIFEST_NAME, validate_image_request_bundle
 from .skillset_plan import validate_skillset_execution_plan
 from .semantic_geometry_binding import bind_semantic_geometry
+from .region_classification_review import bind_region_classification_review
 from .vector_preflight import (
     MANIFEST_NAME as VECTOR_PREFLIGHT_MANIFEST_NAME,
     POLICY_ID as VECTOR_PREFLIGHT_POLICY_ID,
@@ -619,6 +620,9 @@ def _build_job_row(
         "content_hash": "0" * 64,
     }
     job["semantic_geometry_binding"] = bind_semantic_geometry(root, job, work_dir)
+    classification_review = bind_region_classification_review(root, job, work_dir)
+    if classification_review is not None:
+        job["region_classification_review"] = classification_review
     job["content_hash"] = content_sha256(
         {key: value for key, value in job.items() if key != "content_hash"}
     )
@@ -676,6 +680,19 @@ kind hints, and absent canonical copy do not resolve object identity. Keep
 unresolved conflicts in the existing review/notes path; do not insert candidates
 into accepted regions, semantic associations, or vector usage without the
 existing independent classification and acceptance requirements.
+"""
+    if "region_classification_review" in job:
+        candidate_instruction += """
+The optional `region_classification_review` binds a separate review artifact.
+Only its structure and source/provenance consistency were checked. Reviewer
+identity, time and visual-review origin are unverified declarations, not
+authenticated approval or verified semantic truth. Inspect its recorded roles,
+unreviewed observations and unresolved conflicts alongside the source image.
+Complete coverage means all inventory observations were addressed, not full
+image coverage or resolved semantics. All authority fields remain false.
+Do not remove OCR protection, change raw observations, admit vectors/native
+objects, or claim quality acceptance on the basis of this review. Existing
+independent classification, authoring and acceptance requirements still apply.
 """
     launch_instruction = """Launch this fresh worker with the exact `worker_context.codex_argv` stored in
 the job. Do not load the global plugin/Skill catalog. The renderer Skill path

@@ -33,7 +33,11 @@ PROFILE = 'direct-text-shape-raster-v1'
 PRODUCER = 'pngtopptx-pr1-pr6-source-refs-v1'
 GEOMETRY_PROFILE = 'direct-text-shape-raster-lines-v2'
 GEOMETRY_PRODUCER = 'pngtopptx-pr1-pr6-emitter-geometry-v1'
-PROFILE_PRODUCERS = {PROFILE:PRODUCER, GEOMETRY_PROFILE:GEOMETRY_PRODUCER}
+# Exact whole-bundle compatibility, not expanded geometry qualification.
+# The signed-line renderer still marks signed transforms UNSUPPORTED; the
+# unchanged v2 parser accepts only PROJECTED nonflipped records from either.
+PROFILE_PRODUCERS = {PROFILE:(PRODUCER,), GEOMETRY_PROFILE:(GEOMETRY_PRODUCER,
+    'pngtopptx-pr6-signed-line-renderer-v1')}
 MAX_ARCHIVE_BYTES = 64 * 1024 * 1024
 MAX_EXPANDED_BYTES = 128 * 1024 * 1024
 MAX_MEMBER_BYTES = 16 * 1024 * 1024
@@ -88,8 +92,8 @@ def bind_package_correspondence(root, job, work_dir):
                 or request['enabled'] is not True):
             raise ValueError('request schema/profile/enabled is invalid')
         authoring=job.get('source_ref_authoring',{})
-        producer=PROFILE_PRODUCERS[profile]
-        if authoring.get('renderer_capability',{}).get('bundle_id')!=producer:
+        producer=authoring.get('renderer_capability',{}).get('bundle_id')
+        if producer not in PROFILE_PRODUCERS[profile]:
             raise ValueError('package audit profile requires its exact recognized combined producer bundle')
         return {'schema_version':'1.0.0','profile':profile,'producer_bundle':producer,
                 'request':{'path':path.relative_to(root).as_posix(),'sha256':_sha(raw)},'authority':AUTHORITY.copy()}
@@ -357,7 +361,7 @@ def inspect_package(raw, manifest, *, slide, physical_index, canvas, profile=PRO
         # name its qualified bundle; the public job boundary rehashes the actual
         # whole bundle before calling this pure parser. A field alone is not it.
         if ((profile==GEOMETRY_PROFILE or producer_bundle is not None)
-                and producer_bundle!=PROFILE_PRODUCERS[profile]):
+                and producer_bundle not in PROFILE_PRODUCERS[profile]):
             _fail('UNSUPPORTED_PROFILE','package profile does not match its qualified producer bundle')
         if (type(slide) is not int or slide<=0 or type(physical_index) is not int or physical_index<=0
                 or len(canvas)!=2 or any(type(v) is not int or not 0<v<=2**31-1 for v in canvas)):

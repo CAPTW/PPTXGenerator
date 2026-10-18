@@ -39,6 +39,14 @@ REVIEWED_BUNDLES = {
         'atoms_pptx.js':'3262e57a847ae4c6fc30e52582bf004975af048c33feb0f512cf41f6623d9ad7',
         'atoms_html.js':'b487d59a25c14a872eb803c3d0a6e0e801135f05be2fdd40cd38c59b26b32acb',
     },
+    # PR6 aa9dbb65630da6112e19edceffe9cc2b134c50f2: rendering fixes signed
+    # diagonals, but their geometry evidence remains UNSUPPORTED. Compatibility
+    # with package profile v2 covers PROJECTED nonflipped records only.
+    'pngtopptx-pr6-signed-line-renderer-v1': {
+        'object_manifest.js':'f850cb73728cd1d3808a65506f4f00a9354d6f4897962b07895f6772b192a4a5',
+        'atoms_pptx.js':'5e795a64a18b6fee1edf89320634d82c9ff40faee276a20971a59107ad9693fb',
+        'atoms_html.js':'2e5179b6856303f5c77ba9aee5ea547125bd7b3d9cf28255533c2a4834dd0a3f',
+    },
 }
 MODULE_NAMES = ('object_manifest.js', 'atoms_pptx.js', 'atoms_html.js')
 AUTHORITY = {k: False for k in ('semantic_truth', 'text_removal', 'native_admission', 'vector_eligibility', 'quality_accepted')}

@@ -1503,11 +1503,12 @@ def _validate_crops(
 ) -> None:
     raw = payload.get("crops", payload)
     if isinstance(raw, dict):
-        crops = [
-            dict(value, name=value.get("name", name))
-            for name, value in raw.items()
-            if isinstance(value, dict)
-        ]
+        crops = []
+        for name, value in raw.items():
+            if not isinstance(value, dict):
+                issues.append(f"slide {slide} worker crop {name} must be an object")
+                continue
+            crops.append(dict(value, name=value.get("name", name)))
     elif isinstance(raw, list):
         crops = raw
     else:

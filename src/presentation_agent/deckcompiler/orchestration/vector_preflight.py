@@ -16,6 +16,7 @@ import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
+from fractions import Fraction
 from pathlib import Path
 from typing import Any
 
@@ -1018,11 +1019,15 @@ def _build_slide_record(
         overlap_ids = [
             box["id"] for box in semantic_boxes if _boxes_overlap(bbox, box["bbox_px"])
         ]
+        # Integer crop geometry is a conservative enclosure, not a rounded-away
+        # measurement. Keep legacy normalization only when its geometry is unchanged.
+        bounds_changed = any(bbox[key] != measured["bbox_px"][key] for key in bbox)
+        bbox_norm = None if bounds_changed else measured.get("bbox_norm")
         row: dict[str, Any] = {
             "region_id": region_id,
             "kind_hint": str(measured.get("kind_hint", "unknown")),
             "bbox_px": bbox,
-            "bbox_norm": measured.get("bbox_norm") or _norm_bbox(bbox, width, height),
+            "bbox_norm": bbox_norm or _norm_bbox(bbox, width, height),
             "area_ratio": area_ratio,
             "semantic_text_overlap_ids": overlap_ids,
             "measurement_confidence": measured.get("confidence"),
@@ -1238,22 +1243,33 @@ def _semantic_boxes(
 
 
 def _validated_bbox(value: Any, width: int, height: int, label: str) -> dict[str, int]:
+    """Validate native measurements, then conservatively enclose raster pixels.
+
+    The preflight region schema and crop surface require integer boxes. Never
+    truncate either edge before text protection, area checks, or actual cropping.
+    The original detector inventory remains the authoritative measured input.
+    """
     if not isinstance(value, dict):
         raise _error("DC_VECTOR_PREFLIGHT_MEASUREMENT_INVALID", f"{label} bbox is missing")
-    try:
-        bbox = {key: int(value[key]) for key in ("x", "y", "w", "h")}
-    except (KeyError, TypeError, ValueError) as exc:
-        raise _error("DC_VECTOR_PREFLIGHT_MEASUREMENT_INVALID", f"{label} bbox is invalid") from exc
+    if any(
+        type(value.get(key)) not in (int, float)
+        or (type(value[key]) is float and not math.isfinite(value[key]))
+        for key in ("x", "y", "w", "h")
+    ):
+        raise _error("DC_VECTOR_PREFLIGHT_MEASUREMENT_INVALID", f"{label} bbox is invalid")
+    x, y, w, h = (value[key] for key in ("x", "y", "w", "h"))
     if (
-        bbox["x"] < 0
-        or bbox["y"] < 0
-        or bbox["w"] <= 0
-        or bbox["h"] <= 0
-        or bbox["x"] + bbox["w"] > width
-        or bbox["y"] + bbox["h"] > height
+        x < 0 or y < 0 or w <= 0 or h <= 0
+        or x > width or y > height or w > width or h > height
     ):
         raise _error("DC_VECTOR_PREFLIGHT_MEASUREMENT_INVALID", f"{label} bbox escapes native canvas")
-    return bbox
+    # Exact represented endpoints avoid float addition rounding away a subpixel
+    # crossing, and reject out-of-frame measurements before pixel enclosure.
+    right, bottom = Fraction(x) + Fraction(w), Fraction(y) + Fraction(h)
+    if right > width or bottom > height:
+        raise _error("DC_VECTOR_PREFLIGHT_MEASUREMENT_INVALID", f"{label} bbox escapes native canvas")
+    left, top = math.floor(x), math.floor(y)
+    return {"x": left, "y": top, "w": math.ceil(right) - left, "h": math.ceil(bottom) - top}
 
 
 def _boxes_overlap(left: dict[str, int], right: dict[str, int]) -> bool:

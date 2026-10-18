@@ -46,6 +46,7 @@ def main(argv: list[str] | None = None) -> int:
             reader=reader,
             deep_text=True,
         )
+        validate_ocr_inventory(inventory)
         if deep_scan is not None:
             inventory["deep"] = [
                 deep_scan.scan_region(
@@ -68,6 +69,32 @@ def main(argv: list[str] | None = None) -> int:
             f"regions={len(inventory.get('regions', []))}"
         )
     return 0
+
+
+def validate_ocr_inventory(inventory: dict[str, Any]) -> None:
+    """Reject the detector's explicit OCR failures, not successful empty text.
+
+    The external detector can catch image-level OCR errors after the runtime
+    check and return region-only measurements. Its emitted warning must not
+    become successful measurement evidence or be reused from a cached receipt.
+    """
+    notes = inventory.get("notes", [])
+    if not isinstance(notes, list) or any(not isinstance(note, str) for note in notes):
+        raise ValueError("raw detector notes must be an array of strings")
+    for note in notes:
+        normalized = note.strip().casefold()
+        if (
+            normalized in {
+                "pytesseract not installed — text boxes unavailable",
+                "pytesseract not installed",
+                "text boxes unavailable",
+            }
+            or (
+                normalized.startswith("ocr failed (")
+                and normalized.endswith("); falling back to region detection only")
+            )
+        ):
+            raise ValueError(f"raw OCR measurement failed or is unavailable: {note}")
 
 
 def _validate_ocr_runtime(backend: str, deep: bool) -> None:

@@ -20,6 +20,7 @@ from .semantic_geometry_binding import bind_semantic_geometry
 from .region_classification_review import bind_region_classification_review
 from .surface_call_accounting import ACCOUNTING_NAME
 from .source_ref_derivation import validate_source_ref_accounting
+from .source_ref_authoring import bind_source_ref_authoring, source_ref_authoring_prompt
 from .vector_preflight import (
     MANIFEST_NAME as VECTOR_PREFLIGHT_MANIFEST_NAME,
     POLICY_ID as VECTOR_PREFLIGHT_POLICY_ID,
@@ -625,6 +626,9 @@ def _build_job_row(
     classification_review = bind_region_classification_review(root, job, work_dir)
     if classification_review is not None:
         job["region_classification_review"] = classification_review
+    source_ref_authoring = bind_source_ref_authoring(root, job, work_dir, renderer)
+    if source_ref_authoring is not None:
+        job["source_ref_authoring"] = source_ref_authoring
     job["content_hash"] = content_sha256(
         {key: value for key, value in job.items() if key != "content_hash"}
     )
@@ -696,6 +700,7 @@ Do not remove OCR protection, change raw observations, admit vectors/native
 objects, or claim quality acceptance on the basis of this review. Existing
 independent classification, authoring and acceptance requirements still apply.
 """
+    candidate_instruction += source_ref_authoring_prompt(job)
     launch_instruction = """Launch this fresh worker with the exact `worker_context.codex_argv` stored in
 the job. Do not load the global plugin/Skill catalog. The renderer Skill path
 below is the only Skill instruction path required for this job."""

@@ -129,6 +129,8 @@ def derive_surface_call_accounting(root: Path, job: dict, work_dir: Path) -> dic
     try:
         native = _manifest(root)
         if not _has_tags(native, job.get("slide_number")):
+            if "source_ref_authoring" in job:
+                raise ValueError("opted-in source-ref authoring requires at least one tagged surface row")
             return None
         if job.get("content_hash") != content_sha256({k: v for k, v in job.items() if k != "content_hash"}):
             raise ValueError("sourceRefs job content_hash is stale")

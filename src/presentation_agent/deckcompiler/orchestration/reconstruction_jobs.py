@@ -643,6 +643,10 @@ def _worker_prompt(root: Path, work_dir: Path, job: dict[str, Any]) -> str:
     profile = job["execution_profile"]
     authoring = "\n".join(f"- `{name}`" for name in job["authoring_outputs"])
     post_render = "\n".join(f"- `{name}`" for name in job["post_render_outputs"])
+    measurements_canvas = json.dumps(
+        {"canvas": {"width": job["source_png"]["width"], "height": job["source_png"]["height"]}},
+        indent=2,
+    )
     preflight = job["vector_preflight"]
     binding = job["receipt_binding"]
     vector_usage_starter = json.dumps(
@@ -783,6 +787,17 @@ photographic, continuous-tone, or 3D regions; never use the source PNG or a
 near-full-slide crop as the delivered slide surface. Preserve exact copy from the
 semantic sidecar. Do not simplify the source into generic cards or an invented
 template.
+
+In `measurements.json`, use a `canvas` object with source-pixel `width` and
+`height` from this job's `source_png`, with these exact values:
+
+```json
+{measurements_canvas}
+```
+
+Use `width`/`height` for this output's canvas, even when the inventory uses
+`w`/`h`. Keep the remaining measured evidence; this example specifies only the
+canvas. Do not modify the authoritative inventory.
 
 Read the renderer Skill, `styles/_schema.md`, `scripts/classify.md`,
 `references/codex-subagents.md`, and `references/hardlock-mode.md`. Populate the

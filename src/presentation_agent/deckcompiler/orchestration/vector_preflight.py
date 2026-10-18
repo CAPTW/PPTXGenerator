@@ -27,6 +27,7 @@ from ..manifest_io import read_json, write_json
 from ..schemas import REPO_ROOT, validator_for
 from ..vectorization import trace_png_to_svg, validate_svg
 from .image_requests import REQUEST_MANIFEST_NAME, validate_image_request_bundle
+from .raw_measure_batch import validate_ocr_inventory
 from .skillset_plan import validate_skillset_execution_plan
 
 
@@ -991,13 +992,7 @@ def _build_slide_record(
             f"slide {slide} detector did not preserve the native canvas",
             inventory_path,
         )
-    notes = " ".join(str(value) for value in inventory.get("notes", [])).lower()
-    if "pytesseract not installed" in notes or "text boxes unavailable" in notes:
-        raise _error(
-            "DC_VECTOR_PREFLIGHT_MEASUREMENT_INVALID",
-            f"slide {slide} raw detector ran without its OCR dependency",
-            inventory_path,
-        )
+    semantic_boxes = _semantic_boxes(inventory, width, height)
     slide_dir = inventory_path.parent
     detector_record = {
         "schema_name": "raw_pngtosvg_detector_record",
@@ -1012,7 +1007,6 @@ def _build_slide_record(
     }
     detector_record["content_hash"] = content_sha256(detector_record)
     detector_record_path = write_json(slide_dir / "detector_record.json", detector_record)
-    semantic_boxes = _semantic_boxes(inventory, width, height)
     rows: list[dict[str, Any]] = []
     source_image = Image.open(source).convert("RGBA")
     for index, measured in enumerate(inventory.get("regions", []), start=1):
@@ -1201,6 +1195,10 @@ def _semantic_boxes(
     inventory: dict[str, Any], width: int, height: int
 ) -> list[dict[str, Any]]:
     """Fail closed if any protected-text geometry is unusable; never round it."""
+    try:
+        validate_ocr_inventory(inventory)
+    except ValueError as exc:
+        raise _error("DC_VECTOR_PREFLIGHT_MEASUREMENT_INVALID", str(exc)) from exc
     result: list[dict[str, Any]] = []
     for key in ("text_blocks", "suppressed_text"):
         rows = inventory.get(key, [] if key == "suppressed_text" else None)

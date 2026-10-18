@@ -28,7 +28,7 @@ from ..manifest_io import read_json, write_json
 from ..schemas import REPO_ROOT, validator_for
 from ..vectorization import trace_png_to_svg, validate_svg
 from .image_requests import REQUEST_MANIFEST_NAME, validate_image_request_bundle
-from .raw_measure_batch import validate_ocr_inventory
+from .raw_measure_batch import validate_ocr_inventory, validate_region_candidate_evidence
 from .skillset_plan import validate_skillset_execution_plan
 
 
@@ -115,9 +115,12 @@ def prepare_vector_preflight_slide(
     python_executable: str | None = None,
     backend: str = "easyocr",
     deep: bool = True,
+    preserve_region_candidates: bool = False,
 ) -> VectorSlidePreflightPreparationResult:
     """Measure and gate one accepted PNG without waiting for the image batch."""
 
+    if type(preserve_region_candidates) is not bool:
+        raise ValueError("preserve_region_candidates must be a boolean")
     if backend not in {"easyocr", "tesseract"}:
         raise ValueError("backend must be easyocr or tesseract")
     if slide_number < 1:
@@ -163,6 +166,7 @@ def prepare_vector_preflight_slide(
             and (configured_python is None or payload["execution"]["python_executable"] == configured_python)
             and payload["execution"]["backend"] == backend
             and bool(payload["execution"]["deep_scan"]) == deep
+            and payload["execution"].get("preserve_region_candidates", False) == preserve_region_candidates
         ):
             return VectorSlidePreflightPreparationResult(
                 workflow_id=inputs["workflow_id"],
@@ -188,6 +192,7 @@ def prepare_vector_preflight_slide(
         backend=backend,
         deep=deep,
         max_workers=1,
+        preserve_region_candidates=preserve_region_candidates,
     )[slide_number]
     record = _build_slide_record(
         root=root,
@@ -201,6 +206,7 @@ def prepare_vector_preflight_slide(
         stdout=measured["stdout"],
         stderr=measured["stderr"],
         batch_job_path=measured["batch_job_path"],
+        preserve_region_candidates=preserve_region_candidates,
     )
     manifest_path = _write_slide_preflight_receipt(
         root=root,
@@ -210,6 +216,7 @@ def prepare_vector_preflight_slide(
         backend=backend,
         deep=deep,
         record=record,
+        preserve_region_candidates=preserve_region_candidates,
     )
     report = validate_vector_preflight_slide_bundle(root, slide_number)
     if not report["valid"]:
@@ -316,7 +323,7 @@ def validate_vector_preflight_slide_bundle(
             f"slide {slide_number} measurement_batch_job",
             issues,
         )
-        _validate_internal_artifact(
+        detector_record_path = _validate_internal_artifact(
             root,
             record.get("detector_record"),
             f"slide {slide_number} detector_record",
@@ -341,6 +348,7 @@ def validate_vector_preflight_slide_bundle(
             issues.append(f"slide {slide_number} source dimensions must match the actual PNG")
         if inventory.get("canvas_px") != {"w": width, "h": height}:
             issues.append(f"slide {slide_number} inventory must use native {width}x{height} canvas")
+        _validate_candidate_capture(inventory, source, payload.get("execution"), detector_record_path, f"slide {slide_number}", issues)
         try:
             semantic_boxes = _semantic_boxes(inventory, width, height)
         except DeckCompilerError as exc:
@@ -394,6 +402,7 @@ def prepare_vector_preflight(
     max_workers: int = DEFAULT_MAX_WORKERS,
     deep: bool = True,
     require_cached: bool = False,
+    preserve_region_candidates: bool = False,
 ) -> VectorPreflightPreparationResult:
     """Measure selected PNGs, or consolidate verified receipts without remeasurement.
 
@@ -401,6 +410,8 @@ def prepare_vector_preflight(
     Standalone callers retain the existing explicit/default measurement behavior.
     """
 
+    if type(preserve_region_candidates) is not bool:
+        raise ValueError("preserve_region_candidates must be a boolean")
     if backend not in {"easyocr", "tesseract"}:
         raise ValueError("backend must be easyocr or tesseract")
     if not 1 <= max_workers <= 4:
@@ -440,6 +451,7 @@ def prepare_vector_preflight(
             Path(receipt["pipeline_provenance"]["root"]).resolve() != pipeline
             or receipt["execution"]["backend"] != backend
             or bool(receipt["execution"]["deep_scan"]) != deep
+            or receipt["execution"].get("preserve_region_candidates", False) != preserve_region_candidates
             or receipt["execution"]["python_executable"] != executable
         ):
             receipts_reused = False
@@ -462,6 +474,7 @@ def prepare_vector_preflight(
             backend=backend,
             deep=deep,
             max_workers=max_workers,
+            preserve_region_candidates=preserve_region_candidates,
         )
 
         def build(row: dict[str, Any]) -> dict[str, Any]:
@@ -481,6 +494,7 @@ def prepare_vector_preflight(
                 stdout=measured["stdout"],
                 stderr=measured["stderr"],
                 batch_job_path=measured["batch_job_path"],
+                preserve_region_candidates=preserve_region_candidates,
             )
             _write_slide_preflight_receipt(
                 root=root,
@@ -490,6 +504,7 @@ def prepare_vector_preflight(
                 backend=backend,
                 deep=deep,
                 record=record,
+                preserve_region_candidates=preserve_region_candidates,
             )
             return record
 
@@ -525,6 +540,7 @@ def prepare_vector_preflight(
             "canvas": "native",
             "deep_text": True,
             "deep_scan": deep,
+            **({"preserve_region_candidates": True} if preserve_region_candidates else {}),
             "max_parallel_measurement_workers": min(max_workers, len(records)),
             "ocr_reader_initializations_maximum": min(max_workers, len(records)),
             "measurement_dispatch": "bounded_batch_processes_shared_reader_per_worker",
@@ -660,7 +676,7 @@ def validate_vector_preflight_bundle(runtime_root: Path) -> dict[str, Any]:
         inventory_path = _validate_internal_artifact(
             root, row.get("measurement_inventory"), label + " inventory", issues
         )
-        _validate_internal_artifact(
+        detector_record_path = _validate_internal_artifact(
             root, row.get("detector_record"), label + " detector_record", issues
         )
         _validate_internal_artifact(
@@ -684,6 +700,7 @@ def validate_vector_preflight_bundle(runtime_root: Path) -> dict[str, Any]:
             continue
         if canvas != {"w": width, "h": height}:
             issues.append(f"{label} inventory must use native {width}x{height} canvas")
+        _validate_candidate_capture(inventory, source, payload.get("execution"), detector_record_path, label, issues)
         try:
             semantic_boxes = _semantic_boxes(inventory, width, height)
         except DeckCompilerError as exc:
@@ -714,6 +731,29 @@ def validate_vector_preflight_bundle(runtime_root: Path) -> dict[str, Any]:
         "measured_region_count": measured_count,
         "issues": issues,
     }
+
+
+def _validate_candidate_capture(
+    inventory: dict[str, Any], source: Path, execution: Any,
+    detector_record_path: Path | None, label: str, issues: list[str],
+) -> None:
+    capture = execution.get("preserve_region_candidates", False) if isinstance(execution, dict) else None
+    if type(capture) is not bool:
+        issues.append(f"{label} preserve_region_candidates must be a boolean")
+        return
+    try:
+        if detector_record_path is not None:
+            detector = read_json(detector_record_path)
+            if not isinstance(detector, dict):
+                raise ValueError("detector execution record must be an object")
+            actual = detector.get("preserve_region_candidates", False)
+            command = detector.get("command")
+            if (type(actual) is not bool or actual != capture or not isinstance(command, list)
+                or command.count("--preserve-region-candidates") != int(capture)):
+                raise ValueError("capture mode disagrees with detector execution")
+        validate_region_candidate_evidence(inventory, source, required=capture)
+    except (OSError, ValueError, TypeError) as exc:
+        issues.append(f"{label} region candidate evidence is invalid: {exc}")
 
 
 def _load_request_context(root: Path) -> dict[str, Any]:
@@ -760,6 +800,7 @@ def _write_slide_preflight_receipt(
     backend: str,
     deep: bool,
     record: dict[str, Any],
+    preserve_region_candidates: bool = False,
 ) -> Path:
     slide_number = int(record["slide_number"])
     detector = (pipeline / "scripts" / "detect_elements.py").resolve()
@@ -788,6 +829,7 @@ def _write_slide_preflight_receipt(
             "canvas": "native",
             "deep_text": True,
             "deep_scan": deep,
+            **({"preserve_region_candidates": True} if preserve_region_candidates else {}),
             "additional_model_calls": 0,
         },
         "quality_contract": {
@@ -869,6 +911,7 @@ def _run_measurement_batches(
     backend: str,
     deep: bool,
     max_workers: int,
+    preserve_region_candidates: bool = False,
 ) -> dict[int, dict[str, Any]]:
     worker_count = min(max_workers, len(rows))
     chunks: list[list[dict[str, Any]]] = [[] for _ in range(worker_count)]
@@ -920,6 +963,8 @@ def _run_measurement_batches(
         ]
         if deep:
             command.append("--deep")
+        if preserve_region_candidates:
+            command.append("--preserve-region-candidates")
         batch_specs.append((batch_path, chunk, command))
 
     def execute(
@@ -990,6 +1035,7 @@ def _build_slide_record(
     stdout: str,
     stderr: str,
     batch_job_path: Path,
+    preserve_region_candidates: bool = False,
 ) -> dict[str, Any]:
     slide = int(request_row["slide_number"])
     width, height = _png_size(source)
@@ -1000,6 +1046,10 @@ def _build_slide_record(
             inventory_path,
         )
     semantic_boxes = _semantic_boxes(inventory, width, height)
+    try:
+        validate_region_candidate_evidence(inventory, source, required=preserve_region_candidates)
+    except (OSError, ValueError, TypeError) as exc:
+        raise _error("DC_VECTOR_PREFLIGHT_MEASUREMENT_INVALID", str(exc), inventory_path) from exc
     slide_dir = inventory_path.parent
     detector_record = {
         "schema_name": "raw_pngtosvg_detector_record",
@@ -1007,6 +1057,7 @@ def _build_slide_record(
         "slide_number": slide,
         "backend": backend,
         "deep_scan": deep,
+        **({"preserve_region_candidates": True} if preserve_region_candidates else {}),
         "command": command,
         "exit_code": 0,
         "stdout_tail": stdout[-2000:],

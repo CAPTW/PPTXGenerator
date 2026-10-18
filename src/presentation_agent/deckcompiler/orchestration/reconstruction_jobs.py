@@ -642,6 +642,20 @@ def _worker_prompt(root: Path, work_dir: Path, job: dict[str, Any]) -> str:
     profile = job["execution_profile"]
     authoring = "\n".join(f"- `{name}`" for name in job["authoring_outputs"])
     post_render = "\n".join(f"- `{name}`" for name in job["post_render_outputs"])
+    candidate_instruction = ""
+    inventory = read_json(root / job["vector_preflight"]["measurement_inventory"]["path"])
+    if "region_candidate_evidence" in inventory:
+        candidate_instruction = """
+Inspect `region_candidate_evidence` in that same hash-bound inventory during
+the existing source-image classification step. These separate Uxx candidates
+are unadjudicated measurements: they grant no text-removal, native-admission,
+vector-eligibility, or quality authority. They may contain genuine text,
+photo texture, mask padding, or overlapping objects. Overlap links, confidence,
+kind hints, and absent canonical copy do not resolve object identity. Keep
+unresolved conflicts in the existing review/notes path; do not insert candidates
+into accepted regions, semantic associations, or vector usage without the
+existing independent classification and acceptance requirements.
+"""
     launch_instruction = """Launch this fresh worker with the exact `worker_context.codex_argv` stored in
 the job. Do not load the global plugin/Skill catalog. The renderer Skill path
 below is the only Skill instruction path required for this job."""
@@ -706,7 +720,7 @@ measured simple icon only when one of its declared names is an exact semantic
 match; record that decision in `parametricIconUses`. Never convert semantic
 text, a continuous-tone region, or the complete slide to SVG. The measured
 assets are inputs to the official SkillSet reconstruction, not an alternate
-renderer.
+renderer.{candidate_instruction}
 
 Write every renderer icon requested by the fragment to `icon_usage.json` using
 schemaVersion `slide-image-dual-render.icon-usage.v1` and explicit

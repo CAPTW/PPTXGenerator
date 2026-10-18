@@ -10,8 +10,12 @@ from __future__ import annotations
 import argparse
 import importlib
 import importlib.util
+import hashlib
+import inspect
 import json
+import math
 import sys
+from fractions import Fraction
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +26,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--job-file", type=Path, required=True)
     parser.add_argument("--backend", choices=("easyocr", "tesseract"), required=True)
     parser.add_argument("--deep", action="store_true")
+    parser.add_argument("--preserve-region-candidates", action="store_true")
     return parser
 
 
@@ -33,6 +38,15 @@ def main(argv: list[str] | None = None) -> int:
         raise RuntimeError(f"raw detector is missing: {detector_path}")
     sys.path.insert(0, scripts.as_posix())
     detector = _load_module("pptxlocal_raw_detect_elements", detector_path)
+    capture_options: dict[str, Any] = {}
+    if args.preserve_region_candidates:
+        try:
+            parameter = inspect.signature(detector.build_inventory).parameters.get("preserve_region_candidates")
+        except (TypeError, ValueError) as exc:
+            raise RuntimeError("cannot confirm raw detector support for preserve_region_candidates") from exc
+        if parameter is None or parameter.kind not in (inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.KEYWORD_ONLY):
+            raise RuntimeError("raw detector does not support preserve_region_candidates")
+        capture_options["preserve_region_candidates"] = True
     jobs = _load_jobs(args.job_file)
     _validate_ocr_runtime(args.backend, args.deep)
     reader = detector.get_easyocr_reader() if args.backend == "easyocr" else None
@@ -45,8 +59,12 @@ def main(argv: list[str] | None = None) -> int:
             canvas="native",
             reader=reader,
             deep_text=True,
+            **capture_options,
         )
         validate_ocr_inventory(inventory)
+        validate_region_candidate_evidence(
+            inventory, Path(job["source_png"]), required=args.preserve_region_candidates
+        )
         if deep_scan is not None:
             inventory["deep"] = [
                 deep_scan.scan_region(
@@ -69,6 +87,75 @@ def main(argv: list[str] | None = None) -> int:
             f"regions={len(inventory.get('regions', []))}"
         )
     return 0
+
+
+def validate_region_candidate_evidence(
+    inventory: dict[str, Any], source: Path, *, required: bool = False
+) -> None:
+    """Check source-bound evidence without granting semantic or asset authority."""
+    if "region_candidate_evidence" not in inventory:
+        if required:
+            raise ValueError("required region_candidate_evidence is missing from raw detector output")
+        return
+    evidence = inventory["region_candidate_evidence"]
+    if not isinstance(evidence, dict):
+        raise ValueError("region_candidate_evidence must be an object")
+    if (type(evidence.get("schema_version")) is not int or evidence["schema_version"] != 1
+        or evidence.get("status") != "unadjudicated"
+        or evidence.get("method") != "detect_regions_without_ocr_mask"):
+        raise ValueError("region_candidate_evidence has unsupported schema/status/method")
+    authority = evidence.get("authority")
+    authority_keys = {"text_removal", "native_admission", "vector_eligibility", "quality_accepted"}
+    if (not isinstance(authority, dict) or set(authority) != authority_keys
+        or any(value is not False for value in authority.values())):
+        raise ValueError("region_candidate_evidence must grant no authority")
+    from PIL import Image
+
+    with Image.open(source) as opened:
+        image = opened.convert("RGB")
+    width, height = image.size
+    canvas = evidence.get("canvas_px")
+    if (not isinstance(canvas, dict) or set(canvas) != {"w", "h"}
+        or any(type(canvas.get(key)) is not int or canvas[key] != expected
+               for key, expected in (("w", width), ("h", height)))):
+        raise ValueError("region_candidate_evidence must use the native source frame")
+    if evidence.get("canvas_rgb_sha256") != hashlib.sha256(image.tobytes()).hexdigest():
+        raise ValueError("region_candidate_evidence source RGB hash mismatch")
+    area = evidence.get("min_area_fraction")
+    if type(area) not in (int, float) or not 0 <= area <= 1:
+        raise ValueError("region_candidate_evidence min_area_fraction is invalid")
+    notes, candidates = evidence.get("notes"), evidence.get("candidates")
+    if not isinstance(notes, list) or any(not isinstance(note, str) for note in notes):
+        raise ValueError("region_candidate_evidence notes must be strings")
+    if not isinstance(candidates, list):
+        raise ValueError("region_candidate_evidence candidates must be an array")
+    for index, candidate in enumerate(candidates, 1):
+        if not isinstance(candidate, dict) or candidate.get("candidate_id") != f"U{index:02d}":
+            raise ValueError("region_candidate_evidence candidate identity is invalid")
+        measured = candidate.get("measurement")
+        box = measured.get("bbox_px") if isinstance(measured, dict) else None
+        if not isinstance(box, dict) or any(
+            type(box.get(key)) not in (int, float)
+            or (type(box[key]) is float and not math.isfinite(box[key]))
+            for key in ("x", "y", "w", "h")
+        ):
+            raise ValueError("region_candidate_evidence measurement bbox is invalid")
+        x, y, w, h = (box[key] for key in ("x", "y", "w", "h"))
+        if (x < 0 or y < 0 or w <= 0 or h <= 0 or x > width or y > height
+            or w > width or h > height or Fraction(x) + Fraction(w) > width
+            or Fraction(y) + Fraction(h) > height):
+            raise ValueError("region_candidate_evidence measurement escapes native frame")
+        expected_norm = {key: round(value / (width if key in ("x", "w") else height), 4)
+                         for key, value in box.items() if key in ("x", "y", "w", "h")}
+        normalized = measured.get("bbox_norm")
+        if (not isinstance(normalized, dict) or set(normalized) != set(expected_norm)
+            or any(type(normalized[key]) not in (int, float) or normalized[key] != expected_norm[key]
+                   for key in expected_norm)):
+            raise ValueError("region_candidate_evidence normalized bbox mismatch")
+        for key in ("overlapping_ocr_mask_ids", "overlapping_masked_region_ids"):
+            links = candidate.get(key)
+            if not isinstance(links, list) or any(not isinstance(value, str) for value in links):
+                raise ValueError(f"region_candidate_evidence {key} must be string IDs")
 
 
 def validate_ocr_inventory(inventory: dict[str, Any]) -> None:

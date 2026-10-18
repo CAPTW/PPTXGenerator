@@ -18,6 +18,12 @@ from .image_requests import REQUEST_MANIFEST_NAME, validate_image_request_bundle
 from .skillset_plan import validate_skillset_execution_plan
 from .semantic_geometry_binding import bind_semantic_geometry
 from .region_classification_review import bind_region_classification_review
+from .surface_call_accounting import ACCOUNTING_NAME
+from .source_ref_derivation import validate_source_ref_accounting
+from .source_ref_authoring import bind_source_ref_authoring, source_ref_authoring_prompt
+from .package_correspondence import bind_package_correspondence, audit_job_package
+from .raw_measure_batch import (validate_text_alternative_evidence,
+    TEXT_ALTERNATIVE_COLLECTION, TEXT_ALTERNATIVE_CAPABILITY)
 from .vector_preflight import (
     MANIFEST_NAME as VECTOR_PREFLIGHT_MANIFEST_NAME,
     POLICY_ID as VECTOR_PREFLIGHT_POLICY_ID,
@@ -619,10 +625,39 @@ def _build_job_row(
         },
         "content_hash": "0" * 64,
     }
+    inventory = read_json(root / vector_row["measurement_inventory"]["path"])
+    alternatives = vector_preflight.get("execution", {}).get("preserve_text_alternatives", False)
+    if type(alternatives) is not bool:
+        raise _error("DC_RECONSTRUCTION_JOB_INPUT_INVALID", "invalid text alternative mode", vector_preflight_path)
+    try:
+        validate_text_alternative_evidence(inventory, source_path, required=alternatives)
+        if "text_alternative_evidence" in inventory and not alternatives:
+            raise ValueError("text_alternative_evidence requires explicit preserve_text_alternatives mode")
+    except (OSError, ValueError, TypeError) as exc:
+        raise _error("DC_RECONSTRUCTION_JOB_INPUT_INVALID", str(exc), vector_preflight_path) from exc
+    if alternatives:
+        evidence = inventory["text_alternative_evidence"]
+        job["text_alternatives"] = {
+            "status": "UNRESOLVED_DECLARED_OBSERVATIONS",
+            "consumer_capability": TEXT_ALTERNATIVE_CAPABILITY,
+            "measurement_inventory": vector_row["measurement_inventory"].copy(),
+            "evidence_sha256": content_sha256(evidence),
+            "collection": TEXT_ALTERNATIVE_COLLECTION,
+            "observation_ids": [row["observation_id"] for row in evidence["observations"]],
+            "ambiguity_group_ids": [row["group_id"] for row in evidence["ambiguity_groups"]],
+            "unresolved_legacy_block_ids": [row["block_id"] for row in evidence["legacy_assemblies"]],
+            "authority": evidence["authority"].copy(),
+        }
     job["semantic_geometry_binding"] = bind_semantic_geometry(root, job, work_dir)
     classification_review = bind_region_classification_review(root, job, work_dir)
     if classification_review is not None:
         job["region_classification_review"] = classification_review
+    source_ref_authoring = bind_source_ref_authoring(root, job, work_dir, renderer)
+    if source_ref_authoring is not None:
+        job["source_ref_authoring"] = source_ref_authoring
+    package_audit = bind_package_correspondence(root, job, work_dir)
+    if package_audit is not None:
+        job["package_correspondence"] = package_audit
     job["content_hash"] = content_sha256(
         {key: value for key, value in job.items() if key != "content_hash"}
     )
@@ -681,6 +716,23 @@ unresolved conflicts in the existing review/notes path; do not insert candidates
 into accepted regions, semantic associations, or vector usage without the
 existing independent classification and acceptance requirements.
 """
+    if "text_alternatives" in job:
+        alternatives = job["text_alternatives"]
+        candidate_instruction += """
+Inspect `text_alternative_evidence` in the same hash-bound inventory. Its mapped
+OCR observations preserve exact text, confidence, boxes and occurrence counts.
+Connected ambiguity is not pairwise equivalence or a selected reading order.
+Every listed alternative and each linked unresolved legacy assembly remains
+unresolved, including legacy concatenated text: do not treat that concatenation
+as corrected or canonical truth. Do not select, concatenate, remove protection,
+or claim successful resolution based on this evidence or advisory review.
+These alternative IDs are review-only; the renderer sourceRefs namespace does
+not support them. Never pass them to withSourceRefs or invent objects for them.
+Retain ordinary protected text and all alternative boxes. No vector/native
+admission, text-selection, reading-order or quality authority is granted.
+Exact inventory identities (serialization order is not reading order):
+""" + json.dumps({key: alternatives[key] for key in
+            ("collection", "observation_ids", "ambiguity_group_ids", "unresolved_legacy_block_ids")}, indent=2) + "\n"
     if "region_classification_review" in job:
         candidate_instruction += """
 The optional `region_classification_review` binds a separate review artifact.
@@ -694,6 +746,7 @@ Do not remove OCR protection, change raw observations, admit vectors/native
 objects, or claim quality acceptance on the basis of this review. Existing
 independent classification, authoring and acceptance requirements still apply.
 """
+    candidate_instruction += source_ref_authoring_prompt(job)
     launch_instruction = """Launch this fresh worker with the exact `worker_context.codex_argv` stored in
 the job. Do not load the global plugin/Skill catalog. The renderer Skill path
 below is the only Skill instruction path required for this job."""
@@ -1215,6 +1268,25 @@ def _validate_worker_outputs(
         issues.append(f"{label} worker_receipt.artifacts must be an array")
         artifacts = []
     expected_artifacts = [name for name in required if name != "worker_receipt.json"]
+    try:
+        accounting = validate_source_ref_accounting(root, job, work_dir)
+        if accounting is not None:
+            expected_artifacts.append(ACCOUNTING_NAME)
+            if content_sha256(receipt.get("surfaceCallAccounting")) != content_sha256(accounting):
+                issues.append(f"{label} worker_receipt.surfaceCallAccounting does not match the current ledger")
+        elif "surfaceCallAccounting" in receipt:
+            issues.append(f"{label} worker_receipt claims a missing surface-call accounting artifact")
+    except DeckCompilerError as exc:
+        issues.append(f"{label} {exc}")
+    try:
+        package_audit = audit_job_package(root, job, work_dir)
+        if package_audit is not None:
+            if content_sha256(receipt.get("packageCorrespondence")) != content_sha256(package_audit):
+                issues.append(f"{label} worker_receipt.packageCorrespondence does not match the current package")
+        elif "packageCorrespondence" in receipt:
+            issues.append(f"{label} worker_receipt claims an unrequested package audit")
+    except DeckCompilerError as exc:
+        issues.append(f"{label} {exc}")
     if sorted(artifacts) != sorted(expected_artifacts):
         issues.append(f"{label} worker_receipt.artifacts must list every worker output")
     artifact_hashes = receipt.get("artifactHashes")

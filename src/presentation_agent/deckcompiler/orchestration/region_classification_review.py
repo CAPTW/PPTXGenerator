@@ -14,7 +14,9 @@ canvas_rgb_sha256; origin/method and reviewer {name, reviewed_at}; coverage
 (partial/complete); decisions [{collection, observation_id, role, reason}];
 and the four exact false AUTHORITY fields. Collections address text_blocks,
 suppressed_text or region_candidate_evidence.candidates. Roles are claims, not
-permitted actions. Omitted, mixed, uncertain and conflicting observations stay
+permitted actions. Opted-in text_alternative_evidence.observations and linked
+legacy assemblies always remain needs_review, regardless of a declared role.
+Omitted, mixed, uncertain and conflicting observations stay
 needs_review. A 'recorded' row only means its claim was transported intact.
 """
 from __future__ import annotations
@@ -29,7 +31,8 @@ from typing import Any
 
 from ..errors import DeckCompilerError
 from ..identity import content_sha256
-from .raw_measure_batch import validate_region_candidate_evidence
+from .raw_measure_batch import (validate_region_candidate_evidence,
+    validate_text_alternative_evidence, TEXT_ALTERNATIVE_COLLECTION)
 from .vector_preflight import _semantic_boxes
 
 
@@ -58,6 +61,7 @@ def bind_region_classification_review(
         inventory_ref = job["vector_preflight"]["measurement_inventory"]
         inventory = _json_object(_bound_path(root, inventory_ref, "measurement_inventory").read_bytes())
         validate_region_candidate_evidence(inventory, source, required=True)
+        validate_text_alternative_evidence(inventory, source)
         evidence = inventory["region_candidate_evidence"]
         frame = evidence["canvas_px"]
         if any(type(job["source_png"].get(key)) is not int or job["source_png"][key] != frame[axis]
@@ -117,6 +121,14 @@ def bind_region_classification_review(
             raise ValueError("complete coverage requires every source observation identity")
         conflicts, pending = _conflicts(observations, by_id)
         pending.update(missing)
+        alternative_evidence = inventory.get("text_alternative_evidence")
+        if alternative_evidence is not None:
+            unresolved_blocks = {row["block_id"] for row in alternative_evidence["legacy_assemblies"]}
+            unresolved = [key for key in observations if key[0] == TEXT_ALTERNATIVE_COLLECTION
+                or (key[0] in ("text_blocks", "suppressed_text") and key[1] in unresolved_blocks)]
+            pending.update(unresolved)
+            conflicts.extend({"reason": "unresolved_text_alternative_or_legacy_assembly", "observations": [_ref(key)]}
+                             for key in unresolved)
         return {
             "status": "STRUCTURALLY_BOUND_REVIEW",
             "review_artifact": {"path": path.resolve().relative_to(root).as_posix(),
@@ -150,6 +162,11 @@ def _observations(inventory: dict[str, Any]) -> dict[tuple[str, str], dict[str, 
             if key in result:
                 raise ValueError("duplicate source observation identity")
             result[key] = (row["measurement"] if collection == CANDIDATE_COLLECTION else row)["bbox_px"]
+    for row in inventory.get("text_alternative_evidence", {}).get("observations", []):
+        key = (TEXT_ALTERNATIVE_COLLECTION, row["observation_id"])
+        if key in result:
+            raise ValueError("duplicate text alternative identity")
+        result[key] = row["bbox_px"]
     return result
 
 

@@ -155,6 +155,7 @@ def accept_streaming_image(
     vector_backend: str = "easyocr",
     vector_deep: bool = True,
     preserve_region_candidates: bool = False,
+    preserve_text_alternatives: bool = False,
 ) -> StreamingImageAcceptanceResult:
     """Measure one result outside the state lock, then make its job ready."""
 
@@ -169,6 +170,7 @@ def accept_streaming_image(
         backend=vector_backend,
         deep=vector_deep,
         preserve_region_candidates=preserve_region_candidates,
+        preserve_text_alternatives=preserve_text_alternatives,
     )
     with _state_lock(root):
         return _accept_streaming_image_locked(
@@ -548,6 +550,9 @@ def _accepted_preflight_configuration(root: Path, state: dict[str, Any]) -> dict
             provenance = preflight["pipeline_provenance"]
             backend, deep = execution["backend"], execution["deep_scan"]
             capture = execution.get("preserve_region_candidates", False)
+            alternatives = execution.get("preserve_text_alternatives", False)
+            if type(alternatives) is not bool or (alternatives and backend != "easyocr"):
+                raise ValueError("accepted text alternative mode is invalid")
             executable, pipeline = execution["python_executable"], provenance["root"]
             if backend not in {"easyocr", "tesseract"} or type(deep) is not bool or type(capture) is not bool:
                 raise ValueError("accepted measurement backend/deep_scan is invalid")
@@ -567,14 +572,19 @@ def _accepted_preflight_configuration(root: Path, state: dict[str, Any]) -> dict
                 command.append("--deep")
             if capture:
                 command.append("--preserve-region-candidates")
+            if alternatives:
+                command.append("--preserve-text-alternatives")
             if (detector.get("slide_number") != slide or detector.get("exit_code") != 0
                 or detector.get("backend") != backend or type(detector.get("deep_scan")) is not bool
                 or detector["deep_scan"] != deep or detector.get("command") != command
                 or type(detector.get("preserve_region_candidates", False)) is not bool
-                or detector.get("preserve_region_candidates", False) != capture):
+                or detector.get("preserve_region_candidates", False) != capture
+                or type(detector.get("preserve_text_alternatives", False)) is not bool
+                or detector.get("preserve_text_alternatives", False) != alternatives):
                 raise ValueError("accepted measurement configuration disagrees with detector execution")
             selected = {"pipeline_root": Path(pipeline), "python_executable": executable,
-                        "backend": backend, "deep": deep, "preserve_region_candidates": capture}
+                        "backend": backend, "deep": deep, "preserve_region_candidates": capture,
+                        **({"preserve_text_alternatives": True} if alternatives else {})}
             if configuration is not None and selected != configuration:
                 raise ValueError("accepted slides use mixed measurement configurations")
             configuration = selected

@@ -21,7 +21,7 @@ class SignedRendererCompatibilityTests(unittest.TestCase):
  def test_exact_signed_bundle_and_explicit_v2_membership(self):
   self.assertEqual(capability.REVIEWED_BUNDLES.get(NEW),HASHES)
   self.assertEqual(api.PROFILE_PRODUCERS[api.PROFILE],(api.PRODUCER,))
-  self.assertEqual(api.PROFILE_PRODUCERS[api.GEOMETRY_PROFILE],(api.GEOMETRY_PRODUCER,NEW,'pngtopptx-pr6-text-preservation-v1','pngtopptx-pr6-optional-paragraph-loader-v1'))
+  self.assertEqual(api.PROFILE_PRODUCERS[api.GEOMETRY_PROFILE],(api.GEOMETRY_PRODUCER,NEW,'pngtopptx-pr6-text-preservation-v1','pngtopptx-pr6-optional-paragraph-loader-v1','pngtopptx-pr6-optional-paragraph-builtin-import-v1'))
  def test_pure_v2_accepts_projected_nonflipped_only_and_cross_version_rejects(self):
   p,m=geometry.fixture()
   result=api.inspect_package(geometry.base.package(p),m,slide=1,physical_index=1,canvas=(100,100),profile=api.GEOMETRY_PROFILE,producer_bundle=NEW)

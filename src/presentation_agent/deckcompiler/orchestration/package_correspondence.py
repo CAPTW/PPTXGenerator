@@ -34,12 +34,14 @@ PROFILE = 'direct-text-shape-raster-v1'
 PRODUCER = 'pngtopptx-pr1-pr6-source-refs-v1'
 GEOMETRY_PROFILE = 'direct-text-shape-raster-lines-v2'
 GEOMETRY_PRODUCER = 'pngtopptx-pr1-pr6-emitter-geometry-v1'
+SIGNED_LINE_PROFILE = 'direct-text-shape-raster-signed-lines-v3'
 # Exact whole-bundle compatibility, not expanded geometry qualification.
-# The signed-line renderer still marks signed transforms UNSUPPORTED; the
+# The v2 bundle family still leaves signed transforms UNSUPPORTED; the
 # unchanged v2 parser accepts only PROJECTED nonflipped records. The text
 # preparation bundle also requires its fourth helper module in capability binding.
 PROFILE_PRODUCERS = {PROFILE:(PRODUCER,), GEOMETRY_PROFILE:(GEOMETRY_PRODUCER,
-    'pngtopptx-pr6-signed-line-renderer-v1', 'pngtopptx-pr6-text-preservation-v1', dependency.BUNDLE, dependency.BUILTIN_IMPORT_BUNDLE)}
+    'pngtopptx-pr6-signed-line-renderer-v1', 'pngtopptx-pr6-text-preservation-v1', dependency.BUNDLE, dependency.BUILTIN_IMPORT_BUNDLE),
+    SIGNED_LINE_PROFILE:(dependency.PRESERVATION_BUNDLE,)}
 MAX_ARCHIVE_BYTES = 64 * 1024 * 1024
 MAX_EXPANDED_BYTES = 128 * 1024 * 1024
 MAX_MEMBER_BYTES = 16 * 1024 * 1024
@@ -320,6 +322,125 @@ def _qualified_geometry(obj, slide):
     return [transform[k] for k in ('x','y','cx','cy')]
 
 
+def _shortest_source_number(value):
+    """Bounded binary64 -> producer string check, not a general number codec.
+
+    ECMAScript chooses the shortest round-tripping decimal, then the nearest
+    decimal (even significand on a tie). At most 17 significant digits suffice
+    for finite binary64. Integer arithmetic avoids Python/JS formatting drift.
+    """
+    if type(value) is not float or not math.isfinite(value):raise ValueError('finite binary64 required')
+    if value==0:return '-0' if math.copysign(1,value)<0 else '0'
+    number=Fraction.from_float(abs(value))
+    power=lambda n:Fraction(10**n) if n>=0 else Fraction(1,10**(-n))
+    exponent=len(str(number.numerator))-len(str(number.denominator))
+    while number<power(exponent):exponent-=1
+    while number>=power(exponent+1):exponent+=1
+    for digits in range(1,18):
+        scale=power(exponent-digits+1);quotient=number/scale
+        lower=quotient.numerator//quotient.denominator;candidates=[]
+        for integer in (lower,lower+1):
+            if integer<=0:continue
+            decimal=integer*scale
+            try:matches=float(decimal)==abs(value)
+            except OverflowError:matches=False
+            if matches:candidates.append((abs(decimal-number),integer%2,integer))
+        if not candidates:continue
+        integer=min(candidates)[2];place=exponent-digits+1
+        while integer%10==0:integer//=10;place+=1
+        text=str(integer);decimal_exponent=len(text)+place-1
+        if -6<=decimal_exponent<21:
+            point=len(text)+place
+            text=('0.'+'0'*(-point)+text if point<=0 else
+                  text+'0'*(point-len(text)) if point>=len(text) else text[:point]+'.'+text[point:])
+        else:
+            text=text[0]+('.'+text[1:] if len(text)>1 else '')+'e'+('+' if decimal_exponent>=0 else '')+str(decimal_exponent)
+        return ('-' if value<0 else '')+text
+    raise ValueError('binary64 has no bounded round-trip representation')
+
+
+def _source_number(text):
+    if (type(text) is not str or len(text)>32
+            or not re.fullmatch(r'-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:e[+-]?[0-9]+)?',text)):
+        raise ValueError('invalid source binary64 encoding')
+    value=float(text)
+    if not math.isfinite(value) or _shortest_source_number(value)!=text:
+        raise ValueError('source number is not the exact canonical producer encoding')
+    return value
+
+
+def _fixed3(value):
+    """Number(binary64.toFixed(3)): magnitude ties up, including signed zero."""
+    if value==0:return 0.0
+    if abs(value)>=1e21:return value
+    scaled=Fraction.from_float(abs(value))*1000
+    integer,remainder=divmod(scaled.numerator,scaled.denominator)
+    integer+=2*remainder>=scaled.denominator
+    return math.copysign(float(Fraction(integer,1000)),value)
+
+
+def _round_nonnegative(value):
+    # Math.round ties toward +infinity. Do not emulate by adding 0.5: that
+    # extra binary64 operation rounds nextDown(0.5) incorrectly to one.
+    if not math.isfinite(value) or value<0:raise ValueError('nonnegative finite projection required')
+    numerator,denominator=value.as_integer_ratio();integer,remainder=divmod(numerator,denominator)
+    return integer+(2*remainder>=denominator)
+
+
+def _signed_projection(values, canvas):
+    x,y,w,h=values;x=x or 0.0;y=y or 0.0
+    if w<0:x+=w
+    if h<0:y+=h
+    normalized=(x,y,abs(w),abs(h));inches=[]
+    for i,value in enumerate(normalized):
+        scaled=value*(13.333 if i%2==0 else 7.5)/canvas[i%2]
+        if not math.isfinite(scaled):_fail('UNSUPPORTED_PROFILE','nonfinite signed projection')
+        inches.append(_fixed3(scaled))
+    if any(n<0 or n>=100 for n in inches) or min(inches[2:])<=0:
+        _fail('UNSUPPORTED_PROFILE','signed projection is outside qualified numeric geometry')
+    coords=[_round_nonnegative(n*914400) for n in inches]
+    return dict(zip(('x','y','cx','cy'),coords),flipH=w<0,flipV=h<0,rotation=0)
+
+
+def _qualified_signed_geometry(obj, slide, canvas):
+    """Recompute only internally sign-derived nonzero diagonals, never caller transforms."""
+    if obj.get('source')!='surface.ln' or obj.get('type')!='rule':
+        _fail('UNSUPPORTED_PROFILE','signed evidence is qualified only for native lines')
+    refs=obj.get('sourceRefs')
+    if (not isinstance(refs,dict) or refs.get('schemaVersion')!='slide-image-dual-render.source-refs.v1'
+            or type(refs.get('slide')) is not int or refs['slide']!=slide):
+        raise ValueError('signed geometry requires sourceRefs slide/schema')
+    evidence=obj['emitterGeometry']
+    _exact(evidence,{'schemaVersion','emitterVersion','units','status','reason','sourceNormalization','transform','sourceLine'},'signed emitter geometry')
+    if evidence['schemaVersion']!='slide-image-dual-render.emitter-geometry.v2' or evidence['emitterVersion']!='4.0.1':
+        _fail('UNSUPPORTED_PROFILE','unqualified signed schema/emitter')
+    if evidence['units']!='EMU' or evidence['sourceNormalization']!='safe-line-geom-v1':raise ValueError('invalid signed units/normalization')
+    if evidence['status']=='UNSUPPORTED':_fail('UNSUPPORTED_PROFILE','producer signed geometry is unsupported')
+    if evidence['status']!='PROJECTED' or evidence['reason'] is not None:raise ValueError('invalid signed status/reason')
+    source=evidence['sourceLine']
+    _exact(source,{'units','numberEncoding','qualifier','x','y','w','h'},'signed source line')
+    if (source['units']!='source-px' or source['numberEncoding']!='ecmascript-binary64-shortest-v1'
+            or source['qualifier']!='internal-sign-diagonal-v1'):raise ValueError('invalid signed source qualifier')
+    values=[_source_number(source[k]) for k in ('x','y','w','h')]
+    if values[2]==0 or values[3]==0 or not (values[2]<0 or values[3]<0):
+        _fail('UNSUPPORTED_PROFILE','signed profile requires a nonzero internally flipped diagonal')
+    if any(type(obj.get(k)) not in (int,float) or not math.isfinite(obj[k]) or obj[k]!=_fixed3(v)
+           for k,v in zip(('x','y','w','h'),values)):
+        raise ValueError('diagnostic source geometry does not match exact source values')
+    transform=evidence['transform']
+    _exact(transform,{'x','y','cx','cy','flipH','flipV','rotation'},'signed emitter transform')
+    if (any(type(transform[k]) is not int or not 0<=transform[k]<=91440000 for k in ('x','y','cx','cy'))
+            or transform['cx']==0 or transform['cy']==0 or type(transform['flipH']) is not bool
+            or type(transform['flipV']) is not bool or type(transform['rotation']) is not int):
+        raise ValueError('invalid exact signed EMU/flag types')
+    if transform['rotation']!=0:_fail('UNSUPPORTED_PROFILE','signed rotation is unsupported')
+    expected=_signed_projection(values,canvas)
+    if transform!=expected:_fail('CORRESPONDENCE_MISMATCH','signed source/emitter projection mismatch')
+    x,y,cx,cy=[transform[k] for k in ('x','y','cx','cy')];fh=transform['flipH'];fv=transform['flipV']
+    return [x,y,cx,cy],{'flipH':fh,'flipV':fv,'source_line_sha256':content_sha256(source),
+        'ordered_endpoints_emu':[[x+cx if fh else x,y+cy if fv else y],[x if fh else x+cx,y if fv else y+cy]]}
+
+
 def _paragraph_text(body):
     """Only direct a:p / a:r / a:t and direct a:br produce text in v1.
 
@@ -362,7 +483,7 @@ def inspect_package(raw, manifest, *, slide, physical_index, canvas, profile=PRO
         # Legacy pure callers may omit the v1 producer. V2 must explicitly
         # name its qualified bundle; the public job boundary rehashes the actual
         # whole bundle before calling this pure parser. A field alone is not it.
-        if ((profile==GEOMETRY_PROFILE or producer_bundle is not None)
+        if ((profile in (GEOMETRY_PROFILE,SIGNED_LINE_PROFILE) or producer_bundle is not None)
                 and producer_bundle not in PROFILE_PRODUCERS[profile]):
             _fail('UNSUPPORTED_PROFILE','package profile does not match its qualified producer bundle')
         if (type(slide) is not int or slide<=0 or type(physical_index) is not int or physical_index<=0
@@ -407,7 +528,11 @@ def inspect_package(raw, manifest, *, slide, physical_index, canvas, profile=PRO
         result=[]
         for index,(obj,shape) in enumerate(zip(expected,shapes)):
             if not isinstance(obj,dict):raise ValueError('manifest object must be an object')
-            if profile==GEOMETRY_PROFILE:
+            direction=None
+            if (profile==SIGNED_LINE_PROFILE and isinstance(obj.get('emitterGeometry'),dict)
+                    and obj['emitterGeometry'].get('schemaVersion')=='slide-image-dual-render.emitter-geometry.v2'):
+                geometry,direction=_qualified_signed_geometry(obj,slide,canvas)
+            elif profile in (GEOMETRY_PROFILE,SIGNED_LINE_PROFILE):
                 geometry=_qualified_geometry(obj,slide)
             else:
                 box=[obj[k] for k in ('x','y','w','h')]
@@ -416,13 +541,19 @@ def inspect_package(raw, manifest, *, slide, physical_index, canvas, profile=PRO
                 if box[2]<=0 or box[3]<=0:_fail('UNSUPPORTED_PROFILE','zero-extent boxes are unsupported')
                 geometry=[_emu(v,13.333 if i%2==0 else 7.5,canvas[i%2]) for i,v in enumerate(box)]
             transform=_one(shape,'p:spPr/a:xfrm')
-            if transform.attrib:_fail('UNSUPPORTED_PROFILE','rotated/flipped/transformed primitive is unsupported')
+            if direction is None:
+                if transform.attrib:_fail('UNSUPPORTED_PROFILE','rotated/flipped/transformed primitive is unsupported')
+            else:
+                if any(k not in ('flipH','flipV') or v!='1' for k,v in transform.attrib.items()):
+                    _fail('UNSUPPORTED_PROFILE','only internal true line flip attributes are qualified')
+                if transform.attrib!={k:'1' for k in ('flipH','flipV') if direction[k]}:
+                    _fail('CORRESPONDENCE_MISMATCH','serialized line direction mismatch')
             off=_one(transform,'a:off');ext=_one(transform,'a:ext')
             actual=[_integer(off.get(k)) for k in ('x','y')]+[_integer(ext.get(k)) for k in ('cx','cy')]
             if geometry!=actual:_fail('CORRESPONDENCE_MISMATCH',f'geometry mismatch at ordinal {index}')
             body=shape.find('p:txBody',NS)
             if body is not None:body=_one(shape,'p:txBody')
-            if obj.get('type') not in (('text','shape','panel','image','rule') if profile==GEOMETRY_PROFILE else ('text','shape','panel','image','icon')):_fail('UNSUPPORTED_PROFILE','unsupported manifest object type')
+            if obj.get('type') not in (('text','shape','panel','image','rule') if profile in (GEOMETRY_PROFILE,SIGNED_LINE_PROFILE) else ('text','shape','panel','image','icon')):_fail('UNSUPPORTED_PROFILE','unsupported manifest object type')
             kind='image' if shape.tag=='{'+P+'}pic' else 'text' if body is not None else 'shape'
             expected_kind='image' if obj['type'] in ('image','icon') else 'text' if obj['type']=='text' else 'shape'
             if kind!=expected_kind:_fail('CORRESPONDENCE_MISMATCH',f'native kind mismatch at ordinal {index}')
@@ -445,12 +576,13 @@ def inspect_package(raw, manifest, *, slide, physical_index, canvas, profile=PRO
                 if obj.get('imageFileSha256')!=content:_fail('CORRESPONDENCE_MISMATCH',f'image content mismatch at ordinal {index}')
             else:
                 presets={'surface.ell':'ellipse','surface.chev':'chevron','surface.rrect':'roundRect'}
-                if profile==GEOMETRY_PROFILE:presets['surface.ln']='line'
+                if profile in (GEOMETRY_PROFILE,SIGNED_LINE_PROFILE):presets['surface.ln']='line'
                 preset=presets.get(obj.get('source'))
                 if preset is None:_fail('UNSUPPORTED_PROFILE','unsupported native shape source')
                 if _one(shape,'p:spPr/a:prstGeom').get('prst')!=preset:_fail('CORRESPONDENCE_MISMATCH',f'shape preset mismatch at ordinal {index}')
             result.append({'manifest_pointer':f'/slides/{slide}/objects/{index}','manifest_row_sha256':content_sha256(obj),
-                'package_ordinal':index,'kind':kind,'geometry_emu':actual,**({'content_sha256':content} if content is not None else {})})
+                'package_ordinal':index,'kind':kind,'geometry_emu':actual,**({'content_sha256':content} if content is not None else {}),
+                **({'line_direction':direction} if direction is not None else {})})
         return {'schema_version':'1.0.0','profile':profile,'status':'CORRESPONDENCE_VERIFIED','representation_status':'NOT_ESTABLISHED',
             'authority':AUTHORITY.copy(),'source_slide_order':order,'source_slide':slide,'physical_slide_index':physical_index,'slide_part':part,
             'object_count':len(result),'objects':result}

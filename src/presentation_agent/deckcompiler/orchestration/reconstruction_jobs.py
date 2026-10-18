@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import math
 import re
 import struct
 from dataclasses import dataclass
@@ -1447,13 +1448,29 @@ def _validate_crops(
         name = str(crop.get("name", ""))
         if not name.startswith(f"s{slide}"):
             issues.append(f"slide {slide} worker crop names must be prefixed s{slide}")
-        if int(_number(crop.get("slide"), default=-1)) != slide:
-            issues.append(f"slide {slide} worker crop {name or index} has wrong slide")
-        values = {
-            key: _number(crop.get(key), default=-1) for key in ("x", "y", "w", "h")
-        }
+        try:
+            crop_slide = _number(crop.get("slide"), default=-1)
+        except OverflowError:
+            crop_slide = -1
         if (
-            any(value < 0 for value in values.values())
+            isinstance(crop.get("slide"), bool)
+            or not math.isfinite(crop_slide)
+            or crop_slide != slide
+        ):
+            issues.append(f"slide {slide} worker crop {name or index} has wrong slide")
+        try:
+            values = {
+                key: _number(crop.get(key), default=-1)
+                for key in ("x", "y", "w", "h")
+            }
+        except OverflowError:
+            issues.append(
+                f"slide {slide} worker crop {name or index} has invalid geometry"
+            )
+            continue
+        if (
+            any(isinstance(crop.get(key), bool) for key in values)
+            or any(not math.isfinite(value) or value < 0 for value in values.values())
             or values["w"] <= 0
             or values["h"] <= 0
         ):
@@ -1461,7 +1478,25 @@ def _validate_crops(
                 f"slide {slide} worker crop {name or index} has invalid geometry"
             )
             continue
-        area = values["w"] * values["h"]
+        # The official crop generator rounds each source-pixel value before
+        # cropping, then clamps right/bottom edges. Reject plans that would
+        # silently lose content or produce a zero-sized asset in that step.
+        pixels = {key: round(value) for key, value in values.items()}
+        if pixels["w"] <= 0 or pixels["h"] <= 0:
+            issues.append(
+                f"slide {slide} worker crop {name or index} has invalid rounded geometry"
+            )
+            continue
+        if any(
+            box["x"] + box["w"] > source["width"]
+            or box["y"] + box["h"] > source["height"]
+            for box in (values, pixels)
+        ):
+            issues.append(
+                f"slide {slide} worker crop {name or index} exceeds source canvas bounds"
+            )
+            continue
+        area = max(values["w"] * values["h"], pixels["w"] * pixels["h"])
         canvas_area = source["width"] * source["height"]
         if area / canvas_area > 0.45:
             issues.append(

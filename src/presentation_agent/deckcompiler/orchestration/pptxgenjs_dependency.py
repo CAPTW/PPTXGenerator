@@ -16,6 +16,7 @@ from .region_classification_review import _exact, _json_object
 
 BUNDLE = 'pngtopptx-pr6-optional-paragraph-loader-v1'
 BUILTIN_IMPORT_BUNDLE = 'pngtopptx-pr6-optional-paragraph-builtin-import-v1'
+PRESERVATION_BUNDLE = 'pngtopptx-pr6-local-preservation-combined-v1'
 PROFILE = 'pptxgenjs-4.0.1-paragraph-properties-v1'
 REQUEST_REL = Path('analysis/pptxgenjs_dependency.json')
 ORIGINAL_REL = Path('node_modules/pptxgenjs/dist/pptxgen.cjs.js')
@@ -42,6 +43,15 @@ REVIEWED_BUNDLES = {BUNDLE:REVIEWED_MODULES.copy(), BUILTIN_IMPORT_BUNDLE:{
     **REVIEWED_MODULES,
     'pptxgenjs_dependency.js':'0f15a0de0dead168308511d376e7c2d04a69eb7b9932f21e40c7f98311671ca8',
 }}
+# Combined local reviewed surfaces: default HTML freshness, default-off image
+# snapshots and signed-line provenance. Same exact loader/text helper. This is
+# whole-bundle compatibility, not an assertion that snapshotImages was enabled.
+REVIEWED_BUNDLES[PRESERVATION_BUNDLE] = {
+    **REVIEWED_BUNDLES[BUILTIN_IMPORT_BUNDLE],
+    'object_manifest.js':'19b09f7ad0c4abf0838ed2270e89e4e2c81914375aee2fdf19a5b5d265f2016a',
+    'atoms_pptx.js':'8a02470e8bcbfdb852f7d6f430ab2bfe83cd9c45c705ebb81d15b01956bf36f1',
+    'atoms_html.js':'9be458cbad2482392844b0e0cdf583a1c544d6dd23c8d304982ffcbf89b2b96e',
+}
 
 
 def _sha(raw):return hashlib.sha256(raw).hexdigest()

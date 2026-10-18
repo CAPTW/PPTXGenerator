@@ -35,9 +35,10 @@ GEOMETRY_PROFILE = 'direct-text-shape-raster-lines-v2'
 GEOMETRY_PRODUCER = 'pngtopptx-pr1-pr6-emitter-geometry-v1'
 # Exact whole-bundle compatibility, not expanded geometry qualification.
 # The signed-line renderer still marks signed transforms UNSUPPORTED; the
-# unchanged v2 parser accepts only PROJECTED nonflipped records from either.
+# unchanged v2 parser accepts only PROJECTED nonflipped records. The text
+# preparation bundle also requires its fourth helper module in capability binding.
 PROFILE_PRODUCERS = {PROFILE:(PRODUCER,), GEOMETRY_PROFILE:(GEOMETRY_PRODUCER,
-    'pngtopptx-pr6-signed-line-renderer-v1')}
+    'pngtopptx-pr6-signed-line-renderer-v1', 'pngtopptx-pr6-text-preservation-v1')}
 MAX_ARCHIVE_BYTES = 64 * 1024 * 1024
 MAX_EXPANDED_BYTES = 128 * 1024 * 1024
 MAX_MEMBER_BYTES = 16 * 1024 * 1024

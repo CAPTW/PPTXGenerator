@@ -47,6 +47,15 @@ REVIEWED_BUNDLES = {
         'atoms_pptx.js':'5e795a64a18b6fee1edf89320634d82c9ff40faee276a20971a59107ad9693fb',
         'atoms_html.js':'2e5179b6856303f5c77ba9aee5ea547125bd7b3d9cf28255533c2a4834dd0a3f',
     },
+    # PR6 9f9b250e9b0b753f017affff247edbba27d849f0 adds shared emitted-text
+    # preparation. All four members are required; the former three-module
+    # bundles do not attest this helper or the changed text preparation.
+    'pngtopptx-pr6-text-preservation-v1': {
+        'object_manifest.js':'f850cb73728cd1d3808a65506f4f00a9354d6f4897962b07895f6772b192a4a5',
+        'atoms_pptx.js':'666082f0949ad93c4052f2e26d8eea73de64ae5b22632b918069d681150a5b2e',
+        'atoms_html.js':'f8f5ff1f5d05cc13af0218635a9cbb8af738c2b2195741a68322235f9242fa66',
+        'text_content.js':'2637a8b0a6b70aaafd1e909486cd1eaa4e43d803697e773257e6973e0e20dd98',
+    },
 }
 MODULE_NAMES = ('object_manifest.js', 'atoms_pptx.js', 'atoms_html.js')
 AUTHORITY = {k: False for k in ('semantic_truth', 'text_removal', 'native_admission', 'vector_eligibility', 'quality_accepted')}
@@ -94,7 +103,21 @@ def bind_source_ref_authoring(root: Path, job: dict, work_dir: Path, renderer: d
             module = base / 'scripts' / 'lib' / name
             modules[name] = {'path': module.as_posix(), 'sha256': hashlib.sha256(_regular_bytes(module, base)).hexdigest()}
         observed = {name: data['sha256'] for name, data in modules.items()}
-        recognized = next((name for name, hashes in REVIEWED_BUNDLES.items() if observed == hashes), None)
+        recognized = None
+        for bundle_id, hashes in REVIEWED_BUNDLES.items():
+            if any(hashes.get(name) != digest for name, digest in observed.items()):
+                continue
+            # Only a matching core can select additional required dependencies.
+            # Legacy bundles keep their exact three-member descriptor; an extra
+            # local file is neither read nor attested on those old code paths.
+            complete = dict(modules)
+            for name in hashes:
+                if name not in complete:
+                    module = base / 'scripts' / 'lib' / name
+                    complete[name] = {'path': module.as_posix(), 'sha256': hashlib.sha256(_regular_bytes(module, base)).hexdigest()}
+            if {name: data['sha256'] for name, data in complete.items()} == hashes:
+                recognized, modules = bundle_id, complete
+                break
         if recognized is None:
             raise ValueError('installed renderer does not match a whole reviewed sourceRefs bundle')
         return {

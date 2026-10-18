@@ -18,10 +18,10 @@ HASHES={'object_manifest.js':'f850cb73728cd1d3808a65506f4f00a9354d6f4897962b0789
  'atoms_html.js':'2e5179b6856303f5c77ba9aee5ea547125bd7b3d9cf28255533c2a4834dd0a3f'}
 
 class SignedRendererCompatibilityTests(unittest.TestCase):
- def test_exact_new_bundle_and_explicit_two_bundle_v2_membership(self):
+ def test_exact_signed_bundle_and_explicit_v2_membership(self):
   self.assertEqual(capability.REVIEWED_BUNDLES.get(NEW),HASHES)
   self.assertEqual(api.PROFILE_PRODUCERS[api.PROFILE],(api.PRODUCER,))
-  self.assertEqual(api.PROFILE_PRODUCERS[api.GEOMETRY_PROFILE],(api.GEOMETRY_PRODUCER,NEW))
+  self.assertEqual(api.PROFILE_PRODUCERS[api.GEOMETRY_PROFILE],(api.GEOMETRY_PRODUCER,NEW,'pngtopptx-pr6-text-preservation-v1'))
  def test_pure_v2_accepts_projected_nonflipped_only_and_cross_version_rejects(self):
   p,m=geometry.fixture()
   result=api.inspect_package(geometry.base.package(p),m,slide=1,physical_index=1,canvas=(100,100),profile=api.GEOMETRY_PROFILE,producer_bundle=NEW)

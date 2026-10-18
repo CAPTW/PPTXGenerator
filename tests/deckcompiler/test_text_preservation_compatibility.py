@@ -36,7 +36,7 @@ class TextPreservationCompatibilityTests(unittest.TestCase):
  def test_versioned_four_member_registry_and_v2_only_tuple(self):
   self.assertEqual(cap.REVIEWED_BUNDLES.get(NEW),HASHES)
   self.assertEqual(audit.PROFILE_PRODUCERS[audit.PROFILE],(audit.PRODUCER,))
-  self.assertEqual(audit.PROFILE_PRODUCERS[audit.GEOMETRY_PROFILE],(audit.GEOMETRY_PRODUCER,OLD,NEW))
+  self.assertEqual(audit.PROFILE_PRODUCERS[audit.GEOMETRY_PROFILE],(audit.GEOMETRY_PRODUCER,OLD,NEW,'pngtopptx-pr6-optional-paragraph-loader-v1'))
  def test_four_member_job_binding_and_repeat_identity(self):
   f,lib,hashes=self.fixture();row=f.build();bound=row['job']['source_ref_authoring']['renderer_capability']
   self.assertEqual(bound['bundle_id'],NEW);self.assertEqual(set(bound['modules']),set(HASHES))

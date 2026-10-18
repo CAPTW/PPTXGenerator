@@ -27,6 +27,7 @@ from ..errors import DeckCompilerError
 from ..identity import content_sha256
 from .region_classification_review import _exact, _json_object
 from .source_ref_authoring import AUTHORITY, bind_source_ref_authoring
+from . import pptxgenjs_dependency as dependency
 
 REQUEST_NAME = 'package_correspondence.json'
 PROFILE = 'direct-text-shape-raster-v1'
@@ -38,7 +39,7 @@ GEOMETRY_PRODUCER = 'pngtopptx-pr1-pr6-emitter-geometry-v1'
 # unchanged v2 parser accepts only PROJECTED nonflipped records. The text
 # preparation bundle also requires its fourth helper module in capability binding.
 PROFILE_PRODUCERS = {PROFILE:(PRODUCER,), GEOMETRY_PROFILE:(GEOMETRY_PRODUCER,
-    'pngtopptx-pr6-signed-line-renderer-v1', 'pngtopptx-pr6-text-preservation-v1')}
+    'pngtopptx-pr6-signed-line-renderer-v1', 'pngtopptx-pr6-text-preservation-v1', dependency.BUNDLE)}
 MAX_ARCHIVE_BYTES = 64 * 1024 * 1024
 MAX_EXPANDED_BYTES = 128 * 1024 * 1024
 MAX_MEMBER_BYTES = 16 * 1024 * 1024
@@ -461,23 +462,36 @@ def inspect_package(raw, manifest, *, slide, physical_index, canvas, profile=PRO
 def audit_job_package(root, job, work_dir):
     """Recompute before receipt write and again at public completion. No writes."""
     requested=bind_package_correspondence(root,job,work_dir)
-    if requested is None:
+    capability=job.get('source_ref_authoring',{}).get('renderer_capability',{})
+    dependency_active=capability.get('bundle_id')==dependency.BUNDLE or dependency.request_present(root)
+    if requested is None and not dependency_active:
         if 'package_correspondence' in job:_fail('INVALID_INPUT','bound package audit request is missing')
         return None
     try:
-        if content_sha256(requested)!=content_sha256(job.get('package_correspondence')):raise ValueError('stale package audit request binding')
-        capability=job['source_ref_authoring']['renderer_capability'];skill=capability['skill']
+        if requested is None and 'package_correspondence' in job:raise ValueError('bound package audit request is missing')
+        if requested is not None and content_sha256(requested)!=content_sha256(job.get('package_correspondence')):raise ValueError('stale package audit request binding')
+        skill=capability['skill']
         current=bind_source_ref_authoring(root,job,work_dir,{'skill_path':skill['path'],'sha256':skill['sha256']})
         if content_sha256(current)!=content_sha256(job['source_ref_authoring']):raise ValueError('stale producer capability')
+        dependency_result=None
+        if dependency_active:
+            if capability.get('bundle_id')!=dependency.BUNDLE:raise ValueError('unbound optional dependency profile')
+            dependency_result=dependency.validate_dependency_completion(root,capability)
+        # This mandatory dependency check also runs without a package-audit request.
+        if requested is None:return None
         project=root/'pngtopptx-project';native_path=project/'out/native_object_manifest.json';trace_path=project/'out/render_trace.json'
-        native_raw=_local(native_path,root,MAX_MEMBER_BYTES);trace_raw=_local(trace_path,root,MAX_MEMBER_BYTES)
-        native,trace=_json_object(native_raw),_json_object(trace_raw)
+        if dependency_result is not None:
+            native_raw,trace_raw=dependency_result['native_raw'],dependency_result['trace_raw']
+            native,trace=dependency_result['native'],dependency_result['trace']
+        else:
+            native_raw=_local(native_path,root,MAX_MEMBER_BYTES);trace_raw=_local(trace_path,root,MAX_MEMBER_BYTES)
+            native,trace=_json_object(native_raw),_json_object(trace_raw)
         metadata_path=work_dir/'visual_qa/pptx_raster_metadata.json';metadata_raw=_local(metadata_path,root,MAX_MEMBER_BYTES);metadata=_json_object(metadata_raw)
         path=Path(metadata['pptx']);raw=_local(path,project,MAX_ARCHIVE_BYTES)
         if metadata['pptxSha256']!=_sha(raw) or metadata.get('diagnosticOnly') is not True or metadata.get('modifiedPptx') is not False:raise ValueError('invalid package metadata digest/diagnostic flags')
         source_slide=metadata.get('sourceSlideId',metadata.get('slide'))
         if type(source_slide) is not int or source_slide!=job['slide_number'] or metadata.get('mappingMode')!='source-slides-sequential':raise ValueError('invalid package source mapping')
-        build=trace['build'];canvas=job['source_png']
+        build=dependency_result['build'] if dependency_result is not None else trace['build'];canvas=job['source_png']
         if (build['htmlQaStaticMode']['expectedSlideSize']!={'width':canvas['width'],'height':canvas['height']}
                 or trace['projectRoot']!=str(project) or build['projectRoot']!=str(project)
                 or trace['pptxOut']!=str(path) or trace['generated']['pptx']!=str(path) or build['outputs']['pptx']!=str(path)
@@ -498,6 +512,7 @@ def audit_job_package(root, job, work_dir):
             'producer_bundle':requested['producer_bundle'],'renderer_capability_sha256':content_sha256(capability),
             'package_path':path.relative_to(root).as_posix(),'package_sha256':_sha(raw),'native_manifest_sha256':_sha(native_raw),
             'render_trace_sha256':_sha(trace_raw),'raster_metadata_sha256':_sha(metadata_raw),'integrated_slides_sha256':_sha(integrated)}
+        if dependency_result is not None:result['bindings'].update(dependency_result['bindings'])
         return result
     except DeckCompilerError:raise
     except (OSError,ValueError,TypeError,KeyError) as exc:_fail('INVALID_INPUT',str(exc))

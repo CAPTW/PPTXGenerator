@@ -14,6 +14,7 @@ from pathlib import Path
 
 from ..errors import DeckCompilerError
 from .region_classification_review import _exact, _json_object
+from . import pptxgenjs_dependency as dependency
 
 REQUEST_NAME = 'source_ref_authoring.json'
 RECOGNITION_VERSION = 'reviewed-source-refs-bundles-v1'
@@ -57,6 +58,7 @@ REVIEWED_BUNDLES = {
         'text_content.js':'2637a8b0a6b70aaafd1e909486cd1eaa4e43d803697e773257e6973e0e20dd98',
     },
 }
+REVIEWED_BUNDLES[dependency.BUNDLE] = dependency.REVIEWED_MODULES.copy()
 MODULE_NAMES = ('object_manifest.js', 'atoms_pptx.js', 'atoms_html.js')
 AUTHORITY = {k: False for k in ('semantic_truth', 'text_removal', 'native_admission', 'vector_eligibility', 'quality_accepted')}
 
@@ -80,6 +82,9 @@ def _regular_bytes(path: Path, anchor: Path) -> bytes:
 def bind_source_ref_authoring(root: Path, job: dict, work_dir: Path, renderer: dict) -> dict | None:
     path = work_dir / REQUEST_NAME
     if not path.exists() and not path.is_symlink():
+        if dependency.request_present(root):
+            raise DeckCompilerError(code='DC_SOURCE_REF_AUTHORING_INVALID', stage='reconstruction_job_preparation',
+                message='dependency profile requires a bound source-ref authoring request', artifact_path=path.as_posix())
         return None
     try:
         raw = _regular_bytes(path, root.resolve())
@@ -113,18 +118,23 @@ def bind_source_ref_authoring(root: Path, job: dict, work_dir: Path, renderer: d
             complete = dict(modules)
             for name in hashes:
                 if name not in complete:
-                    module = base / 'scripts' / 'lib' / name
+                    module = base / dependency.MODULE_PATHS[name] if bundle_id == dependency.BUNDLE else base / 'scripts' / 'lib' / name
                     complete[name] = {'path': module.as_posix(), 'sha256': hashlib.sha256(_regular_bytes(module, base)).hexdigest()}
             if {name: data['sha256'] for name, data in complete.items()} == hashes:
                 recognized, modules = bundle_id, complete
                 break
         if recognized is None:
             raise ValueError('installed renderer does not match a whole reviewed sourceRefs bundle')
+        dependency_binding = {}
+        if recognized == dependency.BUNDLE:
+            dependency_binding['pptxgenjs_dependency'] = dependency.bind_dependency(root, modules)
+        elif dependency.request_present(root):
+            raise ValueError('dependency profile requires the exact optional-loader bundle')
         return {
             'schema_version':'1.0.0', 'request':{'path':path.relative_to(root.resolve()).as_posix(), 'sha256':hashlib.sha256(raw).hexdigest()},
             'renderer_capability':{'recognition_version':RECOGNITION_VERSION, 'bundle_id':recognized,
                 'meaning':'reviewed-byte-compatibility-not-signed-or-runtime-attestation',
-                'skill':{'path':skill.as_posix(), 'sha256':skill_sha}, 'modules':modules},
+                'skill':{'path':skill.as_posix(), 'sha256':skill_sha}, 'modules':modules, **dependency_binding},
             'post_render_requirement':'at_least_one_valid_tagged_surface_row',
             'empty_observation_scope':'unsupported', 'authority':AUTHORITY.copy(),
         }

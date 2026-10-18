@@ -18,7 +18,8 @@ from .image_requests import REQUEST_MANIFEST_NAME, validate_image_request_bundle
 from .skillset_plan import validate_skillset_execution_plan
 from .semantic_geometry_binding import bind_semantic_geometry
 from .region_classification_review import bind_region_classification_review
-from .surface_call_accounting import ACCOUNTING_NAME, validate_surface_call_accounting
+from .surface_call_accounting import ACCOUNTING_NAME
+from .source_ref_derivation import validate_source_ref_accounting
 from .vector_preflight import (
     MANIFEST_NAME as VECTOR_PREFLIGHT_MANIFEST_NAME,
     POLICY_ID as VECTOR_PREFLIGHT_POLICY_ID,
@@ -1217,7 +1218,7 @@ def _validate_worker_outputs(
         artifacts = []
     expected_artifacts = [name for name in required if name != "worker_receipt.json"]
     try:
-        accounting = validate_surface_call_accounting(root, job, work_dir)
+        accounting = validate_source_ref_accounting(root, job, work_dir)
         if accounting is not None:
             expected_artifacts.append(ACCOUNTING_NAME)
             if content_sha256(receipt.get("surfaceCallAccounting")) != content_sha256(accounting):

@@ -54,8 +54,20 @@ def validate_surface_call_accounting(
     if not path.exists() and not path.is_symlink():
         return None
     try:
+        data = _local_bytes(root.resolve(), path)
+    except (OSError, ValueError) as exc:
+        raise DeckCompilerError(
+            code="DC_SURFACE_CALL_ACCOUNTING_INVALID", stage="reconstruction_completion",
+            message=f"surface-call accounting is invalid: {exc}", artifact_path=path.as_posix(),
+        ) from exc
+    return _validate_surface_call_accounting_data(root, job, work_dir, data)
+
+
+def _validate_surface_call_accounting_data(root, job, work_dir, data):
+    """Use the unchanged consumer checks before derived bytes are materialized."""
+    path = work_dir / ACCOUNTING_NAME
+    try:
         root = root.resolve()
-        data = _local_bytes(root, path)
         ledger = _json_object(data)
         review = bind_region_classification_review(root, job, work_dir)
         if review is None or content_sha256(review) != content_sha256(job.get("region_classification_review")):

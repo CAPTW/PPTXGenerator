@@ -12,7 +12,10 @@ from typing import Any
 from ..errors import DeckCompilerError
 from ..manifest_io import read_json, write_json
 from .quality_acceptance import evaluate_visual_quality_acceptance
-from .surface_call_accounting import ACCOUNTING_NAME, validate_surface_call_accounting
+from .surface_call_accounting import ACCOUNTING_NAME
+from .source_ref_derivation import (
+    prepare_surface_call_accounting, source_ref_accounting_transaction, write_source_ref_receipt,
+)
 from .reconstruction_jobs import (
     JOB_MANIFEST_NAME,
     PROJECT_DIRECTORY,
@@ -45,7 +48,11 @@ def finalize_shared_render_qa(
     summary_path: Path,
 ) -> SharedRenderQAResult:
     """Materialize final job QA only from accepted shared-render evidence."""
+    with source_ref_accounting_transaction(runtime_root, JOB_MANIFEST_NAME):
+        return _finalize_shared_render_qa(runtime_root, summary_path=summary_path)
 
+
+def _finalize_shared_render_qa(runtime_root: Path, *, summary_path: Path) -> SharedRenderQAResult:
     root = runtime_root.resolve()
     project = root / PROJECT_DIRECTORY
     summary = summary_path.resolve()
@@ -115,7 +122,7 @@ def finalize_shared_render_qa(
         job_path = _artifact_path(root, manifest_row.get("job"), f"slide {slide} job")
         job = _read_object(job_path, f"slide {slide} job")
         work_dir = job_path.parent
-        accounting = validate_surface_call_accounting(root, job, work_dir)
+        accounting = prepare_surface_call_accounting(root, job, work_dir)
         visual_dir = work_dir / "visual_qa"
         metrics_path = visual_dir / "visual_metrics.json"
         metrics = _read_object(metrics_path, f"slide {slide} visual metrics")
@@ -264,7 +271,7 @@ def finalize_shared_render_qa(
                 f"slide {slide} cannot close receipt; missing {missing}",
                 work_dir,
             )
-        receipt_path = write_json(
+        receipt_path = write_source_ref_receipt(
             work_dir / "worker_receipt.json",
             {
                 "slide": slide,

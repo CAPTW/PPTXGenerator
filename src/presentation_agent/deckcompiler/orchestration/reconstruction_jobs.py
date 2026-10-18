@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import math
 import re
 import struct
@@ -642,6 +643,22 @@ def _worker_prompt(root: Path, work_dir: Path, job: dict[str, Any]) -> str:
     profile = job["execution_profile"]
     authoring = "\n".join(f"- `{name}`" for name in job["authoring_outputs"])
     post_render = "\n".join(f"- `{name}`" for name in job["post_render_outputs"])
+    preflight = job["vector_preflight"]
+    binding = job["receipt_binding"]
+    vector_usage_starter = json.dumps(
+        {
+            "slide": slide,
+            "policyId": preflight["policy_id"],
+            "vectorPreflightSha256": binding["vector_preflight_sha256"],
+            "vectorSlideContentHash": binding["vector_slide_content_hash"],
+            "measurementInventorySha256": preflight["measurement_inventory"]["sha256"],
+            "measuredCoordinatesAuthoritative": True,
+            "usedRegions": [],
+            "deferredRegions": [],
+            "parametricIconUses": [],
+        },
+        indent=2,
+    )
     candidate_instruction = ""
     inventory = read_json(root / job["vector_preflight"]["measurement_inventory"]["path"])
     if "region_candidate_evidence" in inventory:
@@ -714,13 +731,35 @@ erase masks, style approval, native admission, or visual-quality approval.
 Treat `vector_preflight.measurement_inventory` as authoritative geometry. Do
 not spend model tokens re-measuring detected regions. Use each passed
 `bounded_svg_asset` directly when it preserves the intended editable structure;
-record every used or deliberately deferred measured region in
+record each approved bounded SVG region's use or deliberate deferral in
 `vector_usage.json`. The hash-bound raw `parametric_icon_library` may replace a
 measured simple icon only when one of its declared names is an exact semantic
 match; record that decision in `parametricIconUses`. Never convert semantic
 text, a continuous-tone region, or the complete slide to SVG. The measured
 assets are inputs to the official SkillSet reconstruction, not an alternate
 renderer.{candidate_instruction}
+
+Write `vector_usage.json` with the exact job-bound fields below. The arrays are
+initial values, not completed region decisions; populate them from actual work.
+Keep all three arrays present, including when empty:
+
+```json
+{vector_usage_starter}
+```
+
+Account for every `vector_preflight.regions` entry whose `disposition` is
+`bounded_svg_asset` exactly once across `usedRegions` and `deferredRegions`.
+Each used row needs `regionId` and `assetSha256` equal to that region's
+`vector_svg.sha256`. Each deferred row needs `regionId` and a concrete `reason`
+of at least 8 characters after trimming surrounding whitespace. Do not put other
+regions in these two arrays or duplicate a decision. Both arrays stay empty only when
+there are no approved bounded SVG regions.
+Each `parametricIconUses` row needs `name`, `regionId`, and a `color` in
+`#RRGGBB` form. Use a name in `available_parametric_icon_names` and an existing
+measured region with no `semantic_text_overlap_ids`, `area_ratio` at most 0.35,
+and `kind_hint` other than `photo`. Do not repeat a parametric icon region.
+Parametric icon reporting does not replace the used/deferred decision for an
+approved bounded SVG region. Leave `parametricIconUses` empty when none is used.
 
 Write every renderer icon requested by the fragment to `icon_usage.json` using
 schemaVersion `slide-image-dual-render.icon-usage.v1` and explicit
@@ -756,9 +795,13 @@ exception, or an image-led slide needs the canonical total-crop exception, recor
 it in `profile_override.json.exceptions` with a specific `reason`; do not invent
 exceptions to bypass visual fidelity, editability, largest-crop, text/table-crop,
 or dense-infographic limits.
-The integrator alone will merge accepted fragments into shared files. Complete
-the authoring outputs below as soon as this job arrives, then stop. Do not run an
-isolated one-slide PPTX/HTML build: the workflow renders the integrated deck and
+The integrator alone will merge accepted fragments into shared files. Write
+`s{slide}.fragment.js` with exactly one `function s{slide}(s)` using the shared kit.
+Do not use `require(...)` in the fragment, including for `profile_override.json`
+or helper modules. Read needed profile values while authoring and inline those
+values instead of loading that JSON at runtime.
+Complete the authoring outputs below as soon as this job arrives, then stop. Do
+not run an isolated one-slide PPTX/HTML build: the workflow renders the integrated deck and
 reuses its source-mapped slide pages for per-slide PPTX and HTML QA, avoiding
 twenty duplicate builds without relaxing fidelity or editability checks.
 

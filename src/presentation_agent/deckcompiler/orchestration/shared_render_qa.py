@@ -12,6 +12,7 @@ from typing import Any
 from ..errors import DeckCompilerError
 from ..manifest_io import read_json, write_json
 from .quality_acceptance import evaluate_visual_quality_acceptance
+from .surface_call_accounting import ACCOUNTING_NAME, validate_surface_call_accounting
 from .reconstruction_jobs import (
     JOB_MANIFEST_NAME,
     PROJECT_DIRECTORY,
@@ -114,6 +115,7 @@ def finalize_shared_render_qa(
         job_path = _artifact_path(root, manifest_row.get("job"), f"slide {slide} job")
         job = _read_object(job_path, f"slide {slide} job")
         work_dir = job_path.parent
+        accounting = validate_surface_call_accounting(root, job, work_dir)
         visual_dir = work_dir / "visual_qa"
         metrics_path = visual_dir / "visual_metrics.json"
         metrics = _read_object(metrics_path, f"slide {slide} visual metrics")
@@ -249,6 +251,8 @@ def finalize_shared_render_qa(
         expected_artifacts = [
             name for name in job["required_outputs"] if name != "worker_receipt.json"
         ]
+        if accounting is not None:
+            expected_artifacts.append(ACCOUNTING_NAME)
         produced = {
             name: work_dir / name
             for name in expected_artifacts
@@ -289,6 +293,7 @@ def finalize_shared_render_qa(
                 "reconstructionScore": _relative(project, score_path),
                 "qaResult": _relative(project, qa_result_path),
                 "qaReport": _relative(project, report_path),
+                **({"surfaceCallAccounting": accounting} if accounting is not None else {}),
                 **(
                     {"workerExecution": read_json(work_dir / "worker_execution.json")}
                     if job["execution_profile"]["profile_name"] == "native-inherited-xhigh"

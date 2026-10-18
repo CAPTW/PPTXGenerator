@@ -18,6 +18,7 @@ from .image_requests import REQUEST_MANIFEST_NAME, validate_image_request_bundle
 from .skillset_plan import validate_skillset_execution_plan
 from .semantic_geometry_binding import bind_semantic_geometry
 from .region_classification_review import bind_region_classification_review
+from .surface_call_accounting import ACCOUNTING_NAME, validate_surface_call_accounting
 from .vector_preflight import (
     MANIFEST_NAME as VECTOR_PREFLIGHT_MANIFEST_NAME,
     POLICY_ID as VECTOR_PREFLIGHT_POLICY_ID,
@@ -1215,6 +1216,16 @@ def _validate_worker_outputs(
         issues.append(f"{label} worker_receipt.artifacts must be an array")
         artifacts = []
     expected_artifacts = [name for name in required if name != "worker_receipt.json"]
+    try:
+        accounting = validate_surface_call_accounting(root, job, work_dir)
+        if accounting is not None:
+            expected_artifacts.append(ACCOUNTING_NAME)
+            if content_sha256(receipt.get("surfaceCallAccounting")) != content_sha256(accounting):
+                issues.append(f"{label} worker_receipt.surfaceCallAccounting does not match the current ledger")
+        elif "surfaceCallAccounting" in receipt:
+            issues.append(f"{label} worker_receipt claims a missing surface-call accounting artifact")
+    except DeckCompilerError as exc:
+        issues.append(f"{label} {exc}")
     if sorted(artifacts) != sorted(expected_artifacts):
         issues.append(f"{label} worker_receipt.artifacts must list every worker output")
     artifact_hashes = receipt.get("artifactHashes")

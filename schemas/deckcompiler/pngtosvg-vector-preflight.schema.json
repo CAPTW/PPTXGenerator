@@ -24,7 +24,7 @@
   ],
   "properties": {
     "schema_name": {"const": "pngtosvg_vector_preflight"},
-    "schema_version": {"const": "1.0.0"},
+    "schema_version": {"const": "1.1.0"},
     "workflow_id": {"type": "string", "pattern": "^generate_[0-9a-f]{20}$"},
     "policy_id": {"const": "raw-measured-bounded-vector-v1"},
     "status": {"const": "READY"},

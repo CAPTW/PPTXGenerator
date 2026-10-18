@@ -1514,11 +1514,15 @@ def _validate_crops(
     else:
         issues.append(f"slide {slide} worker crop_plan.json must contain crops")
         return
+    seen_names: set[str] = set()
     for index, crop in enumerate(crops):
         if not isinstance(crop, dict):
             issues.append(f"slide {slide} worker crop {index} must be an object")
             continue
         name = str(crop.get("name", ""))
+        if name in seen_names:
+            issues.append(f"slide {slide} worker crop plan has duplicate crop name {name}")
+        seen_names.add(name)
         if not name.startswith(f"s{slide}"):
             issues.append(f"slide {slide} worker crop names must be prefixed s{slide}")
         try:

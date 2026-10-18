@@ -40,6 +40,55 @@ class ReconstructionCropContractTests(unittest.TestCase):
             _validate_crops(payload, 1, {"width": 1600, "height": 900}, issues)
             self.assertEqual(issues, [])
 
+    def test_duplicate_crop_names_rejected_after_mapping_normalization(self):
+        first = self.crop(name="s1_first")
+        duplicate = self.crop(name="s1_first", x=1300, y=650)
+        for payload in (
+            {"crops": [first, duplicate]},
+            {"crops": {"slot_one": first, "slot_two": duplicate}},
+            {"slot_one": first, "slot_two": duplicate},
+        ):
+            with self.subTest(payload=payload):
+                issues = []
+                _validate_crops(payload, 1, {"width": 1600, "height": 900}, issues)
+                self.assertEqual(issues, ["slide 1 worker crop plan has duplicate crop name s1_first"])
+
+    def test_public_gates_reject_duplicate_crop_names_and_preserve_unique_controls(self):
+        from test_general_generate_workflow import GeneralGenerateWorkflowTests
+
+        fixture = GeneralGenerateWorkflowTests()
+        with tempfile.TemporaryDirectory() as directory:
+            runtime = Path(directory) / "runtime"
+            started = fixture._start(runtime)
+            fixture._build_run_draft(
+                runtime, workflow_id=started.workflow_id, slide_count=1,
+                status="COMPLETED", qa_status="PASS", fail_count=0, blocking_count=0,
+            )
+            work = runtime / "pngtopptx-project/work/slide01"
+            crop_path = work / "crop_plan.json"
+            receipt_path = work / "worker_receipt.json"
+            first = self.crop(name="s1_first")
+            second = self.crop(name="s1_second", x=1300, y=650)
+            duplicate = {**second, "name": "s1_first"}
+            for payload, valid in (
+                ({"crops": [first, second]}, True),
+                ({"crops": [first, duplicate]}, False),
+                ({"crops": {"slot_one": first, "slot_two": second}}, True),
+                ({"crops": {"slot_one": first, "slot_two": duplicate}}, False),
+                ({"crops": {}}, True),
+                ({"crops": []}, True),
+            ):
+                write_json(crop_path, payload)
+                receipt = read_json(receipt_path)
+                receipt["artifactHashes"]["crop_plan.json"] = fixture._sha256(crop_path)
+                write_json(receipt_path, receipt)
+                for flag in ("require_authoring_outputs", "require_worker_outputs"):
+                    with self.subTest(payload=payload, gate=flag):
+                        report = validate_reconstruction_job_bundle(runtime, **{flag: True})
+                        self.assertEqual(report["valid"], valid, report)
+                        if not valid:
+                            self.assertTrue(any("duplicate crop name" in issue for issue in report["issues"]), report)
+
     def test_named_crop_mapping_entries_cannot_be_silently_discarded(self):
         for value in (None, "not a crop", 17, False, []):
             for wrapped in (False, True):
